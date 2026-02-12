@@ -17,10 +17,11 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 | Skill名 | 説明 | バージョン | 主な機能 |
 |---------|------|-----------|---------|
 | [skill-writing-guide](skill-writing-guide/) | Skill執筆ガイド | 1.0.0 | ベストプラクティス、構造化手法、文章作成支援 |
-| [skill-quality-validation](skill-quality-validation/) | 55項目品質検証 | 2.0.0 | 自動品質チェック、スコアリング、改善提案 |
+| [skill-quality-validation](skill-quality-validation/) | 64項目品質検証 | 2.0.0 | 自動品質チェック、スコアリング、改善提案 |
 | [skill-template-generator](skill-template-generator/) | テンプレート自動生成 | 1.0.0 | SKILL.md/SKILL.ja.md雛形生成、構造作成 |
 | [skill-revision-guide](skill-revision-guide/) | 修正・バージョン管理 | 1.0.0 | 変更管理、CHANGELOG、英日同期支援 |
 | [skill-git-japanese-practices](skill-git-japanese-practices/) | Git日本語プラクティス | 1.0.0 | Conventional Commits、GitHubフロー、原子的コミット、コードレビュー |
+| [skill-git-initial-setup](skill-git-initial-setup/) | git初期セットアップ | 1.2.0 | git init/clone初期保護、GitHub保護ルール、フック設定 |
 
 ## 🔧 依存関係
 
@@ -53,7 +54,7 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 
 ### 2. skill-quality-validation
 
-**55項目の品質検証システム**
+**64項目の品質検証システム**
 
 - 構造の完全性チェック（15項目）
 - 内容の品質評価（20項目）
@@ -127,6 +128,21 @@ python ~/.copilot/skills/skill-template-generator/scripts/generate_template.py
 
 詳細: [skill-git-japanese-practices/SKILL.md](skill-git-japanese-practices/SKILL.md) | [日本語版](skill-git-japanese-practices/references/SKILL.ja.md)
 
+### 6. skill-git-initial-setup
+
+**git init/clone時のmain保護デフォルト設定ガイド**
+
+- GitHubブランチ保護ルールの設定
+- pre-commit/pre-pushフックの導入
+- core.hooksPath / init.templateDir の初期設定
+
+**使い方**:
+```
+@workspace /skill-git-initial-setup git init/clone時の保護を標準化したい
+```
+
+詳細: [skill-git-initial-setup/SKILL.md](skill-git-initial-setup/SKILL.md) | [日本語版](skill-git-initial-setup/references/SKILL.ja.md)
+
 ## 🚀 ワークフロー例
 
 ### 新しいSkillを作成する場合
@@ -134,7 +150,7 @@ python ~/.copilot/skills/skill-template-generator/scripts/generate_template.py
 1. **テンプレート生成** - `skill-template-generator`で雛形作成
 2. **執筆ガイド参照** - `skill-writing-guide`でベストプラクティス確認
 3. **内容作成** - 実際のSkill内容を記述
-4. **品質検証** - `skill-quality-validation`で55項目チェック
+4. **品質検証** - `skill-quality-validation`で64項目チェック
 5. **改善反映** - スコア80点以上を目指して修正
 6. **完成・公開**
 

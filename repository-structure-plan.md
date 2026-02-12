@@ -214,7 +214,7 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 | Skill名 | 説明 | バージョン |
 |---------|------|-----------|
 | skill-writing-guide | Skill執筆ガイド | 1.0.0 |
-| skill-quality-validation | 55項目品質検証 | 2.0.0 |
+| skill-quality-validation | 64項目品質検証 | 2.0.0 |
 | skill-template-generator | テンプレート自動生成 | 1.0.0 |
 | skill-revision-guide | 修正・バージョン管理 | 1.0.0 |
 
