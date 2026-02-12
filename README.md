@@ -19,7 +19,7 @@
 
 | カテゴリ | 説明 | 配置先 | Skills数 | 詳細 |
 |---------|------|--------|---------|------|
-| `skills/` | Skill作成支援（Meta-Skills） | グローバル（~/.copilot/skills/） | 5 | [SKILLS_README.md](skills/SKILLS_README.md) |
+| `skills/` | Skill作成支援（Meta-Skills） | グローバル（~/.copilot/skills/） | 10 | [SKILLS_README.md](skills/SKILLS_README.md) |
 
 ### 📌 今後追加予定のカテゴリ
 
@@ -52,7 +52,12 @@ ls ~/.copilot/skills/
 # skill-quality-validation/
 # skill-template-generator/
 # skill-revision-guide/
+# skill-git-commit-practices/
+# skill-github-pr-workflow/
+# skill-git-review-standards/
+# skill-git-history-learning/
 # skill-git-initial-setup/
+# skill-issue-intake/
 ```
 
 **Windowsの場合**:
@@ -105,7 +110,12 @@ GitHub Copilot Chat内で直接Meta-Skillsを呼び出すことができます�
 - `@workspace /skill-quality-validation` - Skillの品質検証
 - `@workspace /skill-template-generator` - テンプレート生成支援
 - `@workspace /skill-revision-guide` - Skillの修正・バージョン管理
+- `@workspace /skill-git-commit-practices` - コミット規約と原子性
+- `@workspace /skill-github-pr-workflow` - PRフローの標準化
+- `@workspace /skill-git-review-standards` - レビュー標準とSLA
+- `@workspace /skill-git-history-learning` - 履歴を学習資産にする
 - `@workspace /skill-git-initial-setup` - git init/clone時の保護を標準化
+- `@workspace /skill-issue-intake` - スコープ外作業のIssue化
 
 ## 📚 ドキュメント
 
@@ -156,12 +166,17 @@ GitHub Copilot Chat内で直接Meta-Skillsを呼び出すことができます�
 
 ### v1.0.0 (2026-02-12)
 - 初回リリース
-- Meta-Skills 5種を収録
+- Meta-Skills 10種を収録
   - skill-writing-guide
   - skill-quality-validation
   - skill-template-generator
   - skill-revision-guide
+  - skill-git-commit-practices
+  - skill-github-pr-workflow
+  - skill-git-review-standards
+  - skill-git-history-learning
   - skill-git-initial-setup
+  - skill-issue-intake
 - リポジトリ構造確立
 - Git管理開始
 
