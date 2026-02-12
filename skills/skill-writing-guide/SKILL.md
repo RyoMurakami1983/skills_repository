@@ -1,6 +1,6 @@
 ---
 name: skill-writing-guide
-description: Guide for writing high-quality GitHub Copilot agent skills. Use when creating new SKILL.md files, structuring skill content, or learning skill writing best practices.
+description: Guide for writing high-quality GitHub Copilot agent skills. Use when creating SKILL.md files.
 author: RyoMurakami1983
 tags: [copilot, agent-skills, documentation, writing-guide]
 invocable: false
@@ -10,32 +10,34 @@ invocable: false
 
 A comprehensive guide for writing high-quality GitHub Copilot agent skills following official specifications and best practices.
 
+## When to Use This Skill
+
+Use this skill when:
+- Building a new SKILL.md file from scratch for GitHub Copilot agents
+- Learning required structure and sections for agent skills documentation
+- Understanding code example best practices and formatting guidelines
+- Designing effective section layouts including When to Use and Patterns
+- Writing clear, actionable skill documentation for developers
+- Ensuring compliance with GitHub Copilot and Claude specifications
+
+---
+
 ## Related Skills
 
 - **`skill-template-generator`** - Generate structured SKILL.md templates
 - **`skill-quality-validation`** - Validate and score skill quality
 - **`skill-revision-guide`** - Revise and maintain existing skills
 
-## When to Use This Skill
-
-Use this skill when:
-- Creating a new SKILL.md file from scratch
-- Learning the structure and sections required for skills
-- Understanding code example best practices
-- Designing section layouts (When to Use, Core Principles, Patterns)
-- Writing clear and actionable skill documentation
-- Ensuring compliance with GitHub Copilot/Claude skill specifications
-
 ---
 
 ## Core Principles
 
-1. **Single File Principle** - Complete all content in SKILL.md; avoid additional support files unless following official guidelines
-2. **Reader-First Design** - Enable readers to determine relevance within 5 seconds
-3. **Progressive Learning** - Structure examples from Simple → Intermediate → Advanced (継続は力 - continuous improvement)
-4. **Problem-Solution Focus** - Always explain "why" before "how" (成長の複利 - compound growth through learning)
+1. **Single File Principle** - Complete all content in SKILL.md; avoid additional support files
+2. **Reader-First Design** - Enable readers to determine relevance within 5 seconds  
+3. **Progressive Learning** - Structure examples from Simple → Intermediate → Advanced
+4. **Problem-Solution Focus** - Always explain "why" before "how" (成長の複利)
 5. **Practical Utility** - Provide copy-paste ready, compilable code examples
-6. **Values Integration** - Align content with development philosophy (基礎と型、成長の複利、温故知新、継続は力、ニュートラル)
+6. **Values Integration** - Align with development philosophy (基礎と型、継続は力、ニュートラル)
 
 ---
 
