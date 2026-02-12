@@ -14,7 +14,7 @@ version: 1.0.0
 ## 関連スキル
 
 - **`skill-writing-guide`** - Skill執筆のベストプラクティス
-- **`skill-quality-validation`** - 55項目品質検証
+- **`skill-quality-validation`** - 64項目品質検証
 - **`skill-template-generator`** - テンプレート自動生成
 - **`skill-revision-guide`** - 修正・バージョン管理
 

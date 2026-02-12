@@ -1,200 +1,195 @@
+---
+name: skill-writing-guide
+description: 高品質なGitHub Copilot agentスキル執筆ガイド。SKILL.md作成時に使用する。
+author: RyoMurakami1983
+tags: [copilot, agent-skills, documentation, writing-guide]
+invocable: false
+---
+
 # Skill執筆ガイド
 
-**作成日**: 2026-02-07  
-**バージョン**: 1.0.0
+公式仕様とベストプラクティスに従って高品質なGitHub Copilot agentスキルを作成するための包括的ガイドです。
 
-このガイドは、高品質なSkillを作成するための実践的な執筆ルールとベストプラクティスを提供します。
+## このスキルを使うとき
 
----
-
-## 📋 目次
-
-1. [基本原則](#基本原則)
-2. [ファイル構造](#ファイル構造)
-3. [YAML Frontmatter](#yaml-frontmatter)
-4. [セクション執筆ルール](#セクション執筆ルール)
-5. [コード例のベストプラクティス](#コード例のベストプラクティス)
-6. [比較表の作成方法](#比較表の作成方法)
-7. [Anti-PatternsとPitfallsの書き分け](#anti-patternsとpitfallsの書き分け)
-8. [言語とトーン](#言語とトーン)
-9. [品質チェックリスト](#品質チェックリスト)
+以下の状況で活用してください：
+- GitHub Copilot agent向けの新しいSKILL.mdをゼロから作成するとき
+- 必須構造やセクションを学びたいとき
+- コード例のベストプラクティスと書式を理解したいとき
+- When to UseやPatternのレイアウトを設計するとき
+- 開発者向けに明確で実行可能なドキュメントを書きたいとき
+- GitHub Copilot/Claude仕様への準拠を確認したいとき
 
 ---
 
-## 基本原則
+## 関連スキル
 
-### 1. 単一ファイル原則
-
-✅ **DO**: SKILL.md のみで完結させる  
-❌ **DON'T**: 追加のサポートファイルを作成しない
-
-**理由**: 
-- 読者が一箇所で全情報を得られる
-- メンテナンス性が高い
-- 検索性が向上
-
-### 2. 読者ファーストの設計
-
-✅ **DO**: 読者が5秒以内に「このSkillは自分に関係あるか」を判断できるようにする  
-❌ **DON'T**: 抽象的な説明から始めない
-
-**実装方法**:
-- "When to Use This Skill" セクションを最優先配置
-- 具体的なユースケースを箇条書き
-- 各項目は50-100文字以内
-
-### 3. 段階的な学習体験
-
-✅ **DO**: Simple → Intermediate → Advanced の順でコード例を提示  
-❌ **DON'T**: いきなり複雑なコードを見せない
-
-**実装方法**:
-- 各パターンで最低3段階の例を用意
-- 各段階で「なぜこの進化が必要か」を説明
-
-### 4. Problem-Solution構造
-
-✅ **DO**: 「なぜこのパターンが必要か」を先に説明  
-❌ **DON'T**: いきなり解決策を提示しない
-
-**実装方法**:
-- 悪い例（❌）→ 良い例（✅）のペアで提示
-- Why を必ず含める
-
-### 5. 実用性の重視
-
-✅ **DO**: コピー&ペーストで動くコードを提供  
-❌ **DON'T**: 抽象的な疑似コードや理論のみ
-
-**実装方法**:
-- 全コード例をコンパイル可能にする
-- 必要なusing文やDI設定を含める
+- **`skill-template-generator`** - SKILL.mdテンプレート生成
+- **`skill-quality-validation`** - Skill品質の検証とスコアリング
+- **`skill-revision-guide`** - 既存Skillの改訂と維持
 
 ---
 
-## ファイル構造
+## コア原則
 
-### ディレクトリ配置
-
-```
-.github/skills/
-└── your-skill-name/
-    └── SKILL.md          # ← 唯一のファイル
-```
-
-### 命名規則
-
-- **フォルダ名**: kebab-case（例: `wpf-mvvm-ddd-enterprise`）
-- **SKILL.md**: 固定（全て大文字）
-- **name** (frontmatter): フォルダ名と一致
+1. **単一ファイル原則** - すべての内容はSKILL.mdに集約し、補助ファイルを増やさない
+2. **読者ファースト** - 5秒で関連性を判断できる構成にする
+3. **段階的学習** - Simple → Intermediate → Advancedの順で例を提示
+4. **問題→解決の順序** - 先に「なぜ」を説明する（成長の複利）
+5. **実用性重視** - コピー&ペーストで動くコードを提供
+6. **価値観の統合** - 開発哲学（基礎と型、継続は力、ニュートラル）と整合
 
 ---
 
-## YAML Frontmatter
+## パターン1: YAML Frontmatter構造
 
-### 必須フィールド
+### 概要
+
+YAML frontmatterはスキルのメタデータを定義し、いつどのようにスキルが起動されるかを決定します。適切な設定は発見性に直結します。
+
+### 基本例
 
 ```yaml
 ---
-name: your-skill-name        # kebab-case, フォルダ名と一致
-description: One-line description of what problem this skill solves
-invocable: false             # 通常は false
----
-```
-
-### オプションフィールド
-
-```yaml
----
-name: skill-name
-description: Description here
+name: your-skill-name
+description: One-line description of what problem this skill solves (100 chars max)
 invocable: false
-tags: [csharp, dotnet, aspire]          # 関連技術タグ
-version: 1.0.0                           # セマンティックバージョニング
-author: GitHub Copilot Team              # 作成者
-last_updated: 2026-02-07                 # 最終更新日
 ---
 ```
 
-### 執筆ルール
+### 使うとき
 
-| フィールド | ルール | 例 |
-|-----------|--------|-----|
-| `name` | kebab-case、フォルダ名と一致 | `wpf-mvvm-patterns` |
-| `description` | 100文字以内、1行、問題解決にフォーカス | `Implement MVVM in WPF with DDD patterns` |
-| `invocable` | 通常は `false` | `false` |
-| `tags` | 3-5個、技術スタック中心 | `[wpf, mvvm, ddd, csharp]` |
+| シナリオ | 設定 | 理由 |
+|----------|------|------|
+| 個人スキル | `invocable: false` | 多くのスキルの標準設定 |
+| 明示的起動が必要 | `invocable: true` | ユーザーが明示的に呼び出せる |
+| 技術特化 | `tags: [tech1, tech2]` | 発見性が向上 |
+
+### 設定例
+
+```yaml
+---
+name: skill-writing-guide
+description: Guide for writing high-quality GitHub Copilot agent skills. Use when creating new SKILL.md files or structuring skill content.
+author: RyoMurakami1983
+tags: [copilot, agent-skills, documentation]
+invocable: false
+---
+```
+
+### 上級パターン（本番向け）
+
+```yaml
+---
+name: wpf-mvvm-patterns
+description: Implement MVVM in WPF with domain-driven design, dependency injection, and testability. Use when building enterprise WPF applications with complex business logic.
+author: RyoMurakami1983
+tags: [wpf, mvvm, ddd, csharp, dotnet]
+invocable: false
+license: MIT
+version: 1.2.0
+---
+```
+
+**フィールド指針**:
+- **name**: kebab-case、フォルダ名と一致、最大64文字
+- **description**: 100文字以内、"Use when..."で起動条件を明示
+- **author**: システム作成スキルは`RyoMurakami1983`
+- **tags**: 3-5個の技術タグ
+- **invocable**: 通常は`false`
 
 ---
 
-## セクション執筆ルール
+## パターン2: "When to Use This Skill" セクション
 
-### 1. "When to Use This Skill" セクション
+### 概要
 
-**目的**: 読者が5秒で関連性を判断できるようにする
+タイトル直後に配置する最初のH2セクションです。読者が「今の課題に関係があるか」を素早く判断できます。
 
-**フォーマット**:
+### 基本例
+
 ```markdown
 ## When to Use This Skill
 
 Use this skill when:
-- Designing public APIs for NuGet packages or libraries
+- Designing public APIs for NuGet packages
 - Making changes to existing public APIs
-- Planning wire format changes for distributed systems
-- Implementing versioning strategies
-- Reviewing pull requests for breaking changes
+- Planning wire format changes
 ```
 
-**ルール**:
-- ✅ 5-8個の具体的なシナリオ
-- ✅ 動詞で始める（Designing, Implementing, Building, etc.）
-- ✅ 各項目は50-100文字
-- ❌ 抽象的な表現（"When you need quality code"）
-- ❌ 10個以上のリスト（冗長）
+### 使うとき
 
-**Good Example**:
+- ✅ **DO**: 5-8個の具体的で行動的なシナリオを書く
+- ✅ **DO**: 各項目を動詞で開始（Designing, Implementing, Building）
+- ✅ **DO**: 各項目は50-100文字以内
+- ❌ **DON'T**: 抽象表現（"When you need quality code"）
+- ❌ **DON'T**: 10個以上並べない
+
+### 設定例
+
 ```markdown
+## When to Use This Skill
+
+Use this skill when:
 - Building enterprise WPF applications with complex business logic
 - Implementing MVVM pattern with domain-driven design
 - Integrating APIs with retry/circuit breaker policies
+- Setting up dependency injection in WPF projects
+- Designing testable ViewModels and Services
+- Managing application state across multiple views
 ```
 
-**Bad Example**:
+### 上級パターン（本番向け）
+
+役割ベースのシナリオを含める：
+
 ```markdown
-- When you want to write good code ← 抽象的すぎ
-- Use WPF ← 技術名だけでシナリオ不明
-- Desktop applications ← 広すぎる
+## When to Use This Skill
+
+Use this skill when:
+- **Architects**: Designing multi-tenant WPF application architecture
+- **Senior Developers**: Implementing advanced MVVM patterns with CQRS
+- **Team Leads**: Reviewing pull requests for MVVM compliance
+- **Junior Developers**: Learning MVVM fundamentals in WPF
+- **DevOps**: Setting up CI/CD pipelines for WPF applications
 ```
 
-### 2. "Core Principles" セクション
+---
 
-**目的**: このSkillの哲学・基盤となる考え方を伝える
+## パターン3: "Core Principles" セクション
 
-**フォーマット**:
+### 概要
+
+スキルの哲学的基盤と指針を定義します。3-5個に絞って簡潔に。
+
+### 基本例
+
 ```markdown
 ## Core Principles
 
-1. **Principle Name** - One-line summary (30-50 chars)
-2. **Another Principle** - One-line summary
-3. **Third Principle** - One-line summary
-```
-
-**ルール**:
-- ✅ 3-5個の原則
-- ✅ 太字で原則名、ハイフン後に説明
-- ✅ 説明は30-50文字
-- ❌ 長文の説明（別セクションで詳述）
-
-**Example**:
-```markdown
 1. **Separation of Concerns** - Views, ViewModels, and Models have distinct responsibilities
 2. **Dependency Inversion** - Depend on abstractions, not concrete implementations
 3. **Testability First** - Design for unit testing from day one
 ```
 
-### 3. パターンセクション（Pattern 1, Pattern 2, ...）
+### 使うとき
 
-**構造**:
+- ✅ **DO**: 3-5個に制限
+- ✅ **DO**: **太字名** - 短い説明（30-50文字）で記述
+- ❌ **DON'T**: 長い説明は後のセクションへ
+
+> 📚 **上級例**: `references/core-principles-examples.md` を参照
+
+---
+
+## パターン4: パターンセクション（7-10必須）
+
+### 概要
+
+各パターンは具体的なアプローチや実装戦略を示します。完成したSkillには7-10個のパターンが必要です。
+
+### 基本例
+
 ```markdown
 ## Pattern 1: [Pattern Name]
 
@@ -210,458 +205,395 @@ Brief explanation (2-3 sentences)
 - Condition A
 - Condition B
 
-### With Configuration
-```csharp
-// ✅ CORRECT - With options
-```
-
 ### Advanced Pattern
 ```csharp
-// ✅ CORRECT - Production-grade
+// ✅ CORRECT - Production-ready
 ```
 ```
 
-**ルール**:
-- ✅ 1つのSkillに7-10個のパターン
-- ✅ 各パターンは独立して理解可能
-- ✅ 進化的な例（Simple → Advanced）
-- ❌ 他のパターンへの強い依存
+### 使うとき
 
-### 4. "Common Pitfalls" セクション
+段階的学習を支える構成：
+1. **Overview**: 何を解決するか
+2. **Basic Example**: 最小の実装
+3. **When to Use**: 判断基準
+4. **Advanced**: 本番向け実装
 
-**目的**: 実装時によくある失敗を予防
-
-**フォーマット**:
-```markdown
-## Common Pitfalls
-
-### 1. Pitfall Name - Brief Description
-
-**Problem**: What users typically do wrong.
-
-```csharp
-// ❌ WRONG
-```
-
-**Solution**: How to fix it.
-
-```csharp
-// ✅ CORRECT
-```
-```
-
-**ルール**:
-- ✅ 3-5個の具体的な失敗例
-- ✅ Problem-Solution構造
-- ✅ 実際のコードで示す
-- ❌ 理論的な説明のみ
-
-### 5. "Anti-Patterns" セクション
-
-**目的**: アーキテクチャレベルの設計ミスを防ぐ
-
-**フォーマット**:
-```markdown
-## Anti-Patterns
-
-### Anti-Pattern Name
-
-**What**: Description of the architectural mistake.
-
-```csharp
-// ❌ WRONG - Architectural flaw
-```
-
-**Why It's Wrong**:
-- Reason 1
-- Reason 2
-
-**Better Approach**:
-
-```csharp
-// ✅ CORRECT - Proper design
-```
-```
-
-**ルール**:
-- ✅ 2-4個のアーキテクチャレベルの問題
-- ✅ Why（なぜダメか）を明確に
-- ✅ Better Approach を必ず提示
-- ❌ Pitfallsと混同しない（後述）
-
-### 6. "Quick Reference" セクション
-
-**目的**: at-a-glance で意思決定できるようにする
-
-**フォーマット**:
-```markdown
-## Quick Reference
-
-| Scenario | Pattern | Code Snippet |
-|----------|---------|--------------|
-| Simple case | Pattern 1 | `new Example()` |
-| With config | Pattern 2 | `services.Configure<T>()` |
-```
-
-**ルール**:
-- ✅ 表形式で簡潔に
-- ✅ 3-5列、5-10行
-- ✅ コードスニペットを含める
-- ❌ 詳細な説明（本文で行う）
+> 📚 **完全な例**: `references/pattern-examples.md` を参照
 
 ---
 
-## コード例のベストプラクティス
+## パターン5: コード例のベストプラクティス
 
-### 1. 段階的な進化
+### 概要
 
-**パターン**: Simple → With Configuration → Advanced
+コード例は実用的かつコンパイル可能で、段階的に複雑化します。✅/❌マーカーを一貫して使用します。
 
-**例**:
+### 基本例
 
-**Level 1: Basic**
-```csharp
-// ✅ CORRECT - Simplest case
-var data = await _client.GetAsync("/api/data");
-```
-
-**Level 2: With Configuration**
-```csharp
-// ✅ CORRECT - With retry policy
-var data = await _retryPolicy.ExecuteAsync(
-    () => _client.GetAsync("/api/data"));
-```
-
-**Level 3: Production-Grade**
-```csharp
-// ✅ CORRECT - With circuit breaker, timeout, and logging
-var data = await _combinedPolicy.ExecuteAsync(
-    async ct =>
-    {
-        _logger.LogInformation("Calling API...");
-        var response = await _client.GetAsync("/api/data", ct);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<Data>(ct);
-    },
-    cancellationToken);
-```
-
-### 2. ✅/❌ マーカーの使用
-
-**ルール**:
-- ✅ `// ✅ CORRECT -` で正しい例を示す
-- ✅ `// ❌ WRONG -` で間違った例を示す
-- ✅ マーカー後に理由を簡潔に追加
-
-**Good Example**:
 ```csharp
 // ✅ CORRECT - Async all the way
-await SomeAsyncMethod();
-
-// ❌ WRONG - Deadlock risk with .Result
-var result = SomeAsyncMethod().Result;
-```
-
-**Bad Example**:
-```csharp
-// Good ← ✅を使うべき
-await SomeAsyncMethod();
-
-// Bad ← ❌を使うべき
-var result = SomeAsyncMethod().Result;
-```
-
-### 3. インラインコメントの書き方
-
-**ルール**:
-- ✅ WHYを説明（HOWはコードで明らか）
-- ✅ 重要な決定ポイントのみ
-- ❌ 冗長なコメント
-
-**Good Example**:
-```csharp
-// ✅ CORRECT - AsNoTracking for read-only queries improves performance
-var orders = await _db.Orders.AsNoTracking().ToListAsync();
-```
-
-**Bad Example**:
-```csharp
-// Get orders from database ← HOWを説明（不要）
-var orders = await _db.Orders.ToListAsync();
-```
-
-### 4. using文とDI設定を含める
-
-**ルール**:
-- ✅ 必要なusing文を明記
-- ✅ DI設定例を含める
-- ❌ "省略" や "..." で済ませない
-
-**Good Example**:
-```csharp
-using Microsoft.Extensions.DependencyInjection;
-using Polly;
-
-// In Program.cs
-builder.Services.AddHttpClient<IApiClient, ApiClient>()
-    .AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(2)));
-```
-
-### 5. 実行可能なコード
-
-**ルール**:
-- ✅ コピー&ペーストでコンパイル可能
-- ✅ 依存関係を明記
-- ❌ 疑似コードや抽象的な例
-
-**Good Example**:
-```csharp
-public class OrderService
+public async Task<Data> GetDataAsync()
 {
-    private readonly IOrderRepository _repository;
-    
-    public OrderService(IOrderRepository repository)
-    {
-        _repository = repository;
-    }
-    
-    public async Task<Order> GetOrderAsync(int id)
-    {
-        return await _repository.GetByIdAsync(id);
-    }
+    return await _client.GetAsync("/api/data");
 }
 
-// In Program.cs
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<OrderService>();
+// ❌ WRONG - Blocking async code
+public Data GetData()
+{
+    return _client.GetAsync("/api/data").Result; // Deadlock risk
+}
 ```
+
+### 使うとき
+
+**✅/❌マーカーの使用**:
+- ✅ `// ✅ CORRECT - Reason` で良い例を示す
+- ❌ `// ❌ WRONG - Reason` で悪い例を示す
+- 必ず良い例と悪い例をペアで提示
+
+**コンテキストを含める**:
+- ✅ using文を含める
+- ✅ DI設定を示す
+- ✅ 上級例にはエラーハンドリング
+- ❌ 疑似コードや"..."は使わない
+
+> 📚 **本番向け例**: `references/advanced-examples.md` を参照
 
 ---
 
-## 比較表の作成方法
+## パターン6: 比較表
 
-### 1. 意思決定支援表
+### 概要
 
-**目的**: 読者が「どのパターンを選ぶべきか」を即座に判断できるようにする
+比較表は意思決定を素早く支援します。パターン、ツール、シナリオの比較に使用します。
 
-**フォーマット**:
+### 基本例
+
 ```markdown
 | Scenario | Recommendation | Why |
 |----------|----------------|-----|
 | Read-only data | AsNoTracking() | No change tracking overhead |
 | Update entity | Tracking | Automatic change detection |
-| Bulk operations | ExecuteUpdate() | More efficient than tracking |
 ```
 
-**ルール**:
-- ✅ 3列: Scenario, Recommendation, Why
-- ✅ 5-10行（多すぎない）
-- ✅ 推奨パターンを太字で強調
-- ❌ 詳細な説明（本文で）
+### 使うとき
 
-### 2. 技術比較表
+**意思決定表**:
+- 3列構成（Scenario, Recommendation, Why）
+- 5-10行以内
+- 推奨項目は太字
 
-**目的**: 複数の技術・ツールから選択する際のガイド
+**技術比較表**:
+- Tool, Type, Performance, Use Whenを含める
+- 推奨ツールを太字で強調
 
-**フォーマット**:
+### 設定例
+
 ```markdown
-| Tool | Type | Performance | Use When |
-|------|------|-------------|----------|
-| **Polly** | Resilience | High | HTTP calls, retries |
-| **MediatR** | Messaging | Medium | CQRS, event-driven |
-| Refit | HTTP Client | High | Type-safe REST clients |
-```
-
-**ルール**:
-- ✅ 推奨ツールを太字
-- ✅ 4-6列まで
-- ✅ "Use When" 列を含める
-- ❌ 主観的な評価のみ（定量データも）
-
-### 3. パターン比較表
-
-**フォーマット**:
-```markdown
-| Aspect | Pattern A | Pattern B | Pattern C |
-|--------|-----------|-----------|-----------|
+| Feature | Pattern A | Pattern B | Pattern C |
+|---------|-----------|-----------|-----------|
 | **Complexity** | Low | Medium | High |
-| **Performance** | Fast | Faster | Fastest |
-| **Use Case** | Simple queries | Complex queries | Bulk operations |
+| **Performance** | Good | Better | Best |
+| **Maintainability** | High | Medium | Low |
+| **Use Case** | Simple CRUD | Complex queries | Bulk operations |
+| **Recommendation** | ✅ Start here | Scale to this | **Only if needed** |
 ```
 
 ---
 
-## Anti-PatternsとPitfallsの書き分け
+## パターン7: アンチパターンとよくある落とし穴
 
-### 違いの定義
+### 概要
 
-| 区分 | 対象 | 例 |
-|------|------|-----|
-| **Anti-Patterns** | アーキテクチャ・設計レベルの問題 | God Class, Tight Coupling |
-| **Common Pitfalls** | 実装・使用時のミス | Forgetting await, Null reference |
+設計上の誤り（Anti-Patterns）と実装ミス（Common Pitfalls）を区別します。
 
-### Anti-Patterns の書き方
+### 基本例
 
-**フォーカス**: 設計原則違反、スケーラビリティ問題、保守性の低下
+**Common Pitfall**:
+```csharp
+// ❌ WRONG - Resource not disposed
+var stream = File.OpenRead("file.txt");
 
-**例**:
+// ✅ CORRECT - Automatically disposed
+using var stream = File.OpenRead("file.txt");
+```
+
+### 使うとき
+
+| 種類 | 焦点 | 例 |
+|------|------|----|
+| **Anti-Pattern** | アーキテクチャ、設計原則 | God Class, Tight Coupling |
+| **Common Pitfall** | 実装ミス | Forgetting await, null refs |
+
+> 📚 **詳細**: `references/anti-patterns.md` を参照
+
+---
+
+## パターン8: 500行制限の最適化
+
+### 概要
+
+段階的開示でSKILL.mdを500行以内に保ちつつ品質を維持します。
+
+### コア戦略
+
+**Progressive Disclosure**: 必須内容はSKILL.mdに、詳細はreferences/へ。
+
+```
+┌─────────────────────────────────────┐
+│ SKILL.md (≤500 lines)               │
+│ • ✅ Good patterns (5-15 lines)     │
+│ • Basic examples                    │
+│ • Simple comparisons                │
+└─────────────────────────────────────┘
+           ↓ references
+┌─────────────────────────────────────┐
+│ references/ (loaded when needed)    │
+│ • ❌ Anti-pattern details           │
+│ • 📚 Advanced implementations       │
+│ • ⚙️ Complex configurations         │
+└─────────────────────────────────────┘
+```
+
+### SKILL.mdに残すもの
+
+✅ **残す**（高優先度）:
+1. ✅マーカー付き良い例（5-15行）
+2. 基本的なYAML/markdown例
+3. 簡潔な比較表
+4. コア原則と決定ツリー
+
+### references/へ移すもの
+
+📤 **移動**（低優先度）:
+1. ❌詳細なアンチパターン → `references/anti-patterns.md`
+2. 📚本番向け実装 → `references/advanced-examples.md`
+3. ⚙️複雑な設定 → `references/configuration.md`
+4. 🌏日本語版 → `references/SKILL.ja.md`
+
+### 決定ツリー
+
+| 質問 | 回答 | アクション |
+|------|------|------------|
+| コード例が15行超？ | Yes | references/へ移動を検討 |
+| 基本理解に必須？ | No | references/へ移動 |
+| アンチパターン？ | Yes | references/anti-patterns.mdへ |
+| 上級/本番向け？ | Yes | references/advanced-examples.mdへ |
+| 良い基本例？ | Yes | **SKILL.mdに残す** |
+
+### 基本例
+
+✅ **CORRECT - Concise good pattern**:
+```yaml
+---
+name: wpf-databinding
+description: Guide for WPF data binding patterns. Use when implementing MVVM.
+---
+```
+
+> 📚 **アンチパターンと詳細例**: `references/anti-patterns.md` を参照
+
+### 使うとき
+
+次の条件に該当するとき：
+- SKILL.mdが500行を超えている
+- ✅/❌例が多い
+- 本番向け実装が含まれている
+- 読者の認知負荷を下げたい
+
+---
+
+## よくある落とし穴
+
+### 1. 単一ファイル原則の破り
+
+**問題**: README.mdやexamples.mdなどの補助ファイルで内容が分断される。
+
+```
+❌ WRONG Structure:
+skill-name/
+├── SKILL.md
+├── README.md          # Redundant
+├── examples.md        # Should be in SKILL.md
+└── guidelines.md      # Should be in SKILL.md
+```
+
+**解決策**: すべての内容をSKILL.mdに統合。500行超の場合のみ`references/`で分離。
+
+```
+✅ CORRECT Structure:
+skill-name/
+└── SKILL.md           # Single source of truth
+```
+
+### 2. あいまいな"When to Use"
+
+**問題**: 抽象的なシナリオでは関連性判断ができない。
+
 ```markdown
-### God ViewModel Anti-Pattern
+❌ WRONG:
+- When you want to write good code
+- Use this for WPF applications
+- Helpful for developers
+```
 
-**What**: ViewModelが全ての責務を持つ
+**解決策**: 具体的で行動的なシナリオを書く。
+
+```markdown
+✅ CORRECT:
+- Building enterprise WPF applications with complex business logic
+- Implementing MVVM pattern with dependency injection
+- Designing testable ViewModels with INotifyPropertyChanged
+```
+
+### 3. ✅/❌マーカーの欠落
+
+**問題**: 良い例と悪い例の区別ができない。
 
 ```csharp
-// ❌ WRONG - 1000行のViewModel
-public class MainViewModel
-{
-    // UI logic, business logic, data access, validation...
-}
+// UNCLEAR - Is this good or bad?
+var result = SomeAsyncMethod().Result;
+```
+
+**解決策**: 明示的なマーカーを必ず付ける。
+
+```csharp
+// ❌ WRONG - Deadlock risk with .Result
+var result = SomeAsyncMethod().Result;
+
+// ✅ CORRECT - Async all the way
+var result = await SomeAsyncMethod();
+```
+
+---
+
+## アンチパターン
+
+### 1. 1つのSkillにパターンを詰め込みすぎる
+
+**What**: 20+パターンを含めてスキルが過大化。
+
+**Why It's Wrong**:
+- 推奨される500行制限を超える
+- 内容がスキャンできない
+- 段階的開示に反する
+
+**Better Approach**: スキルを分割する。
+
+```markdown
+❌ WRONG: wpf-everything-guide (30 patterns)
+
+✅ CORRECT:
+- wpf-mvvm-fundamentals (8 patterns)
+- wpf-data-binding-patterns (7 patterns)
+- wpf-performance-optimization (7 patterns)
+```
+
+### 2. 起動条件が不明確なSkill
+
+**What**: 汎用的すぎるdescription。
+
+```yaml
+❌ WRONG:
+description: A helpful guide for WPF development
 ```
 
 **Why It's Wrong**:
-- Violates Single Responsibility Principle
-- Difficult to test
-- Hard to maintain
+- GitHub Copilotが起動条件を判断できない
+- 読者に発見されない
 
-**Better Approach**:
-```csharp
-// ✅ CORRECT - 責務を分離
-public class MainViewModel
-{
-    private readonly IOrderService _orderService;
-    // Only UI logic
-}
-```
-```
+**Better Approach**: descriptionに"Use when..."を含める。
 
-### Common Pitfalls の書き方
-
-**フォーカス**: 実装ミス、よくある間違い、Silent failures
-
-**例**:
-```markdown
-### Forgetting AsNoTracking for Read-Only Queries
-
-**Problem**: Change tracking オーバーヘッドが発生
-
-```csharp
-// ❌ WRONG - Tracking for read-only data
-var orders = await _db.Orders.ToListAsync();
-```
-
-**Solution**:
-
-```csharp
-// ✅ CORRECT - AsNoTracking for reads
-var orders = await _db.Orders.AsNoTracking().ToListAsync();
-```
+```yaml
+✅ CORRECT:
+description: Implement MVVM in WPF with dependency injection and testability. Use when building enterprise WPF applications with complex business logic.
 ```
 
 ---
 
-## 言語とトーン
+## クイックリファレンス
 
-### 1. 明確で簡潔な表現
+### Skill構成チェックリスト
 
-✅ **DO**: 能動態、短文、具体的な用語  
-❌ **DON'T**: 受動態、長文、曖昧な表現
+- [ ] YAML frontmatter（name, description, author, tags）
+- [ ] H1タイトルがSkill名と一致
+- [ ] Related Skillsセクション
+- [ ] "When to Use This Skill" が最初のH2（5-8シナリオ）
+- [ ] Core Principles（3-5原則）
+- [ ] 7-10個のPatternセクション（段階的例付き）
+- [ ] Common Pitfalls（3-5項目）
+- [ ] Anti-Patterns（2-4項目）
+- [ ] Quick Reference または Decision Tree
+- [ ] Best Practices Summary
+- [ ] Resourcesセクション
+- [ ] Changelog（大きい場合はCHANGELOG.mdへリンク）
 
-**Good Example**:
-> "Use `AsNoTracking()` for read-only queries to improve performance."
+### セクション執筆チェックリスト
 
-**Bad Example**:
-> "It is recommended that `AsNoTracking()` should be used in scenarios where data is being read without the intention of modification, as this can potentially lead to performance improvements."
+- [ ] ✅/❌マーカーを一貫して使用
+- [ ] using文とDI設定を含める
+- [ ] WHYを説明し、WHATに留めない
+- [ ] SKILL.mdを500行以内に保つ
+- [ ] 判断支援に表を使う
+- [ ] "When to Use"項目は動詞で開始
+- [ ] Core Principlesは独立して簡潔に
+- [ ] パターン構成: Overview → Basic → Configuration → Advanced
 
-### 2. 一貫した用語
+### コード品質チェックリスト
 
-✅ **DO**: 同じ概念に同じ用語を使う  
-❌ **DON'T**: 類義語を混在させる
-
-**Example**:
-- 一貫して "ViewModel" を使う（"View Model", "VM" を混ぜない）
-- 一貫して "dependency injection" を使う（"DI", "IoC" を混ぜない）
-
-### 3. 技術用語の定義
-
-✅ **DO**: 初出時に簡潔に定義  
-❌ **DON'T**: 読者が知っている前提
-
-**Example**:
-> "MVVM (Model-View-ViewModel) is an architectural pattern that separates UI logic from business logic."
-
-### 4. 命令形の使用
-
-✅ **DO**: "Use", "Implement", "Avoid"  
-❌ **DON'T**: "You should", "It is better to"
-
-**Good Example**:
-> "Implement INotifyPropertyChanged for data binding."
-
-**Bad Example**:
-> "You should implement INotifyPropertyChanged if you want data binding to work."
+- [ ] すべてのコード例がコンパイル可能
+- [ ] 上級例にエラーハンドリングがある
+- [ ] AsyncメソッドにCancellationTokenを含む
+- [ ] リソースが確実に破棄される（using）
+- [ ] 適切なDI設定が示されている
 
 ---
 
-## 品質チェックリスト
+## ベストプラクティスまとめ
 
-執筆完了後、以下をチェック：
-
-### 構造チェック（10項目）
-
-- [ ] ✅ SKILL.md 単一ファイルのみ
-- [ ] ✅ YAML frontmatter が正しい
-- [ ] ✅ "When to Use" が最初のセクション
-- [ ] ✅ Core Principles を含む
-- [ ] ✅ 7-10個のパターンセクション
-- [ ] ✅ Problem-Solution 構造
-- [ ] ✅ 比較表が含まれている
-- [ ] ✅ Anti-Patterns セクションがある
-- [ ] ✅ Common Pitfalls セクションがある
-- [ ] ✅ Quick Reference または Decision Tree がある
-
-### 内容チェック
-
-- [ ] 全コード例がコンパイル可能
-- [ ] ✅/❌ マーカーが一貫している
-- [ ] using文やDI設定が含まれている
-- [ ] 段階的な例（Simple → Advanced）
-- [ ] Why が説明されている
-- [ ] 具体的なシナリオが5個以上
-- [ ] Related Skills のリンクが正しい
-
-### 言語チェック
-
-- [ ] 能動態で書かれている
-- [ ] 一文が50文字以内（英語なら20単語以内）
-- [ ] 専門用語が初出時に定義されている
-- [ ] 一貫した用語使用
-
-### 読みやすさチェック
-
-- [ ] 見出しのみをスキャンして構造が理解できる
-- [ ] コード例にインラインコメントがある
-- [ ] 表が見やすい（3-6列）
-- [ ] セクションの長さが適切（500-1000文字）
+1. **単一ファイル原則** - 内容はSKILL.mdに集約し分割しない
+2. **起動条件を明確化** - descriptionに具体的な"Use when"を書く
+3. **段階的な複雑度** - Basic → Configuration → Advancedで構成
+4. **マーカー統一** - ✅/❌をすべてのコード例で使用
+5. **行動的なシナリオ** - "When to Use"は動詞開始
+6. **WHYを説明** - コードコメントは理由を説明
+7. **7-10パターン** - 過不足なく網羅
+8. **比較表を活用** - 意思決定を支援
+9. **アンチパターンと落とし穴を分離** - 設計と実装を区別
+10. **500行制限** - 追加情報はreferences/へ
 
 ---
 
-## まとめ
+## リソース
 
-高品質なSkillは以下を満たす：
-
-1. **明確な価値提案** - "When to Use" で即座に関連性が分かる
-2. **段階的な学習** - Simple → Advanced の進化
-3. **実用性** - コピペで動くコード
-4. **問題解決フォーカス** - Why を説明
-5. **一貫性** - フォーマット、用語、マーカー
-6. **完全性** - using文、DI、エラーハンドリング
-7. **意思決定支援** - 比較表、Decision Tree
-8. **失敗予防** - Anti-Patterns, Pitfalls
-9. **保守性** - 単一ファイル、明確な構造
-10. **読みやすさ** - スキャン可能、簡潔な文章
-
-このガイドに従えば、`.github/skills/` の既存Skillと同等の品質を達成できます。
+- [GitHub Copilot Agent Skills Documentation](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
+- [Claude Skills Documentation](https://claude.com/docs/skills/overview)
+- [Agent Skills Specification](https://agentskills.io/specification)
+- [SKILL_TEMPLATE.md](../../.copilot/docs/SKILL_TEMPLATE.md) - English template
+- [SKILL_TEMPLATE.ja.md](../../.copilot/docs/SKILL_TEMPLATE.ja.md) - Japanese template
 
 ---
 
-**次のステップ**: [SKILL_QUALITY_CHECKLIST.md](./SKILL_QUALITY_CHECKLIST.md) で品質を検証
+## 変更履歴
+
+CHANGELOG.mdに詳細を記載。直近の変更：
+
+### Version 2.0.0 (2026-02-12)
+- **Core Principles拡張**: Values統合（基礎と型、成長の複利、温故知新、継続は力、ニュートラル）
+- **Pattern 8更新**: 500行推奨 + 550行許容（+10%）
+- **開発哲学の統合**: Valuesとパターンを整合
+- **WHY説明の強調**: 成長の複利に沿った説明追加
+- **品質検証同期**: skill-quality-validation 64項目と整合
+
+### Version 1.0.0 (2026-02-12)
+- 初版リリース
+- 8パターンを収録
+- コード例ベストプラクティス定義
+- アンチパターンと落とし穴の区別
+- 段階的開示戦略を導入
+
+<!-- 
+Japanese version available at references/SKILL.ja.md
+日本語版は references/SKILL.ja.md を参照してください
+-->

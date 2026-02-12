@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Prevent direct commits to protected branches.
+
+set -euo pipefail
+
+protected_branches=("main")
+current_branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo '')"
+
+if [ -z "$current_branch" ]; then
+    exit 0
+fi
+
+for branch in "${protected_branches[@]}"; do
+    if [ "$current_branch" = "$branch" ]; then
+        echo ""
+        echo "❌ ERROR: Direct commits to '$branch' are not allowed."
+        echo ""
+        echo "Use a feature branch instead:"
+        echo "  1. git checkout -b feature/your-change"
+        echo ""
+        exit 1
+    fi
+done
+
+exit 0

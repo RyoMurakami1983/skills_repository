@@ -19,7 +19,7 @@
 
 | カテゴリ | 説明 | 配置先 | Skills数 | 詳細 |
 |---------|------|--------|---------|------|
-| `skills/` | Skill作成支援（Meta-Skills） | グローバル（~/.copilot/skills/） | 4 | [SKILLS_README.md](skills/SKILLS_README.md) |
+| `skills/` | Skill作成支援（Meta-Skills） | グローバル（~/.copilot/skills/） | 5 | [SKILLS_README.md](skills/SKILLS_README.md) |
 
 ### 📌 今後追加予定のカテゴリ
 
@@ -52,6 +52,7 @@ ls ~/.copilot/skills/
 # skill-quality-validation/
 # skill-template-generator/
 # skill-revision-guide/
+# skill-git-initial-setup/
 ```
 
 **Windowsの場合**:
@@ -93,7 +94,7 @@ python ~/.copilot/skills/skill-template-generator/scripts/generate_template.py
 
 #### 2. 品質検証
 ```bash
-# 作成したSkillの品質を55項目でチェック
+# 作成したSkillの品質を64項目でチェック
 python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
 ```
 
@@ -104,6 +105,7 @@ GitHub Copilot Chat内で直接Meta-Skillsを呼び出すことができます�
 - `@workspace /skill-quality-validation` - Skillの品質検証
 - `@workspace /skill-template-generator` - テンプレート生成支援
 - `@workspace /skill-revision-guide` - Skillの修正・バージョン管理
+- `@workspace /skill-git-initial-setup` - git init/clone時の保護を標準化
 
 ## 📚 ドキュメント
 
@@ -120,7 +122,7 @@ GitHub Copilot Chat内で直接Meta-Skillsを呼び出すことができます�
 1. **適切なカテゴリを選択** - 現在は`skills/`のみ、今後他カテゴリも追加予定
 2. **テンプレート生成** - `skill-template-generator`を使用
 3. **内容を作成** - `skill-writing-guide`を参考に記述
-4. **品質検証** - `skill-quality-validation`で55項目チェック
+4. **品質検証** - `skill-quality-validation`で64項目チェック
 5. **Pull Request作成** - レビュー後にマージ
 
 ### 既存Skillを改善する
@@ -154,11 +156,12 @@ GitHub Copilot Chat内で直接Meta-Skillsを呼び出すことができます�
 
 ### v1.0.0 (2026-02-12)
 - 初回リリース
-- Meta-Skills 4種を収録
+- Meta-Skills 5種を収録
   - skill-writing-guide
   - skill-quality-validation
   - skill-template-generator
   - skill-revision-guide
+  - skill-git-initial-setup
 - リポジトリ構造確立
 - Git管理開始
 
