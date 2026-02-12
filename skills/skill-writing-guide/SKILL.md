@@ -32,9 +32,10 @@ Use this skill when:
 
 1. **Single File Principle** - Complete all content in SKILL.md; avoid additional support files unless following official guidelines
 2. **Reader-First Design** - Enable readers to determine relevance within 5 seconds
-3. **Progressive Learning** - Structure examples from Simple → Intermediate → Advanced
-4. **Problem-Solution Focus** - Always explain "why" before "how"
+3. **Progressive Learning** - Structure examples from Simple → Intermediate → Advanced (継続は力 - continuous improvement)
+4. **Problem-Solution Focus** - Always explain "why" before "how" (成長の複利 - compound growth through learning)
 5. **Practical Utility** - Provide copy-paste ready, compilable code examples
+6. **Values Integration** - Align content with development philosophy (基礎と型、成長の複利、温故知新、継続は力、ニュートラル)
 
 ---
 
@@ -576,11 +577,19 @@ description: Implement MVVM in WPF with dependency injection and testability. Us
 
 See CHANGELOG.md for full history. Recent changes:
 
+### Version 2.0.0 (2026-02-12)
+- **Expanded Core Principles**: Added Values integration (基礎と型、成長の複利、温故知新、継続は力、ニュートラル)
+- **Updated Pattern 8**: 500-line recommendation with 550-line (+10%) tolerance
+- **Development Philosophy Integration**: Aligned patterns with development Values
+- **Enhanced guidance**: Emphasized "Why" explanations for compound learning growth
+- **Quality validation alignment**: Synchronized with skill-quality-validation 64-item checklist
+
 ### Version 1.0.0 (2026-02-12)
 - Initial release
-- 7 pattern sections documented
+- 8 pattern sections documented
 - Code example best practices defined
 - Anti-patterns vs. pitfalls clarified
+- Progressive Disclosure strategy introduced
 
 <!-- 
 Japanese version available at references/SKILL.ja.md

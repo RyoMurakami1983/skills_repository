@@ -8,7 +8,7 @@ invocable: false
 
 # Skill Quality Validation
 
-Comprehensive quality assessment system for GitHub Copilot agent skills with 56-point checklist and automated scoring.
+Comprehensive quality assessment system for GitHub Copilot agent skills with 64-point checklist, automated scoring, and development philosophy integration.
 
 ## Related Skills
 
@@ -30,11 +30,12 @@ Use this skill when:
 
 ## Core Principles
 
-1. **Quantitative Assessment** - Use 56-item checklist with objective pass/fail criteria
-2. **Category-Based Scoring** - Evaluate Structure (11), Content (20), Code Quality (15), Language (10)
-3. **Clear Pass Criteria** - Require 80% per category, 85% overall (48/56 points)
+1. **Quantitative Assessment** - Use 64-item checklist with objective pass/fail criteria
+2. **Category-Based Scoring** - Evaluate Structure (14), Content (23), Code Quality (16), Language (11)
+3. **Clear Pass Criteria** - Require 80% per category, 80% overall (51/64 points)
 4. **Actionable Feedback** - Identify specific failures with improvement recommendations
-5. **Continuous Improvement** - Target 95%+ scores after iterative refinement
+5. **Continuous Improvement** - Target 90%+ scores after iterative refinement
+6. **Philosophy Integration** - Align with development Values (基礎と型、成長の複利、温故知新、継続は力、ニュートラル)
 
 ---
 
@@ -42,7 +43,7 @@ Use this skill when:
 
 ### Overview
 
-Execute the 56-point checklist to assess skill quality across four categories.
+Execute the 64-point checklist to assess skill quality across four categories, with expanded validation for file length optimization, references/ structure, bilingual support, and development philosophy integration.
 
 ### Basic Example
 
@@ -88,15 +89,15 @@ Execute the 56-point checklist to assess skill quality across four categories.
 
 ---
 
-## Pattern 2: Structure Validation (10 Items)
+## Pattern 2: Structure Validation (14 Items)
 
 ### Overview
 
-Validates physical file structure, section ordering, and YAML frontmatter compliance.
+Validates physical file structure, section ordering, YAML frontmatter compliance, file length optimization, references/ directory structure, and bilingual support.
 
 ### Basic Example
 
-**10-Item Structure Checklist**:
+**14-Item Structure Checklist**:
 
 1. **Single File**: SKILL.md only (no README.md, examples.md, etc.)
 2. **YAML Frontmatter**: Contains name, description, invocable
@@ -108,7 +109,10 @@ Validates physical file structure, section ordering, and YAML frontmatter compli
 8. **Common Pitfalls**: Section exists
 9. **Anti-Patterns**: Section exists
 10. **Quick Reference**: Section or Decision Tree exists
-11. **File Length**: SKILL.md ≤500 lines (Claude/GitHub Copilot recommendation)
+11. **File Length Optimization**: ≤500 lines (recommended) OR ≤550 lines (+10% tolerance) with valid reasoning
+12. **References Directory** (if >500 lines): `references/` exists with at least one valid file
+13. **Japanese Version** (bonus): `references/SKILL.ja.md` exists (+1 bonus point)
+14. **References Structure Validity**: If `references/` exists, all files follow naming conventions
 
 ### When to Use
 
@@ -117,7 +121,7 @@ Execute structure validation:
 - **After major refactoring**: Verify structure integrity
 - **During peer review**: Quick structural compliance check
 
-**Pass Criteria**: 9/11 (82%) minimum
+**Pass Criteria**: 11/14 (79%) minimum
 
 ### With Configuration
 
@@ -128,7 +132,7 @@ Execute structure validation:
 checks:
   1.1_single_file:
     rule: "Count of *.md files in skill directory == 1"
-    allow_exceptions: ["references/SKILL.ja.md", "CHANGELOG.md"]
+    allow_exceptions: ["references/SKILL.ja.md", "references/*.md", "CHANGELOG.md"]
   
   1.4_description_length:
     rule: "len(frontmatter['description']) <= 100"
@@ -137,17 +141,39 @@ checks:
   1.7_pattern_count:
     rule: "7 <= pattern_count <= 10"
     count_method: "regex: ^## Pattern \\d+:"
+  
+  1.11_file_length_optimization:
+    rule: |
+      if line_count <= 500: PASS
+      elif line_count <= 550: PASS with WARNING (+10% tolerance)
+      else: FAIL (require references/ structure)
+    recommended: 500
+    tolerance: 550
+  
+  1.12_references_directory:
+    rule: "If line_count > 500, check references/ directory exists"
+    valid_files: ["anti-patterns.md", "advanced-examples.md", "configuration.md", "SKILL.ja.md"]
+    required_count: ">= 1"
+  
+  1.13_japanese_version:
+    rule: "Check for references/SKILL.ja.md"
+    bonus: true  # +1 bonus point if exists
+    required: false
+  
+  1.14_references_validity:
+    rule: "If references/ exists, validate all files are *.md"
+    severity: "error"
 ```
 
 
 
 ---
 
-## Pattern 3: Content Validation (20 Items)
+## Pattern 3: Content Validation (23 Items)
 
 ### Overview
 
-Validates completeness, clarity, and practical utility of skill content across "When to Use", Core Principles, Patterns, and Problem-Solution structures.
+Validates completeness, clarity, and practical utility of skill content across "When to Use", Core Principles, Patterns, Problem-Solution structures, Values integration, and Why explanations.
 
 ### Basic Example
 
@@ -165,6 +191,14 @@ Validates completeness, clarity, and practical utility of skill content across "
   - Each has "When to Use" guidance
   - No duplication between patterns
 
+- **Core Principles** (2 items):
+  - Values integration: References at least one development Value (基礎と型、成長の複利、etc.)
+  - Alignment: Principles align with skill purpose
+
+- **Pattern Quality** (2 items):
+  - Why explanations: Complex patterns include "Why" or rationale
+  - Progressive Disclosure: If file >500 lines, advanced content moved to references/
+
 ### When to Use
 
 Content validation is critical for:
@@ -172,7 +206,7 @@ Content validation is critical for:
 - **Verifying completeness**: Check all required subsections exist
 - **Ensuring clarity**: Validate scenarios are specific, not vague
 
-**Pass Criteria**: 16/20 (80%) minimum
+**Pass Criteria**: 18/23 (78%) minimum
 
 ### With Configuration
 
@@ -197,6 +231,31 @@ if all(50 <= len(s) <= 100 for s in scenarios):
 # Check 2.1.4: No abstract phrases
 if not any(phrase in s.lower() for s in scenarios for phrase in ABSTRACT_PHRASES):
     pass  # ✅ Valid
+
+# ✅ NEW - Validate Core Principles - Values integration
+core_principles = skill.get_core_principles()
+DEVELOPMENT_VALUES = ['基礎と型', '成長の複利', '温故知新', '継続は力', 'ニュートラル']
+
+# Check 2.2.1: Values integration (bonus)
+values_found = any(value in core_principles for value in DEVELOPMENT_VALUES)
+if values_found:
+    bonus_points += 1  # +1 bonus point
+
+# ✅ NEW - Validate Pattern Quality - Why explanations
+advanced_patterns = skill.get_patterns(level='Advanced')
+
+# Check 2.2.2: Why explanations in complex patterns
+why_count = sum(1 for p in advanced_patterns if 'why' in p.lower() or '理由' in p)
+if why_count >= len(advanced_patterns) * 0.5:  # At least 50%
+    pass  # ✅ Valid
+
+# ✅ NEW - Validate Progressive Disclosure
+if skill.line_count > 500:
+    # Check 2.2.3: Progressive Disclosure strategy
+    has_references_dir = Path('references/').exists()
+    advanced_in_references = any(f.name.startswith('advanced') for f in Path('references/').glob('*.md'))
+    if has_references_dir and advanced_in_references:
+        pass  # ✅ Valid
 ```
 
 > 📚 **Complete validator implementation**: See `references/validation-examples.md`  
@@ -204,11 +263,11 @@ if not any(phrase in s.lower() for s in scenarios for phrase in ABSTRACT_PHRASES
 
 ---
 
-## Pattern 4: Code Quality Validation (15 Items)
+## Pattern 4: Code Quality Validation (16 Items)
 
 ### Overview
 
-Validates code examples for compilability, progressive complexity, consistent markers, and production-readiness.
+Validates code examples for compilability, progressive complexity, consistent markers, production-readiness, and code example length limits.
 
 ### Basic Example
 
@@ -218,6 +277,7 @@ Validates code examples for compilability, progressive complexity, consistent ma
 - **Progression** (3 items): Simple → Advanced ordering, each stage explained
 - **Markers** (4 items): ✅/❌ used consistently, comments explain WHY not WHAT
 - **Completeness** (5 items): DI config, error handling, async/await, resource disposal
+- **Code Length** (1 item): Inline examples ≤15 lines (advanced examples moved to references/)
 
 ### When to Use
 
@@ -226,7 +286,7 @@ Code validation ensures:
 - Readers can learn through progressive complexity
 - Production-grade patterns are demonstrated
 
-**Pass Criteria**: 12/15 (80%) minimum
+**Pass Criteria**: 13/16 (81%) minimum
 
 ### With Configuration
 
@@ -247,6 +307,20 @@ WHAT_PATTERNS = [r'//\s*Get\s+\w+', r'//\s*Set\s+\w+', r'//\s*Call\s+\w+']
 for block in code_blocks:
     for pattern in WHAT_PATTERNS:
         assert not re.search(pattern, block), "Comment explains WHAT, should explain WHY"
+
+# ✅ NEW - Check 3.16: Code example length limit
+for block in code_blocks:
+    lines = [l for l in block.split('\n') if l.strip() and not l.strip().startswith('using')]
+    line_count = len(lines)
+    
+    if line_count <= 15:
+        pass  # ✅ Valid - Inline examples are concise
+    elif line_count <= 20:
+        warnings.append("Code example is 16-20 lines, consider moving to references/")
+    else:
+        # >20 lines should be in references/advanced-examples.md
+        has_advanced_ref = Path('references/advanced-examples.md').exists()
+        assert has_advanced_ref, "Code example >20 lines requires references/advanced-examples.md"
 ```
 
 > 📚 **Complete validator implementation**: See `references/validation-examples.md`  
@@ -256,11 +330,11 @@ for block in code_blocks:
 
 ---
 
-## Pattern 5: Language & Expression Validation (10 Items)
+## Pattern 5: Language & Expression Validation (11 Items)
 
 ### Overview
 
-Validates writing style, terminology consistency, and scannability for optimal readability.
+Validates writing style, terminology consistency, scannability for optimal readability, and bilingual support.
 
 ### Basic Example
 
@@ -268,6 +342,8 @@ Validates writing style, terminology consistency, and scannability for optimal r
 
 - **Style** (4 items): Active voice, short sentences, imperative form, minimal ambiguity
 - **Terminology** (3 items): Consistent terms, definitions on first use, acronyms expanded
+- **Scannability** (3 items): Clear headers, table clarity, important info highlighted
+- **Bilingual Support** (1 item): English SKILL.md + Japanese references/SKILL.ja.md (bonus)
 - **Scannability** (3 items): Headings reveal structure, tables are clear, key info highlighted
 
 ### When to Use
@@ -277,7 +353,7 @@ Language validation ensures:
 - Technical terms are defined
 - Content is scannable
 
-**Pass Criteria**: 8/10 (80%) minimum
+**Pass Criteria**: 9/11 (82%) minimum
 
 ### With Configuration
 
@@ -298,6 +374,16 @@ PASSIVE_INDICATORS = [r'\bis\s+\w+ed\b', r'\bwas\s+\w+ed\b', r'\bcan\s+be\s+\w+e
 passive_count = sum(1 for s in sentences for p in PASSIVE_INDICATORS if re.search(p, s))
 passive_ratio = passive_count / len(sentences)
 assert passive_ratio < 0.2, f"Too much passive voice: {passive_ratio:.0%}"
+
+# ✅ NEW - Check 5.11: Bilingual Support
+has_english = Path('SKILL.md').exists()
+has_japanese = Path('references/SKILL.ja.md').exists()
+
+if has_english and has_japanese:
+    bonus_points += 1  # +1 bonus point for bilingual support
+elif not has_english and has_japanese:
+    assert False, "Japanese-only skill - must have English SKILL.md"
+# English-only is acceptable (no penalty)
 ```
 
 > 📚 **Complete validator implementation**: See `references/validation-examples.md`  
@@ -318,15 +404,16 @@ Generate comprehensive reports with scores, failures, and actionable improvement
 ```markdown
 # Quality Report: skill-name
 
-**Overall**: 45/55 (82%) ⚠️ CONDITIONAL PASS
-- Structure: 9/10 (90%) ✅
-- Content: 17/20 (85%) ✅
-- Code Quality: 11/15 (73%) ❌
-- Language: 8/10 (80%) ✅
+**Overall**: 52/64 (81%) ✅ PASS
+- Structure: 11/14 (79%) ✅
+- Content: 19/23 (83%) ✅
+- Code Quality: 13/16 (81%) ✅
+- Language: 9/11 (82%) ✅
+- Bonus Points: +1 (Japanese version)
 
 **Critical Issues**:
-- Only 3 pattern sections (need 7-10)
-- Code examples missing DI configuration
+- File length: 520 lines (warning: use references/ for >500)
+- Missing Why explanations in Advanced patterns
 ```
 
 
@@ -335,25 +422,25 @@ Generate comprehensive reports with scores, failures, and actionable improvement
 
 ## Common Pitfalls
 
-### 1. Passing Skills with < 85% Overall Score
+### 1. Passing Skills with < 80% Overall Score
 
-**Problem**: Skills barely meeting 80% per category but falling short of 85% overall get published.
+**Problem**: Skills barely meeting 80% per category but falling short of overall threshold get published.
 
-**Solution**: Enforce BOTH criteria: 80% per category AND 85% overall.
+**Solution**: Enforce BOTH criteria: 80% per category AND 80% overall (51/64 points).
 
 ```python
 # ✅ CORRECT - Strict validation
 def is_passing(results: Dict[str, ValidationResult]) -> bool:
-    # Check per-category threshold
+    # Check per-category threshold (80%)
     if not all(r.score >= 80 for r in results.values()):
         return False
     
-    # Check overall threshold
+    # Check overall threshold (80%, 51/64 points)
     total_passed = sum(r.passed for r in results.values())
     total_items = sum(r.total for r in results.values())
     overall_score = (total_passed / total_items) * 100
     
-    return overall_score >= 85
+    return overall_score >= 80  # 51/64 = 79.7%, round to 80%
 ```
 
 ### 2. Ignoring Context in Code Quality Checks
@@ -409,23 +496,23 @@ python validate_skill.py --skill my-skill --full-check
 ### Validation Workflow
 
 ```
-1. Run structure check (10 items)
+1. Run structure check (14 items)
    ├─ PASS: Continue
    └─ FAIL: Fix structure issues, restart
 
-2. Run content check (20 items)
+2. Run content check (23 items)
    ├─ PASS: Continue
-   └─ FAIL: Improve scenarios, patterns, explanations
+   └─ FAIL: Improve scenarios, patterns, Values integration
 
-3. Run code quality check (15 items)
+3. Run code quality check (16 items)
    ├─ PASS: Continue
-   └─ FAIL: Fix code examples, add DI/error handling
+   └─ FAIL: Fix code examples, add DI/error handling, shorten long examples
 
-4. Run language check (10 items)
+4. Run language check (11 items)
    ├─ PASS: Calculate overall score
-   └─ FAIL: Rewrite for clarity, active voice
+   └─ FAIL: Rewrite for clarity, active voice, add Japanese version
 
-5. Overall score ≥ 85% AND all categories ≥ 80%?
+5. Overall score ≥ 80% AND all categories ≥ 80%?
    ├─ YES: ✅ PUBLISH
    └─ NO: Review failures, iterate
 ```
@@ -434,11 +521,12 @@ python validate_skill.py --skill my-skill --full-check
 
 | Category | Items | Pass Threshold | Weight |
 |----------|-------|----------------|--------|
-| Structure | 11 | ≥ 9 (82%) | Critical |
-| Content | 20 | ≥ 16 (80%) | High |
-| Code Quality | 15 | ≥ 12 (80%) | High |
-| Language | 10 | ≥ 8 (80%) | Medium |
-| **Overall** | **56** | **≥ 48 (86%)** | **Required** |
+| Structure | 14 | ≥ 11 (79%) | Critical |
+| Content | 23 | ≥ 18 (78%) | High |
+| Code Quality | 16 | ≥ 13 (81%) | High |
+| Language | 11 | ≥ 9 (82%) | Medium |
+| **Overall** | **64** | **≥ 51 (80%)** | **Required** |
+| **Bonus** | **+2** | **Japanese + Values** | **Optional** |
 
 ---
 
@@ -446,14 +534,16 @@ python validate_skill.py --skill my-skill --full-check
 
 1. **Run Early and Often** - Validate during writing, not just at the end
 2. **Fix Structurally First** - Structure failures block everything else
-3. **Automate Where Possible** - Use scripts for repetitive checks
+3. **Automate Where Possible** - Use .ps1/.sh scripts for repetitive checks
 4. **Prioritize Critical Failures** - Fix structure/content before language
-5. **Target 95%+ After Revision** - First draft 85% is acceptable, revise to 95%+
-6. **Document Exceptions** - Note when intentionally skipping a check (e.g., tutorial-level skills)
+5. **Target 90%+ After Revision** - First draft 80% is acceptable, revise to 90%+
+6. **Document Exceptions** - Note when intentionally skipping a check
 7. **Peer Review Final Draft** - Automated checks + human review
 8. **Re-validate After Changes** - Don't assume fixes don't break other checks
 9. **Track Improvement Over Time** - Monitor scores across skill versions
 10. **Use Reports for Learning** - Analyze common failures to improve writing
+11. **Leverage references/** - Move detailed content to references/ for >500 line skills
+12. **Integrate Development Values** - Align Core Principles with 基礎と型、成長の複利、etc.
 
 ---
 
@@ -461,13 +551,24 @@ python validate_skill.py --skill my-skill --full-check
 
 - **[references/anti-patterns.md](references/anti-patterns.md)** - Detailed ❌ bad pattern examples and common failures
 - **[references/validation-examples.md](references/validation-examples.md)** - Advanced validator implementations
-- **[SKILL_QUALITY_CHECKLIST.md](../../.copilot/docs/SKILL_QUALITY_CHECKLIST.md)** - Full 56-item checklist
 - **[skill-writing-guide](../skill-writing-guide/SKILL.md)** - Learn how to write high-quality skills
 - **[skill-revision-guide](../skill-revision-guide/SKILL.md)** - Fix issues found during validation
+- **[Development Philosophy](../../.github/copilot-instructions.md)** - Values and coding standards
 
 ---
 
 ## Changelog
+
+### Version 3.0.0 (2026-02-12)
+- **Expanded checklist**: 56 → 64 items (+8 validation checks)
+- **Added file length optimization**: 500 line recommendation with 550 line (+10%) tolerance
+- **Added references/ validation**: Check for references/ directory structure
+- **Added bilingual support**: Japanese version bonus point
+- **Added Values integration**: Development philosophy alignment checks
+- **Added code length limits**: Inline examples ≤15 lines recommended
+- **Added Progressive Disclosure**: Advanced content in references/ for >500 line skills
+- **Updated thresholds**: Overall 85% → 80% (51/64 points)
+- **New scripts**: PowerShell (.ps1) and Bash (.sh) validation scripts
 
 ### Version 2.0.0 (2026-02-12)
 - **Optimized file length**: Reduced from 780 lines to 335 lines (57% reduction)

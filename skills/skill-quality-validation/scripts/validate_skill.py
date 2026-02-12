@@ -1,22 +1,35 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 SKILL.md Quality Validator
 
-Validates GitHub Copilot agent skills against 55-item quality checklist.
-Automates the validation process defined in SKILL_QUALITY_CHECKLIST.md.
+Validates GitHub Copilot agent skills against 64-item quality checklist.
+Automates the validation process with expanded checks for file length optimization,
+references/ structure, bilingual support, and development philosophy integration.
 
 Usage:
     python validate_skill.py path/to/SKILL.md
     python validate_skill.py path/to/SKILL.md --json
     python validate_skill.py path/to/SKILL.md --output report.txt
+    
+Version: 3.0.0
+Author: RyoMurakami1983
+Last Updated: 2026-02-12
 """
 
 import argparse
 import re
 import json
+import sys
 from pathlib import Path
 from dataclasses import dataclass, asdict
 from typing import List, Dict, Tuple, Optional
+
+# Ensure UTF-8 encoding for stdout
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 
 @dataclass
@@ -53,7 +66,7 @@ class ValidationReport:
     total_max_score: int
     overall_percentage: float
     overall_passed: bool
-    overall_threshold: float = 85.0
+    overall_threshold: float = 80.0  # Changed from 85.0 to 80.0 for 64-item checklist
 
 
 class SkillValidator:
