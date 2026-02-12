@@ -1,6 +1,6 @@
 ---
 name: skill-template-generator
-description: Generate structured SKILL.md templates for GitHub Copilot agent skills. Use when starting a new skill from scratch or creating skill boilerplate.
+description: Generate structured SKILL.md templates for GitHub Copilot agent skills.
 author: RyoMurakami1983
 tags: [copilot, agent-skills, templates, generator, scaffolding]
 invocable: false
@@ -10,31 +10,32 @@ invocable: false
 
 Automated generation of structured SKILL.md templates with proper formatting, sections, and boilerplate code.
 
+## When to Use This Skill
+
+Use this skill when:
+- Generating standard SKILL.md structure with all required sections
+- Creating skills that comply with GitHub Copilot specifications
+- Setting up bilingual skill boilerplate (English and Japanese)
+- Establishing skill scaffolding with proper YAML frontmatter
+- Building skill templates with author attribution included
+- Automating skill structure validation from the start
+
+---
+
 ## Related Skills
 
 - **`skill-writing-guide`** - Learn skill writing best practices
 - **`skill-quality-validation`** - Validate generated skills
 - **`skill-revision-guide`** - Revise generated skills
 
-## When to Use This Skill
-
-Use this skill when:
-- Starting a new skill from scratch
-- Need standard SKILL.md structure with all required sections
-- Want to generate both English and Japanese versions simultaneously
-- Setting up skill boilerplate with proper YAML frontmatter
-- Creating skills that comply with GitHub Copilot/Claude specifications
-- Ensuring `author: RyoMurakami1983` is included for system-created skills
-
 ---
 
 ## Core Principles
 
-1. **Standard Compliance** - Generate templates that pass quality validation by default
-2. **Bilingual Support** - Create both English (SKILL.md) and Japanese (references/SKILL.ja.md) versions
-3. **Customizable** - Allow users to specify skill name, description, tags, and pattern count
-4. **Author Attribution** - Automatically include `author: RyoMurakami1983` for tracking
-5. **Ready to Fill** - Provide placeholders and examples that guide content creation
+1. **基礎と型（Foundation & Form）** - Generate templates that embed standard structure and pass quality validation by default
+2. **成長の複利（Compound Growth）** - Provide scaffolding that makes it easy to add patterns incrementally over time
+3. **継続は力（Consistency is Strength）** - Support bilingual versions (English + Japanese) to maintain accessibility and reach
+4. **ニュートラル（Neutrality）** - Create templates with clear placeholders and guidance for diverse skill domains
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: skill-revision-guide
-description: Guide for revising and maintaining GitHub Copilot agent skills. Use when updating existing SKILL.md files, managing changelogs, keeping English-Japanese versions synchronized, or identifying skills needing updates. Enhanced support for skills with author RyoMurakami1983.
+description: Guide for revising GitHub Copilot agent skills and managing changelogs.
 author: RyoMurakami1983
 tags: [copilot, agent-skills, revision, maintenance, changelog]
 invocable: false
@@ -10,31 +10,32 @@ invocable: false
 
 Comprehensive guide for revising, maintaining, and version-controlling GitHub Copilot agent skills with changelog management and bilingual synchronization.
 
+## When to Use This Skill
+
+Use this skill when:
+- Updating existing SKILL.md files with new content or bug fixes
+- Recording changes in CHANGELOG.md with concise one-line entries
+- Synchronizing English SKILL.md with Japanese versions
+- Managing skill versions and maintaining backward compatibility
+- Identifying skills created by this system via author metadata
+- Determining if a change is substantial or trivial
+
+---
+
 ## Related Skills
 
 - **`skill-writing-guide`** - Reference skill writing standards
 - **`skill-quality-validation`** - Validate revisions before publishing
 - **`skill-template-generator`** - Generate new skills
 
-## When to Use This Skill
-
-Use this skill when:
-- Updating existing SKILL.md files with new content or fixes
-- Recording changes in CHANGELOG.md with concise 1-line entries
-- Synchronizing English SKILL.md with Japanese references/SKILL.ja.md
-- Identifying skills created by this system (`author: RyoMurakami1983`)
-- Deciding if a change is substantial (changelog-worthy) vs. trivial (typo)
-- Managing skill versions and maintaining backward compatibility
-
 ---
 
 ## Core Principles
 
-1. **Concise Changelog** - Record only substantial changes in 1-line format: "Changed: [before] → [after]"
-2. **English-Japanese Sync** - Always update both versions when revising system-created skills
-3. **Substantial Changes Only** - Log content/functionality changes; skip typos, formatting
-4. **Author-Based Detection** - Use `author: RyoMurakami1983` to identify system skills requiring enhanced support
-5. **CHANGELOG.md Separation** - Move changelogs from SKILL.md to CHANGELOG.md when they grow large
+1. **Changelog Discipline** - Record substantial changes in one-line format (基礎と型)
+2. **Bilingual Sync** - Always update both English and Japanese versions (温故知新)
+3. **Author Tracking** - Use `author: RyoMurakami1983` to detect system skills (ニュートラル)
+4. **Knowledge Base** - Build revision history for compound growth (成長の複利)
 
 ---
 
