@@ -1,6 +1,6 @@
 ---
 name: skill-quality-validation
-description: Validate and score the quality of GitHub Copilot agent skills. Use when reviewing SKILL.md files for completeness, adherence to best practices, or generating quality reports.
+description: Validate GitHub Copilot agent skills. Use when reviewing SKILL.md files for quality.
 author: RyoMurakami1983
 tags: [copilot, agent-skills, quality, validation, testing]
 invocable: false
@@ -10,21 +10,23 @@ invocable: false
 
 Comprehensive quality assessment system for GitHub Copilot agent skills with 64-point checklist, automated scoring, and development philosophy integration.
 
+## When to Use This Skill
+
+Use this skill when:
+- Reviewing a completed SKILL.md file before publishing to ensure quality
+- Assessing skill quality against official 64-item standards and criteria
+- Generating detailed quality reports with scores and improvement recommendations
+- Identifying structural or content issues in skill documentation files
+- Validating compliance with GitHub Copilot and Claude skill specifications
+- Performing thorough peer reviews of skill documentation and code examples
+
+---
+
 ## Related Skills
 
 - **`skill-writing-guide`** - Learn skill writing best practices
 - **`skill-template-generator`** - Generate skill templates
 - **`skill-revision-guide`** - Revise skills based on validation results
-
-## When to Use This Skill
-
-Use this skill when:
-- Reviewing a completed SKILL.md file before publishing
-- Assessing skill quality against official standards
-- Generating quality reports with scores and improvement recommendations
-- Identifying structural or content issues in skills
-- Validating compliance with GitHub Copilot/Claude specifications
-- Performing peer reviews of skill documentation
 
 ---
 
