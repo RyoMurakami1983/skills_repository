@@ -20,6 +20,7 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 | [skill-quality-validation](skill-quality-validation/) | 55項目品質検証 | 2.0.0 | 自動品質チェック、スコアリング、改善提案 |
 | [skill-template-generator](skill-template-generator/) | テンプレート自動生成 | 1.0.0 | SKILL.md/SKILL.ja.md雛形生成、構造作成 |
 | [skill-revision-guide](skill-revision-guide/) | 修正・バージョン管理 | 1.0.0 | 変更管理、CHANGELOG、英日同期支援 |
+| [skill-git-japanese-practices](skill-git-japanese-practices/) | Git日本語プラクティス | 1.0.0 | Conventional Commits、GitHubフロー、原子的コミット、コードレビュー |
 
 ## 🔧 依存関係
 
@@ -107,6 +108,24 @@ python ~/.copilot/skills/skill-template-generator/scripts/generate_template.py
 ```
 
 詳細: [skill-revision-guide/SKILL.md](skill-revision-guide/SKILL.md) | [日本語版](skill-revision-guide/references/SKILL.ja.md)
+
+### 5. skill-git-japanese-practices
+
+**Git運用のベストプラクティスガイド**
+
+- 日本語コミットメッセージの効果的な書き方
+- Conventional Commits形式の実践
+- GitHubフローのブランチ戦略
+- 原子的コミットの作り方
+- コードレビュー文化の醸成
+- 開発憲法との整合（基礎と型 / 成長の複利）
+
+**使い方**:
+```
+@workspace /skill-git-japanese-practices Conventional Commitsを導入したい
+```
+
+詳細: [skill-git-japanese-practices/SKILL.md](skill-git-japanese-practices/SKILL.md) | [日本語版](skill-git-japanese-practices/references/SKILL.ja.md)
 
 ## 🚀 ワークフロー例
 
