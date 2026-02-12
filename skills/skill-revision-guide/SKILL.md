@@ -13,12 +13,12 @@ Comprehensive guide for revising, maintaining, and version-controlling GitHub Co
 ## When to Use This Skill
 
 Use this skill when:
-- Updating existing SKILL.md files with new content or bug fixes
-- Recording changes in CHANGELOG.md with concise one-line entries
+- Updating existing SKILL.md files with new content or fixes
+- Recording changes in CHANGELOG.md with concise entries
 - Synchronizing English SKILL.md with Japanese versions
-- Managing skill versions and maintaining backward compatibility
-- Identifying skills created by this system via author metadata
-- Determining if a change is substantial or trivial
+- Managing skill versions and backward compatibility
+- Identifying system-created skills via author metadata
+- Determining whether a change is substantial or trivial
 
 ---
 
@@ -33,8 +33,8 @@ Use this skill when:
 ## Core Principles
 
 1. **Changelog Discipline** - Record substantial changes in one-line format (基礎と型)
-2. **Bilingual Sync** - Always update both English and Japanese versions (温故知新)
-3. **Author Tracking** - Use `author: RyoMurakami1983` to detect system skills (ニュートラル)
+2. **Bilingual Sync** - Always update English and Japanese versions (温故知新)
+3. **Author Tracking** - Use author field to detect system skills (ニュートラル)
 4. **Knowledge Base** - Build revision history for compound growth (成長の複利)
 
 ---
@@ -44,6 +44,8 @@ Use this skill when:
 ### Overview
 
 Detect skills created by this system via `author: RyoMurakami1983` in YAML frontmatter to provide targeted revision support.
+
+**Why**: System-created skills require enhanced maintenance including bilingual synchronization and changelog management, while community-contributed skills may follow different conventions.
 
 ### Basic Example
 
@@ -136,6 +138,8 @@ class SkillRevisionAssistant:
 ### Overview
 
 Determine if a change is substantial (should be logged) vs. trivial (skip logging).
+
+**Why**: Maintaining a focused changelog prevents noise and helps users quickly identify meaningful updates. Logging every typo fix would make the changelog unreadable.
 
 ### Basic Example
 
@@ -447,6 +451,178 @@ Determine when to increment version numbers based on change significance.
 ```
 
 > 📚 **Detailed versioning rules**: See [references/versioning-guide.md](references/versioning-guide.md) for comprehensive semantic versioning guide, deprecation strategies, and CHANGELOG best practices.
+
+---
+
+## Anti-Patterns
+
+### 1. Logging Every Change
+
+**Problem**: Recording trivial changes like typo fixes clutters the changelog and obscures meaningful updates.
+
+**Impact**: Users waste time reading irrelevant changelog entries; actual breaking changes get buried.
+
+**Solution**: Apply the substantial change filter - only log content/functionality changes, not formatting or typos.
+
+```python
+# ❌ ANTI-PATTERN - Logging everything
+changelog.append("Fixed: typo in line 42")
+changelog.append("Fixed: indentation")
+changelog.append("Fixed: comma placement")
+
+# ✅ CORRECT - Log only substantial changes
+if is_substantial_change(diff):
+    changelog.append(f"Changed: {before} → {after}")
+```
+
+### 2. Neglecting Bilingual Synchronization
+
+**Problem**: Updating English SKILL.md but forgetting the Japanese version creates documentation drift.
+
+**Impact**: Japanese users receive outdated or incorrect information; translation inconsistencies accumulate.
+
+**Solution**: Always update both versions atomically, or use automation to detect desync.
+
+```python
+# ❌ ANTI-PATTERN - English only update
+update_file("SKILL.md", new_content)
+# Forgot references/SKILL.ja.md!
+
+# ✅ CORRECT - Synchronized update
+update_file("SKILL.md", new_content_en)
+update_file("references/SKILL.ja.md", new_content_ja)
+verify_sync("SKILL.md", "references/SKILL.ja.md")
+```
+
+---
+
+## Pattern 6: Detecting Outdated Skills
+
+### Overview
+
+Identify skills that need updates based on age, dependency changes, or framework evolution.
+
+**Why**: Proactive maintenance prevents skills from becoming obsolete. Regular reviews ensure examples remain current and compatible with latest tooling.
+
+### Basic Example
+
+```python
+# ✅ CORRECT - Detect outdated skills
+from datetime import datetime, timedelta
+import re
+
+def check_skill_freshness(skill_path: Path) -> dict:
+    """Check if skill needs review"""
+    content = skill_path.read_text(encoding='utf-8')
+    
+    # Extract last update from changelog
+    changelog_match = re.search(r'## Version.*?\((\d{4}-\d{2}-\d{2})\)', content)
+    if not changelog_match:
+        return {"status": "no_changelog", "action": "Add changelog"}
+    
+    last_update = datetime.strptime(changelog_match.group(1), '%Y-%m-%d')
+    age_days = (datetime.now() - last_update).days
+    
+    if age_days > 180:
+        return {"status": "stale", "age_days": age_days, "action": "Review for updates"}
+    elif age_days > 90:
+        return {"status": "aging", "age_days": age_days, "action": "Consider review"}
+    else:
+        return {"status": "fresh", "age_days": age_days, "action": "No action needed"}
+
+# Usage
+result = check_skill_freshness(Path("skills/skill-writing-guide/SKILL.md"))
+print(f"Status: {result['status']} ({result['age_days']} days)")
+print(f"Action: {result['action']}")
+```
+
+### When to Use
+
+| Age | Status | Action |
+|-----|--------|--------|
+| < 90 days | Fresh | No action needed |
+| 90-180 days | Aging | Consider review |
+| > 180 days | Stale | Review for updates |
+| No changelog | Unknown | Add changelog |
+
+---
+
+## Pattern 7: Batch Revision Workflow
+
+### Overview
+
+Efficiently revise multiple skills in a single session with consistent quality standards.
+
+**Why**: Batch processing reduces context-switching overhead. Applying the same standards across all skills ensures consistency and completeness.
+
+### Basic Example
+
+```python
+# ✅ CORRECT - Batch revision with validation
+from pathlib import Path
+from typing import List
+
+def batch_revise_skills(skill_paths: List[Path], changes: dict):
+    """Revise multiple skills consistently"""
+    results = []
+    
+    for skill_path in skill_paths:
+        print(f"\nRevising: {skill_path.name}")
+        
+        # 1. Check if system skill
+        is_system = check_author_field(skill_path)
+        
+        # 2. Apply changes
+        apply_revision(skill_path, changes)
+        
+        # 3. Update Japanese version if system skill
+        if is_system:
+            ja_path = skill_path.parent / "references" / "SKILL.ja.md"
+            if ja_path.exists():
+                apply_revision(ja_path, changes, language='ja')
+        
+        # 4. Update changelog
+        update_changelog(skill_path, changes['description'])
+        
+        # 5. Run validation
+        score = run_validation(skill_path)
+        
+        results.append({
+            "skill": skill_path.name,
+            "system_skill": is_system,
+            "score": score,
+            "passed": score >= 80.0
+        })
+    
+    # Summary report
+    print("\n=== Batch Revision Summary ===")
+    for r in results:
+        status = "PASS" if r['passed'] else "FAIL"
+        print(f"{r['skill']}: {r['score']:.1f}% ({status})")
+    
+    return results
+
+# Usage
+skills_to_update = [
+    Path("skills/skill-writing-guide/SKILL.md"),
+    Path("skills/skill-quality-validation/SKILL.md"),
+    Path("skills/skill-template-generator/SKILL.md")
+]
+
+changes = {
+    "type": "update",
+    "description": "Updated code examples to Python 3.12 syntax"
+}
+
+batch_revise_skills(skills_to_update, changes)
+```
+
+### When to Use
+
+- Applying framework/library version updates across multiple skills
+- Standardizing formatting or style across the repository
+- Fixing the same issue found in multiple skills
+- Performing quarterly skill maintenance reviews
 
 ---
 
