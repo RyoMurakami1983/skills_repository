@@ -1,22 +1,35 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 SKILL.md Quality Validator
 
-Validates GitHub Copilot agent skills against 55-item quality checklist.
-Automates the validation process defined in SKILL_QUALITY_CHECKLIST.md.
+Validates GitHub Copilot agent skills against 64-item quality checklist.
+Automates the validation process with expanded checks for file length optimization,
+references/ structure, bilingual support, and development philosophy integration.
 
 Usage:
     python validate_skill.py path/to/SKILL.md
     python validate_skill.py path/to/SKILL.md --json
     python validate_skill.py path/to/SKILL.md --output report.txt
+    
+Version: 3.0.0
+Author: RyoMurakami1983
+Last Updated: 2026-02-12
 """
 
 import argparse
 import re
 import json
+import sys
 from pathlib import Path
 from dataclasses import dataclass, asdict
 from typing import List, Dict, Tuple, Optional
+
+# Ensure UTF-8 encoding for stdout
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 
 @dataclass
@@ -69,8 +82,11 @@ class SkillValidator:
         return bool(re.search(pattern, self.content, re.IGNORECASE | re.MULTILINE))
 
     def count_sections(self, pattern: str) -> int:
-        """Count number of matching sections"""
-        return len(re.findall(pattern, self.content, re.MULTILINE))
+        """Count number of matching sections, excluding code blocks"""
+        # Remove code blocks first to avoid counting headings inside them
+        # Use line-start anchor to avoid matching inline code
+        content_without_code = re.sub(r'^```.*?^```', '', self.content, flags=re.DOTALL | re.MULTILINE)
+        return len(re.findall(pattern, content_without_code, re.MULTILINE))
 
     def extract_frontmatter(self) -> Optional[str]:
         """Extract YAML frontmatter"""
@@ -162,16 +178,10 @@ class StructureValidator(SkillValidator):
         ))
 
         # 1.7 7-10 pattern sections
-        # Count H2 sections excluding known non-pattern sections
-        all_h2 = self.count_sections(r'^##\s+')
-        excluded = ['When to Use', 'Core Principles', 'The Philosophy', 
-                   'Common Pitfalls', 'Anti-Patterns', 'Quick Reference', 
-                   'Decision Tree', 'Summary', 'References']
-        
-        pattern_count = all_h2
-        for section in excluded:
-            if self.has_section(rf'^##\s+.*{section}'):
-                pattern_count -= 1
+        # Count Pattern sections directly (e.g., "## Pattern 1:", "## Pattern 2:")
+        # Remove code blocks first (use line-start anchor to avoid inline code)
+        content_without_code = re.sub(r'^```.*?^```', '', self.content, flags=re.DOTALL | re.MULTILINE)
+        pattern_count = len(re.findall(r'^##\s+Pattern\s+\d+:', content_without_code, re.MULTILINE))
         
         pattern_count_ok = 7 <= pattern_count <= 10
         checks.append(CheckResult(
@@ -275,7 +285,8 @@ class ContentValidator(SkillValidator):
                     self.get_section_content("The Philosophy") or ""
 
         # 2.2.1 3-5 principles listed
-        principle_count = len(re.findall(r'^\*\*[^*]+\*\*', principles, re.MULTILINE))
+        # Match numbered list format: "1. **Name** - description"
+        principle_count = len(re.findall(r'^\d+\.\s+\*\*[^*]+\*\*', principles, re.MULTILINE))
         checks.append(CheckResult(
             "2.2.1",
             "3-5 principles listed",
@@ -377,30 +388,43 @@ class ContentValidator(SkillValidator):
         ))
 
         # 2.5 Anti-Patterns & Pitfalls (3 items)
-        antipatterns_section = self.get_section_content("Anti-Patterns") or ""
-        pitfalls_section = self.get_section_content("Common Pitfalls") or ""
+        # Extract all Anti-Patterns and Pitfalls sections (there may be multiple)
+        antipatterns_sections = re.findall(
+            r'^##\s+Anti-Patterns.*?\n(.*?)(?=^##\s|\Z)',
+            self.content, re.MULTILINE | re.DOTALL | re.IGNORECASE
+        )
+        pitfalls_sections = re.findall(
+            r'^##\s+.*Pitfalls.*?\n(.*?)(?=^##\s|\Z)',
+            self.content, re.MULTILINE | re.DOTALL | re.IGNORECASE
+        )
+        
+        # Combine all sections
+        all_antipatterns = "\n".join(antipatterns_sections)
+        all_pitfalls = "\n".join(pitfalls_sections)
 
         # 2.5.1 Anti-Patterns address architecture-level issues
-        has_architecture_terms = any(term in antipatterns_section.lower() 
+        has_architecture_terms = any(term in all_antipatterns.lower() 
                                     for term in ['architecture', 'design', 'structure', 'layer'])
         checks.append(CheckResult(
             "2.5.1",
             "Anti-Patterns address architecture-level issues",
-            has_architecture_terms or len(antipatterns_section) > 100
+            has_architecture_terms or len(all_antipatterns) > 100
         ))
 
         # 2.5.2 Pitfalls address implementation-level issues
-        has_implementation_terms = any(term in pitfalls_section.lower() 
+        has_implementation_terms = any(term in all_pitfalls.lower() 
                                       for term in ['implement', 'code', 'method', 'function'])
         checks.append(CheckResult(
             "2.5.2",
             "Pitfalls address implementation-level issues",
-            has_implementation_terms or len(pitfalls_section) > 100
+            has_implementation_terms or len(all_pitfalls) > 100
         ))
 
         # 2.5.3 Each issue has fix/solution
-        fix_count = len(re.findall(r'fix|solution|instead|correct', 
-                                   antipatterns_section + pitfalls_section, re.IGNORECASE))
+        # Search in full content (excluding code blocks) to capture all Anti-Patterns/Pitfalls sections
+        content_no_code = re.sub(r'^```.*?^```', '', self.content, flags=re.DOTALL | re.MULTILINE)
+        fix_count = len(re.findall(r'\b(fix|solution|instead|correct)\b', 
+                                   content_no_code, re.IGNORECASE))
         checks.append(CheckResult(
             "2.5.3",
             "Issues have fixes/solutions",
