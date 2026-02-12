@@ -527,7 +527,387 @@ generator.generate()
 
 ---
 
+## Pattern 4: Version Control Integration
+
+### Overview
+
+Generate CHANGELOG.md template alongside SKILL.md for proper version tracking from day one.
+
+**Why**: Starting with a changelog structure encourages documenting changes from the beginning, establishing good maintenance habits and making future updates easier to track.
+
+### Basic Example
+
+```python
+# ✅ CORRECT - Generate with changelog
+def generate_skill_with_changelog(name: str, output_dir: Path):
+    """Generate SKILL.md and CHANGELOG.md together"""
+    skill_path = output_dir / "SKILL.md"
+    changelog_path = output_dir / "CHANGELOG.md"
+    
+    # Generate main skill file
+    skill_content = generate_skill_template(name)
+    skill_path.write_text(skill_content, encoding='utf-8')
+    
+    # Generate changelog template
+    changelog_content = f"""# Changelog - {name}
+
+All notable changes to this skill will be documented in this file.
+
+Format: `Category: Description (max 100 chars)`
+
+## Version 1.0.0 ({datetime.now().strftime('%Y-%m-%d')})
+- Added: Initial skill creation
+- Added: Core patterns and examples
+- Added: Documentation and references
+"""
+    changelog_path.write_text(changelog_content, encoding='utf-8')
+    
+    print(f"✅ Generated: {skill_path}")
+    print(f"✅ Generated: {changelog_path}")
+```
+
+### When to Use
+
+- Creating production-ready skills that will evolve over time
+- Setting up skills for team collaboration with version tracking
+- Establishing skills that require formal release management
+
+---
+
+## Pattern 5: Multi-Pattern Skill Generation
+
+### Overview
+
+Generate skills with multiple pattern sections (7-10 recommended) using pattern templates.
+
+**Why**: Skills with 7-10 patterns hit the sweet spot for comprehensive coverage without overwhelming readers. Template-driven generation ensures consistency across patterns.
+
+### Basic Example
+
+```python
+# ✅ CORRECT - Generate multi-pattern skill
+def generate_multi_pattern_skill(name: str, pattern_count: int = 8):
+    """Generate skill with specified number of patterns"""
+    if not (7 <= pattern_count <= 10):
+        print(f"⚠️ Warning: {pattern_count} patterns (recommended: 7-10)")
+    
+    patterns = []
+    for i in range(1, pattern_count + 1):
+        pattern = f"""
+## Pattern {i}: [Pattern Name]
+
+### Overview
+
+[Brief description of what this pattern addresses]
+
+**Why**: [Explanation of why this pattern is important]
+
+### Basic Example
+
+```python
+# ✅ CORRECT - [Pattern implementation]
+# TODO: Add code example
+```
+
+### When to Use
+
+- [Scenario 1]
+- [Scenario 2]
+- [Scenario 3]
+"""
+        patterns.append(pattern)
+    
+    skill_content = generate_base_template(name) + "\n".join(patterns)
+    return skill_content
+```
+
+### When to Use
+
+- Creating comprehensive skills covering a broad topic
+- Generating skills that need multiple approaches or techniques
+- Building skills for complex domains requiring detailed patterns
+
+---
+
+## Pattern 6: Dependency and Requirements
+
+### Overview
+
+Document dependencies, prerequisites, and installation requirements in the generated template.
+
+**Why**: Clear dependency documentation prevents setup issues and helps users determine if a skill is applicable to their environment.
+
+### Basic Example
+
+```python
+# ✅ CORRECT - Include dependencies section
+dependencies_section = """
+## Prerequisites
+
+### Required Tools
+- Python 3.8 or higher
+- pip package manager
+
+### Required Libraries
+```bash
+pip install pyyaml jinja2
+```
+
+### Optional Tools
+- VS Code with Python extension (recommended)
+- GitHub CLI for repository operations
+
+## Dependencies
+
+This skill requires the following Python packages:
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| pyyaml | ≥6.0 | YAML parsing for frontmatter |
+| jinja2 | ≥3.0 | Template rendering |
+| pathlib | stdlib | File path handling |
+
+To install all dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+"""
+
+def generate_with_dependencies(name: str, deps: list[str]):
+    """Generate skill with dependency documentation"""
+    template = load_base_template()
+    template = template.replace("{{DEPENDENCIES}}", dependencies_section)
+    
+    # Generate requirements.txt
+    requirements_content = "\n".join([f"{dep}>=1.0" for dep in deps])
+    
+    return {
+        "SKILL.md": template,
+        "requirements.txt": requirements_content
+    }
+```
+
+### When to Use
+
+- Generating skills with external library dependencies
+- Creating skills for specific tool ecosystems
+- Building skills that require particular environment setups
+
+---
+
+## Pattern 7: Asset and Template Management
+
+### Overview
+
+Organize generated templates, assets, and reference materials in a structured directory layout.
+
+**Why**: Proper asset organization (assets/, references/) keeps skills maintainable and adheres to the references/ pattern for content exceeding 500 lines.
+
+### Basic Example
+
+```python
+# ✅ CORRECT - Structured asset generation
+from pathlib import Path
+
+def generate_skill_with_assets(name: str, output_dir: Path):
+    """Generate skill with complete directory structure"""
+    skill_dir = output_dir / name
+    skill_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Create directory structure
+    (skill_dir / "assets").mkdir(exist_ok=True)
+    (skill_dir / "references").mkdir(exist_ok=True)
+    
+    # Generate main skill file
+    skill_md = skill_dir / "SKILL.md"
+    skill_md.write_text(generate_template(name), encoding='utf-8')
+    
+    # Generate Japanese version in references/
+    ja_md = skill_dir / "references" / "SKILL.ja.md"
+    ja_md.write_text(generate_template_ja(name), encoding='utf-8')
+    
+    # Generate template assets
+    template_file = skill_dir / "assets" / "TEMPLATE.md"
+    template_file.write_text(load_pattern_template(), encoding='utf-8')
+    
+    # Generate README for references/
+    readme = skill_dir / "references" / "README.md"
+    readme.write_text(f"""# {name} References
+
+This directory contains supplementary materials for the {name} skill:
+
+- **SKILL.ja.md**: Japanese translation of the main skill
+- **extended-examples.md**: Additional code examples
+- **api-reference.md**: Detailed API documentation
+
+## File Organization
+
+Place content here when:
+- Main SKILL.md exceeds 500 lines (recommended) or 550 lines (max)
+- Detailed reference material supports main patterns
+- Bilingual versions require separate files
+""", encoding='utf-8')
+    
+    print(f"✅ Generated skill structure:")
+    print(f"   {skill_md}")
+    print(f"   {ja_md}")
+    print(f"   {template_file}")
+    print(f"   {readme}")
+```
+
+### When to Use
+
+- Creating skills with extensive reference materials
+- Generating bilingual skills (English + Japanese)
+- Building skills with reusable template assets
+- Setting up skills that will exceed 500 lines
+
+---
+
+## Anti-Patterns
+
+### 1. Hardcoding Template Content
+
+**Problem**: Embedding all template content directly in code instead of using external template files makes templates inflexible and difficult to customize.
+
+**Impact**: Every template change requires code modification, testing, and redeployment. Users cannot easily adapt templates to their needs.
+
+**Fix**: Use external template files (Jinja2, Mustache) instead of hardcoding. This separates content from logic and enables easy customization.
+
+```python
+# ❌ ANTI-PATTERN - Hardcoded template
+def generate_skill(name):
+    return f"""---
+name: {name}
+description: [Add description]
+---
+
+# {name}
+
+[Content goes here]
+"""
+
+# ✅ CORRECT - Template file approach
+from jinja2 import Template
+
+template = Template(Path("templates/SKILL.j2").read_text())
+skill_content = template.render(name=name, description=desc)
+```
+
+### 2. Ignoring File Length Limits
+
+**Problem**: Generating massive SKILL.md files without considering the 500-line recommendation or 550-line maximum.
+
+**Impact**: Generated skills fail quality validation and become difficult to navigate and maintain.
+
+**Fix**: Split content into main SKILL.md and references/ directory when approaching limits. Check line count and automatically distribute content.
+
+```python
+# ❌ ANTI-PATTERN - No length checking
+def generate_skill(patterns: list):
+    content = base_template + "\n".join([p.render() for p in patterns])
+    return content  # Could be 1000+ lines!
+
+# ✅ CORRECT - Length-aware generation with split
+def generate_skill_smart(patterns: list):
+    main_content = base_template + "\n".join([p.render() for p in patterns[:5]])
+    
+    if len(main_content.split('\n')) > 500:
+        # Move detailed examples to references/
+        extended = "\n".join([p.render_extended() for p in patterns])
+        return {
+            "SKILL.md": main_content,
+            "references/extended-examples.md": extended
+        }
+    
+    return {"SKILL.md": main_content}
+```
+
+---
+
 ## Common Pitfalls
+
+### 1. Missing Import Statements in Generated Code
+
+**Problem**: Generated code examples lack necessary import statements, making them non-compilable.
+
+**Solution**: Always include required imports at the top of code blocks.
+
+```python
+# ❌ WRONG - Missing imports
+code_example = '''
+def load_yaml(path):
+    return yaml.safe_load(Path(path).read_text())
+'''
+
+# ✅ CORRECT - Include imports
+code_example = '''
+import yaml
+from pathlib import Path
+
+def load_yaml(path):
+    return yaml.safe_load(Path(path).read_text())
+'''
+```
+
+**Fix**: Create import template that prepends required imports based on code analysis.
+
+### 2. No Error Handling in Templates
+
+**Problem**: Generated code examples don't demonstrate proper error handling, leading to brittle skills.
+
+**Solution**: Include try-except blocks and validation in generated examples.
+
+```python
+# ❌ WRONG - No error handling
+def generate_example():
+    return '''
+skill_path = Path(skill_name) / "SKILL.md"
+skill_path.write_text(content)
+'''
+
+# ✅ CORRECT - With error handling
+def generate_example_safe():
+    return '''
+try:
+    skill_path = Path(skill_name) / "SKILL.md"
+    skill_path.parent.mkdir(parents=True, exist_ok=True)
+    skill_path.write_text(content, encoding='utf-8')
+    print(f"✅ Generated: {skill_path}")
+except OSError as e:
+    print(f"❌ Failed to write {skill_path}: {e}")
+    raise
+'''
+```
+
+**Fix**: Wrap file operations and external calls in try-except with meaningful error messages.
+
+### 3. Forgetting Bilingual Support
+
+**Problem**: Generating only English SKILL.md without considering Japanese translation needs for system skills.
+
+**Solution**: Offer bilingual generation as default or prominent option.
+
+```python
+# ❌ WRONG - English only
+def generate_skill(name):
+    return generate_template("en", name)
+
+# ✅ CORRECT - Bilingual by default for system skills
+def generate_skill(name, bilingual=True):
+    files = {"SKILL.md": generate_template("en", name)}
+    
+    if bilingual:
+        files["references/SKILL.ja.md"] = generate_template("ja", name)
+        print("✅ Generated bilingual skill (EN + JA)")
+    
+    return files
+```
+
+**Fix**: Make bilingual generation the default for `author: RyoMurakami1983` skills.
+
+---
 
 ### 1. Forgetting to Set `author: RyoMurakami1983`
 
