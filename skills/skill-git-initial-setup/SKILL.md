@@ -23,7 +23,9 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skill-git-japanese-practices`** - Git workflow and code review practices
+- **`skill-git-commit-practices`** - Commit workflow and conventions
+- **`skill-github-pr-workflow`** - PR creation and merge flow
+- **`skill-git-review-standards`** - Review quality and PR sizing
 - **`skill-writing-guide`** - Skill documentation standards
 - **`skill-quality-validation`** - Validate skill quality
 
