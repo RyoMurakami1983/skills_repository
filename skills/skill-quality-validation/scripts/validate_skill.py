@@ -82,8 +82,11 @@ class SkillValidator:
         return bool(re.search(pattern, self.content, re.IGNORECASE | re.MULTILINE))
 
     def count_sections(self, pattern: str) -> int:
-        """Count number of matching sections"""
-        return len(re.findall(pattern, self.content, re.MULTILINE))
+        """Count number of matching sections, excluding code blocks"""
+        # Remove code blocks first to avoid counting headings inside them
+        # Use line-start anchor to avoid matching inline code
+        content_without_code = re.sub(r'^```.*?^```', '', self.content, flags=re.DOTALL | re.MULTILINE)
+        return len(re.findall(pattern, content_without_code, re.MULTILINE))
 
     def extract_frontmatter(self) -> Optional[str]:
         """Extract YAML frontmatter"""
@@ -175,16 +178,10 @@ class StructureValidator(SkillValidator):
         ))
 
         # 1.7 7-10 pattern sections
-        # Count H2 sections excluding known non-pattern sections
-        all_h2 = self.count_sections(r'^##\s+')
-        excluded = ['When to Use', 'Core Principles', 'The Philosophy', 
-                   'Common Pitfalls', 'Anti-Patterns', 'Quick Reference', 
-                   'Decision Tree', 'Summary', 'References']
-        
-        pattern_count = all_h2
-        for section in excluded:
-            if self.has_section(rf'^##\s+.*{section}'):
-                pattern_count -= 1
+        # Count Pattern sections directly (e.g., "## Pattern 1:", "## Pattern 2:")
+        # Remove code blocks first (use line-start anchor to avoid inline code)
+        content_without_code = re.sub(r'^```.*?^```', '', self.content, flags=re.DOTALL | re.MULTILINE)
+        pattern_count = len(re.findall(r'^##\s+Pattern\s+\d+:', content_without_code, re.MULTILINE))
         
         pattern_count_ok = 7 <= pattern_count <= 10
         checks.append(CheckResult(
