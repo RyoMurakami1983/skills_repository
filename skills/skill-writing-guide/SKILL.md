@@ -1,547 +1,119 @@
 ---
 name: skill-writing-guide
-description: Guide for writing high-quality GitHub Copilot agent skills. Use when creating SKILL.md files.
+description: Router skill. Use when unsure which skill-authoring workflow to use.
 author: RyoMurakami1983
-tags: [copilot, agent-skills, documentation, writing-guide]
+tags: [copilot, agent-skills, router, writing]
 invocable: false
 ---
 
-# Skill Writing Guide
+# Skill Writing Guide (Router)
 
-A comprehensive guide for writing high-quality GitHub Copilot agent skills following official specifications and best practices.
+> **This is a router skill.** It guides you to the correct workflow skill. The original multi-pattern content has been migrated to focused single-workflow skills.
 
 ## When to Use This Skill
 
 Use this skill when:
-- Building a new SKILL.md file from scratch for GitHub Copilot agents
-- Learning required structure and sections for agent skills documentation
-- Understanding code example best practices and formatting guidelines
-- Designing effective section layouts including When to Use and Patterns
-- Writing clear, actionable skill documentation for developers
-- Ensuring compliance with GitHub Copilot and Claude specifications
+- You are not sure which skill-authoring workflow to use
+- You want an overview of all available skill-writing workflows
+- You are looking for the legacy "skill-writing-guide" content
 
 ---
 
-## Related Skills
+## Related Skills (Migration Targets)
 
-- **`skill-template-generator`** - Generate structured SKILL.md templates
-- **`skill-quality-validation`** - Validate and score skill quality
-- **`skill-revision-guide`** - Revise and maintain existing skills
+| Your Intent | Use This Skill | Description |
+|-------------|---------------|-------------|
+| Write a new SKILL.md from scratch | **[`skills-author-skill`](../skills-author-skill/SKILL.md)** | End-to-end authoring workflow |
+| Convert a multi-pattern skill to single-workflow | **[`skills-refactor-skill-to-single-workflow`](../skills-refactor-skill-to-single-workflow/SKILL.md)** | Migration workflow |
+| Improve name/description/tags for agent discovery | **[`skills-optimize-skill-discoverability`](../skills-optimize-skill-discoverability/SKILL.md)** | Discoverability optimization |
+| Generate a skill template/skeleton | **[`skills-generate-skill-template`](../skills-generate-skill-template/SKILL.md)** | Template generation |
+| Validate a skill against quality criteria | **[`skills-validate-skill`](../skills-validate-skill/SKILL.md)** | Quality validation |
+| Revise an existing skill | **[`skills-revise-skill`](../skills-revise-skill/SKILL.md)** | Revision and changelog management |
 
 ---
 
 ## Core Principles
 
-1. **Single File Principle** - Complete all content in SKILL.md; avoid additional support files
-2. **Reader-First Design** - Enable readers to determine relevance within 5 seconds  
-3. **Progressive Learning** - Structure examples from Simple → Intermediate → Advanced
-4. **Problem-Solution Focus** - Always explain "why" before "how" (成長の複利)
-5. **Practical Utility** - Provide copy-paste ready, compilable code examples
-6. **Values Integration** - Align with development philosophy (基礎と型、継続は力、ニュートラル)
+1. **One Skill = One Workflow** — Each skill documents exactly one end-to-end workflow (基礎と型)
+2. **Router for Compatibility** — This skill exists to preserve backward compatibility during migration (継続は力)
+3. **Values Integration** — All workflow skills connect to PHILOSOPHY.md Values (成長の複利)
 
 ---
 
-## Pattern 1: YAML Frontmatter Structure
+## Workflow: Route to the Correct Skill
 
-### Overview
+### Step 1 — Identify Your Intent
 
-The YAML frontmatter defines metadata that determines when and how the skill is activated. Proper configuration is critical for skill discoverability.
+Ask yourself: "What am I trying to accomplish right now?"
 
-### Basic Example
+### Step 2 — Match to a Workflow Skill
 
-```yaml
----
-name: your-skill-name
-description: One-line description of what problem this skill solves (100 chars max)
-invocable: false
----
+```
+What do you need?
+│
+├─ Creating a brand new skill?
+│  └─ → skills-author-skill
+│
+├─ Converting a legacy multi-pattern skill?
+│  └─ → skills-refactor-skill-to-single-workflow
+│
+├─ Improving skill naming/tags/description?
+│  └─ → skills-optimize-skill-discoverability
+│
+├─ Generating a skeleton/template?
+│  └─ → skills-generate-skill-template
+│
+├─ Validating quality?
+│  └─ → skills-validate-skill
+│
+└─ Updating an existing skill?
+   └─ → skills-revise-skill
 ```
 
-### When to Use
+### Step 3 — Navigate
 
-| Scenario | Field Configuration | Why |
-|----------|-------------------|-----|
-| Personal skill | `invocable: false` | Standard for most skills |
-| Requires specific activation | `invocable: true` | User must explicitly invoke |
-| Technology-specific | Add `tags: [tech1, tech2]` | Improves discoverability |
-
-### With Configuration
-
-```yaml
----
-name: skill-writing-guide
-description: Guide for writing high-quality GitHub Copilot agent skills. Use when creating new SKILL.md files or structuring skill content.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, documentation]
-invocable: false
----
-```
-
-### Advanced Pattern (Production-Grade)
-
-```yaml
----
-name: wpf-mvvm-patterns
-description: Implement MVVM in WPF with domain-driven design, dependency injection, and testability. Use when building enterprise WPF applications with complex business logic.
-author: RyoMurakami1983
-tags: [wpf, mvvm, ddd, csharp, dotnet]
-invocable: false
-license: MIT
-version: 1.2.0
----
-```
-
-**Field Guidelines**:
-- **name**: kebab-case, must match directory name, max 64 characters
-- **description**: 100 chars max, include "Use when..." for activation context
-- **author**: Use `RyoMurakami1983` for skills created by this system
-- **tags**: 3-5 technology-focused tags
-- **invocable**: Usually `false`
+Click the link in the Related Skills table above, or invoke the skill by name.
 
 ---
 
-## Pattern 2: "When to Use This Skill" Section
+## Migration Notice
 
-### Overview
+This skill was migrated from a multi-pattern format (9 patterns, ~548 lines) to a router skill as part of the "1 skill = 1 workflow" migration. The original content is now distributed across:
 
-The first H2 section after the title. Enables readers to quickly determine if the skill is relevant to their current task.
+- **`skills-author-skill`** — Patterns 1–8 consolidated into one authoring workflow
+- **`skills-optimize-skill-discoverability`** — Naming and activation optimization
+- **`skills-refactor-skill-to-single-workflow`** — Migration methodology itself
 
-### Basic Example
-
-```markdown
-## When to Use This Skill
-
-Use this skill when:
-- Designing public APIs for NuGet packages
-- Making changes to existing public APIs
-- Planning wire format changes
-```
-
-### When to Use
-
-- ✅ **DO**: Write 5-8 specific, action-oriented scenarios
-- ✅ **DO**: Start each item with a verb (Designing, Implementing, Building)
-- ✅ **DO**: Keep each item to 50-100 characters
-- ❌ **DON'T**: Use abstract phrases ("When you need quality code")
-- ❌ **DON'T**: List more than 10 items (overwhelming)
-
-### With Configuration
-
-```markdown
-## When to Use This Skill
-
-Use this skill when:
-- Building enterprise WPF applications with complex business logic
-- Implementing MVVM pattern with domain-driven design
-- Integrating APIs with retry/circuit breaker policies
-- Setting up dependency injection in WPF projects
-- Designing testable ViewModels and Services
-- Managing application state across multiple views
-```
-
-### Advanced Pattern (Production-Grade)
-
-Include context-specific scenarios with role-based filtering:
-
-```markdown
-## When to Use This Skill
-
-Use this skill when:
-- **Architects**: Designing multi-tenant WPF application architecture
-- **Senior Developers**: Implementing advanced MVVM patterns with CQRS
-- **Team Leads**: Reviewing pull requests for MVVM compliance
-- **Junior Developers**: Learning MVVM fundamentals in WPF
-- **DevOps**: Setting up CI/CD pipelines for WPF applications
-```
-
----
-
-## Pattern 3: "Core Principles" Section
-
-### Overview
-
-Defines the philosophical foundation and guiding principles of the skill. Keep it concise (3-5 principles).
-
-### Basic Example
-
-```markdown
-## Core Principles
-
-1. **Separation of Concerns** - Views, ViewModels, and Models have distinct responsibilities
-2. **Dependency Inversion** - Depend on abstractions, not concrete implementations
-3. **Testability First** - Design for unit testing from day one
-```
-
-### When to Use
-
-- ✅ **DO**: Limit to 3-5 principles
-- ✅ **DO**: Format as **Bold Name** - Short explanation (30-50 chars)
-- ❌ **DON'T**: Write lengthy explanations (save for dedicated sections)
-
-> 📚 **Advanced examples**: See `references/core-principles-examples.md`
-
----
-
-## Pattern 4: Pattern Sections (7-10 Required)
-
-### Overview
-
-Each pattern section documents a specific approach, technique, or implementation strategy. A complete skill should contain 7-10 pattern sections.
-
-### Basic Example
-
-```markdown
-## Pattern 1: [Pattern Name]
-
-### Overview
-Brief explanation (2-3 sentences)
-
-### Basic Example
-```csharp
-// ✅ CORRECT - Simple case
-```
-
-### When to Use
-- Condition A
-- Condition B
-
-### Advanced Pattern
-```csharp
-// ✅ CORRECT - Production-ready
-```
-```
-
-### When to Use
-
-Structure patterns to enable progressive learning:
-1. **Overview**: What problem does this solve?
-2. **Basic Example**: Simplest possible implementation
-3. **When to Use**: Decision criteria
-4. **Advanced**: Production-grade with error handling
-
-> 📚 **Full pattern examples**: See `references/pattern-examples.md`
-
----
-
-## Pattern 5: Code Example Best Practices
-
-### Overview
-
-Code examples must be practical, compilable, and progressively complex. Follow the ✅/❌ marker convention consistently.
-
-### Basic Example
-
-```csharp
-// ✅ CORRECT - Async all the way
-public async Task<Data> GetDataAsync()
-{
-    return await _client.GetAsync("/api/data");
-}
-
-// ❌ WRONG - Blocking async code
-public Data GetData()
-{
-    return _client.GetAsync("/api/data").Result; // Deadlock risk
-}
-```
-
-### When to Use
-
-**Use ✅/❌ markers**:
-- ✅ `// ✅ CORRECT - Reason` for good examples
-- ❌ `// ❌ WRONG - Reason` for anti-patterns
-- Always pair wrong examples with correct alternatives
-
-**Include context**:
-- ✅ Add using statements
-- ✅ Show DI configuration
-- ✅ Include error handling in advanced examples
-- ❌ Don't use pseudocode or placeholders like "..."
-
-> 📚 **Production-grade examples**: See `references/advanced-examples.md`
-
----
-
-## Pattern 6: Comparison Tables
-
-Tables enable at-a-glance decision making. Use 3-column format: Scenario | Recommendation | Why.
-
-```markdown
-| Scenario | Recommendation | Why |
-|----------|----------------|-----|
-| Read-only data | AsNoTracking() | No change tracking overhead |
-| Update entity | Tracking | Automatic change detection |
-```
-
----
-
-## Pattern 7: Anti-Patterns vs. Common Pitfalls
-
-**Anti-Pattern**: Architectural mistake (God Class, Tight Coupling)  
-**Common Pitfall**: Implementation error (Forgetting await, null refs)
-
-> 📚 **Detailed anti-patterns**: See `references/anti-patterns.md`
-
----
-
-## Pattern 8: Optimizing for 500-Line Limit
-
-**Progressive Disclosure**: Keep essentials in SKILL.md (~500 lines), move details to references/.
-
-**Keep**: Good patterns (5-15 lines), basic examples, core principles  
-**Move to references/**: Anti-pattern details, advanced examples, complex configs, Japanese (SKILL.ja.md)
-
-> 📚 **Full optimization guide**: See `references/optimization-guide.md`
-
----
-
-## Good Practices
-
-### 1. Start with "When to Use" for Quick Discovery
-
-**What**: Place "When to Use This Skill" as first H2 with 5-8 specific scenarios.
-
-**Why**: Enables 5-second relevance check; improves AI discoverability.
-
-```markdown
-## When to Use This Skill
-Use this skill when:
-- Building enterprise WPF applications with complex business logic
-- Implementing MVVM pattern with dependency injection
-```
-
-**Values**: ニュートラル（形式知化で誰もが理解可能）
-
-### 2. Use ✅/❌ Markers Consistently
-
-**What**: Prefix code with ✅ CORRECT or ❌ WRONG + brief reason.
-
-**Why**: Eliminates ambiguity; enables quick scanning; reinforces contrast learning.
-
-```csharp
-// ✅ CORRECT - Async all the way
-var result = await SomeAsyncMethod();
-
-// ❌ WRONG - Deadlock risk  
-var result = SomeAsyncMethod().Result;
-```
-
-**Values**: 基礎と型（明確なパターン）/ 成長の複利（対比学習）
-
-### 3. Progressive Disclosure for Length Management
-
-**What**: Keep essential patterns in SKILL.md (~500 lines); move details to references/.
-
-**Why**: Maintains AI performance; reduces cognitive load; preserves deep-dive content.
-
-```
-SKILL.md (≤550)      references/
-├─ ✅ Good patterns  ├─ anti-patterns.md
-├─ Basic examples    ├─ advanced-examples.md  
-└─ Core principles   └─ SKILL.ja.md (日本語)
-```
-
-**Values**: 基礎と型（最小形式で最大可能性）
-
-### 4. Explain WHY in Comments and Text
-
-**What**: Always include "Why" for design decisions, not just "What".
-
-**Why**: Transforms 暗黙知 into 形式知; supports compound learning growth.
-
-```python
-timeout = 30  # Why: Production analysis showed 10s insufficient for large datasets
-```
-
-**Values**: 成長の複利（学習資産化）/ ニュートラル（形式知化）
-
----
-
-## Common Pitfalls
-
-### 1. Violating the Single File Principle
-
-**Problem**: Creating multiple support files fragments content.
-
-**Solution**: Consolidate into SKILL.md; use references/ only for 500+ line overflow.
-
-```
-❌ WRONG: skill-name/ with README.md, examples.md, guidelines.md
-✅ CORRECT: skill-name/SKILL.md (single source of truth)
-```
-
-### 2. Vague "When to Use" Scenarios
-
-**Problem**: Abstract scenarios don't help determine relevance.
-
-**Solution**: Write specific, action-oriented scenarios.
-
-```markdown
-❌ WRONG: "When you want to write good code"
-✅ CORRECT: "Building enterprise WPF apps with complex business logic"
-```
-
-### 3. Missing ✅/❌ Markers in Code
-
-**Problem**: Readers can't distinguish good from bad.
-
-**Solution**: Always use explicit markers.
-
-```csharp
-❌ WRONG - Deadlock risk: var result = SomeAsyncMethod().Result;
-✅ CORRECT - Async all the way: var result = await SomeAsyncMethod();
-```
-
----
-
-## Anti-Patterns
-
-### Overloading a Single Skill with Too Many Patterns
-
-**What**: Including 20+ pattern sections in one skill, making it overwhelming.
-
-**Why It's Wrong**: Exceeds 500-line limit, violates progressive disclosure, reduces scannability.
-
-**Better Approach**: Split into focused skills (7-10 patterns each).
-
-```markdown
-❌ WRONG: wpf-everything-guide (30 patterns, 1000+ lines)
-
-✅ CORRECT:
-- wpf-mvvm-fundamentals (8 patterns)
-- wpf-data-binding-patterns (7 patterns)
-- wpf-performance-optimization (7 patterns)
-```
-
-### Creating Skills Without Clear Activation Criteria
-
-**What**: Writing generic descriptions without "Use when..." specifications.
-
-**Why It's Wrong**: GitHub Copilot can't determine when to activate; poor discoverability.
-
-**Better Approach**: Include specific activation scenarios in description.
-
-```yaml
-❌ WRONG:
-description: A helpful guide for WPF development
-
-✅ CORRECT:
-description: Implement MVVM in WPF with DI and testability. Use when building enterprise WPF applications.
-```
-
-### Mixing Good and Bad Examples Without Clear Labels
-
-**What**: Showing code without ✅/❌ markers; ambiguous recommendations.
-
-**Why It's Wrong**: Readers and AI can't distinguish good from bad; violates 形式知化.
-
-**Better Approach**: Always use explicit markers and pair anti-patterns with solutions.
-
-```csharp
-❌ WRONG - No labels:
-var result = SomeAsyncMethod().Result;
-
-✅ CORRECT - Clear labels:
-// ❌ WRONG - Deadlock risk
-var result = SomeAsyncMethod().Result;
-
-// ✅ CORRECT - Async all the way  
-var result = await SomeAsyncMethod();
-```
-
-> 📚 **Detailed anti-patterns with examples and remediation**: See `references/anti-patterns.md`
-
----
-
-## Quick Reference
-
-### Skill Structure Checklist
-
-- [ ] YAML frontmatter with name, description, author, tags
-- [ ] H1 title matching skill name
-- [ ] Related Skills section
-- [ ] "When to Use This Skill" as first H2 section (5-8 scenarios)
-- [ ] Core Principles (3-5 principles)
-- [ ] 7-10 Pattern sections with progressive examples
-- [ ] Common Pitfalls (3-5 items)
-- [ ] Anti-Patterns (2-4 items)
-- [ ] Quick Reference or Decision Tree
-- [ ] Best Practices Summary
-- [ ] Resources section
-- [ ] Changelog (link to CHANGELOG.md if large)
-
-### Section Writing Checklist
-
-- [ ] Use ✅/❌ markers consistently in code examples
-- [ ] Include using statements and DI configuration
-- [ ] Write inline comments explaining WHY, not WHAT
-- [ ] Keep SKILL.md under 500 lines
-- [ ] Use tables for decision support
-- [ ] Start each "When to Use" item with a verb
-- [ ] Make Core Principles independent and concise
-- [ ] Structure patterns: Overview → Basic → Configuration → Advanced
-
-### Code Quality Checklist
-
-- [ ] All code examples are compilable
-- [ ] Advanced examples include error handling
-- [ ] Async methods use CancellationToken
-- [ ] Resources are properly disposed (using statements)
-- [ ] DI configuration is shown where relevant
-
----
-
-## Best Practices Summary
-
-1. **Single File Principle** - Consolidate in SKILL.md; references/ for overflow only
-2. **Clear Activation** - Specific "Use when..." in description
-3. **Progressive Complexity** - Basic → Configuration → Advanced
-4. **Consistent Markers** - ✅/❌ prefixes in all code
-5. **Action-Oriented** - Verb-led "When to Use" items
-6. **Explain WHY** - Comments show decisions, not syntax
-7. **7-10 Patterns** - Complete coverage without overload
-8. **Comparison Tables** - Enable quick decision-making
-9. **Distinguish Types** - Separate anti-patterns from pitfalls
-10. **500-Line Limit** - Concise main file; details to references/
+For the original reference materials, see `references/`.
 
 ---
 
 ## Resources
 
-- [GitHub Copilot Agent Skills Documentation](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
-- [Claude Skills Documentation](https://claude.com/docs/skills/overview)
+- [PHILOSOPHY.md](../../PHILOSOPHY.md) — Development constitution and Values
+- [skills-author-skill](../skills-author-skill/SKILL.md) — Primary authoring workflow
 - [Agent Skills Specification](https://agentskills.io/specification)
-- [SKILL_TEMPLATE.md](../../.copilot/docs/SKILL_TEMPLATE.md) - English template
-- [SKILL_TEMPLATE.ja.md](../../.copilot/docs/SKILL_TEMPLATE.ja.md) - Japanese template
 
 ---
 
 ## Changelog
 
-See CHANGELOG.md for full history. Recent changes:
+### Version 3.0.0 (2026-02-13)
+- **Breaking**: Converted to router skill (single workflow)
+- **Migrated**: 9 patterns → `skills-author-skill`, `skills-refactor-skill-to-single-workflow`, `skills-optimize-skill-discoverability`
+- **Preserved**: Backward compatibility via routing table
 
 ### Version 2.1.0 (2026-02-13)
-- **Added Good Practices section**: 4 essential good practices with Values integration
-- **Enhanced Anti-Patterns section**: Added "Mixing Good and Bad Examples" anti-pattern
-- **Japanese consolidation**: Moved from references/SKILL.ja.md to SKILL.ja.md (root level)
-- **Progressive Disclosure**: Added reference to detailed anti-patterns in references/anti-patterns.md
-- **Optimized length**: Condensed to 546 lines (within 550-line tolerance)
+- Added Good Practices section with Values integration
+- Enhanced Anti-Patterns section
 
 ### Version 2.0.0 (2026-02-12)
-- **Expanded Core Principles**: Added Values integration (基礎と型、成長の複利、温故知新、継続は力、ニュートラル)
-- **Updated Pattern 8**: 500-line recommendation with 550-line (+10%) tolerance
-- **Development Philosophy Integration**: Aligned patterns with development Values
-- **Enhanced guidance**: Emphasized "Why" explanations for compound learning growth
-- **Quality validation alignment**: Synchronized with skill-quality-validation 64-item checklist
+- Expanded Core Principles with Values integration
 
 ### Version 1.0.0 (2026-02-12)
-- Initial release
-- 8 pattern sections documented
-- Code example best practices defined
-- Anti-patterns vs. pitfalls clarified
-- Progressive Disclosure strategy introduced
+- Initial release with 8 pattern sections
 
-<!-- 
-Japanese version available at SKILL.ja.md
-日本語版は SKILL.ja.md を参照してください
+<!--
+Japanese version available at references/SKILL.ja.md
+日本語版は references/SKILL.ja.md を参照してください
 -->

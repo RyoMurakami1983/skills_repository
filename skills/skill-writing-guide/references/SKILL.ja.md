@@ -26,7 +26,7 @@ invocable: false
 
 - **`skill-template-generator`** - SKILL.mdテンプレート生成
 - **`skill-quality-validation`** - Skill品質の検証とスコアリング
-- **`skill-revision-guide`** - 既存Skillの改訂と維持
+- **`skills-revise-skill`** - 既存Skillの改訂と維持
 
 ---
 

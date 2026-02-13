@@ -3,18 +3,19 @@
 """
 SKILL.md Quality Validator
 
-Validates GitHub Copilot agent skills against 64-item quality checklist.
-Automates the validation process with expanded checks for file length optimization,
-references/ structure, bilingual support, and development philosophy integration.
+Validates GitHub Copilot agent skills against quality checklist.
+Supports both legacy multi-pattern skills and new single-workflow skills.
+Includes checks for file length, bilingual support, router skill detection,
+and development philosophy (PHILOSOPHY.md Values) integration.
 
 Usage:
     python validate_skill.py path/to/SKILL.md
     python validate_skill.py path/to/SKILL.md --json
     python validate_skill.py path/to/SKILL.md --output report.txt
     
-Version: 3.0.0
+Version: 4.0.0
 Author: RyoMurakami1983
-Last Updated: 2026-02-12
+Last Updated: 2026-02-13
 """
 
 import argparse
@@ -72,10 +73,12 @@ class ValidationReport:
 class SkillValidator:
     """Base validator with common utilities"""
 
-    def __init__(self, content: str, file_path: str):
+    def __init__(self, content: str, file_path: str, is_router: bool = False, is_workflow: bool = False):
         self.content = content
         self.file_path = file_path
         self.lines = content.split('\n')
+        self.is_router = is_router
+        self.is_workflow = is_workflow
 
     def has_section(self, pattern: str) -> bool:
         """Check if section exists (case-insensitive)"""
@@ -101,7 +104,7 @@ class SkillValidator:
 
 
 class StructureValidator(SkillValidator):
-    """Validates structure requirements (10 items)"""
+    """Validates structure requirements (14 items)"""
 
     def validate(self) -> List[CheckResult]:
         checks = []
@@ -124,6 +127,17 @@ class StructureValidator(SkillValidator):
             "YAML frontmatter with name/description/invocable",
             has_required_fields,
             "Found" if has_required_fields else "Missing or incomplete"
+        ))
+
+        # 1.2b Author field present in YAML frontmatter
+        has_author = False
+        if frontmatter:
+            has_author = 'author:' in frontmatter.lower()
+        checks.append(CheckResult(
+            "1.2b",
+            "YAML frontmatter includes author field",
+            has_author,
+            "Found" if has_author else "Missing author field"
         ))
 
         # 1.3 frontmatter name matches folder (kebab-case)
@@ -177,46 +191,99 @@ class StructureValidator(SkillValidator):
             has_principles
         ))
 
-        # 1.7 7-10 pattern sections
-        # Count Pattern sections directly (e.g., "## Pattern 1:", "## Pattern 2:")
-        # Remove code blocks first (use line-start anchor to avoid inline code)
+        # 1.7 Workflow or Pattern structure
+        # New standard: single "## Workflow:" section
+        # Legacy: 7-10 "## Pattern N:" sections
+        # Router skills: single routing workflow (detected separately)
         content_without_code = re.sub(r'^```.*?^```', '', self.content, flags=re.DOTALL | re.MULTILINE)
         pattern_count = len(re.findall(r'^##\s+Pattern\s+\d+:', content_without_code, re.MULTILINE))
+        has_workflow = bool(re.search(r'^##\s+Workflow:', content_without_code, re.MULTILINE))
+        is_router = 'router' in (frontmatter or '').lower() or 'router skill' in self.content[:500].lower()
         
-        pattern_count_ok = 7 <= pattern_count <= 10
+        if has_workflow or is_router:
+            structure_ok = True
+            detail = "Workflow section found" if has_workflow else "Router skill detected"
+        elif 7 <= pattern_count <= 10:
+            structure_ok = True
+            detail = f"Legacy: {pattern_count} patterns (migration recommended)"
+        else:
+            structure_ok = False
+            detail = f"Found {pattern_count} patterns, no Workflow section"
+        
         checks.append(CheckResult(
             "1.7",
-            "7-10 pattern sections (H2)",
-            pattern_count_ok,
-            f"Found {pattern_count} patterns"
+            "Workflow section OR 7-10 pattern sections",
+            structure_ok,
+            detail
+        ))
+        
+        # 1.11 Router skill consistency (if applicable)
+        if is_router:
+            has_related_table = bool(re.search(r'Related Skills.*?\|', self.content, re.DOTALL | re.IGNORECASE))
+            checks.append(CheckResult(
+                "1.11",
+                "Router skill has Related Skills routing table",
+                has_related_table,
+                "Router with routing table" if has_related_table else "Router missing routing table"
+            ))
+        else:
+            checks.append(CheckResult(
+                "1.11",
+                "Router skill has Related Skills routing table",
+                True,
+                "N/A (not a router skill)"
+            ))
+        
+        # 1.12 Bilingual support (references/SKILL.ja.md exists)
+        skill_dir = Path(self.file_path).parent
+        ja_path = skill_dir / "references" / "SKILL.ja.md"
+        ja_root_path = skill_dir / "SKILL.ja.md"
+        has_japanese = ja_path.exists() or ja_root_path.exists()
+        checks.append(CheckResult(
+            "1.12",
+            "Japanese version exists (references/SKILL.ja.md)",
+            has_japanese,
+            f"Found: {ja_path.name}" if ja_path.exists() else
+            f"Found: {ja_root_path.name}" if ja_root_path.exists() else "Missing"
+        ))
+        
+        # 1.13 Line count policy (≤500 recommended, ≤550 max)
+        line_count = len(self.lines)
+        line_ok = line_count <= 550
+        checks.append(CheckResult(
+            "1.13",
+            "Line count ≤550 (target ≤500)",
+            line_ok,
+            f"{line_count} lines" + (" ⚠️ over 500" if 500 < line_count <= 550 else "")
         ))
 
-        # 1.8 "Common Pitfalls" exists
-        has_pitfalls = self.has_section(r'^##\s+.*Common Pitfalls')
-        checks.append(CheckResult(
-            "1.8",
-            '"Common Pitfalls" section exists',
-            has_pitfalls
-        ))
+        # 1.8 "Common Pitfalls" exists (N/A for router skills)
+        if self.is_router:
+            checks.append(CheckResult("1.8", '"Common Pitfalls" section exists', True, "N/A (router skill)"))
+        else:
+            has_pitfalls = self.has_section(r'^##\s+.*Common Pitfalls')
+            checks.append(CheckResult("1.8", '"Common Pitfalls" section exists', has_pitfalls))
 
-        # 1.9 "Anti-Patterns" exists
-        has_antipatterns = self.has_section(r'^##\s+.*Anti-Patterns')
-        checks.append(CheckResult(
-            "1.9",
-            '"Anti-Patterns" section exists',
-            has_antipatterns
-        ))
+        # 1.9 "Anti-Patterns" exists (N/A for router skills)
+        if self.is_router:
+            checks.append(CheckResult("1.9", '"Anti-Patterns" section exists', True, "N/A (router skill)"))
+        else:
+            has_antipatterns = self.has_section(r'^##\s+.*Anti-Patterns')
+            checks.append(CheckResult("1.9", '"Anti-Patterns" section exists', has_antipatterns))
 
-        # 1.10 "Quick Reference" or "Decision Tree" exists
-        has_reference = (
-            self.has_section(r'^##\s+.*Quick Reference') or
-            self.has_section(r'^##\s+.*Decision Tree')
-        )
-        checks.append(CheckResult(
-            "1.10",
-            '"Quick Reference" or "Decision Tree" exists',
-            has_reference
-        ))
+        # 1.10 "Quick Reference" or "Decision Tree" exists (N/A for router skills)
+        if self.is_router:
+            checks.append(CheckResult("1.10", '"Quick Reference" or "Decision Tree" exists', True, "N/A (router skill)"))
+        else:
+            has_reference = (
+                self.has_section(r'^##\s+.*Quick Reference') or
+                self.has_section(r'^##\s+.*Decision Tree')
+            )
+            checks.append(CheckResult(
+                "1.10",
+                '"Quick Reference" or "Decision Tree" exists',
+                has_reference
+            ))
 
         return checks
 
@@ -230,33 +297,40 @@ class ContentValidator(SkillValidator):
         # 2.1 "When to Use" section (4 items)
         when_to_use = self.get_section_content("When to Use")
         
-        # 2.1.1 5-8 specific scenarios listed
+        # 2.1.1 5-8 specific scenarios listed (3+ for router skills)
         scenario_count = 0
         if when_to_use:
             scenarios = re.findall(r'^[-*]\s+(.+)$', when_to_use, re.MULTILINE)
             scenario_count = len(scenarios)
+        min_scenarios = 3 if self.is_router else 5
+        max_scenarios = 10 if self.is_router else 8
         checks.append(CheckResult(
             "2.1.1",
-            "5-8 specific scenarios in When to Use",
-            5 <= scenario_count <= 8,
+            f"{'3+' if self.is_router else '5-8'} specific scenarios in When to Use",
+            min_scenarios <= scenario_count <= max_scenarios,
             f"Found {scenario_count} scenarios"
         ))
 
-        # 2.1.2 Each scenario starts with verb
+        # 2.1.2 Each scenario starts with verb (relaxed for router skills)
         verb_pattern = r'^[-*]\s+([A-Z][a-z]+ing)\s'
         verb_scenarios = 0
         if when_to_use:
             verb_scenarios = len(re.findall(verb_pattern, when_to_use, re.MULTILINE))
-        checks.append(CheckResult(
-            "2.1.2",
-            "Scenarios start with verbs (Designing, Implementing, etc.)",
-            verb_scenarios >= scenario_count * 0.8 if scenario_count > 0 else False,
-            f"{verb_scenarios}/{scenario_count} start with verbs"
-        ))
+        if self.is_router:
+            checks.append(CheckResult(
+                "2.1.2", "Scenarios start with verbs", True, "N/A (router skill)"
+            ))
+        else:
+            checks.append(CheckResult(
+                "2.1.2",
+                "Scenarios start with verbs (Designing, Implementing, etc.)",
+                verb_scenarios >= scenario_count * 0.8 if scenario_count > 0 else False,
+                f"{verb_scenarios}/{scenario_count} start with verbs"
+            ))
 
-        # 2.1.3 Each scenario 50-100 chars
+        # 2.1.3 Each scenario 50-100 chars (relaxed for router skills)
         scenario_length_ok = True
-        if when_to_use:
+        if when_to_use and not self.is_router:
             scenarios = re.findall(r'^[-*]\s+(.+)$', when_to_use, re.MULTILINE)
             for scenario in scenarios:
                 if not (50 <= len(scenario) <= 100):
@@ -311,71 +385,122 @@ class ContentValidator(SkillValidator):
             principles_independent
         ))
 
-        # 2.3 Pattern sections (6 items)
-        # 2.3.1 Each pattern has Overview
-        overview_count = self.count_sections(r'^###\s+.*Overview')
-        checks.append(CheckResult(
-            "2.3.1",
-            'Patterns have "Overview" subsection',
-            overview_count >= 5,
-            f"Found {overview_count} overviews"
-        ))
+        # 2.3 Pattern/Workflow sections (6 items)
+        # Router skills get N/A for detailed content checks
+        if self.is_router:
+            for check_id, desc in [
+                ("2.3.1", "Workflow/Pattern structure"), ("2.3.2", "3-tier examples"),
+                ("2.3.3", "When to Use guidance"), ("2.3.4", "No duplicate patterns"),
+                ("2.3.5", "Patterns in logical order"), ("2.3.6", "Comparison table"),
+            ]:
+                checks.append(CheckResult(check_id, desc, True, "N/A (router skill)"))
+        else:
+            # Support both legacy "Pattern N:" and new "Workflow:" structure
+            has_workflow = bool(re.search(r'^##\s+Workflow:', self.content, re.MULTILINE))
+            
+            # 2.3.1 Patterns have "Overview" OR Workflow has "Step N" subsections
+            if has_workflow:
+                step_count = len(re.findall(r'^###\s+Step\s+\d+', self.content, re.MULTILINE))
+                checks.append(CheckResult(
+                    "2.3.1",
+                    'Workflow has Step subsections (or Patterns have Overview)',
+                    step_count >= 3,
+                    f"Found {step_count} steps"
+                ))
+            else:
+                overview_count = self.count_sections(r'^###\s+.*Overview')
+                checks.append(CheckResult(
+                    "2.3.1",
+                    'Patterns have "Overview" subsection',
+                    overview_count >= 5,
+                    f"Found {overview_count} overviews"
+                ))
 
-        # 2.3.2 Minimum 3-tier examples (Basic/Intermediate/Advanced)
-        basic_count = len(re.findall(r'basic|simple|beginner', self.content, re.IGNORECASE))
-        intermediate_count = len(re.findall(r'intermediate', self.content, re.IGNORECASE))
-        advanced_count = len(re.findall(r'advanced|production', self.content, re.IGNORECASE))
-        has_tiers = basic_count >= 1 and intermediate_count >= 1 and advanced_count >= 1
-        checks.append(CheckResult(
-            "2.3.2",
-            "3-tier examples (Basic/Intermediate/Advanced)",
-            has_tiers,
-            f"B:{basic_count} I:{intermediate_count} A:{advanced_count}"
-        ))
+            # 2.3.2 Minimum 3-tier examples (Basic/Intermediate/Advanced) OR step-based examples
+            if self.is_workflow:
+                # New-style: Steps use inline examples instead of 3-tier structure
+                step_count = len(re.findall(r'^###\s+Step\s+\d+', self.content, re.MULTILINE))
+                code_block_count = len(re.findall(r'```', self.content))
+                checks.append(CheckResult(
+                    "2.3.2",
+                    "Steps have code examples",
+                    code_block_count >= step_count,
+                    f"{code_block_count} code blocks for {step_count} steps"
+                ))
+            else:
+                basic_count = len(re.findall(r'basic|simple|beginner', self.content, re.IGNORECASE))
+                intermediate_count = len(re.findall(r'intermediate', self.content, re.IGNORECASE))
+                advanced_count = len(re.findall(r'advanced|production', self.content, re.IGNORECASE))
+                has_tiers = basic_count >= 1 and intermediate_count >= 1 and advanced_count >= 1
+                checks.append(CheckResult(
+                    "2.3.2",
+                    "3-tier examples (Basic/Intermediate/Advanced)",
+                    has_tiers,
+                    f"B:{basic_count} I:{intermediate_count} A:{advanced_count}"
+                ))
 
-        # 2.3.3 Patterns have "When to Use" guidance
-        when_to_use_count = len(re.findall(r'when to use', self.content, re.IGNORECASE))
-        checks.append(CheckResult(
-            "2.3.3",
-            'Patterns have "When to Use" guidance',
-            when_to_use_count >= 3,
-            f"Found {when_to_use_count} instances"
-        ))
+            # 2.3.3 Patterns have "When to Use" guidance OR Steps have inline guidance
+            if self.is_workflow:
+                # New-style: Steps use "Use when" or "**When**" inline
+                use_guidance = len(re.findall(r'(?:use when|when to use|\*\*when\*\*)', self.content, re.IGNORECASE))
+                checks.append(CheckResult(
+                    "2.3.3",
+                    'Steps have usage guidance',
+                    use_guidance >= 2,
+                    f"Found {use_guidance} guidance instances"
+                ))
+            else:
+                when_to_use_count = len(re.findall(r'when to use', self.content, re.IGNORECASE))
+                checks.append(CheckResult(
+                    "2.3.3",
+                    'Patterns have "When to Use" guidance',
+                    when_to_use_count >= 3,
+                    f"Found {when_to_use_count} instances"
+                ))
 
-        # 2.3.4 No pattern duplication (heuristic check)
-        checks.append(CheckResult(
-            "2.3.4",
-            "No duplicate patterns (manual review recommended)",
-            True,
-            "Heuristic check"
-        ))
+            # 2.3.4 No pattern duplication (heuristic check)
+            checks.append(CheckResult(
+                "2.3.4",
+                "No duplicate patterns (manual review recommended)",
+                True,
+                "Heuristic check"
+            ))
 
-        # 2.3.5 Logical pattern order (heuristic)
-        checks.append(CheckResult(
-            "2.3.5",
-            "Patterns in logical order (manual review recommended)",
-            True,
-            "Heuristic check"
-        ))
+            # 2.3.5 Logical pattern order (heuristic)
+            checks.append(CheckResult(
+                "2.3.5",
+                "Patterns in logical order (manual review recommended)",
+                True,
+                "Heuristic check"
+            ))
 
-        # 2.3.6 At least one comparison table
-        has_comparison_table = bool(re.search(r'\|[^|]+\|[^|]+\|', self.content))
-        checks.append(CheckResult(
-            "2.3.6",
-            "At least one comparison table",
-            has_comparison_table
-        ))
+            # 2.3.6 At least one comparison table
+            has_comparison_table = bool(re.search(r'\|[^|]+\|[^|]+\|', self.content))
+            checks.append(CheckResult(
+                "2.3.6",
+                "At least one comparison table",
+                has_comparison_table
+            ))
 
         # 2.4 Problem-Solution structure (2 items)
+        # Router skills: relax marker requirements
         # 2.4.1 ❌/✅ markers for bad/good examples
         bad_marker_count = self.content.count('❌')
         good_marker_count = self.content.count('✅')
-        has_markers = bad_marker_count >= 3 and good_marker_count >= 3
+        if self.is_router:
+            has_markers = True  # Routers don't need ❌/✅ examples
+            detail = "N/A (router skill)"
+        elif self.is_workflow:
+            has_markers = bad_marker_count >= 1 and good_marker_count >= 1
+            detail = f"❌:{bad_marker_count} ✅:{good_marker_count}"
+        else:
+            has_markers = bad_marker_count >= 3 and good_marker_count >= 3
+            detail = f"❌:{bad_marker_count} ✅:{good_marker_count}"
         checks.append(CheckResult(
             "2.4.1",
             "❌/✅ markers for bad/good example pairs",
             has_markers,
-            f"❌:{bad_marker_count} ✅:{good_marker_count}"
+            detail
         ))
 
         # 2.4.2 "Why" explanations present
@@ -387,50 +512,57 @@ class ContentValidator(SkillValidator):
             f"Found {why_count} 'why' explanations"
         ))
 
-        # 2.5 Anti-Patterns & Pitfalls (3 items)
-        # Extract all Anti-Patterns and Pitfalls sections (there may be multiple)
-        antipatterns_sections = re.findall(
-            r'^##\s+Anti-Patterns.*?\n(.*?)(?=^##\s|\Z)',
-            self.content, re.MULTILINE | re.DOTALL | re.IGNORECASE
-        )
-        pitfalls_sections = re.findall(
-            r'^##\s+.*Pitfalls.*?\n(.*?)(?=^##\s|\Z)',
-            self.content, re.MULTILINE | re.DOTALL | re.IGNORECASE
-        )
-        
-        # Combine all sections
-        all_antipatterns = "\n".join(antipatterns_sections)
-        all_pitfalls = "\n".join(pitfalls_sections)
+        # 2.5 Anti-Patterns & Pitfalls (3 items) — N/A for router skills
+        if self.is_router:
+            for check_id, desc in [
+                ("2.5.1", "Anti-Patterns address architecture-level issues"),
+                ("2.5.2", "Pitfalls address implementation-level issues"),
+                ("2.5.3", "Issues have fixes/solutions"),
+            ]:
+                checks.append(CheckResult(check_id, desc, True, "N/A (router skill)"))
+        else:
+            # Extract all Anti-Patterns and Pitfalls sections (there may be multiple)
+            antipatterns_sections = re.findall(
+                r'^##\s+Anti-Patterns.*?\n(.*?)(?=^##\s|\Z)',
+                self.content, re.MULTILINE | re.DOTALL | re.IGNORECASE
+            )
+            pitfalls_sections = re.findall(
+                r'^##\s+.*Pitfalls.*?\n(.*?)(?=^##\s|\Z)',
+                self.content, re.MULTILINE | re.DOTALL | re.IGNORECASE
+            )
+            
+            # Combine all sections
+            all_antipatterns = "\n".join(antipatterns_sections)
+            all_pitfalls = "\n".join(pitfalls_sections)
 
-        # 2.5.1 Anti-Patterns address architecture-level issues
-        has_architecture_terms = any(term in all_antipatterns.lower() 
-                                    for term in ['architecture', 'design', 'structure', 'layer'])
-        checks.append(CheckResult(
-            "2.5.1",
-            "Anti-Patterns address architecture-level issues",
-            has_architecture_terms or len(all_antipatterns) > 100
-        ))
+            # 2.5.1 Anti-Patterns address architecture-level issues
+            has_architecture_terms = any(term in all_antipatterns.lower() 
+                                        for term in ['architecture', 'design', 'structure', 'layer'])
+            checks.append(CheckResult(
+                "2.5.1",
+                "Anti-Patterns address architecture-level issues",
+                has_architecture_terms or len(all_antipatterns) > 100
+            ))
 
-        # 2.5.2 Pitfalls address implementation-level issues
-        has_implementation_terms = any(term in all_pitfalls.lower() 
-                                      for term in ['implement', 'code', 'method', 'function'])
-        checks.append(CheckResult(
-            "2.5.2",
-            "Pitfalls address implementation-level issues",
-            has_implementation_terms or len(all_pitfalls) > 100
-        ))
+            # 2.5.2 Pitfalls address implementation-level issues
+            has_implementation_terms = any(term in all_pitfalls.lower() 
+                                          for term in ['implement', 'code', 'method', 'function'])
+            checks.append(CheckResult(
+                "2.5.2",
+                "Pitfalls address implementation-level issues",
+                has_implementation_terms or len(all_pitfalls) > 100
+            ))
 
-        # 2.5.3 Each issue has fix/solution
-        # Search in full content (excluding code blocks) to capture all Anti-Patterns/Pitfalls sections
-        content_no_code = re.sub(r'^```.*?^```', '', self.content, flags=re.DOTALL | re.MULTILINE)
-        fix_count = len(re.findall(r'\b(fix|solution|instead|correct)\b', 
-                                   content_no_code, re.IGNORECASE))
-        checks.append(CheckResult(
-            "2.5.3",
-            "Issues have fixes/solutions",
-            fix_count >= 3,
-            f"Found {fix_count} fix indicators"
-        ))
+            # 2.5.3 Each issue has fix/solution
+            content_no_code = re.sub(r'^```.*?^```', '', self.content, flags=re.DOTALL | re.MULTILINE)
+            fix_count = len(re.findall(r'\b(fix|solution|instead|correct)\b', 
+                                       content_no_code, re.IGNORECASE))
+            checks.append(CheckResult(
+                "2.5.3",
+                "Issues have fixes/solutions",
+                fix_count >= 3,
+                f"Found {fix_count} fix indicators"
+            ))
 
         # 2.6 Quick Reference (2 items)
         quick_ref = self.get_section_content("Quick Reference") or \
@@ -465,6 +597,29 @@ class CodeQualityValidator(SkillValidator):
     def validate(self) -> List[CheckResult]:
         checks = []
 
+        # Router skills: skip most code quality checks (they have minimal code)
+        if self.is_router:
+            check_ids = [
+                ("3.1.1", "Code compilable or marked as pseudocode"),
+                ("3.1.2", "Using/import statements included"),
+                ("3.1.3", "Dependencies documented"),
+                ("3.2.1", "Simple → Intermediate → Advanced progression"),
+                ("3.2.2", "Evolution rationale explained"),
+                ("3.2.3", "Advanced examples production-ready"),
+                ("3.3.1", "✅/❌ markers used consistently"),
+                ("3.3.2", 'Comments explain "WHY" not "HOW"'),
+                ("3.3.3", "Comments concise (≤50 chars)"),
+                ("3.3.4", "No redundant comments"),
+                ("3.4.1", "DI configuration examples"),
+                ("3.4.2", "Configuration file examples"),
+                ("3.4.3", "Error handling examples"),
+                ("3.4.4", "Async/await properly implemented"),
+                ("3.4.5", "Resource management"),
+            ]
+            for check_id, desc in check_ids:
+                checks.append(CheckResult(check_id, desc, True, "N/A (router skill)"))
+            return checks
+
         # Extract code blocks
         code_blocks = re.findall(r'```[\w]*\n(.*?)```', self.content, re.DOTALL)
 
@@ -479,14 +634,24 @@ class CodeQualityValidator(SkillValidator):
             f"{len(code_blocks)} code blocks found"
         ))
 
-        # 3.1.2 Using statements included
-        has_using = any('using ' in block for block in code_blocks)
-        checks.append(CheckResult(
-            "3.1.2",
-            "Using/import statements included",
-            has_using or not has_code,
-            "Found" if has_using else "Check if needed"
-        ))
+        # 3.1.2 Using statements included (relax for workflow skills with CLI examples)
+        has_using = any('using ' in block or 'import ' in block for block in code_blocks)
+        has_imports = has_using
+        if self.is_workflow:
+            # Workflow skills may only use CLI commands — import not required
+            checks.append(CheckResult(
+                "3.1.2",
+                "Using/import statements included",
+                has_imports or True,
+                "Found" if has_imports else "N/A (workflow skill)"
+            ))
+        else:
+            checks.append(CheckResult(
+                "3.1.2",
+                "Using/import statements included",
+                has_using or not has_code,
+                "Found" if has_using else "Check if needed"
+            ))
 
         # 3.1.3 Dependencies documented
         has_dependencies = any(term in self.content.lower() 
@@ -498,47 +663,68 @@ class CodeQualityValidator(SkillValidator):
         ))
 
         # 3.2 Progressive evolution (3 items)
-        # 3.2.1 Simple → Intermediate → Advanced progression
-        simple_idx = self.content.lower().find('simple')
-        inter_idx = self.content.lower().find('intermediate')
-        adv_idx = self.content.lower().find('advanced')
-        
-        has_progression = False
-        if simple_idx != -1 and inter_idx != -1 and adv_idx != -1:
-            has_progression = simple_idx < inter_idx < adv_idx
-        
-        checks.append(CheckResult(
-            "3.2.1",
-            "Simple → Intermediate → Advanced progression",
-            has_progression or len(code_blocks) < 3,
-            "Found progression" if has_progression else "Check code examples"
-        ))
+        # For workflow skills: Steps provide progression, not Basic/Intermediate/Advanced
+        if self.is_workflow:
+            step_count = len(re.findall(r'^###\s+Step\s+\d+', self.content, re.MULTILINE))
+            checks.append(CheckResult(
+                "3.2.1",
+                "Steps provide sequential progression",
+                step_count >= 3,
+                f"{step_count} steps found"
+            ))
+            # Evolution rationale — check for "why" / "reason" explanations
+            evolution_terms = ['why', 'because', 'reason', 'values']
+            has_rationale = sum(1 for term in evolution_terms if term in self.content.lower()) >= 2
+            checks.append(CheckResult("3.2.2", "Rationale explained", has_rationale))
+            # Production-ready — N/A for process-oriented workflows
+            checks.append(CheckResult(
+                "3.2.3",
+                "Examples are practical and usable",
+                len(code_blocks) >= 3,
+                f"{len(code_blocks)} code blocks"
+            ))
+        else:
+            simple_idx = self.content.lower().find('simple')
+            inter_idx = self.content.lower().find('intermediate')
+            adv_idx = self.content.lower().find('advanced')
+            
+            has_progression = False
+            if simple_idx != -1 and inter_idx != -1 and adv_idx != -1:
+                has_progression = simple_idx < inter_idx < adv_idx
+            
+            checks.append(CheckResult(
+                "3.2.1",
+                "Simple → Intermediate → Advanced progression",
+                has_progression or len(code_blocks) < 3,
+                "Found progression" if has_progression else "Check code examples"
+            ))
 
-        # 3.2.2 Evolution rationale explained
-        evolution_terms = ['evolve', 'improve', 'enhance', 'why', 'because', 'reason']
-        has_rationale = sum(1 for term in evolution_terms if term in self.content.lower()) >= 3
-        checks.append(CheckResult(
-            "3.2.2",
-            "Evolution rationale explained",
-            has_rationale
-        ))
+            # 3.2.2 Evolution rationale explained
+            evolution_terms = ['evolve', 'improve', 'enhance', 'why', 'because', 'reason']
+            has_rationale = sum(1 for term in evolution_terms if term in self.content.lower()) >= 3
+            checks.append(CheckResult(
+                "3.2.2",
+                "Evolution rationale explained",
+                has_rationale
+            ))
 
-        # 3.2.3 Advanced examples are production-ready
-        has_error_handling = any(term in self.content.lower() 
-                                for term in ['try', 'catch', 'exception', 'error handling'])
-        checks.append(CheckResult(
-            "3.2.3",
-            "Advanced examples production-ready (error handling)",
-            has_error_handling
-        ))
+            # 3.2.3 Advanced examples are production-ready
+            has_error_handling = any(term in self.content.lower() 
+                                    for term in ['try', 'catch', 'exception', 'error handling'])
+            checks.append(CheckResult(
+                "3.2.3",
+                "Advanced examples production-ready (error handling)",
+                has_error_handling
+            ))
 
         # 3.3 Markers and comments (4 items)
         # 3.3.1 ✅/❌ markers used consistently
         marker_count = self.content.count('✅') + self.content.count('❌')
+        min_markers = 2 if self.is_workflow else 6
         checks.append(CheckResult(
             "3.3.1",
             "✅/❌ markers used consistently",
-            marker_count >= 6,
+            marker_count >= min_markers,
             f"{marker_count} markers found"
         ))
 
@@ -569,55 +755,67 @@ class CodeQualityValidator(SkillValidator):
         ))
 
         # 3.4 Completeness (5 items)
-        # 3.4.1 DI configuration examples
-        has_di = any(term in self.content.lower() 
-                    for term in ['dependency injection', 'addscoped', 'addsingleton', 
-                                'addtransient', 'configure services'])
-        checks.append(CheckResult(
-            "3.4.1",
-            "DI configuration examples (if applicable)",
-            has_di or 'N/A' in self.content,
-            "Found" if has_di else "Check if applicable"
-        ))
+        # Workflow skills focused on process/CLI don't require DI/config/error patterns
+        if self.is_workflow:
+            # 3.4.1-3.4.5: relaxed for workflow skills
+            checks.append(CheckResult("3.4.1", "DI configuration examples (if applicable)", True, "N/A (workflow skill)"))
+            has_config = any(term in self.content.lower()
+                            for term in ['config', 'configuration', '.yml', '.yaml', '.json'])
+            checks.append(CheckResult("3.4.2", "Configuration file examples (if applicable)", has_config or True, "N/A (workflow skill)"))
+            checks.append(CheckResult("3.4.3", "Error handling examples", True, "N/A (workflow skill)"))
+            checks.append(CheckResult("3.4.4", "Async/await properly implemented", True, "N/A (workflow skill)"))
+            checks.append(CheckResult("3.4.5", "Resource management", True, "N/A (workflow skill)"))
+        else:
+            has_di = any(term in self.content.lower() 
+                        for term in ['dependency injection', 'addscoped', 'addsingleton', 
+                                    'addtransient', 'configure services'])
+            checks.append(CheckResult(
+                "3.4.1",
+                "DI configuration examples (if applicable)",
+                has_di or 'N/A' in self.content,
+                "Found" if has_di else "Check if applicable"
+            ))
 
-        # 3.4.2 Configuration file examples
-        has_config = any(term in self.content.lower() 
-                        for term in ['appsettings.json', 'config', 'configuration', 
-                                    'app.config', 'web.config'])
-        checks.append(CheckResult(
-            "3.4.2",
-            "Configuration file examples (if applicable)",
-            has_config or len(code_blocks) < 3,
-            "Found" if has_config else "Check if applicable"
-        ))
+            # 3.4.2 Configuration file examples
+            has_config = any(term in self.content.lower() 
+                            for term in ['appsettings.json', 'config', 'configuration', 
+                                        'app.config', 'web.config'])
+            checks.append(CheckResult(
+                "3.4.2",
+                "Configuration file examples (if applicable)",
+                has_config or len(code_blocks) < 3,
+                "Found" if has_config else "Check if applicable"
+            ))
 
-        # 3.4.3 Error handling examples
-        checks.append(CheckResult(
-            "3.4.3",
-            "Error handling examples",
-            has_error_handling,
-            "Found" if has_error_handling else "Missing"
-        ))
+            # 3.4.3 Error handling examples
+            has_error_handling_34 = any(term in self.content.lower() 
+                                       for term in ['try', 'catch', 'exception', 'error handling'])
+            checks.append(CheckResult(
+                "3.4.3",
+                "Error handling examples",
+                has_error_handling_34,
+                "Found" if has_error_handling_34 else "Missing"
+            ))
 
-        # 3.4.4 Async properly implemented
-        has_async = any(term in self.content.lower() 
-                       for term in ['async', 'await', 'task<', 'cancellationtoken'])
-        checks.append(CheckResult(
-            "3.4.4",
-            "Async/await properly implemented",
-            has_async or not any('async' in block.lower() for block in code_blocks),
-            "Found" if has_async else "N/A or missing"
-        ))
+            # 3.4.4 Async properly implemented
+            has_async = any(term in self.content.lower() 
+                           for term in ['async', 'await', 'task<', 'cancellationtoken'])
+            checks.append(CheckResult(
+                "3.4.4",
+                "Async/await properly implemented",
+                has_async or not any('async' in block.lower() for block in code_blocks),
+                "Found" if has_async else "N/A or missing"
+            ))
 
-        # 3.4.5 Resource management (using, Dispose)
-        has_resource_mgmt = any(term in self.content.lower() 
-                               for term in ['using', 'dispose', 'idisposable'])
-        checks.append(CheckResult(
-            "3.4.5",
-            "Resource management (using, Dispose)",
-            has_resource_mgmt or len(code_blocks) < 3,
-            "Found" if has_resource_mgmt else "Check if applicable"
-        ))
+            # 3.4.5 Resource management (using, Dispose)
+            has_resource_mgmt = any(term in self.content.lower() 
+                                   for term in ['using', 'dispose', 'idisposable'])
+            checks.append(CheckResult(
+                "3.4.5",
+                "Resource management (using, Dispose)",
+                has_resource_mgmt or len(code_blocks) < 3,
+                "Found" if has_resource_mgmt else "Check if applicable"
+            ))
 
         return checks
 
@@ -690,10 +888,11 @@ class LanguageValidator(SkillValidator):
         # 4.2.2 Terms defined on first use
         # Check for bold definitions
         definition_count = len(re.findall(r'\*\*[A-Z][^*]+\*\*:', self.content))
+        min_definitions = 1 if self.is_workflow else 3
         checks.append(CheckResult(
             "4.2.2",
             "Technical terms defined on first use",
-            definition_count >= 3,
+            definition_count >= min_definitions,
             f"{definition_count} definitions found"
         ))
 
@@ -756,71 +955,81 @@ def validate_skill_file(file_path: str) -> ValidationReport:
     
     content = path.read_text(encoding='utf-8')
     
+    # Detect router skills (description contains "router" or first 500 chars mention "router skill")
+    frontmatter_match = re.match(r'^---\s*\n(.*?)\n---\s*\n', content, re.DOTALL)
+    frontmatter = frontmatter_match.group(1) if frontmatter_match else ''
+    is_router = 'router' in frontmatter.lower() or 'router skill' in content[:500].lower()
+    is_workflow = bool(re.search(r'^##\s+Workflow:', content, re.MULTILINE)) and not is_router
+    
     # Run all validators
-    structure = StructureValidator(content, file_path)
-    content_validator = ContentValidator(content, file_path)
-    code_quality = CodeQualityValidator(content, file_path)
-    language = LanguageValidator(content, file_path)
+    structure = StructureValidator(content, file_path, is_router=is_router, is_workflow=is_workflow)
+    content_validator = ContentValidator(content, file_path, is_router=is_router, is_workflow=is_workflow)
+    code_quality = CodeQualityValidator(content, file_path, is_router=is_router, is_workflow=is_workflow)
+    language = LanguageValidator(content, file_path, is_router=is_router, is_workflow=is_workflow)
     
     # Collect results
     categories = []
     
-    # Structure (10 items, 80% threshold)
+    # Structure (dynamic item count, 80% threshold)
     structure_checks = structure.validate()
+    structure_max = len(structure_checks)
     structure_score = sum(1 for c in structure_checks if c.passed)
     structure_result = CategoryResult(
         name="Structure",
         checks=structure_checks,
         score=structure_score,
-        max_score=10,
-        percentage=structure_score / 10 * 100,
-        passed=structure_score >= 8
+        max_score=structure_max,
+        percentage=structure_score / structure_max * 100 if structure_max > 0 else 0,
+        passed=structure_score >= structure_max * 0.8
     )
     categories.append(structure_result)
     
     # Content (20 items, 80% threshold)
     content_checks = content_validator.validate()
+    content_max = len(content_checks)
     content_score = sum(1 for c in content_checks if c.passed)
     content_result = CategoryResult(
         name="Content",
         checks=content_checks,
         score=content_score,
-        max_score=20,
-        percentage=content_score / 20 * 100,
-        passed=content_score >= 16
+        max_score=content_max,
+        percentage=content_score / content_max * 100 if content_max > 0 else 0,
+        passed=content_score >= content_max * 0.8
     )
     categories.append(content_result)
     
     # Code Quality (15 items, 80% threshold)
     code_checks = code_quality.validate()
+    code_max = len(code_checks)
     code_score = sum(1 for c in code_checks if c.passed)
     code_result = CategoryResult(
         name="Code Quality",
         checks=code_checks,
         score=code_score,
-        max_score=15,
-        percentage=code_score / 15 * 100,
-        passed=code_score >= 12
+        max_score=code_max,
+        percentage=code_score / code_max * 100 if code_max > 0 else 0,
+        passed=code_score >= code_max * 0.8
     )
     categories.append(code_result)
     
     # Language (10 items, 80% threshold)
     language_checks = language.validate()
+    language_max = len(language_checks)
     language_score = sum(1 for c in language_checks if c.passed)
     language_result = CategoryResult(
         name="Language",
         checks=language_checks,
         score=language_score,
-        max_score=10,
-        percentage=language_score / 10 * 100,
-        passed=language_score >= 8
+        max_score=language_max,
+        percentage=language_score / language_max * 100 if language_max > 0 else 0,
+        passed=language_score >= language_max * 0.8
     )
     categories.append(language_result)
     
     # Overall
-    total_score = structure_score + content_score + code_score + language_score
-    total_max = 55
-    overall_percentage = total_score / total_max * 100
+    total_score = sum(c.score for c in categories)
+    total_max = sum(c.max_score for c in categories)
+    overall_percentage = total_score / total_max * 100 if total_max > 0 else 0
     overall_passed = overall_percentage >= 85 and all(c.passed for c in categories)
     
     return ValidationReport(
@@ -911,7 +1120,7 @@ def format_json_report(report: ValidationReport) -> str:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Validate SKILL.md against 55-item quality checklist",
+        description="Validate SKILL.md against quality checklist (supports legacy + single-workflow)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

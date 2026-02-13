@@ -26,7 +26,7 @@ GitHub Copilot agentスキル向けの64項目チェックリスト、スコア�
 
 - **`skill-writing-guide`** - Skill執筆のベストプラクティス
 - **`skill-template-generator`** - Skillテンプレート生成
-- **`skill-revision-guide`** - 検証結果に基づく修正
+- **`skills-revise-skill`** - 検証結果に基づく修正
 
 ---
 
@@ -548,7 +548,7 @@ python validate_skill.py --skill my-skill --full-check
 - **[references/anti-patterns.md](references/anti-patterns.md)** - 詳細な❌例と失敗パターン
 - **[references/validation-examples.md](references/validation-examples.md)** - 検証ロジック実装例
 - **[skill-writing-guide](../skill-writing-guide/SKILL.md)** - Skill執筆ガイド
-- **[skill-revision-guide](../skill-revision-guide/SKILL.md)** - 修正ガイド
+- **[skills-revise-skill](../skills-revise-skill/SKILL.md)** - 修正ガイド
 - **[Development Philosophy](../../.github/copilot-instructions.md)** - Valuesと規範
 
 ---
