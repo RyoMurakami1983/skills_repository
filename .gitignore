@@ -125,3 +125,7 @@ site/
 # Git patches
 *.patch
 *.diff
+
+# RyoMurakami1983独自
+## AI・LLM・Agentに参照してもらうためのローカル開発資料置き場
+dev_docs/
