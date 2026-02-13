@@ -31,7 +31,30 @@
 
 ### グローバルインストール（全プロジェクト共通）
 
-**Meta-Skills（Skill作成支援）をグローバルに配置**:
+**Meta-Skills（Skill作成支援）をグローバルに配置（Windows推奨: 安全同期）**:
+
+```powershell
+# 1) 専用のローカルcloneを作成（初回のみ）
+git clone https://github.com/RyoMurakami1983/skills_repository.git C:\tools\skills_repository
+
+# 2) 同期先フォルダを作成（初回のみ）
+New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\skills | Out-Null
+
+# 3) 初回同期（不要ファイル削除も含めて完全同期）
+robocopy C:\tools\skills_repository\skills $env:USERPROFILE\.copilot\skills /MIR
+```
+
+**更新時（常に最新へ安全同期）**:
+
+```powershell
+Set-Location C:\tools\skills_repository
+git pull --ff-only
+robocopy C:\tools\skills_repository\skills $env:USERPROFILE\.copilot\skills /MIR
+```
+
+> 注意: `/MIR` は同期先の不要ファイルを削除します。`$env:USERPROFILE\.copilot\skills` を専用同期先として使用してください。
+
+**Linux/macOS（初回）**:
 
 ```bash
 git clone https://github.com/RyoMurakami1983/skills_repository.git /tmp/skills-repository
@@ -39,13 +62,15 @@ mkdir -p ~/.copilot/skills
 cp -r /tmp/skills-repository/skills/* ~/.copilot/skills/
 ```
 
-**Windowsの場合**:
+**Linux/macOS（更新時）**:
 
-```powershell
-git clone https://github.com/RyoMurakami1983/skills_repository.git C:\temp\skills-repository
-New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\skills
-Copy-Item -Recurse -Force C:\temp\skills-repository\skills\* $env:USERPROFILE\.copilot\skills\
+```bash
+cd /tmp/skills-repository
+git pull --ff-only
+rsync -a --delete /tmp/skills-repository/skills/ ~/.copilot/skills/
 ```
+
+> 注意: `cp -r` の再実行だけでは削除済みSkillが同期先に残る場合があります。更新時は `rsync --delete` を使用してください。
 
 ### プロジェクトインストール（プロジェクト固有）
 
