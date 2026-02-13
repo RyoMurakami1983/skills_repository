@@ -20,6 +20,7 @@
 | カテゴリ | 説明 | 配置先 | Skills数 | 詳細 |
 |---------|------|--------|---------|------|
 | `skills/` | Skill作成支援（Meta-Skills） | グローバル（~/.copilot/skills/） | 10 | [SKILLS_README.md](skills/SKILLS_README.md) |
+| `production/` | MVP/本番向け開発プラクティス | プロジェクト（.github/skills/） | 1 | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
 
 ### 📌 今後追加予定のカテゴリ
 
@@ -74,9 +75,15 @@ Copy-Item -Recurse C:\temp\skills-repository\skills\* $env:USERPROFILE\.copilot\
 Get-ChildItem $env:USERPROFILE\.copilot\skills\
 ```
 
-### プロジェクトインストール（プロジェクト固有） - 今後対応予定
+### プロジェクトインストール（プロジェクト固有）
 
-今後追加される言語別Skillsは、プロジェクトの`.github/skills/`にコピーして使用します。
+production/ や言語別Skillsは、プロジェクトの`.github/skills/`にコピーして使用します。
+
+**例: Production Skillsをプロジェクトに追加**:
+```bash
+mkdir -p .github/skills
+cp -r /tmp/skills-repository/production/* .github/skills/
+```
 
 **例: Python Skillsをプロジェクトに追加**（今後実装予定）:
 ```bash
@@ -121,6 +128,7 @@ GitHub Copilot Chat内で直接Meta-Skillsを呼び出すことができます�
 
 - **[repository-structure-plan.md](repository-structure-plan.md)** - リポジトリ構造の詳細設計
 - **[skills/SKILLS_README.md](skills/SKILLS_README.md)** - Meta-Skills詳細情報
+- **[production/PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md)** - Production Skills詳細情報
 - **[skill-quality-gaps-analysis.md](skill-quality-gaps-analysis.md)** - 品質分析レポート
 
 ## 🤝 貢献
@@ -129,7 +137,7 @@ GitHub Copilot Chat内で直接Meta-Skillsを呼び出すことができます�
 
 ### 新しいSkillを追加する
 
-1. **適切なカテゴリを選択** - 現在は`skills/`のみ、今後他カテゴリも追加予定
+1. **適切なカテゴリを選択** - 現在は`skills/`と`production/`、今後他カテゴリも追加予定
 2. **テンプレート生成** - `skill-template-generator`を使用
 3. **内容を作成** - `skill-writing-guide`を参考に記述
 4. **品質検証** - `skill-quality-validation`で64項目チェック
@@ -163,6 +171,10 @@ GitHub Copilot Chat内で直接Meta-Skillsを呼び出すことができます�
 - **Discussions**: 質問や議論は[GitHub Discussions](https://github.com/your-org/skills-repository/discussions)へ
 
 ## 🔄 バージョン履歴
+
+### v1.1.0 (2026-02-13)
+- Productionカテゴリを追加
+- tdd-standard-practice を追加
 
 ### v1.0.0 (2026-02-12)
 - 初回リリース
