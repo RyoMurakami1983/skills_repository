@@ -19,7 +19,7 @@ GitHub Copilot エージェントスキル用の構造化されたSKILL.mdテン
 
 - **`skill-writing-guide`** - スキル執筆のベストプラクティスを学ぶ
 - **`skill-quality-validation`** - 生成されたスキルを検証する
-- **`skill-revision-guide`** - 生成されたスキルを改訂する
+- **`skills-revise-skill`** - 生成されたスキルを改訂する
 
 ## When to Use This Skill
 

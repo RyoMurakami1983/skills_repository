@@ -1,5 +1,5 @@
 ---
-name: skill-git-commit-practices
+name: git-commit-practices
 description: Commit practices with Conventional Commits and atomic changes. Use when standardizing team history.
 author: RyoMurakami1983
 tags: [git, commits, conventional-commits, workflow, quality]
@@ -23,10 +23,8 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skill-github-pr-workflow`** - PR creation and merge flow
-- **`skill-git-review-standards`** - Review quality and PR sizing
-- **`skill-git-history-learning`** - Learning from commit history
-- **`skill-issue-intake`** - Issue capture and triage
+- **`github-pr-workflow`** - PR creation and merge flow
+- **`github-issue-intake`** - Issue capture and triage
 
 ---
 

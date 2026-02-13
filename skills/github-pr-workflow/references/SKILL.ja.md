@@ -1,5 +1,5 @@
 ---
-name: skill-github-pr-workflow
+name: github-pr-workflow
 description: ブランチからマージまでのPR運用ガイド。GitHub Flow標準化に使う。
 author: RyoMurakami1983
 tags: [github, pull-requests, workflow, git, collaboration]
@@ -27,10 +27,9 @@ version: 1.0.0
 
 ## 関連スキル
 
-- **`skill-git-commit-practices`** - コミット形式と原子的コミット
-- **`skill-git-review-standards`** - レビュー品質とPRサイズ
-- **`skill-git-initial-setup`** - ブランチ保護の初期設定
-- **`skill-issue-intake`** - Issue作成とトリアージ
+- **`git-commit-practices`** - コミット形式と原子的コミット
+- **`git-initial-setup`** - ブランチ保護の初期設定
+- **`github-issue-intake`** - Issue作成とトリアージ
 
 ---
 

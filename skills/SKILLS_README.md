@@ -42,22 +42,22 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 |---------|-------------|------|
 | [skills-review-skill-enterprise-readiness](skills-review-skill-enterprise-readiness/) | エンタープライズ適合評価 | 34項目チェックリストによる企業導入準備評価 |
 
-### Git/GitHub/Issue ワークフロースキル（移行済み）
+### Git/GitHub/Issue ワークフロースキル（移行済み・リネーム済み）
 
 | Skill名 | ワークフロー | 行数 | 状態 |
 |---------|-------------|------|------|
-| [skill-git-commit-practices](skill-git-commit-practices/) | Write Quality Commits | 228 | ✅ 移行済み |
-| [skill-git-initial-setup](skill-git-initial-setup/) | Protect Main Branch | 276 | ✅ 移行済み |
-| [skill-github-pr-workflow](skill-github-pr-workflow/) | Ship via Pull Request | 229 | ✅ 移行済み |
-| [skill-issue-intake](skill-issue-intake/) | Capture Deferred Work as Issues | 269 | ✅ 移行済み |
-| [skill-revision-guide](skill-revision-guide/) | Revise and Version Skills | 312 | ✅ 移行済み |
+| [git-commit-practices](git-commit-practices/) | Write Quality Commits | 228 | ✅ 移行済み |
+| [git-initial-setup](git-initial-setup/) | Protect Main Branch | 276 | ✅ 移行済み |
+| [github-pr-workflow](github-pr-workflow/) | Ship via Pull Request | 229 | ✅ 移行済み |
+| [github-issue-intake](github-issue-intake/) | Capture Deferred Work as Issues | 269 | ✅ 移行済み |
+| [skills-revise-skill](skills-revise-skill/) | Revise and Version Skills | 312 | ✅ 移行済み |
 
-### 未移行スキル（レガシー形式）
+### アーカイブ済みスキル
 
 | Skill名 | 説明 | 状態 |
 |---------|------|------|
-| [skill-git-review-standards](skill-git-review-standards/) | Gitレビュー標準 | ⏸️ 除外（必要性検討中） |
-| [skill-git-history-learning](skill-git-history-learning/) | Git履歴学習 | ⏸️ 除外（必要性検討中） |
+| skill-git-review-standards | Gitレビュー標準 | 📦 アーカイブ（archive/） |
+| skill-git-history-learning | Git履歴学習 | 📦 アーカイブ（archive/） |
 
 ## 🔧 依存関係
 
@@ -128,7 +128,7 @@ python skill-template-generator/scripts/generate_template.py --name "git-protect
 
 ### 既存Skillを更新する場合
 
-1. **修正ガイド参照** - `skill-revision-guide`で変更管理手法確認
+1. **修正ガイド参照** - `skills-revise-skill`で変更管理手法確認
 2. **内容修正** - 必要な変更を実施
 3. **品質再検証** - `skills-validate-skill`で品質維持確認
 4. **CHANGELOG更新** - 変更内容を記録

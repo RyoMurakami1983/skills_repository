@@ -1,5 +1,5 @@
 ---
-name: skill-git-initial-setup
+name: git-initial-setup
 description: git init/clone後のmain保護をデフォルト化する設定ガイド。初期セットアップで使う。
 author: RyoMurakami1983
 tags: [git, github, branch-protection, hooks, bootstrap]
@@ -23,9 +23,8 @@ git init/clone後のmain保護をデフォルト化するため、GitHubブラ�
 
 ## 関連スキル
 
-- **`skill-git-commit-practices`** - コミット運用と規約
-- **`skill-github-pr-workflow`** - PR作成とマージフロー
-- **`skill-git-review-standards`** - レビュー品質とPRサイズ基準
+- **`git-commit-practices`** - コミット運用と規約
+- **`github-pr-workflow`** - PR作成とマージフロー
 - **`skills-author-skill`** - Skill執筆の標準
 - **`skills-validate-skill`** - Skill品質の検証
 
@@ -139,7 +138,7 @@ git config --global core.hooksPath "~/.githooks"
 ## オンボーディングチェックリスト
 - [ ] `./scripts/setup.sh` を実行してフックを導入
 - [ ] mainのブランチ保護が有効か確認
-- [ ] skill-github-pr-workflowでPR運用を確認
+- [ ] github-pr-workflowでPR運用を確認
 ```
 
 複数リポジトリの管理や、チーム間で統一した保護が必要なときに使います。

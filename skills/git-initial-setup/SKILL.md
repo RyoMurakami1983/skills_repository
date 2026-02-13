@@ -1,5 +1,5 @@
 ---
-name: skill-git-initial-setup
+name: git-initial-setup
 description: Default git setup to protect main after git init/clone. Use when standardizing repo bootstrap.
 author: RyoMurakami1983
 tags: [git, github, branch-protection, hooks, bootstrap]
@@ -23,9 +23,8 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skill-git-commit-practices`** - Commit workflow and conventions
-- **`skill-github-pr-workflow`** - PR creation and merge flow
-- **`skill-git-review-standards`** - Review quality and PR sizing
+- **`git-commit-practices`** - Commit workflow and conventions
+- **`github-pr-workflow`** - PR creation and merge flow
 - **`skills-author-skill`** - Skill documentation standards
 - **`skills-validate-skill`** - Validate skill quality
 
@@ -139,7 +138,7 @@ Roll out protections with clear communication: announce the PR-only policy, shar
 ## Onboarding Checklist
 - [ ] Run `./scripts/setup.sh` to install hooks
 - [ ] Confirm branch protection is enabled on main
-- [ ] Review PR workflow in skill-github-pr-workflow
+- [ ] Review PR workflow in github-pr-workflow
 ```
 
 Use when you manage multiple repositories or need consistent protections across teams.

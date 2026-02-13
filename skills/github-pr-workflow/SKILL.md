@@ -1,5 +1,5 @@
 ---
-name: skill-github-pr-workflow
+name: github-pr-workflow
 description: PR workflow from branch to merge and main sync. Use when standardizing GitHub Flow.
 author: RyoMurakami1983
 tags: [github, pull-requests, workflow, git, collaboration]
@@ -27,10 +27,9 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skill-git-commit-practices`** - Commit formatting and atomic changes
-- **`skill-git-review-standards`** - Review quality and PR sizing
-- **`skill-git-initial-setup`** - Branch protection defaults
-- **`skill-issue-intake`** - Issue creation and triage
+- **`git-commit-practices`** - Commit formatting and atomic changes
+- **`git-initial-setup`** - Branch protection defaults
+- **`github-issue-intake`** - Issue creation and triage
 
 ---
 

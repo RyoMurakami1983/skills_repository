@@ -83,11 +83,11 @@ python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.py path
 - `skills-review-skill-enterprise-readiness` — エンタープライズ適性レビュー
 
 **Git/GitHub系**:
-- `skill-git-commit-practices` — コミット規約と原子性
-- `skill-git-initial-setup` — git init/clone時のブランチ保護
-- `skill-github-pr-workflow` — PRフローの標準化
-- `skill-issue-intake` — スコープ外作業のIssue化
-- `skill-revision-guide` — スキルの修正・バージョン管理
+- `git-commit-practices` — コミット規約と原子性
+- `git-initial-setup` — git init/clone時のブランチ保護
+- `github-pr-workflow` — PRフローの標準化
+- `github-issue-intake` — スコープ外作業のIssue化
+- `skills-revise-skill` — スキルの修正・バージョン管理
 
 **ルータースキル**（後方互換）:
 - `skill-writing-guide` → skills-* 系へ振り分け

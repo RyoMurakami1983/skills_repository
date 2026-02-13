@@ -26,7 +26,7 @@ Use this skill when:
 | Run a quality check on a SKILL.md | **[`skills-validate-skill`](../skills-validate-skill/SKILL.md)** | Full validation with scoring and report |
 | Fix issues found in a quality report | **[`skills-remediate-validation-findings`](../skills-remediate-validation-findings/SKILL.md)** | Systematic remediation workflow |
 | Write a new skill correctly | **[`skills-author-skill`](../skills-author-skill/SKILL.md)** | End-to-end authoring workflow |
-| Revise an existing skill | **[`skill-revision-guide`](../skill-revision-guide/SKILL.md)** | Revision and changelog management |
+| Revise an existing skill | **[`skills-revise-skill`](../skills-revise-skill/SKILL.md)** | Revision and changelog management |
 
 ---
 

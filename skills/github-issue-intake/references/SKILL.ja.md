@@ -1,5 +1,5 @@
 ---
-name: skill-issue-intake
+name: github-issue-intake
 description: スコープ外作業をIssueとして記録するためのガイド。判断と作成手順に使う。
 author: RyoMurakami1983
 tags: [github, issues, triage, workflow, documentation]
@@ -23,11 +23,10 @@ version: 1.0.0
 
 ## 関連スキル
 
-- **`skill-git-commit-practices`** - コミット運用と実践
-- **`skill-github-pr-workflow`** - PR運用とマージ方針
-- **`skill-git-review-standards`** - レビュー標準とPRサイズ
-- **`skill-git-initial-setup`** - リポジトリ初期保護
-- **`skill-revision-guide`** - 変更管理と履歴整理
+- **`git-commit-practices`** - コミット運用と実践
+- **`github-pr-workflow`** - PR運用とマージ方針
+- **`git-initial-setup`** - リポジトリ初期保護
+- **`skills-revise-skill`** - 変更管理と履歴整理
 - **`skills-validate-skill`** - ドキュメント品質検証
 
 ---

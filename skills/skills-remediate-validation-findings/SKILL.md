@@ -25,7 +25,7 @@ Use this skill when:
 
 - **`skills-validate-skill`** — Generate the quality report this skill consumes
 - **`skills-author-skill`** — Reference for correct skill structure
-- **`skill-revision-guide`** — Version management after remediation
+- **`skills-revise-skill`** — Version management after remediation
 
 ---
 

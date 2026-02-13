@@ -1,5 +1,5 @@
 ---
-name: skill-git-commit-practices
+name: git-commit-practices
 description: Conventional Commitsと原子的コミットの実践ガイド。履歴標準化に使う。
 author: RyoMurakami1983
 tags: [git, commits, conventional-commits, workflow, quality]
@@ -23,10 +23,8 @@ version: 1.0.0
 
 ## 関連スキル
 
-- **`skill-github-pr-workflow`** - PR作成とマージ運用
-- **`skill-git-review-standards`** - レビュー品質とPRサイズ基準
-- **`skill-git-history-learning`** - 履歴を学習資産化
-- **`skill-issue-intake`** - Issue作成とトリアージ
+- **`github-pr-workflow`** - PR作成とマージ運用
+- **`github-issue-intake`** - Issue作成とトリアージ
 
 ---
 

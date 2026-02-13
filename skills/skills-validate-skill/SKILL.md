@@ -27,7 +27,7 @@ Use this skill when:
 - **`skills-remediate-validation-findings`** — Fix issues found during validation
 - **`skills-author-skill`** — Write a new skill following best practices
 - **`skills-refactor-skill-to-single-workflow`** — Convert legacy multi-pattern skills
-- **`skill-revision-guide`** — Revise and version existing skills
+- **`skills-revise-skill`** — Revise and version existing skills
 
 ---
 

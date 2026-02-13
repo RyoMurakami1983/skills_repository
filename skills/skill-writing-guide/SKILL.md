@@ -28,7 +28,7 @@ Use this skill when:
 | Improve name/description/tags for agent discovery | **[`skills-optimize-skill-discoverability`](../skills-optimize-skill-discoverability/SKILL.md)** | Discoverability optimization |
 | Generate a skill template/skeleton | **[`skills-generate-skill-template`](../skills-generate-skill-template/SKILL.md)** | Template generation |
 | Validate a skill against quality criteria | **[`skills-validate-skill`](../skills-validate-skill/SKILL.md)** | Quality validation |
-| Revise an existing skill | **[`skill-revision-guide`](../skill-revision-guide/SKILL.md)** | Revision and changelog management |
+| Revise an existing skill | **[`skills-revise-skill`](../skills-revise-skill/SKILL.md)** | Revision and changelog management |
 
 ---
 
@@ -67,7 +67,7 @@ What do you need?
 │  └─ → skills-validate-skill
 │
 └─ Updating an existing skill?
-   └─ → skill-revision-guide
+   └─ → skills-revise-skill
 ```
 
 ### Step 3 — Navigate

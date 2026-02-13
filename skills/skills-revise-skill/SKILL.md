@@ -1,5 +1,5 @@
 ---
-name: skill-revision-guide
+name: skills-revise-skill
 description: Guide for revising GitHub Copilot agent skills and managing changelogs.
 author: RyoMurakami1983
 tags: [copilot, agent-skills, revision, maintenance, changelog]

@@ -1,5 +1,5 @@
 ---
-name: skill-issue-intake
+name: github-issue-intake
 description: Capture deferred work as actionable GitHub issues. Use when triaging scope.
 author: RyoMurakami1983
 tags: [github, issues, triage, workflow, documentation]
@@ -23,11 +23,10 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skill-git-commit-practices`** - Commit workflow and conventions
-- **`skill-github-pr-workflow`** - PR workflow and merge policies
-- **`skill-git-review-standards`** - Review quality and PR sizing
-- **`skill-git-initial-setup`** - Default repo protections for new repos
-- **`skill-revision-guide`** - Revision and change log practices
+- **`git-commit-practices`** - Commit workflow and conventions
+- **`github-pr-workflow`** - PR workflow and merge policies
+- **`git-initial-setup`** - Default repo protections for new repos
+- **`skills-revise-skill`** - Revision and change log practices
 - **`skills-validate-skill`** - Validate documentation quality
 
 ---
