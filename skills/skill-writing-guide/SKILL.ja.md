@@ -485,11 +485,11 @@ timeout = 30  # Why: 大量データ処理時に10秒では不足。
 SKILL.md (≤550行)               references/
 ├─ ✅ グッドパターン            ├─ anti-patterns.md（詳細なアンチパターン）
 ├─ 基本例                       ├─ advanced-examples.md（高度な実装例）
-└─ コア原則                     └─ skill_jp.md（日本語詳細版・人間向け）
+└─ コア原則                     └─ SKILL.ja.md（日本語詳細版・人間向け）
 ```
 
 **Why（理由の詳細）**:
-SKILL.mdはGitHub Copilot Agentが読み込むため、約500行（+10%許容で550行）に抑えるのが理想です。これによりAIエージェントの処理効率が向上し、適切なタイミングでスキルを提案できます。一方、人間向けの日本語詳細版（skill_jp.md）は行数制限を気にせず、Whyの説明を充実させることができます。
+SKILL.mdはGitHub Copilot Agentが読み込むため、約500行（+10%許容で550行）に抑えるのが理想です。これによりAIエージェントの処理効率が向上し、適切なタイミングでスキルを提案できます。一方、人間向けの日本語詳細版（SKILL.ja.md）は行数制限を気にせず、Whyの説明を充実させることができます。
 
 **保持すべき内容（SKILL.md）**:
 1. ✅ グッドパターン（5-15行/パターン）
@@ -501,7 +501,7 @@ SKILL.mdはGitHub Copilot Agentが読み込むため、約500行（+10%許容で
 1. ❌ 詳細なアンチパターンコード → `references/anti-patterns.md`
 2. 📚 本番向け実装 → `references/advanced-examples.md`
 3. ⚙️ 複雑な設定 → `references/configuration.md`
-4. 🌏 日本語詳細版 → `skill_jp.md`（人間向け・行数制限なし）
+4. 🌏 日本語詳細版 → `SKILL.ja.md`（人間向け・行数制限なし）
 
 **Values（該当する価値観）**: 基礎と型（最小形式で最大可能性）
 
@@ -811,7 +811,7 @@ var result = await SomeAsyncMethod();
 
 ### 4. （追加）日本語版で詳細説明を省略する
 
-**What（概要）**: 日本語版（skill_jp.md）でも英語版（SKILL.md）と同じ簡潔さを保ち、Whyの詳細説明を省略してしまう。
+**What（概要）**: 日本語版（SKILL.ja.md）でも英語版（SKILL.md）と同じ簡潔さを保ち、Whyの詳細説明を省略してしまう。
 
 **Why It's Wrong（なぜ間違いか）**:
 1. **学習機会の損失**: 人間向けの詳細説明で理解を深める機会を逃す
@@ -820,14 +820,14 @@ var result = await SomeAsyncMethod();
 
 **Better Approach（改善策）**:
 - **SKILL.md（英語・AI向け）**: 簡潔に、約500行以内
-- **skill_jp.md（日本語・人間向け）**: 詳細に、行数制限なし
+- **SKILL.ja.md（日本語・人間向け）**: 詳細に、行数制限なし
 
 **具体例**:
 ```markdown
 ## SKILL.md（英語・AI向け）
 timeout = 30  # Why: Production analysis showed 10s insufficient for large datasets
 
-## skill_jp.md（日本語・人間向け）
+## SKILL.ja.md（日本語・人間向け）
 timeout = 30  # Why: 大量データ処理時に10秒では不足。
               # 本番ログ分析により30秒が適切と判断（2026-02-10調査）
               # 理由: 計測システムから5万件/秒のデータが流入するため、
@@ -863,7 +863,7 @@ timeout = 30  # Why: 大量データ処理時に10秒では不足。
 - [ ] タグが具体的で技術焦点
 - [ ] 関連スキルを相互参照
 - [ ] 段階的開示を適用（詳細はreferences/へ）
-- [ ] 日本語版（skill_jp.md）でWhyを詳細に説明
+- [ ] 日本語版（SKILL.ja.md）でWhyを詳細に説明
 
 ### 価値観との整合
 
@@ -947,7 +947,7 @@ CHANGELOG.mdに詳細を記載。直近の変更：
 ### Version 2.1.0 (2026-02-13)
 - **グッドプラクティスセクション追加**: 4つの重要なグッドプラクティスとValues統合（詳細版）
 - **アンチパターンセクション強化**: 4つのアンチパターンに拡張（日本語版は詳細解説付き）
-- **日本語版の独立**: references/SKILL.ja.md から skill_jp.md に移行（人間向け詳細版として）
+- **日本語版の独立**: references/SKILL.ja.md から SKILL.ja.md に移行（人間向け詳細版として）
 - **段階的開示の実装**: 詳細なアンチパターンは references/anti-patterns.md へ（英語版）
 - **Whyの充実**: 日本語版で各パターンの理由と背景を詳細に説明
 
@@ -969,14 +969,14 @@ CHANGELOG.mdに詳細を記載。直近の変更：
 
 ## 日本語版について（About Japanese Version）
 
-このファイル（skill_jp.md）は**人間向けの詳細な日本語版**です。
+このファイル（SKILL.ja.md）は**人間向けの詳細な日本語版**です。
 
 ### ファイル構成
 - **SKILL.md**: 英語版・AI向け（約500行、簡潔）
   - GitHub Copilot AgentがSKILL.mdを読み込むため、簡潔にする
   - 必須のグッドパターンと基本例を集約
   
-- **skill_jp.md**: 日本語版・人間向け（行数制限なし、詳細）
+- **SKILL.ja.md**: 日本語版・人間向け（行数制限なし、詳細）
   - Whyの説明を充実（なぜそのパターンなのか、価値観との関連）
   - 具体例を豊富に（実際のコード、シナリオ、チェックリスト）
   - 学習資産として活用（成長の複利の実現）
@@ -992,7 +992,7 @@ CHANGELOG.mdに詳細を記載。直近の変更：
 - AIエージェントの処理効率を維持
 - 必須のグッドパターンを素早く参照
 
-**skill_jp.md（日本語・人間向け）**:
+**SKILL.ja.md（日本語・人間向け）**:
 - 行数制限を気にせず、Whyを詳細に説明
 - 学習資産として活用（成長の複利）
 - チーム内での知識共有に最適
@@ -1001,8 +1001,8 @@ CHANGELOG.mdに詳細を記載。直近の変更：
 ### 推奨される使い方
 
 1. **AIエージェントに任せる時**: SKILL.mdを参照（GitHub Copilotが自動で使用）
-2. **自分で学ぶ時**: skill_jp.md を読む（Whyが詳しい）
-3. **チームに教える時**: skill_jp.md を共有（日本語で詳細）
+2. **自分で学ぶ時**: SKILL.ja.md を読む（Whyが詳しい）
+3. **チームに教える時**: SKILL.ja.md を共有（日本語で詳細）
 4. **深掘りしたい時**: references/anti-patterns.md も参照（英語だが具体例豊富）
 
 ---

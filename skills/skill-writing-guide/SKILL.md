@@ -264,11 +264,7 @@ public Data GetData()
 
 ## Pattern 6: Comparison Tables
 
-### Overview
-
-Tables enable at-a-glance decision making. Use them to compare patterns, tools, or scenarios.
-
-### Basic Example
+Tables enable at-a-glance decision making. Use 3-column format: Scenario | Recommendation | Why.
 
 ```markdown
 | Scenario | Recommendation | Why |
@@ -277,54 +273,12 @@ Tables enable at-a-glance decision making. Use them to compare patterns, tools, 
 | Update entity | Tracking | Automatic change detection |
 ```
 
-### When to Use
-
-**Decision Support Tables**:
-- 3 columns: Scenario, Recommendation, Why
-- 5-10 rows maximum
-- Bold the recommended option
-
-**Technology Comparison Tables**:
-- Include: Tool, Type, Performance, Use When
-- Highlight recommended tools in bold
-
-### With Configuration
-
-```markdown
-| Feature | Pattern A | Pattern B | Pattern C |
-|---------|-----------|-----------|-----------|
-| **Complexity** | Low | Medium | High |
-| **Performance** | Good | Better | Best |
-| **Maintainability** | High | Medium | Low |
-| **Use Case** | Simple CRUD | Complex queries | Bulk operations |
-| **Recommendation** | ✅ Start here | Scale to this | **Only if needed** |
-```
-
 ---
 
 ## Pattern 7: Anti-Patterns vs. Common Pitfalls
 
-### Overview
-
-Distinguish between architectural mistakes (Anti-Patterns) and implementation errors (Common Pitfalls).
-
-### Basic Example
-
-**Common Pitfall**:
-```csharp
-// ❌ WRONG - Resource not disposed
-var stream = File.OpenRead("file.txt");
-
-// ✅ CORRECT - Automatically disposed
-using var stream = File.OpenRead("file.txt");
-```
-
-### When to Use
-
-| Type | Focus | Example |
-|------|-------|---------|
-| **Anti-Pattern** | Architecture, design principles | God Class, Tight Coupling |
-| **Common Pitfall** | Implementation mistakes | Forgetting await, null refs |
+**Anti-Pattern**: Architectural mistake (God Class, Tight Coupling)  
+**Common Pitfall**: Implementation error (Forgetting await, null refs)
 
 > 📚 **Detailed anti-patterns**: See `references/anti-patterns.md`
 
@@ -332,75 +286,12 @@ using var stream = File.OpenRead("file.txt");
 
 ## Pattern 8: Optimizing for 500-Line Limit
 
-### Overview
+**Progressive Disclosure**: Keep essentials in SKILL.md (~500 lines), move details to references/.
 
-Apply progressive disclosure to keep SKILL.md under 500 lines while maintaining quality.
+**Keep**: Good patterns (5-15 lines), basic examples, core principles  
+**Move to references/**: Anti-pattern details, advanced examples, complex configs, Japanese (SKILL.ja.md)
 
-### Core Strategy
-
-**Progressive Disclosure**: Essential content in SKILL.md, details in references/
-
-```
-┌─────────────────────────────────────┐
-│ SKILL.md (≤500 lines)               │
-│ • ✅ Good patterns (5-15 lines)     │
-│ • Basic examples                    │
-│ • Simple comparisons                │
-└─────────────────────────────────────┘
-           ↓ references
-┌─────────────────────────────────────┐
-│ references/ (loaded when needed)    │
-│ • ❌ Anti-pattern details           │
-│ • 📚 Advanced implementations       │
-│ • ⚙️ Complex configurations         │
-└─────────────────────────────────────┘
-```
-
-### What to Keep in SKILL.md
-
-✅ **Keep** (High Priority):
-1. Good patterns with ✅ markers (5-15 lines each)
-2. Basic YAML/markdown examples
-3. Simple comparisons (✅ vs ❌, 2-3 lines each)
-4. Core principles and decision trees
-
-### What to Move to references/
-
-📤 **Move** (Lower Priority):
-1. ❌ Detailed anti-pattern code → `references/anti-patterns.md`
-2. 📚 Production-grade implementations → `references/advanced-examples.md`
-3. ⚙️ Complex configurations → `references/configuration.md`
-4. 🌏 Japanese translations → `references/SKILL.ja.md`
-
-### Decision Tree
-
-| Question | Answer | Action |
-|----------|--------|--------|
-| Code example > 15 lines? | Yes | Consider moving to references/ |
-| Essential for basic understanding? | No | Move to references/ |
-| Is it an anti-pattern? | Yes | Move to references/anti-patterns.md |
-| Is it advanced/production-grade? | Yes | Move to references/advanced-examples.md |
-| Is it a good basic example? | Yes | **Keep in SKILL.md** |
-
-### Basic Example
-
-✅ **CORRECT - Concise good pattern**:
-```yaml
----
-name: wpf-databinding
-description: Guide for WPF data binding patterns. Use when implementing MVVM.
----
-```
-
-> 📚 **Anti-patterns and detailed examples**: See `references/anti-patterns.md`
-
-### When to Use
-
-Use this pattern when:
-- Your SKILL.md exceeds 500 lines
-- You have many code examples (both ✅ and ❌)
-- You have production-grade implementations
-- You want to reduce cognitive load
+> 📚 **Full optimization guide**: See `references/optimization-guide.md`
 
 ---
 
@@ -447,7 +338,7 @@ var result = SomeAsyncMethod().Result;
 SKILL.md (≤550)      references/
 ├─ ✅ Good patterns  ├─ anti-patterns.md
 ├─ Basic examples    ├─ advanced-examples.md  
-└─ Core principles   └─ skill_jp.md (日本語)
+└─ Core principles   └─ SKILL.ja.md (日本語)
 ```
 
 **Values**: 基礎と型（最小形式で最大可能性）
@@ -632,8 +523,9 @@ See CHANGELOG.md for full history. Recent changes:
 ### Version 2.1.0 (2026-02-13)
 - **Added Good Practices section**: 4 essential good practices with Values integration
 - **Enhanced Anti-Patterns section**: Added "Mixing Good and Bad Examples" anti-pattern
-- **Japanese consolidation**: Moved from references/SKILL.ja.md to skill_jp.md for better organization
+- **Japanese consolidation**: Moved from references/SKILL.ja.md to SKILL.ja.md (root level)
 - **Progressive Disclosure**: Added reference to detailed anti-patterns in references/anti-patterns.md
+- **Optimized length**: Condensed to 546 lines (within 550-line tolerance)
 
 ### Version 2.0.0 (2026-02-12)
 - **Expanded Core Principles**: Added Values integration (基礎と型、成長の複利、温故知新、継続は力、ニュートラル)
@@ -650,6 +542,6 @@ See CHANGELOG.md for full history. Recent changes:
 - Progressive Disclosure strategy introduced
 
 <!-- 
-Japanese version available at skill_jp.md
-日本語版は skill_jp.md を参照してください
+Japanese version available at SKILL.ja.md
+日本語版は SKILL.ja.md を参照してください
 -->
