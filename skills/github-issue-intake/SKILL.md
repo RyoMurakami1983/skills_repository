@@ -4,7 +4,7 @@ description: Capture deferred work as actionable GitHub issues. Use when triagin
 author: RyoMurakami1983
 tags: [github, issues, triage, workflow, documentation]
 invocable: false
-version: 1.0.0
+version: 2.1.0
 ---
 
 # Issue Intake
@@ -17,6 +17,7 @@ Use this skill when:
 - Capturing out-of-scope bugs discovered during a Pull Request (PR) review
 - Deferring non-critical fixes to a later sprint or milestone
 - Standardizing issue titles, labels, and priority across teams
+- Clarifying existing issues that are vague or hard to act on (rewrite title/body)
 - Recording reproducible steps for intermittent production failures
 - Converting support requests into trackable engineering work
 - Handing off follow-up tasks to another owner or team
@@ -67,12 +68,31 @@ Action: Create issue and continue
 
 **When**: You discover scope creep during a PR or a fix risks delaying the current release.
 
-### Step 2: Write Title and Body
+### Step 2: Write (or Refactor) Title and Body
 
-Write a clear, searchable title with a type prefix and a structured body. A good title starts with `Bug:`, `Feature:`, or `Chore:` followed by a specific description. Use a template body with Summary, Steps to Reproduce, Expected/Actual Result, and Impact sections.
+Write a clear, searchable title and a structured body.
+
+#### Recommended: priority markers in the title
+
+Use color-circle markers for quick scanning during triage. Keep labels as the source of truth; the emoji is for visibility.
+
+| Marker | Meaning | Typical mapping |
+|--------|---------|-----------------|
+| 🔴 | Urgent / P0 | Production down |
+| 🟡 | High / P1 | Major user impact |
+| 🟢 | Medium / P2 | Standard bug / improvement |
+| 🔵 | Low / P3 | Minor / cleanup |
+
+Examples:
+- `🟡 validate_skill.py: Harden section extraction for Workflow/Router`
+- `🟢 Windows: Standardize UTF-8 I/O (PowerShell/gh/python)`
+
+#### Body template
+
+A good title starts with `Bug:`, `Feature:`, or `Chore:` (or uses the marker + component style above) and is followed by a specific description.
 
 ```markdown
-Title: "Bug: CSV import fails on UTF-8 BOM"
+Title: "🟡 Bug: CSV import fails on UTF-8 BOM"
 
 ## Summary
 CSV import rejects files with UTF-8 BOM encoding.
@@ -91,7 +111,9 @@ Import succeeds.
 Blocks users with Excel-exported CSVs.
 ```
 
-**When**: Every new issue — never skip the template even for small bugs.
+**Note (Markdown gotcha)**: Avoid placeholders like `<path>` in issue bodies — they may be treated as HTML tags and disappear. Prefer `PATH` / `FILE` or fenced code blocks.
+
+**When**: Every new issue and every “unclear issue” you choose to refactor.
 
 ### Step 3: Apply Labels and Priority
 
@@ -136,23 +158,46 @@ Log: 2026-02-12T12:03:11Z ERROR import failed (BOM detected)
 
 **When**: Always for bugs; for features, include user-scenario context instead.
 
-### Step 5: Create Issue via CLI
+### Step 5: Create or Edit Issues via CLI (Recommended)
 
-Use `gh issue create` for fast, repeatable issue creation from the terminal. Add labels, assignees, and a body file in one command.
+Use `gh issue create` for fast, repeatable creation, and `gh issue edit` to refactor unclear issues.
 
 ```bash
+# Create
 gh issue create \
-  --title "Bug: CSV import fails on UTF-8 BOM" \
+  --title "🟡 Bug: CSV import fails on UTF-8 BOM" \
   --body-file issue.md \
   --label bug,priority/P1,area/import \
   --assignee @me
+
+# Edit
+gh issue edit 123 --title "🟢 Windows: Standardize UTF-8 I/O" --body-file issue.md
 ```
 
-**When**: You are already in the terminal and want speed over formatting.
+#### Windows / PowerShell: safest body-file approach (UTF-8)
+
+Avoid passing large multiline strings via `--body` (quoting can break or hang). Generate a UTF-8 body file and pass it.
+
+```powershell
+$bodyLines = @(
+  '## Background',
+  '- ...',
+  '',
+  '## Definition of Done (DoD)',
+  '- [ ] ...'
+)
+$bodyFile = Join-Path $env:TEMP 'issue_body.md'
+Set-Content -Path $bodyFile -Value $bodyLines -Encoding utf8
+
+gh issue edit 123 --title '🟢 ...' --body-file $bodyFile
+Remove-Item -LiteralPath $bodyFile -Force
+```
+
+**When**: You are already in the terminal and want speed, repeatability, and consistent formatting.
 
 ### Step 6: Create Issue via Web UI
 
-Use the GitHub web interface when you need drag-and-drop screenshots, rich Markdown preview, or template selection. Navigate to Issues → New issue, select a template, fill required fields, and add labels and milestone before submitting.
+Use the GitHub web interface when you need drag-and-drop screenshots, rich Markdown preview, or template selection.
 
 ```text
 1. Open repository → Issues → New issue
@@ -186,12 +231,14 @@ Fixes owner/repo#123
 
 ## Best Practices
 
+- Refactor unclear issues into an actionable format (Background → Goal → Scope → DoD)
+- Use the priority marker scheme (🔴🟡🟢🔵) consistently in titles
 - Use action verbs in titles (Fix, Add, Remove)
 - Keep one issue per problem
 - Add impact and priority before triage meetings
 - Include repro steps or evidence whenever possible
 - Link PRs with closing keywords
-- Use the template and add labels before assigning an owner
+- Use `--body-file` for anything beyond one-line bodies
 
 ---
 
@@ -200,10 +247,12 @@ Fixes owner/repo#123
 - Writing vague titles like "Bug" or "Fix later"
 - Skipping repro steps for intermittent failures
 - Mixing multiple problems into one issue
+- Passing long bodies via `gh issue edit --body ...` on PowerShell
+- Using placeholders like `<PATH>` that may disappear in Markdown rendering
 
 Fix: Use the standard template and split issues by scope.
 Fix: Always add repro steps or evidence links.
-Fix: Add labels before assigning ownership.
+Fix: Prefer `--body-file` with UTF-8 for CLI edits.
 
 ---
 
@@ -223,8 +272,8 @@ A: File an issue when the fix is out of scope or exceeds your timebox.
 **Q: What labels are mandatory?**
 A: At minimum, include type and priority labels.
 
-**Q: Can I create issues from PRs?**
-A: Yes. Reference the issue in the PR and use closing keywords.
+**Q: Can I edit existing issues to make them clearer?**
+A: Yes — treat it as backlog maintenance. Update title/body (and add DoD) so the next owner can act without questions.
 
 ---
 
@@ -233,16 +282,19 @@ A: Yes. Reference the issue in the PR and use closing keywords.
 | Step | Action | Output |
 |------|--------|--------|
 | 1 | Decide fix vs issue | Decision logged |
-| 2 | Write title and body | Searchable issue |
+| 2 | Write/refactor title + body (use 🔴🟡🟢🔵) | Searchable, actionable issue |
 | 3 | Apply labels and priority | Sortable backlog |
 | 4 | Add repro steps and evidence | Reproducible report |
-| 5 | Create via CLI | Fast terminal workflow |
+| 5 | Create/edit via CLI (`--body-file`) | Fast, safe workflow |
 | 6 | Create via Web UI | Rich formatted issue |
 | 7 | Link to PR | Auto-close on merge |
 
 ```bash
 # CLI quick create
-gh issue create --title "Bug: ..." --body-file issue.md --label bug,priority/P1
+gh issue create --title "🟡 Bug: ..." --body-file issue.md --label bug,priority/P1
+
+# CLI quick edit
+gh issue edit 123 --title "🟢 ..." --body-file issue.md
 ```
 
 ---
@@ -252,10 +304,16 @@ gh issue create --title "Bug: ..." --body-file issue.md --label bug,priority/P1
 - [About issues](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues)
 - [Closing issues with keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue)
 - [GitHub CLI issue create](https://cli.github.com/manual/gh_issue_create)
+- [GitHub CLI issue edit](https://cli.github.com/manual/gh_issue_edit)
 
 ---
 
 ## Changelog
+
+### Version 2.1.0 (2026-02-13)
+- Added "refactor unclear issues" guidance (rewrite title/body with DoD)
+- Documented Windows/PowerShell-safe `--body-file` workflow (UTF-8)
+- Added priority marker scheme (🔴🟡🟢🔵) for titles
 
 ### Version 2.0.0 (2026-02-12)
 - Migrated from 7-pattern format to single-workflow with 7 steps
