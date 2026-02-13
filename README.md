@@ -41,11 +41,12 @@
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/your-org/skills-repository.git /tmp/skills-repository
+git clone https://github.com/RyoMurakami1983/skills_repository.git /tmp/skills-repository
 
 # グローバルスキルディレクトリにコピー
 mkdir -p ~/.copilot/skills
 cp -r /tmp/skills-repository/skills/* ~/.copilot/skills/
+
 
 # 確認
 ls ~/.copilot/skills/
@@ -65,11 +66,13 @@ ls ~/.copilot/skills/
 
 ```powershell
 # リポジトリをクローン
-git clone https://github.com/your-org/skills-repository.git C:\temp\skills-repository
+git clone https://github.com/RyoMurakami1983/skills_repository.git C:\temp\skills-repository
 
 # グローバルスキルディレクトリにコピー
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\skills
 Copy-Item -Recurse C:\temp\skills-repository\skills\* $env:USERPROFILE\.copilot\skills\
+# 強制上書き
+Copy-Item -Recurse -Force C:\temp\skills-repository\skills\* $env:USERPROFILE\.copilot\skills\
 
 # 確認
 Get-ChildItem $env:USERPROFILE\.copilot\skills\
