@@ -185,6 +185,7 @@ Route to the best matching skill.
     assert check.passed is True
     assert "N/A" in (check.details or "")
 
-    assert len(report.categories) == 4
+    category_names = {c.name for c in report.categories}
+    assert {"Structure", "Content", "Code Quality", "Language"}.issubset(category_names)
     assert report.total_score == sum(c.score for c in report.categories)
     assert report.total_max_score == sum(c.max_score for c in report.categories)
