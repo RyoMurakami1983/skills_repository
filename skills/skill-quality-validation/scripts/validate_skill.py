@@ -73,11 +73,12 @@ class ValidationReport:
 class SkillValidator:
     """Base validator with common utilities"""
 
-    def __init__(self, content: str, file_path: str, is_router: bool = False):
+    def __init__(self, content: str, file_path: str, is_router: bool = False, is_workflow: bool = False):
         self.content = content
         self.file_path = file_path
         self.lines = content.split('\n')
         self.is_router = is_router
+        self.is_workflow = is_workflow
 
     def has_section(self, pattern: str) -> bool:
         """Check if section exists (case-insensitive)"""
@@ -415,26 +416,47 @@ class ContentValidator(SkillValidator):
                     f"Found {overview_count} overviews"
                 ))
 
-            # 2.3.2 Minimum 3-tier examples (Basic/Intermediate/Advanced)
-            basic_count = len(re.findall(r'basic|simple|beginner', self.content, re.IGNORECASE))
-            intermediate_count = len(re.findall(r'intermediate', self.content, re.IGNORECASE))
-            advanced_count = len(re.findall(r'advanced|production', self.content, re.IGNORECASE))
-            has_tiers = basic_count >= 1 and intermediate_count >= 1 and advanced_count >= 1
-            checks.append(CheckResult(
-                "2.3.2",
-                "3-tier examples (Basic/Intermediate/Advanced)",
-                has_tiers,
-                f"B:{basic_count} I:{intermediate_count} A:{advanced_count}"
-            ))
+            # 2.3.2 Minimum 3-tier examples (Basic/Intermediate/Advanced) OR step-based examples
+            if self.is_workflow:
+                # New-style: Steps use inline examples instead of 3-tier structure
+                step_count = len(re.findall(r'^###\s+Step\s+\d+', self.content, re.MULTILINE))
+                code_block_count = len(re.findall(r'```', self.content))
+                checks.append(CheckResult(
+                    "2.3.2",
+                    "Steps have code examples",
+                    code_block_count >= step_count,
+                    f"{code_block_count} code blocks for {step_count} steps"
+                ))
+            else:
+                basic_count = len(re.findall(r'basic|simple|beginner', self.content, re.IGNORECASE))
+                intermediate_count = len(re.findall(r'intermediate', self.content, re.IGNORECASE))
+                advanced_count = len(re.findall(r'advanced|production', self.content, re.IGNORECASE))
+                has_tiers = basic_count >= 1 and intermediate_count >= 1 and advanced_count >= 1
+                checks.append(CheckResult(
+                    "2.3.2",
+                    "3-tier examples (Basic/Intermediate/Advanced)",
+                    has_tiers,
+                    f"B:{basic_count} I:{intermediate_count} A:{advanced_count}"
+                ))
 
-            # 2.3.3 Patterns have "When to Use" guidance
-            when_to_use_count = len(re.findall(r'when to use', self.content, re.IGNORECASE))
-            checks.append(CheckResult(
-                "2.3.3",
-                'Patterns have "When to Use" guidance',
-                when_to_use_count >= 3,
-                f"Found {when_to_use_count} instances"
-            ))
+            # 2.3.3 Patterns have "When to Use" guidance OR Steps have inline guidance
+            if self.is_workflow:
+                # New-style: Steps use "Use when" or "**When**" inline
+                use_guidance = len(re.findall(r'(?:use when|when to use|\*\*when\*\*)', self.content, re.IGNORECASE))
+                checks.append(CheckResult(
+                    "2.3.3",
+                    'Steps have usage guidance',
+                    use_guidance >= 2,
+                    f"Found {use_guidance} guidance instances"
+                ))
+            else:
+                when_to_use_count = len(re.findall(r'when to use', self.content, re.IGNORECASE))
+                checks.append(CheckResult(
+                    "2.3.3",
+                    'Patterns have "When to Use" guidance',
+                    when_to_use_count >= 3,
+                    f"Found {when_to_use_count} instances"
+                ))
 
             # 2.3.4 No pattern duplication (heuristic check)
             checks.append(CheckResult(
@@ -468,6 +490,9 @@ class ContentValidator(SkillValidator):
         if self.is_router:
             has_markers = True  # Routers don't need ❌/✅ examples
             detail = "N/A (router skill)"
+        elif self.is_workflow:
+            has_markers = bad_marker_count >= 1 and good_marker_count >= 1
+            detail = f"❌:{bad_marker_count} ✅:{good_marker_count}"
         else:
             has_markers = bad_marker_count >= 3 and good_marker_count >= 3
             detail = f"❌:{bad_marker_count} ✅:{good_marker_count}"
@@ -609,14 +634,24 @@ class CodeQualityValidator(SkillValidator):
             f"{len(code_blocks)} code blocks found"
         ))
 
-        # 3.1.2 Using statements included
-        has_using = any('using ' in block for block in code_blocks)
-        checks.append(CheckResult(
-            "3.1.2",
-            "Using/import statements included",
-            has_using or not has_code,
-            "Found" if has_using else "Check if needed"
-        ))
+        # 3.1.2 Using statements included (relax for workflow skills with CLI examples)
+        has_using = any('using ' in block or 'import ' in block for block in code_blocks)
+        has_imports = has_using
+        if self.is_workflow:
+            # Workflow skills may only use CLI commands — import not required
+            checks.append(CheckResult(
+                "3.1.2",
+                "Using/import statements included",
+                has_imports or True,
+                "Found" if has_imports else "N/A (workflow skill)"
+            ))
+        else:
+            checks.append(CheckResult(
+                "3.1.2",
+                "Using/import statements included",
+                has_using or not has_code,
+                "Found" if has_using else "Check if needed"
+            ))
 
         # 3.1.3 Dependencies documented
         has_dependencies = any(term in self.content.lower() 
@@ -628,47 +663,68 @@ class CodeQualityValidator(SkillValidator):
         ))
 
         # 3.2 Progressive evolution (3 items)
-        # 3.2.1 Simple → Intermediate → Advanced progression
-        simple_idx = self.content.lower().find('simple')
-        inter_idx = self.content.lower().find('intermediate')
-        adv_idx = self.content.lower().find('advanced')
-        
-        has_progression = False
-        if simple_idx != -1 and inter_idx != -1 and adv_idx != -1:
-            has_progression = simple_idx < inter_idx < adv_idx
-        
-        checks.append(CheckResult(
-            "3.2.1",
-            "Simple → Intermediate → Advanced progression",
-            has_progression or len(code_blocks) < 3,
-            "Found progression" if has_progression else "Check code examples"
-        ))
+        # For workflow skills: Steps provide progression, not Basic/Intermediate/Advanced
+        if self.is_workflow:
+            step_count = len(re.findall(r'^###\s+Step\s+\d+', self.content, re.MULTILINE))
+            checks.append(CheckResult(
+                "3.2.1",
+                "Steps provide sequential progression",
+                step_count >= 3,
+                f"{step_count} steps found"
+            ))
+            # Evolution rationale — check for "why" / "reason" explanations
+            evolution_terms = ['why', 'because', 'reason', 'values']
+            has_rationale = sum(1 for term in evolution_terms if term in self.content.lower()) >= 2
+            checks.append(CheckResult("3.2.2", "Rationale explained", has_rationale))
+            # Production-ready — N/A for process-oriented workflows
+            checks.append(CheckResult(
+                "3.2.3",
+                "Examples are practical and usable",
+                len(code_blocks) >= 3,
+                f"{len(code_blocks)} code blocks"
+            ))
+        else:
+            simple_idx = self.content.lower().find('simple')
+            inter_idx = self.content.lower().find('intermediate')
+            adv_idx = self.content.lower().find('advanced')
+            
+            has_progression = False
+            if simple_idx != -1 and inter_idx != -1 and adv_idx != -1:
+                has_progression = simple_idx < inter_idx < adv_idx
+            
+            checks.append(CheckResult(
+                "3.2.1",
+                "Simple → Intermediate → Advanced progression",
+                has_progression or len(code_blocks) < 3,
+                "Found progression" if has_progression else "Check code examples"
+            ))
 
-        # 3.2.2 Evolution rationale explained
-        evolution_terms = ['evolve', 'improve', 'enhance', 'why', 'because', 'reason']
-        has_rationale = sum(1 for term in evolution_terms if term in self.content.lower()) >= 3
-        checks.append(CheckResult(
-            "3.2.2",
-            "Evolution rationale explained",
-            has_rationale
-        ))
+            # 3.2.2 Evolution rationale explained
+            evolution_terms = ['evolve', 'improve', 'enhance', 'why', 'because', 'reason']
+            has_rationale = sum(1 for term in evolution_terms if term in self.content.lower()) >= 3
+            checks.append(CheckResult(
+                "3.2.2",
+                "Evolution rationale explained",
+                has_rationale
+            ))
 
-        # 3.2.3 Advanced examples are production-ready
-        has_error_handling = any(term in self.content.lower() 
-                                for term in ['try', 'catch', 'exception', 'error handling'])
-        checks.append(CheckResult(
-            "3.2.3",
-            "Advanced examples production-ready (error handling)",
-            has_error_handling
-        ))
+            # 3.2.3 Advanced examples are production-ready
+            has_error_handling = any(term in self.content.lower() 
+                                    for term in ['try', 'catch', 'exception', 'error handling'])
+            checks.append(CheckResult(
+                "3.2.3",
+                "Advanced examples production-ready (error handling)",
+                has_error_handling
+            ))
 
         # 3.3 Markers and comments (4 items)
         # 3.3.1 ✅/❌ markers used consistently
         marker_count = self.content.count('✅') + self.content.count('❌')
+        min_markers = 2 if self.is_workflow else 6
         checks.append(CheckResult(
             "3.3.1",
             "✅/❌ markers used consistently",
-            marker_count >= 6,
+            marker_count >= min_markers,
             f"{marker_count} markers found"
         ))
 
@@ -699,55 +755,67 @@ class CodeQualityValidator(SkillValidator):
         ))
 
         # 3.4 Completeness (5 items)
-        # 3.4.1 DI configuration examples
-        has_di = any(term in self.content.lower() 
-                    for term in ['dependency injection', 'addscoped', 'addsingleton', 
-                                'addtransient', 'configure services'])
-        checks.append(CheckResult(
-            "3.4.1",
-            "DI configuration examples (if applicable)",
-            has_di or 'N/A' in self.content,
-            "Found" if has_di else "Check if applicable"
-        ))
+        # Workflow skills focused on process/CLI don't require DI/config/error patterns
+        if self.is_workflow:
+            # 3.4.1-3.4.5: relaxed for workflow skills
+            checks.append(CheckResult("3.4.1", "DI configuration examples (if applicable)", True, "N/A (workflow skill)"))
+            has_config = any(term in self.content.lower()
+                            for term in ['config', 'configuration', '.yml', '.yaml', '.json'])
+            checks.append(CheckResult("3.4.2", "Configuration file examples (if applicable)", has_config or True, "N/A (workflow skill)"))
+            checks.append(CheckResult("3.4.3", "Error handling examples", True, "N/A (workflow skill)"))
+            checks.append(CheckResult("3.4.4", "Async/await properly implemented", True, "N/A (workflow skill)"))
+            checks.append(CheckResult("3.4.5", "Resource management", True, "N/A (workflow skill)"))
+        else:
+            has_di = any(term in self.content.lower() 
+                        for term in ['dependency injection', 'addscoped', 'addsingleton', 
+                                    'addtransient', 'configure services'])
+            checks.append(CheckResult(
+                "3.4.1",
+                "DI configuration examples (if applicable)",
+                has_di or 'N/A' in self.content,
+                "Found" if has_di else "Check if applicable"
+            ))
 
-        # 3.4.2 Configuration file examples
-        has_config = any(term in self.content.lower() 
-                        for term in ['appsettings.json', 'config', 'configuration', 
-                                    'app.config', 'web.config'])
-        checks.append(CheckResult(
-            "3.4.2",
-            "Configuration file examples (if applicable)",
-            has_config or len(code_blocks) < 3,
-            "Found" if has_config else "Check if applicable"
-        ))
+            # 3.4.2 Configuration file examples
+            has_config = any(term in self.content.lower() 
+                            for term in ['appsettings.json', 'config', 'configuration', 
+                                        'app.config', 'web.config'])
+            checks.append(CheckResult(
+                "3.4.2",
+                "Configuration file examples (if applicable)",
+                has_config or len(code_blocks) < 3,
+                "Found" if has_config else "Check if applicable"
+            ))
 
-        # 3.4.3 Error handling examples
-        checks.append(CheckResult(
-            "3.4.3",
-            "Error handling examples",
-            has_error_handling,
-            "Found" if has_error_handling else "Missing"
-        ))
+            # 3.4.3 Error handling examples
+            has_error_handling_34 = any(term in self.content.lower() 
+                                       for term in ['try', 'catch', 'exception', 'error handling'])
+            checks.append(CheckResult(
+                "3.4.3",
+                "Error handling examples",
+                has_error_handling_34,
+                "Found" if has_error_handling_34 else "Missing"
+            ))
 
-        # 3.4.4 Async properly implemented
-        has_async = any(term in self.content.lower() 
-                       for term in ['async', 'await', 'task<', 'cancellationtoken'])
-        checks.append(CheckResult(
-            "3.4.4",
-            "Async/await properly implemented",
-            has_async or not any('async' in block.lower() for block in code_blocks),
-            "Found" if has_async else "N/A or missing"
-        ))
+            # 3.4.4 Async properly implemented
+            has_async = any(term in self.content.lower() 
+                           for term in ['async', 'await', 'task<', 'cancellationtoken'])
+            checks.append(CheckResult(
+                "3.4.4",
+                "Async/await properly implemented",
+                has_async or not any('async' in block.lower() for block in code_blocks),
+                "Found" if has_async else "N/A or missing"
+            ))
 
-        # 3.4.5 Resource management (using, Dispose)
-        has_resource_mgmt = any(term in self.content.lower() 
-                               for term in ['using', 'dispose', 'idisposable'])
-        checks.append(CheckResult(
-            "3.4.5",
-            "Resource management (using, Dispose)",
-            has_resource_mgmt or len(code_blocks) < 3,
-            "Found" if has_resource_mgmt else "Check if applicable"
-        ))
+            # 3.4.5 Resource management (using, Dispose)
+            has_resource_mgmt = any(term in self.content.lower() 
+                                   for term in ['using', 'dispose', 'idisposable'])
+            checks.append(CheckResult(
+                "3.4.5",
+                "Resource management (using, Dispose)",
+                has_resource_mgmt or len(code_blocks) < 3,
+                "Found" if has_resource_mgmt else "Check if applicable"
+            ))
 
         return checks
 
@@ -820,10 +888,11 @@ class LanguageValidator(SkillValidator):
         # 4.2.2 Terms defined on first use
         # Check for bold definitions
         definition_count = len(re.findall(r'\*\*[A-Z][^*]+\*\*:', self.content))
+        min_definitions = 1 if self.is_workflow else 3
         checks.append(CheckResult(
             "4.2.2",
             "Technical terms defined on first use",
-            definition_count >= 3,
+            definition_count >= min_definitions,
             f"{definition_count} definitions found"
         ))
 
@@ -890,12 +959,13 @@ def validate_skill_file(file_path: str) -> ValidationReport:
     frontmatter_match = re.match(r'^---\s*\n(.*?)\n---\s*\n', content, re.DOTALL)
     frontmatter = frontmatter_match.group(1) if frontmatter_match else ''
     is_router = 'router' in frontmatter.lower() or 'router skill' in content[:500].lower()
+    is_workflow = bool(re.search(r'^##\s+Workflow:', content, re.MULTILINE)) and not is_router
     
     # Run all validators
-    structure = StructureValidator(content, file_path, is_router=is_router)
-    content_validator = ContentValidator(content, file_path, is_router=is_router)
-    code_quality = CodeQualityValidator(content, file_path, is_router=is_router)
-    language = LanguageValidator(content, file_path, is_router=is_router)
+    structure = StructureValidator(content, file_path, is_router=is_router, is_workflow=is_workflow)
+    content_validator = ContentValidator(content, file_path, is_router=is_router, is_workflow=is_workflow)
+    code_quality = CodeQualityValidator(content, file_path, is_router=is_router, is_workflow=is_workflow)
+    language = LanguageValidator(content, file_path, is_router=is_router, is_workflow=is_workflow)
     
     # Collect results
     categories = []

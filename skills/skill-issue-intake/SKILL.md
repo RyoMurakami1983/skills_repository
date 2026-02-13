@@ -43,26 +43,18 @@ Use this skill when:
 ## Core Principles
 
 1. **Actionable First** - Every issue includes clear next steps (基礎と型)
-2. **Scope Separation** - Track later work without blocking now
+2. **Scope Separation** - Track later work without blocking now (ニュートラル)
 3. **Traceability** - Link issues to PRs and evidence (成長の複利)
-4. **Consistency** - Use standard labels, priorities, and templates
+4. **Consistency** - Use standard labels, priorities, and templates (温故知新)
 5. **Low Friction** - Capture fast to avoid forgotten work (継続は力)
 
 ---
 
-## Pattern 1: Decide Fix Now vs File Issue
+## Workflow: Capture Deferred Work as Issues
 
-### Overview
+### Step 1: Decide Fix Now or File Issue
 
-Decide whether to fix immediately or capture the work as a tracked issue.
-
-### Basic Example
-
-| Question | If Yes | If No |
-|----------|--------|-------|
-| Breaks release or main? | Fix now | Create issue |
-| Needs design discussion? | Create issue | Fix now |
-| >30 minutes to resolve? | Create issue | Fix now |
+Determine whether to fix inline or defer. Use a simple decision matrix based on impact, effort, and scope relevance. If the fix is out of scope or exceeds a 30-minute timebox, file an issue instead.
 
 ```text
 # ✅ CORRECT - File issue when out of scope
@@ -74,86 +66,44 @@ Action: Create issue and continue
 // TODO: fix later
 ```
 
-### Intermediate Example
+**When**: You discover scope creep during a PR or a fix risks delaying the current release.
 
-- Timebox quick fixes to 30 minutes
-- If timebox is exceeded, stop and file an issue
+### Step 2: Write Title and Body
 
-### Advanced Example
-
-| Impact | Effort | Decision |
-|--------|--------|----------|
-| High | High | Create issue + schedule |
-| High | Low | Fix now |
-| Low | High | Create issue |
-
-### When to Use
-
-- When you discover scope creep during a PR
-- When a fix risks delaying the current release
-
-**Why**: Separating scope keeps PRs focused and predictable.
-
----
-
-## Pattern 2: Issue Title and Body Template
-
-### Overview
-
-Standardize titles and bodies so issues are searchable and actionable.
-
-### Basic Example
+Write a clear, searchable title with a type prefix and a structured body. A good title starts with `Bug:`, `Feature:`, or `Chore:` followed by a specific description. Use a template body with Summary, Steps to Reproduce, Expected/Actual Result, and Impact sections.
 
 ```markdown
-# ✅ CORRECT - Clear title
 Title: "Bug: CSV import fails on UTF-8 BOM"
 
-# ❌ WRONG - Vague title
-Title: "Bug"
-```
-
-### Intermediate Example
-
-```markdown
 ## Summary
+CSV import rejects files with UTF-8 BOM encoding.
+
 ## Steps to Reproduce
+1. Upload CSV with UTF-8 BOM
+2. Click Import
+
 ## Expected Result
+Import succeeds.
+
 ## Actual Result
+"Invalid encoding" error displayed.
+
 ## Impact
+Blocks users with Excel-exported CSVs.
 ```
 
-### Advanced Example
+**When**: Every new issue — never skip the template even for small bugs.
 
-```markdown
-## Acceptance Criteria
-- [ ] Repro steps documented
-- [ ] Fix implemented
-- [ ] Tests added
-```
+### Step 3: Apply Labels and Priority
 
-```yaml
-# .github/ISSUE_TEMPLATE/bug.yml
-name: Bug Report
-description: Report a reproducible bug
-body:
-  - type: textarea
-    id: repro
-    attributes:
-      label: Steps to Reproduce
-      required: true
-```
+Assign labels for type, priority, and area so the backlog is sortable. At minimum, every issue needs a type label and a priority label.
 
-**Why**: Clear titles and structure reduce back-and-forth.
-
----
-
-## Pattern 3: Labels and Priority Triage
-
-### Overview
-
-Apply consistent labels and priorities so work can be sorted and scheduled.
-
-### Basic Example
+| Priority | Meaning | SLA |
+|----------|---------|-----|
+| P0 | Production down | Same day |
+| P1 | Major user impact | 1–3 days |
+| P2 | Standard bug | 1–2 sprints |
+| P3 | Minor/cleanup | Backlog |
 
 ```yaml
 # ✅ CORRECT
@@ -163,31 +113,11 @@ labels: [bug, priority/P1, area/import]
 labels: []
 ```
 
-### Intermediate Example
+**When**: Before triage meetings or when handing off to another team member.
 
-| Priority | Meaning | SLA |
-|----------|---------|-----|
-| P0 | Production down | Same day |
-| P1 | Major user impact | 1-3 days |
-| P2 | Standard bug | 1-2 sprints |
-| P3 | Minor/cleanup | Backlog |
+### Step 4: Add Repro Steps and Evidence
 
-### Advanced Example
-
-- Add `type/bug`, `type/debt`, `type/feature`
-- Add `status/triage`, `status/ready`, `status/blocked`
-
-**Why**: Labels make issue queues sortable and predictable.
-
----
-
-## Pattern 4: Repro Steps and Evidence
-
-### Overview
-
-Provide reproducible steps and evidence so the next owner can fix quickly.
-
-### Basic Example
+Include numbered reproduction steps, expected vs actual results, and supporting evidence (logs, screenshots, request IDs). The next owner should be able to reproduce the problem without asking follow-up questions.
 
 ```markdown
 ## Steps to Reproduce
@@ -200,38 +130,16 @@ Import succeeds
 
 ## Actual
 "Invalid encoding" error
-```
 
-### Intermediate Example
-
-Attach evidence:
-- Logs or screenshots
-- Request/response IDs
-
-### Advanced Example
-
-```text
+## Evidence
 Log: 2026-02-12T12:03:11Z ERROR import failed (BOM detected)
 ```
 
-**Why**: Repro steps reduce time wasted on guesswork.
+**When**: Always for bugs; for features, include user-scenario context instead.
 
----
+### Step 5: Create Issue via CLI
 
-## Pattern 5: GitHub CLI Issue Creation
-
-### Overview
-
-Use the GitHub CLI (command-line interface, CLI) for fast issue creation.
-
-### Basic Example
-
-```bash
-# ✅ CORRECT
-gh issue create --title "Bug: CSV import fails on UTF-8 BOM" --body "See repro steps"
-```
-
-### Intermediate Example
+Use `gh issue create` for fast, repeatable issue creation from the terminal. Add labels, assignees, and a body file in one command.
 
 ```bash
 gh issue create \
@@ -241,87 +149,25 @@ gh issue create \
   --assignee @me
 ```
 
-Why: Intermediate adds labels and ownership for faster triage.
+**When**: You are already in the terminal and want speed over formatting.
 
-### Advanced Example
+### Step 6: Create Issue via Web UI
 
-```python
-# ✅ CORRECT - Generate issue body file
-import textwrap
-from pathlib import Path
+Use the GitHub web interface when you need drag-and-drop screenshots, rich Markdown preview, or template selection. Navigate to Issues → New issue, select a template, fill required fields, and add labels and milestone before submitting.
 
-body = textwrap.dedent("""\
-## Summary
-CSV import fails on UTF-8 BOM.
-
-## Steps to Reproduce
-1. Upload CSV with UTF-8 BOM
-2. Click Import
-
-## Expected
-Import succeeds
-
-## Actual
-"Invalid encoding" error
-""")
-
-try:
-    Path("issue.md").write_text(body, encoding="utf-8")
-except OSError as exc:
-    raise SystemExit(f"Failed to write issue body: {exc}")
-```
-
-```csharp
-// ✅ CORRECT - Register an issue template service
-using Microsoft.Extensions.DependencyInjection;
-
-services.AddSingleton<IssueTemplateService>();
-```
-
-**Why**: Advanced automation reduces manual errors and keeps templates consistent.
-
----
-
-## Pattern 6: GitHub Web UI Issue Creation
-
-### Overview
-
-Use the GitHub web interface when you need rich formatting or quick screenshots.
-
-### Basic Example
-
+```text
 1. Open repository → Issues → New issue
-2. Select template
-3. Fill required fields and submit
-
-### Intermediate Example
-
-- Add labels and milestone
-- Assign an owner and reviewer
-
-### Advanced Example
-
-- Convert a PR comment into an issue reference
-- Link the issue to a project board
-
-**Why**: The UI is best for context-rich reports.
-
----
-
-## Pattern 7: Link Issues to PRs and Close
-
-### Overview
-
-Ensure issues close automatically when the PR merges.
-
-### Basic Example
-
-```markdown
-## Related
-Closes #123
+2. Select template (e.g., Bug Report)
+3. Fill required fields, attach screenshots
+4. Add labels, milestone, and assignee
+5. Submit
 ```
 
-### Intermediate Example
+**When**: The issue needs embedded images, complex formatting, or you are triaging from the browser.
+
+### Step 7: Link Issues to PRs
+
+Reference issues in PR descriptions using closing keywords so issues close automatically on merge. Use `Closes #N` for direct fixes and `Refs #N` for related context.
 
 ```markdown
 ## Related
@@ -329,20 +175,13 @@ Closes #123
 Refs #130
 ```
 
-### Advanced Example
+For cross-repo references, use the full `owner/repo#N` syntax:
 
 ```markdown
-## Related
 Fixes owner/repo#123
-Relates-to owner/repo#130
 ```
 
-### When to Use
-
-- When a PR directly resolves a tracked issue
-- When you need full traceability across repos
-
-**Why**: Auto-closing keeps the backlog accurate.
+**When**: Every PR that resolves or relates to a tracked issue.
 
 ---
 
@@ -353,7 +192,7 @@ Relates-to owner/repo#130
 - Add impact and priority before triage meetings
 - Include repro steps or evidence whenever possible
 - Link PRs with closing keywords
-Use the template and add labels before assigning an owner.
+- Use the template and add labels before assigning an owner
 
 ---
 
@@ -379,13 +218,13 @@ Fix: Add labels before assigning ownership.
 
 ## FAQ
 
-**Q: When should I file an issue instead of fixing now?**  
+**Q: When should I file an issue instead of fixing now?**
 A: File an issue when the fix is out of scope or exceeds your timebox.
 
-**Q: What labels are mandatory?**  
+**Q: What labels are mandatory?**
 A: At minimum, include type and priority labels.
 
-**Q: Can I create issues from PRs?**  
+**Q: Can I create issues from PRs?**
 A: Yes. Reference the issue in the PR and use closing keywords.
 
 ---
@@ -395,13 +234,16 @@ A: Yes. Reference the issue in the PR and use closing keywords.
 | Step | Action | Output |
 |------|--------|--------|
 | 1 | Decide fix vs issue | Decision logged |
-| 2 | Use template | Clear issue body |
-| 3 | Add labels | Priority visible |
-| 4 | Link PR | Auto-close on merge |
+| 2 | Write title and body | Searchable issue |
+| 3 | Apply labels and priority | Sortable backlog |
+| 4 | Add repro steps and evidence | Reproducible report |
+| 5 | Create via CLI | Fast terminal workflow |
+| 6 | Create via Web UI | Rich formatted issue |
+| 7 | Link to PR | Auto-close on merge |
 
 ```bash
 # CLI quick create
-gh issue create --title "Bug: ..." --body-file issue.md
+gh issue create --title "Bug: ..." --body-file issue.md --label bug,priority/P1
 ```
 
 ---
@@ -415,6 +257,11 @@ gh issue create --title "Bug: ..." --body-file issue.md
 ---
 
 ## Changelog
+
+### Version 2.0.0 (2026-02-12)
+- Migrated from 7-pattern format to single-workflow with 7 steps
+- Compressed examples: one best example per step
+- Added Japanese value tags to all Core Principles
 
 ### Version 1.0.0 (2026-02-12)
 - Initial release

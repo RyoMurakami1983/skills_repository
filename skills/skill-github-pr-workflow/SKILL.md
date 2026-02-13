@@ -9,14 +9,11 @@ version: 1.0.0
 
 # GitHub PR Workflow
 
-A repeatable Pull Request (PR) workflow: branch, push, review, merge, and sync main safely.
+A repeatable Pull Request workflow: branch, push, review, merge, and sync main safely.
 
 **Pull Request (PR)**: A reviewed change proposal in GitHub.
 **Branch Protection**: Repository rules that block unsafe merges or direct pushes.
 **Continuous Integration (CI)**: Automated checks that run on pull requests.
-
-Progression: Simple → Intermediate → Advanced examples improve clarity because each step adds safeguards.
-Reason: More safeguards reduce rework and protect main from risky merges.
 
 ## When to Use This Skill
 
@@ -47,103 +44,52 @@ Use this skill when:
 
 ## Core Principles
 
-1. **Branch First** - Work stays off main until reviewed
-2. **Traceability** - Link PRs to issues and evidence
-3. **Review Gates** - Approvals and CI checks protect main
-4. **Clean Main** - Merge only verified changes
-5. **Fast Sync** - Update local main after merge
+1. **Branch First** (基礎と型) - Work stays off main until reviewed; the branch-first pattern is the foundation every PR builds on
+2. **Traceability** (成長の複利) - Link PRs to issues so future developers learn why changes were made
+3. **Review Gates** (ニュートラル) - Approvals and CI checks protect main with unbiased quality standards
+4. **Clean Main** (継続は力) - Merge only verified changes; steady discipline keeps the codebase healthy
+5. **Fast Sync** (温故知新) - Update local main after merge to build on the latest shared history
 
 ---
 
-## Pattern 1: Branch and Push Workflow
+## Workflow: Ship via Pull Request
 
-### Overview
+### Step 1: Create Feature Branch
 
-Create a feature branch from main and push it before opening a PR.
-
-### Basic Example
+Branch from the latest main before starting work. Use descriptive prefixes (`feature/`, `fix/`, `docs/`) with the issue number for traceability.
 
 ```bash
-# ✅ CORRECT
 git checkout main
 git pull --ff-only
 git checkout -b feature/issue-123
 git push -u origin feature/issue-123
-
-# ❌ WRONG
-git checkout main
-git push origin main
 ```
 
-### Intermediate Example
+Use when multiple developers collaborate on the same repository or when branch protection blocks direct pushes to main.
 
-- Use prefixes like `feature/`, `fix/`, `docs/`
-- Include issue number in the branch name
+### Step 2: Open PR with Clear Context
 
-### Advanced Example
-
-- Protect main with branch rules before creating branches
-
-### When to Use
-
-- When you want a repeatable PR workflow
-- When multiple developers collaborate on the same repo
-
----
-
-## Pattern 2: Create a PR with Clear Context
-
-### Overview
-
-Create a PR with a clear title, body, and linked issue.
-
-### Basic Example
+Create a PR with an action-oriented title and a body that gives reviewers the full picture. Include Summary, Why, Testing, and linked issues.
 
 ```bash
-# ✅ CORRECT
-gh pr create --title "feat: 支払い画面を改善" --body "Closes #123"
+gh pr create --title "feat: 支払い画面を改善" --body "## Summary
+Redesigned payment form layout.
 
-# ❌ WRONG
-gh pr create --title "update" --body ""
-```
-
-### Intermediate Example
-
-```markdown
-## Summary
 ## Why
+Current layout causes 15% drop-off at checkout.
+
 ## Testing
+Manual test on staging.
+
 ## Related
-Closes #123
-
-Why: Give reviewers context and reduce re-review cycles.
+Closes #123"
 ```
 
-### Advanced Example
+Use when reviewers need context quickly and you want consistent PR content across the team.
 
-```bash
-# Fail fast if PR creation fails
-if ! gh pr create --title "feat: 支払い画面を改善" --body "Closes #123"; then
-  echo "PR creation failed"; exit 1
-fi
-```
+### Step 3: Pass Review and CI Gates
 
-### When to Use
-
-- When you want consistent PR content
-- When reviewers need context quickly
-
----
-
-## Pattern 3: Review Gates and CI Checks
-
-### Overview
-
-Require approvals and CI checks before merging.
-
-### Basic Example
-
-CI configuration file example:
+Require approvals and passing CI checks before merging. Configure branch protection to enforce these gates automatically.
 
 ```yaml
 # .github/workflows/ci.yml
@@ -157,72 +103,23 @@ jobs:
       - run: npm test
 ```
 
-### Intermediate Example
+Use when main must stay deployable and you need audit-ready review evidence.
 
-- Require 1-2 approvals
-- Require conversations to be resolved
+### Step 4: Link Issues with Closing Keywords
 
-### Advanced Example
-
-```csharp
-// ✅ CORRECT - Register a PR gate
-using Microsoft.Extensions.DependencyInjection;
-
-services.AddSingleton<PullRequestGate>();
-```
-
-### When to Use
-
-- When main must stay deployable
-- When you need audit-ready review evidence
-
----
-
-## Pattern 4: Link Issues with Closing Keywords
-
-### Overview
-
-Use closing keywords so issues are auto-closed on merge.
-
-### Basic Example
-
-```markdown
-## Related
-Closes #123
-```
-
-### Intermediate Example
+Add closing keywords in the PR body so issues are auto-closed on merge. Use `Closes` for resolved issues and `Refs` for related context.
 
 ```markdown
 ## Related
 Closes #123
 Refs #130
-
-Why: Keep issue traceability visible in the PR body.
 ```
 
-### Advanced Example
+Use when work originates from an issue and you need end-to-end traceability from issue to merged code.
 
-```markdown
-## Related
-Fixes owner/repo#123
-Relates-to owner/repo#130
-```
+### Step 5: Choose Merge Strategy
 
-### When to Use
-
-- When work starts from an issue
-- When you need end-to-end traceability
-
----
-
-## Pattern 5: Merge Strategy Selection
-
-### Overview
-
-Choose the merge strategy that fits your repo policy.
-
-### Basic Example
+Select the merge strategy that matches your repository policy.
 
 | Strategy | Use When | Result |
 |----------|----------|--------|
@@ -230,92 +127,34 @@ Choose the merge strategy that fits your repo policy.
 | Merge | Preserve history | Full commits |
 | Rebase | Linear history | No merge commit |
 
-### Intermediate Example
+Use when you need consistent history patterns or compliance requires a specific merge type.
 
-- Use squash for feature branches
-- Use merge for release branches
+### Step 6: Sync and Clean Up
 
-### Advanced Example
-
-- Enforce linear history in branch protection settings
-
-### When to Use
-
-- When you need consistent history patterns
-- When compliance requires specific merge types
-
----
-
-## Pattern 6: Post-Merge Sync and Cleanup
-
-### Overview
-
-Sync main locally and remove branches after merge.
-
-### Basic Example
+After merge, sync your local main and delete the merged branch to keep your workspace clean.
 
 ```bash
-# ✅ CORRECT
 git checkout main
 git pull --ff-only
 git branch -d feature/issue-123
-
-# ❌ WRONG
-git checkout main
-git pull
-```
-
-### Intermediate Example
-
-```bash
-# Delete remote branch
 git push origin --delete feature/issue-123
 ```
 
-### Advanced Example
+Use after every merged PR to avoid working on stale history.
 
-- Update changelog or release notes after merge
+### Step 7: Handle Hotfixes
 
-### When to Use
-
-- After reviewers merge your PR
-- When you want main to stay current locally
-
----
-
-## Pattern 7: Hotfix Workflow
-
-### Overview
-
-Handle urgent fixes without bypassing protection.
-
-### Basic Example
+Create a hotfix branch for urgent production fixes. Follow the same PR process — never bypass branch protection.
 
 ```bash
-# ✅ CORRECT
+git checkout main
+git pull --ff-only
 git checkout -b hotfix/issue-999
+# Fix, commit, push, then open PR as usual
+git push -u origin hotfix/issue-999
 ```
 
-### Intermediate Example
-
-```bash
-# Cherry-pick into release branch
-git cherry-pick <commit>
-```
-
-### Advanced Example
-
-```python
-# ✅ CORRECT - record hotfix evidence
-from pathlib import Path
-
-Path("hotfix.txt").write_text("hotfix applied", encoding="utf-8")
-```
-
-### When to Use
-
-- When production is down
-- When main protections must remain intact
+Use when production is down but branch protections must remain intact.
 
 ---
 
@@ -325,27 +164,27 @@ Path("hotfix.txt").write_text("hotfix applied", encoding="utf-8")
 - Define required testing notes in the PR template
 - Apply closing keywords to keep issues updated
 - Avoid merging without approvals or passing CI
-- Consider syncing main after every merge
+- Sync main locally after every merge
 
 ---
 
 ## Common Pitfalls
 
-1. **Skipping CI checks**  
-Fix: Require CI in branch protection.
+1. **Skipping CI checks**
+   Fix: Require CI in branch protection.
 
-2. **Merging without review**  
-Fix: Require approvals and code owners.
+2. **Merging without review**
+   Fix: Require approvals and code owners.
 
-3. **Forgetting main sync**  
-Fix: Pull main after merge.
+3. **Forgetting main sync**
+   Fix: Pull main with `--ff-only` after every merge.
 
 ---
 
 ## Anti-Patterns
 
-- Direct push to main without branch protection architecture
-- Merging failed checks
+- Direct push to main without branch protection
+- Merging with failed checks
 - Leaving merged branches undeleted
 
 ---
@@ -359,27 +198,27 @@ Fix: Pull main after merge.
 - [ ] Add `Closes #` keywords
 - [ ] Pass CI and get approvals
 - [ ] Merge via policy
-- [ ] Pull main after merge
+- [ ] Pull main and delete branch
 
 ### Merge Decision Table
 
-| Situation | Merge Type | Decision |
-|-----------|------------|----------|
-| Small feature | Squash | Decision: reduce noise |
-| Release branch | Merge | Decision: preserve commits |
-| Linear history required | Rebase | Decision: avoid merge commit |
+| Situation | Merge Type | Reason |
+|-----------|------------|--------|
+| Small feature | Squash | Reduce noise |
+| Release branch | Merge | Preserve commits |
+| Linear history required | Rebase | Avoid merge commit |
 
 ---
 
 ## FAQ
 
-**Q: Should every PR close an issue?**  
+**Q: Should every PR close an issue?**
 A: Use closing keywords when work is issue-driven.
 
-**Q: Can I merge if CI fails?**  
+**Q: Can I merge if CI fails?**
 A: No. Fix CI or document the exception.
 
-**Q: When should I delete branches?**  
+**Q: When should I delete branches?**
 A: After merge to keep remotes clean.
 
 ---

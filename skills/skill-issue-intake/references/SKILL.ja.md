@@ -42,27 +42,19 @@ version: 1.0.0
 
 ## コア原則
 
-1. **行動可能性** - 次にやるべきことが明確（基礎と型）
-2. **スコープ分離** - 今やる/後でやるを分ける
-3. **トレーサビリティ** - IssueとPRを必ず紐付け（成長の複利）
-4. **一貫性** - ラベルとテンプレを統一
-5. **低摩擦** - 早く記録して忘れない（継続は力）
+1. **行動可能性** - すべてのIssueに明確な次のステップを含める（基礎と型）
+2. **スコープ分離** - 今の作業をブロックせずに後続作業を追跡する（ニュートラル）
+3. **トレーサビリティ** - IssueをPRと証拠に紐付ける（成長の複利）
+4. **一貫性** - 標準ラベル・優先度・テンプレートを使う（温故知新）
+5. **低摩擦** - 素早く記録して忘れない（継続は力）
 
 ---
 
-## パターン1: 今直すかIssue化するか判断
+## ワークフロー: 先送りした作業をIssueとして記録する
 
-### 概要
+### Step 1: 今直すかIssue化するか判断
 
-今修正するか、Issueとして記録するかを判断します。
-
-### 基本例
-
-| 質問 | Yes | No |
-|------|-----|----|
-| リリースを止めるか | 今直す | Issue化 |
-| 設計議論が必要か | Issue化 | 今直す |
-| 30分以上かかるか | Issue化 | 今直す |
+インラインで修正するか先送りするかを判断します。影響度・工数・スコープ関連性に基づくシンプルな判断マトリクスを使います。スコープ外または30分のタイムボックスを超える場合はIssue化します。
 
 ```text
 # ✅ CORRECT - スコープ外はIssue化
@@ -74,86 +66,44 @@ Action: Issueを作成して続行
 // TODO: fix later
 ```
 
-### 中級例
+**いつ**: PR中にスコープクリープを発見した場合、または修正が現リリースを遅延させるリスクがある場合。
 
-- 30分のタイムボックスを設定
-- 超えたらIssue化して続行
+### Step 2: タイトルと本文を書く
 
-### 上級例
-
-| 影響度 | 工数 | 判断 |
-|--------|------|------|
-| 高 | 高 | Issue化 + スケジュール |
-| 高 | 低 | 今直す |
-| 低 | 高 | Issue化 |
-
-### 使うとき
-
-- PR中にスコープ外の問題を見つけた
-- 修正がリリースを遅らせる可能性がある
-
-**Why**: スコープを分けるとPRが安定する。
-
----
-
-## パターン2: Issueタイトルと本文テンプレ
-
-### 概要
-
-検索しやすく実行可能なIssueを作るため、タイトルと本文を標準化します。
-
-### 基本例
+型プレフィックス付きの明確で検索しやすいタイトルと、構造化された本文を書きます。良いタイトルは `Bug:`、`Feature:`、`Chore:` で始まり、具体的な説明が続きます。テンプレート本文にはSummary、Steps to Reproduce、Expected/Actual Result、Impactのセクションを含めます。
 
 ```markdown
-# ✅ CORRECT - 明確なタイトル
 Title: "Bug: CSV import fails on UTF-8 BOM"
 
-# ❌ WRONG - あいまい
-Title: "Bug"
-```
-
-### 中級例
-
-```markdown
 ## Summary
+CSV import rejects files with UTF-8 BOM encoding.
+
 ## Steps to Reproduce
+1. Upload CSV with UTF-8 BOM
+2. Click Import
+
 ## Expected Result
+Import succeeds.
+
 ## Actual Result
+"Invalid encoding" error displayed.
+
 ## Impact
+Blocks users with Excel-exported CSVs.
 ```
 
-### 上級例
+**いつ**: すべての新規Issue — 小さなバグでもテンプレートを省略しない。
 
-```markdown
-## Acceptance Criteria
-- [ ] Repro steps documented
-- [ ] Fix implemented
-- [ ] Tests added
-```
+### Step 3: ラベルと優先度を付与
 
-```yaml
-# .github/ISSUE_TEMPLATE/bug.yml
-name: Bug Report
-description: Report a reproducible bug
-body:
-  - type: textarea
-    id: repro
-    attributes:
-      label: Steps to Reproduce
-      required: true
-```
+バックログをソート可能にするため、種別・優先度・領域のラベルを付与します。最低限、すべてのIssueに種別ラベルと優先度ラベルが必要です。
 
-**Why**: 統一テンプレで確認コストを減らす。
-
----
-
-## パターン3: ラベルと優先度トリアージ
-
-### 概要
-
-ラベルと優先度を揃えて、キューを整理します。
-
-### 基本例
+| 優先度 | 意味 | SLA |
+|--------|------|-----|
+| P0 | 本番停止 | 当日 |
+| P1 | 重大影響 | 1–3日 |
+| P2 | 標準バグ | 1–2スプリント |
+| P3 | 軽微/整理 | バックログ |
 
 ```yaml
 # ✅ CORRECT
@@ -163,31 +113,11 @@ labels: [bug, priority/P1, area/import]
 labels: []
 ```
 
-### 中級例
+**いつ**: トリアージミーティング前、または別メンバーへの引き渡し時。
 
-| 優先度 | 意味 | 目安 |
-|--------|------|------|
-| P0 | 本番停止 | 当日 |
-| P1 | 重大影響 | 1-3日 |
-| P2 | 標準バグ | 1-2スプリント |
-| P3 | 軽微 | バックログ |
+### Step 4: 再現手順と証拠を追加
 
-### 上級例
-
-- `type/bug`, `type/debt`, `type/feature` を追加
-- `status/triage`, `status/ready`, `status/blocked` を追加
-
-**Why**: 優先度が揃うと計画が立てやすい。
-
----
-
-## パターン4: 再現手順と証拠
-
-### 概要
-
-次の担当者がすぐ修正できるよう再現手順と証拠を残します。
-
-### 基本例
+番号付きの再現手順、期待結果と実際の結果、裏付け証拠（ログ、スクリーンショット、リクエストID）を含めます。次の担当者がフォローアップの質問なしで問題を再現できるようにします。
 
 ```markdown
 ## Steps to Reproduce
@@ -200,37 +130,16 @@ Import succeeds
 
 ## Actual
 "Invalid encoding" error
-```
 
-### 中級例
-
-- ログやスクリーンショットを添付
-- リクエストIDを記載
-
-### 上級例
-
-```text
+## Evidence
 Log: 2026-02-12T12:03:11Z ERROR import failed (BOM detected)
 ```
 
-**Why**: 再現性が高いほど修正が早い。
+**いつ**: バグの場合は常に。機能の場合はユーザーシナリオのコンテキストを代わりに含める。
 
----
+### Step 5: CLIでIssueを作成
 
-## パターン5: GitHub CLIでIssue作成
-
-### 概要
-
-GitHub CLI (command-line interface, CLI)で素早くIssueを作成します。
-
-### 基本例
-
-```bash
-# ✅ CORRECT
-gh issue create --title "Bug: CSV import fails on UTF-8 BOM" --body "See repro steps"
-```
-
-### 中級例
+`gh issue create` を使い、ターミナルから素早く反復可能なIssue作成を行います。ラベル、担当者、本文ファイルを1コマンドで指定します。
 
 ```bash
 gh issue create \
@@ -240,87 +149,25 @@ gh issue create \
   --assignee @me
 ```
 
-Why: ラベルと担当を明確にしてトリアージを早める。
+**いつ**: ターミナルで作業中で、フォーマットより速度を重視する場合。
 
-### 上級例
+### Step 6: Web UIでIssueを作成
 
-```python
-# ✅ CORRECT - Issue本文を自動生成
-import textwrap
-from pathlib import Path
+ドラッグ＆ドロップのスクリーンショット、リッチMarkdownプレビュー、テンプレート選択が必要な場合はGitHub Web UIを使います。Issues → New issue に移動し、テンプレートを選択、必須項目を入力、ラベルとマイルストーンを追加してから送信します。
 
-body = textwrap.dedent("""\
-## Summary
-CSV import fails on UTF-8 BOM.
-
-## Steps to Reproduce
-1. Upload CSV with UTF-8 BOM
-2. Click Import
-
-## Expected
-Import succeeds
-
-## Actual
-"Invalid encoding" error
-""")
-
-try:
-    Path("issue.md").write_text(body, encoding="utf-8")
-except OSError as exc:
-    raise SystemExit(f"Failed to write issue body: {exc}")
+```text
+1. リポジトリ → Issues → New issue を開く
+2. テンプレートを選択（例: Bug Report）
+3. 必須項目を入力し、スクリーンショットを添付
+4. ラベル、マイルストーン、担当者を追加
+5. 送信
 ```
 
-```csharp
-// ✅ CORRECT - Issueテンプレートサービスを登録
-using Microsoft.Extensions.DependencyInjection;
+**いつ**: 埋め込み画像、複雑なフォーマット、またはブラウザからのトリアージが必要な場合。
 
-services.AddSingleton<IssueTemplateService>();
-```
+### Step 7: IssueをPRにリンク
 
-**Why**: 自動化で漏れを減らし、テンプレを統一する。
-
----
-
-## パターン6: GitHub Web UIでIssue作成
-
-### 概要
-
-GUIで素早く整理したい場合はWeb UIを使います。
-
-### 基本例
-
-1. リポジトリ → Issues → New issue
-2. テンプレを選択
-3. 必須項目を埋めて送信
-
-### 中級例
-
-- ラベルとマイルストーンを追加
-- 担当者を割り当てる
-
-### 上級例
-
-- PRコメントからIssue参照を作る
-- Projectボードにリンクする
-
-**Why**: UIは文脈のある情報に向く。
-
----
-
-## パターン7: IssueとPRの連携・クローズ
-
-### 概要
-
-PRにクローズキーワードを入れて自動クローズします。
-
-### 基本例
-
-```markdown
-## Related
-Closes #123
-```
-
-### 中級例
+PR説明文にクローズキーワードを使ってIssueを参照し、マージ時に自動クローズさせます。直接修正には `Closes #N`、関連コンテキストには `Refs #N` を使います。
 
 ```markdown
 ## Related
@@ -328,20 +175,13 @@ Closes #123
 Refs #130
 ```
 
-### 上級例
+クロスリポジトリ参照には完全な `owner/repo#N` 構文を使います：
 
 ```markdown
-## Related
 Fixes owner/repo#123
-Relates-to owner/repo#130
 ```
 
-### 使うとき
-
-- PRでIssueを直接解決する場合
-- リポジトリ間の追跡性が必要
-
-**Why**: 自動クローズでバックログを正確に保つ。
+**いつ**: 追跡対象のIssueを解決または関連するすべてのPR。
 
 ---
 
@@ -349,58 +189,61 @@ Relates-to owner/repo#130
 
 - タイトルは動詞で開始（Fix, Add, Remove）
 - 1 Issue = 1 問題に絞る
-- 影響度と優先度を先に付ける
-- 再現手順か証拠を必ず記載
+- トリアージミーティング前に影響度と優先度を付ける
+- 可能な限り再現手順か証拠を記載
 - PRにクローズキーワードを入れる
-テンプレを使い、ラベル付け後に担当を割り当てる。
+- テンプレートを使い、ラベル付け後に担当を割り当てる
 
 ---
 
 ## よくある落とし穴
 
-- "Bug"のような曖昧なタイトル
-- 再現手順がない断続的障害
-- 1つのIssueに複数問題を混在
+- "Bug" や "Fix later" のような曖昧なタイトル
+- 断続的障害で再現手順を省略する
+- 1つのIssueに複数の問題を混在させる
 
-Fix: テンプレを使いスコープを分割する。 
-Fix: 再現手順か証拠リンクを追加する。 
-Fix: ラベルを付けてから担当を割り当てる。
+Fix: 標準テンプレートを使い、スコープ別にIssueを分割する。
+Fix: 再現手順か証拠リンクを必ず追加する。
+Fix: 担当を割り当てる前にラベルを付ける。
 
 ---
 
 ## アンチパターン
 
 - TODOコメントでIssueを作らない
-- 次のアクションがないIssueを作る
-- 解決内容を残さずIssueを閉じる
+- 明確な次のアクションがないIssueを作る
+- 解決内容を記録せずIssueを閉じる
 
 ---
 
 ## FAQ
 
-**Q: いつIssue化すべき？**  
-A: タイムボックスを超える場合やスコープ外ならIssue化。
+**Q: 今直すかIssue化するか、いつ判断すべき？**
+A: 修正がスコープ外、またはタイムボックスを超える場合はIssue化する。
 
-**Q: 必須ラベルは？**  
-A: 最低限、typeとpriorityを付ける。
+**Q: 必須ラベルは？**
+A: 最低限、種別（type）と優先度（priority）ラベルを付ける。
 
-**Q: PRからIssueを作れる？**  
-A: 可能。PR本文にクローズキーワードを入れる。
+**Q: PRからIssueを作成できる？**
+A: 可能。PR本文でIssueを参照し、クローズキーワードを使う。
 
 ---
 
 ## クイックリファレンス
 
-| 手順 | アクション | 結果 |
+| Step | アクション | 結果 |
 |------|------------|------|
-| 1 | 今直すか判断 | スコープ確定 |
-| 2 | テンプレ適用 | 明確な本文 |
-| 3 | ラベル付与 | 優先度が可視化 |
-| 4 | PR連携 | マージで自動クローズ |
+| 1 | 今直すかIssue化か判断 | 判断を記録 |
+| 2 | タイトルと本文を作成 | 検索可能なIssue |
+| 3 | ラベルと優先度を付与 | ソート可能なバックログ |
+| 4 | 再現手順と証拠を追加 | 再現可能なレポート |
+| 5 | CLIで作成 | 高速ターミナルワークフロー |
+| 6 | Web UIで作成 | リッチフォーマットのIssue |
+| 7 | PRにリンク | マージで自動クローズ |
 
 ```bash
 # CLIで即作成
-gh issue create --title "Bug: ..." --body-file issue.md
+gh issue create --title "Bug: ..." --body-file issue.md --label bug,priority/P1
 ```
 
 ---
@@ -414,6 +257,11 @@ gh issue create --title "Bug: ..." --body-file issue.md
 ---
 
 ## 変更履歴
+
+### Version 2.0.0 (2026-02-12)
+- 7パターン形式からStep 1–7の単一ワークフローに移行
+- 例を圧縮：各ステップにベストな例を1つ
+- コア原則に日本語Valuesタグを追加
 
 ### Version 1.0.0 (2026-02-12)
 - 初版リリース

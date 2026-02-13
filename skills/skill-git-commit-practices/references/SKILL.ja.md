@@ -11,13 +11,6 @@ version: 1.0.0
 
 一貫したコミットメッセージ、原子的コミット、学習可能な履歴を作るための実践パターンです。
 
-**Conventional Commits**: feat/fix等の標準化されたコミット形式。
-**Atomic Commit**: 1つの目的に絞ったコミット。
-**Pull Request (PR)**: GitHub上のレビュー前提の変更提案。
-
-Progression: Simple → Intermediate → Advanced の例で段階的に深めます。
-Reason: 文脈が増えるほど履歴の再利用性が上がります。
-
 ## このスキルを使うとき
 
 以下の状況で活用してください：
@@ -43,43 +36,21 @@ Reason: 文脈が増えるほど履歴の再利用性が上がります。
 - Conventional Commitsの合意
 - Pull Request (PR)運用
 
----
-
 ## コア原則
 
-1. **単一責務** - 1コミット=1論理変更
-2. **Whyを残す** - 理由は実装より長持ちする
-3. **形式の一貫性** - 自動化と検索性を高める
-4. **レビュー容易性** - 小さなコミットでリスク低減
-5. **学習資産化** - 履歴をチームの教材にする
+1. **単一責務** - 1コミット=1論理変更 (基礎と型)
+2. **Whyを残す** - 理由は実装より長持ちする (成長の複利)
+3. **形式の一貫性** - 自動化と検索性を高める (ニュートラル)
+4. **レビュー容易性** - 小さなコミットでリスク低減 (継続は力)
+5. **学習資産化** - 履歴をチームの教材にする (温故知新)
 
 ---
 
-## パターン1: Conventional Commits構造
+## ワークフロー: 品質の高いコミットを書く
 
-### 概要
+### Step 1: Conventional Commits形式を使う
 
-Conventional Commitsでメッセージを統一します。
-
-### 基本例
-
-```bash
-# ✅ CORRECT
-git commit -m "feat: 通知設定を追加"
-
-# ❌ WRONG
-git commit -m "update stuff"
-```
-
-### 中級例
-
-```bash
-git commit -m "fix: CSVインポートの文字化けを修正
-
-Why: UTF-8 BOM付きCSVで失敗していたため"
-```
-
-### 上級例
+`type(scope): subject` 形式に従い、人と自動化ツールの両方が解析できるメッセージを書きます。
 
 ```bash
 git commit -m "feat(auth)!: OAuth2を導入
@@ -87,20 +58,11 @@ git commit -m "feat(auth)!: OAuth2を導入
 BREAKING CHANGE: /auth/login を /oauth/authorize に変更"
 ```
 
-### 使うとき
+複数人で統一した形式が必要な場合や、CHANGELOGの自動生成をしたいときに使います。
 
-- 履歴からCHANGELOGを自動生成したい
-- 複数人で同じ形式を使いたい
+### Step 2: タイプとスコープを選定する
 
----
-
-## パターン2: タイプとスコープ選定
-
-### 概要
-
-typeとscopeで変更意図を明確化します。
-
-### 基本例
+変更意図に合ったtypeを選び、モジュール分割が明確なときはscopeを付けます。
 
 | Type | 用途 | 例 |
 |------|-----|----|
@@ -110,75 +72,32 @@ typeとscopeで変更意図を明確化します。
 | `test` | テスト | `test: E2E追加` |
 | `refactor` | 内部整理 | `refactor: 命名整理` |
 
-E2Eはend-to-end (E2E) テストです。
-
-### 中級例
-
 ```bash
-# ✅ CORRECT - scope指定
+# scope指定でドメインを明示
 git commit -m "feat(api): 決済APIを追加"
 ```
 
-### 上級例
+モジュールやドメインが明確に分離されているリポジトリで使います。
+
+### Step 3: 明確な日本語メッセージを書く
+
+`git log` で検索可能で自己説明的なメッセージにします。
 
 ```bash
-# モノレポscope
-git commit -m "fix(web): 404画面の導線修正"
-```
-
-### 使うとき
-
-- モジュール単位で責務が分かれている
-- 複数ドメインが共存する
-
----
-
-## パターン3: 日本語メッセージの明確化
-
-### 概要
-
-日本語コミットを検索可能にします。
-
-### 基本例
-
-```bash
-# ✅ CORRECT
-git commit -m "fix: ログイン失敗時のエラーメッセージを明確化"
-
-# ❌ WRONG
-git commit -m "fix: バグ修正"
-```
-
-### 中級例
-
-```bash
+# ✅ CORRECT - 具体的な対象と操作
 git commit -m "feat: 注文履歴画面に検索フィルタを追加
 
 Why: サポート対応で検索要求が多かったため"
+
+# ❌ WRONG - 曖昧
+git commit -m "fix: バグ修正"
 ```
 
-### 上級例
+日本語がチームの主要言語である場合や、履歴を監査で使うときに使います。
 
-```bash
-git commit -m "refactor: 配送計算ロジックを整理
+### Step 4: 原子的コミットに分割する
 
-Why: 例外処理の分岐が増えたため"
-```
-
-### 使うとき
-
-- チームの母国語が日本語
-- 履歴を監査・レビューで使う
-
----
-
-## パターン4: 原子的コミット
-
-### 概要
-
-原子的コミットで変更を分割します。
-
-### 基本例
+1つのコミットに1つの関心事だけを含め、個別にレビュー・リバートできるようにします。
 
 ```bash
 # ❌ WRONG - 複数責務
@@ -190,94 +109,32 @@ git commit -m "refactor: UIレイアウトを改善"
 git commit -m "test: 認証フローのテストを追加"
 ```
 
-### 中級例
+レビューで段階的に確認したい場合や、安全にリバートしたいときに使います。
 
-- モデル変更とAPI変更は別コミット
-- ドキュメント更新は別コミット
+### Step 5: 本文にWhyを記述する
 
-### 上級例
-
-```bash
-# 部分ステージング
-git add -p src/user/service.py
-git commit -m "feat: ユーザー検証を追加"
-```
-
-### 使うとき
-
-- レビューで段階的に確認したい
-- 安全にリバートしたい
-
----
-
-## パターン5: Commit本文とWhy
-
-### 概要
-
-Whyを残して判断理由を共有します。
-
-### 基本例
+コミット本文に「なぜ」を残し、将来の読者がdiffではなく判断理由を理解できるようにします。
 
 ```bash
 git commit -m "fix: APIタイムアウトを10s→30sに変更
 
-Why: 大量データ処理で10sでは不足していたため"
+- 大量データ処理で10sでは不足していたため
+- 監視で504エラーが増加していたため
+Why: SLA達成率が低下していたため"
 ```
 
-### 中級例
+後から理由が問われそうな変更や、判断根拠を残したい場合に使います。
 
-```bash
-git commit -m "refactor: キャッシュキー生成を整理
+### Step 6: コミット前チェックを実行する
 
-- 旧キーの衝突を回避
-- 生成ロジックを共通化
-Why: 監視で衝突率が増えたため"
-```
-
-### 上級例
-
-```python
-# ✅ CORRECT - 根拠を残す
-import textwrap
-
-message = textwrap.dedent("""\
-fix: 画像圧縮率を調整
-
-Why: 画像サイズが平均30%増加していたため
-""")
-```
-
-### 使うとき
-
-- 後で理由が問われそうな変更
-- 判断根拠を残したい場合
-
----
-
-## パターン6: コミット前チェック
-
-### 概要
-
-チェックリストで品質を担保します。
-
-### 基本例
+diffを確認し、テストを実行してからコミットし、履歴をクリーンに保ちます。
 
 ```bash
 git diff
 git status
+npm test
 git commit -m "feat: ..."
 ```
-
-### 中級例
-
-```bash
-# テスト実行
-npm test
-```
-
-### 上級例
-
-コミットlint設定ファイル（config）の例:
 
 ```yaml
 # .commitlintrc.yml
@@ -285,58 +142,22 @@ rules:
   type-enum: [2, "always", ["feat","fix","docs","test","refactor","chore"]]
 ```
 
-```csharp
-// ✅ CORRECT - コミットポリシー登録
-using Microsoft.Extensions.DependencyInjection;
+PRを開く前のプッシュ時や、新規メンバーのオンボーディングで使います。
 
-services.AddSingleton<CommitPolicyChecker>();
-```
+### Step 7: AmendとRebaseの安全運用
 
-```bash
-# ✅ CORRECT - error handling for commit checks
-if ! git diff --check --exit-code; then
-  echo "Commit check failed"; exit 1
-fi
-```
-
-### 使うとき
-
-- PR前に品質を安定させたい
-- 新規メンバーのオンボーディング
-
----
-
-## パターン7: AmendとRebaseの安全運用
-
-### 概要
-
-共有前のみ履歴を書き換えます。
-
-### 基本例
+履歴の書き換えは共有前のみ行います。push後は新しいコミットで対応します。
 
 ```bash
+# push前: amendまたはinteractive rebase
 git commit --amend -m "fix: 正しいメッセージ"
-```
-
-### 中級例
-
-```bash
 git rebase -i HEAD~3
-```
 
-### 上級例
-
-```bash
-# push後は新コミットで修正
+# push後: 新コミットで修正
 git commit -m "fix: 補足修正"
 ```
 
-### 使うとき
-
-- PR前の整理をしたい
-- 共有ブランチの安定を守りたい
-
----
+PR前に履歴を整理したい場合や、共有ブランチの安定を守りたいときに使います。
 
 ## ベストプラクティス
 

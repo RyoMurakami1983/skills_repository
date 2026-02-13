@@ -11,13 +11,6 @@ version: 1.0.0
 
 Practical patterns for consistent commit messages, atomic changes, and durable history.
 
-**Conventional Commits**: A standardized commit message format (feat, fix, docs).
-**Atomic Commit**: A single-purpose change that can be reverted independently.
-**Pull Request (PR)**: A reviewed change proposal in GitHub.
-
-Progression: Simple → Intermediate → Advanced examples improve clarity because each step adds more context.
-Reason: The extra context makes future reviews and rollbacks safer.
-
 ## When to Use This Skill
 
 Use this skill when:
@@ -43,43 +36,21 @@ Use this skill when:
 - Team agreement on Conventional Commits
 - Pull Request (PR) workflow for review
 
----
-
 ## Core Principles
 
-1. **Single Intent** - One commit equals one logical change
-2. **Explain Why** - Reasons outlive implementation details
-3. **Consistent Format** - Predictable history for automation
-4. **Reviewable Chunks** - Small commits reduce risk
-5. **Learning Asset** - Commit history teaches future teams
+1. **Single Intent** - One commit equals one logical change (基礎と型)
+2. **Explain Why** - Reasons outlive implementation details (成長の複利)
+3. **Consistent Format** - Predictable history for automation (ニュートラル)
+4. **Reviewable Chunks** - Small commits reduce risk (継続は力)
+5. **Learning Asset** - Commit history teaches future teams (温故知新)
 
 ---
 
-## Pattern 1: Conventional Commits Structure
+## Workflow: Write Quality Commits
 
-### Overview
+### Step 1: Use Conventional Commits Format
 
-Conventional Commits provides a predictable commit message format for teams.
-
-### Basic Example
-
-```bash
-# ✅ CORRECT
-git commit -m "feat: 通知設定を追加"
-
-# ❌ WRONG
-git commit -m "update stuff"
-```
-
-### Intermediate Example
-
-```bash
-git commit -m "fix: CSVインポートの文字化けを修正
-
-Why: UTF-8 BOM付きCSVで失敗していたため"
-```
-
-### Advanced Example
+Follow the `type(scope): subject` structure so every commit is parseable by humans and tools.
 
 ```bash
 git commit -m "feat(auth)!: OAuth2を導入
@@ -87,20 +58,11 @@ git commit -m "feat(auth)!: OAuth2を導入
 BREAKING CHANGE: /auth/login を /oauth/authorize に変更"
 ```
 
-### When to Use
+Use when multiple contributors need consistent messages or you want automated changelogs.
 
-- When you want automated changelogs from commit history
-- When multiple contributors need consistent commit messages
+### Step 2: Select Type and Scope
 
----
-
-## Pattern 2: Type and Scope Selection
-
-### Overview
-
-Choose a type and optional scope to clarify intent and impact.
-
-### Basic Example
+Pick the type that matches your intent, and add a scope when modules are clearly separated.
 
 | Type | Use | Example |
 |------|-----|---------|
@@ -110,174 +72,69 @@ Choose a type and optional scope to clarify intent and impact.
 | `test` | Tests | `test: E2E追加` |
 | `refactor` | Internal change | `refactor: 命名整理` |
 
-E2E means end-to-end (E2E) tests.
-
-### Intermediate Example
-
 ```bash
-# ✅ CORRECT - scoped change
+# Scoped change for multi-domain repos
 git commit -m "feat(api): 決済APIを追加"
 ```
 
-### Advanced Example
+Use when the repo has multiple modules or domains that benefit from explicit scope labels.
+
+### Step 3: Write Clear Japanese Subjects
+
+Be specific so subjects are searchable and self-explanatory in `git log`.
 
 ```bash
-# Monorepo scope
-git commit -m "fix(web): 404画面の導線修正"
-```
-
-### When to Use
-
-- When modules are clearly separated
-- When the repo has multiple domains
-
----
-
-## Pattern 3: Japanese Message Clarity
-
-### Overview
-
-Write Japanese commit subjects that are specific and searchable.
-
-### Basic Example
-
-```bash
-# ✅ CORRECT
-git commit -m "fix: ログイン失敗時のエラーメッセージを明確化"
-
-# ❌ WRONG
-git commit -m "fix: バグ修正"
-```
-
-### Intermediate Example
-
-```bash
+# ✅ CORRECT - specific action and target
 git commit -m "feat: 注文履歴画面に検索フィルタを追加
 
 Why: サポート対応で検索要求が多かったため"
+
+# ❌ WRONG - vague
+git commit -m "fix: バグ修正"
 ```
 
-### Advanced Example
+Use when Japanese is the primary team language or commit history will be used for audits.
 
-```bash
-git commit -m "refactor: 配送計算ロジックを整理
+### Step 4: Split Into Atomic Commits
 
-Why: 例外処理の分岐が増えたため"
-```
-
-### When to Use
-
-- When Japanese is the primary team language
-- When commit history will be used for audits
-
----
-
-## Pattern 4: Atomic Commits
-
-### Overview
-
-Atomic commits keep each change focused and reversible.
-
-### Basic Example
+Each commit should address one concern so it can be reviewed and reverted independently.
 
 ```bash
 # ❌ WRONG - multiple concerns
 git commit -m "feat: 認証追加とUI改善とテスト追加"
 
-# ✅ CORRECT - split commits
+# ✅ CORRECT - split into focused commits
 git commit -m "feat: 認証機能を追加"
 git commit -m "refactor: UIレイアウトを改善"
 git commit -m "test: 認証フローのテストを追加"
 ```
 
-### Intermediate Example
+Use when reviewers need to verify changes incrementally or you want safe rollbacks.
 
-- Commit model changes separately from API changes
-- Keep docs updates in a separate commit
+### Step 5: Add Body with Why
 
-### Advanced Example
-
-```bash
-# Use partial staging
-git add -p src/user/service.py
-git commit -m "feat: ユーザー検証を追加"
-```
-
-### When to Use
-
-- When reviewers need to verify changes incrementally
-- When you want safe rollbacks
-
----
-
-## Pattern 5: Commit Body and Why
-
-### Overview
-
-Explain "why" so future readers understand the decision.
-
-### Basic Example
+Explain "why" in the commit body so future readers understand the decision, not just the diff.
 
 ```bash
 git commit -m "fix: APIタイムアウトを10s→30sに変更
 
-Why: 大量データ処理で10sでは不足していたため"
+- 大量データ処理で10sでは不足していたため
+- 監視で504エラーが増加していたため
+Why: SLA達成率が低下していたため"
 ```
 
-### Intermediate Example
+Use when a change might be questioned later or you need to preserve decision context.
 
-```bash
-git commit -m "refactor: キャッシュキー生成を整理
+### Step 6: Run Pre-Commit Checks
 
-- 旧キーの衝突を回避
-- 生成ロジックを共通化
-Why: 監視で衝突率が増えたため"
-```
-
-### Advanced Example
-
-```python
-# ✅ CORRECT - attach evidence
-import textwrap
-
-message = textwrap.dedent("""\
-fix: 画像圧縮率を調整
-
-Why: 画像サイズが平均30%増加していたため
-""")
-```
-
-### When to Use
-
-- When a change might be questioned later
-- When you need to preserve decision context
-
----
-
-## Pattern 6: Pre-Commit Checklist
-
-### Overview
-
-Use a checklist to keep commits clean and reviewable.
-
-### Basic Example
+Review your diff and run tests before committing to keep history clean.
 
 ```bash
 git diff
 git status
+npm test
 git commit -m "feat: ..."
 ```
-
-### Intermediate Example
-
-```bash
-# Run tests before committing
-npm test
-```
-
-### Advanced Example
-
-Commit lint configuration file (config) example:
 
 ```yaml
 # .commitlintrc.yml
@@ -285,58 +142,22 @@ rules:
   type-enum: [2, "always", ["feat","fix","docs","test","refactor","chore"]]
 ```
 
-```csharp
-// ✅ CORRECT - Register commit policy checker
-using Microsoft.Extensions.DependencyInjection;
+Use before pushing a branch to open a PR or when onboarding new contributors.
 
-services.AddSingleton<CommitPolicyChecker>();
-```
+### Step 7: Amend and Rebase Safely
 
-```bash
-# ✅ CORRECT - error handling for commit checks
-if ! git diff --check --exit-code; then
-  echo "Commit check failed"; exit 1
-fi
-```
-
-### When to Use
-
-- Before pushing a branch to open a PR
-- When onboarding new contributors
-
----
-
-## Pattern 7: Amend and Rebase Safely
-
-### Overview
-
-Rewrite history only before it is shared.
-
-### Basic Example
+Rewrite history only before it is shared. After pushing, prefer a new commit.
 
 ```bash
+# Before push: amend or interactive rebase
 git commit --amend -m "fix: 正しいメッセージ"
-```
-
-### Intermediate Example
-
-```bash
 git rebase -i HEAD~3
-```
 
-### Advanced Example
-
-```bash
-# After push: prefer a new commit
+# After push: add a new commit instead
 git commit -m "fix: 補足修正"
 ```
 
-### When to Use
-
-- When a commit needs cleanup before PR
-- When you want to keep shared branches stable
-
----
+Use when a commit needs cleanup before PR or when you want to keep shared branches stable.
 
 ## Best Practices
 
