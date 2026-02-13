@@ -4,7 +4,9 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 
 ## 📋 概要
 
-このカテゴリには、高品質なSkillを作成・検証・管理するためのMeta-Skillsが含まれています。これらは新しいSkillを開発する際の強力な支援ツールとして機能します。
+このカテゴリには、高品質なSkillを作成・検証・管理するためのMeta-Skillsが含まれています。
+
+**設計方針**: 「1 Skill = 1 Workflow」— 各スキルは単一のワークフローに特化し、SKILL.mdは500行以内を目標とします。
 
 ## 🎯 用途
 
@@ -14,18 +16,37 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 
 ## 📦 収録Skills
 
-| Skill名 | 説明 | バージョン | 主な機能 |
-|---------|------|-----------|---------|
-| [skill-writing-guide](skill-writing-guide/) | Skill執筆ガイド | 1.0.0 | ベストプラクティス、構造化手法、文章作成支援 |
-| [skill-quality-validation](skill-quality-validation/) | 64項目品質検証 | 2.0.0 | 自動品質チェック、スコアリング、改善提案 |
-| [skill-template-generator](skill-template-generator/) | テンプレート自動生成 | 1.0.0 | SKILL.md/SKILL.ja.md雛形生成、構造作成 |
-| [skill-revision-guide](skill-revision-guide/) | 修正・バージョン管理 | 1.0.0 | 変更管理、CHANGELOG、英日同期支援 |
-| [skill-git-commit-practices](skill-git-commit-practices/) | Gitコミット実践 | 1.0.0 | Conventional Commits、原子的コミット、コミット文脈 |
-| [skill-github-pr-workflow](skill-github-pr-workflow/) | GitHub PRワークフロー | 1.0.0 | PR作成、レビュー、マージ、Issue連携 |
-| [skill-git-review-standards](skill-git-review-standards/) | Gitレビュー標準 | 1.0.0 | レビュー目的、PRサイズ、承認SLA |
-| [skill-git-history-learning](skill-git-history-learning/) | Git履歴学習 | 1.0.0 | 履歴学習、オンボーディング、リリースノート |
-| [skill-git-initial-setup](skill-git-initial-setup/) | git初期セットアップ | 1.2.0 | git init/clone初期保護、GitHub保護ルール、フック設定 |
-| [skill-issue-intake](skill-issue-intake/) | Issueインテーク | 1.0.0 | Issue作成判断、テンプレ、ラベル/優先度、CLI/GUI手順 |
+### Skills-System ワークフロースキル（新規）
+
+| Skill名 | ワークフロー | 説明 |
+|---------|-------------|------|
+| [skills-author-skill](skills-author-skill/) | スキル執筆 | SKILL.mdを一から書き上げるエンドツーエンドワークフロー |
+| [skills-refactor-skill-to-single-workflow](skills-refactor-skill-to-single-workflow/) | レガシー移行 | 複数パターンスキルを単一ワークフローに変換 |
+| [skills-optimize-skill-discoverability](skills-optimize-skill-discoverability/) | 発見性最適化 | 命名・タグ・説明文の最適化 |
+| [skills-validate-skill](skills-validate-skill/) | 品質検証 | 37項目チェックリストによる品質検証 |
+| [skills-remediate-validation-findings](skills-remediate-validation-findings/) | 検証結果修正 | 検証レポートに基づく体系的修正 |
+| [skills-generate-skill-template](skills-generate-skill-template/) | テンプレート生成 | 単一スキルの骨格生成 |
+| [skills-generate-skill-suite](skills-generate-skill-suite/) | スイート生成 | 関連スキル群の一括生成 |
+
+### ルータースキル（後方互換性）
+
+| Skill名 | 役割 | ルーティング先 |
+|---------|------|---------------|
+| [skill-writing-guide](skill-writing-guide/) | 🔀 ルーター | → skills-author-skill, skills-refactor-*, skills-optimize-* |
+| [skill-quality-validation](skill-quality-validation/) | 🔀 ルーター | → skills-validate-skill, skills-remediate-* |
+| [skill-template-generator](skill-template-generator/) | 🔀 ルーター | → skills-generate-skill-template, skills-generate-skill-suite |
+
+### その他のスキル
+
+| Skill名 | 説明 | 主な機能 |
+|---------|------|---------|
+| [skill-revision-guide](skill-revision-guide/) | 修正・バージョン管理 | 変更管理、CHANGELOG、英日同期支援 |
+| [skill-git-commit-practices](skill-git-commit-practices/) | Gitコミット実践 | Conventional Commits、原子的コミット |
+| [skill-github-pr-workflow](skill-github-pr-workflow/) | GitHub PRワークフロー | PR作成、レビュー、マージ、Issue連携 |
+| [skill-git-review-standards](skill-git-review-standards/) | Gitレビュー標準 | レビュー目的、PRサイズ、承認SLA |
+| [skill-git-history-learning](skill-git-history-learning/) | Git履歴学習 | 履歴学習、オンボーディング、リリースノート |
+| [skill-git-initial-setup](skill-git-initial-setup/) | git初期セットアップ | git init/clone初期保護、フック設定 |
+| [skill-issue-intake](skill-issue-intake/) | Issueインテーク | Issue作成判断、テンプレ、ラベル/優先度 |
 
 ## 🔧 依存関係
 
@@ -38,206 +59,93 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 
 > **Note**: スクリプトを使用しない場合、PythonなしでもGitHub Copilot Chat内で直接Skillsを呼び出せます。
 
-## 📖 各Skillの詳細
+## 📖 Skills-System ワークフロー詳細
 
-### 1. skill-writing-guide
+### skills-author-skill
 
-**Skill執筆のためのベストプラクティスガイド**
+**SKILL.mdを一から書き上げるエンドツーエンドワークフロー**
 
-- 新しいSkillを作成する際の指針
-- 構造化されたSKILL.mdの書き方
-- 効果的な例文・サンプルコードの作成方法
-- 日本語/英語の両言語対応手法
+スキルの構想から完成版まで、単一ワークフローで執筆を完結させます。
 
-**使い方**:
-```
-@workspace /skill-writing-guide 新しいPython用のSkillを作成したい
-```
+詳細: [skills-author-skill/SKILL.md](skills-author-skill/SKILL.md) | [日本語版](skills-author-skill/references/SKILL.ja.md)
 
-詳細: [skill-writing-guide/SKILL.md](skill-writing-guide/SKILL.md) | [日本語版](skill-writing-guide/references/SKILL.ja.md)
+### skills-validate-skill
 
-### 2. skill-quality-validation
+**37項目チェックリストによる品質検証**
 
-**64項目の品質検証システム**
-
-- 構造の完全性チェック（15項目）
-- 内容の品質評価（20項目）
-- ベストプラクティス準拠（20項目）
-- 自動スコアリング（100点満点）
-- 具体的な改善提案
-
-**使い方**:
 ```bash
-# スクリプトで自動検証
-python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
-
-# またはCopilot Chat内で
-@workspace /skill-quality-validation このSkillを検証してください
+# スクリプトで自動検証（スクリプトはskill-quality-validationに配置）
+python skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
 ```
 
-詳細: [skill-quality-validation/SKILL.md](skill-quality-validation/SKILL.md) | [日本語版](skill-quality-validation/references/SKILL.ja.md)
+詳細: [skills-validate-skill/SKILL.md](skills-validate-skill/SKILL.md) | [日本語版](skills-validate-skill/references/SKILL.ja.md)
 
-### 3. skill-template-generator
+### skills-generate-skill-template
 
-**SKILL.md/SKILL.ja.mdテンプレート自動生成**
+**単一スキルの骨格を生成**
 
-- 標準的な構造を持つテンプレート生成
-- 日本語版と英語版の両方作成
-- カスタマイズ可能なセクション
-- ベストプラクティスに準拠した雛形
-
-**使い方**:
 ```bash
-# スクリプトでテンプレート生成
-python ~/.copilot/skills/skill-template-generator/scripts/generate_template.py
-
-# またはCopilot Chat内で
-@workspace /skill-template-generator FastAPI用のSkillテンプレートを生成
+# スクリプトで生成（スクリプトはskill-template-generatorに配置）
+python skill-template-generator/scripts/generate_template.py --name "git-protect-main"
 ```
 
-詳細: [skill-template-generator/SKILL.md](skill-template-generator/SKILL.md) | [日本語版](skill-template-generator/references/SKILL.ja.md)
-
-### 4. skill-revision-guide
-
-**Skillの修正・バージョン管理ガイド**
-
-- 既存Skillの効果的な修正方法
-- CHANGELOGの適切な管理
-- 英語版と日本語版の同期保持
-- バージョニング戦略
-- 特定作者（RyoMurakami1983）のSkill管理強化
-
-**使い方**:
-```
-@workspace /skill-revision-guide このSkillを更新したい
-```
-
-詳細: [skill-revision-guide/SKILL.md](skill-revision-guide/SKILL.md) | [日本語版](skill-revision-guide/references/SKILL.ja.md)
-
-### 5. skill-git-commit-practices
-
-**Gitコミット実践ガイド**
-
-- Conventional Commits形式の実践
-- 日本語コミットメッセージの明確化
-- 原子的コミットの作り方
-- Whyを残すコミット文化
-
-**使い方**:
-```
-@workspace /skill-git-commit-practices コミット規約を標準化したい
-```
-
-詳細: [skill-git-commit-practices/SKILL.md](skill-git-commit-practices/SKILL.md) | [日本語版](skill-git-commit-practices/references/SKILL.ja.md)
-
-### 6. skill-github-pr-workflow
-
-**GitHub PRワークフロー標準化**
-
-- PR作成からマージまでの流れ
-- Issueクローズキーワードの運用
-- CIと承認ゲートの標準化
-- マージ後のmain同期
-
-**使い方**:
-```
-@workspace /skill-github-pr-workflow PR運用を標準化したい
-```
-
-詳細: [skill-github-pr-workflow/SKILL.md](skill-github-pr-workflow/SKILL.md) | [日本語版](skill-github-pr-workflow/references/SKILL.ja.md)
-
-### 7. skill-git-review-standards
-
-**Gitレビュー標準ガイド**
-
-- レビュー目的とチェックリスト
-- PRサイズ基準とSLA
-- フィードバック表現の統一
-- 形骸化レビューの防止
-
-**使い方**:
-```
-@workspace /skill-git-review-standards レビュー品質を上げたい
-```
-
-詳細: [skill-git-review-standards/SKILL.md](skill-git-review-standards/SKILL.md) | [日本語版](skill-git-review-standards/references/SKILL.ja.md)
-
-### 8. skill-git-history-learning
-
-**Git履歴学習ガイド**
-
-- 履歴から学ぶオンボーディング
-- リリースノート生成
-- 意思決定の記録と共有
-- 履歴を学習資産に変換
-
-**使い方**:
-```
-@workspace /skill-git-history-learning 履歴を学習資産にしたい
-```
-
-詳細: [skill-git-history-learning/SKILL.md](skill-git-history-learning/SKILL.md) | [日本語版](skill-git-history-learning/references/SKILL.ja.md)
-
-### 9. skill-git-initial-setup
-
-**git init/clone時のmain保護デフォルト設定ガイド**
-
-- GitHubブランチ保護ルールの設定
-- pre-commit/pre-pushフックの導入
-- core.hooksPath / init.templateDir の初期設定
-
-**使い方**:
-```
-@workspace /skill-git-initial-setup git init/clone時の保護を標準化したい
-```
-
-詳細: [skill-git-initial-setup/SKILL.md](skill-git-initial-setup/SKILL.md) | [日本語版](skill-git-initial-setup/references/SKILL.ja.md)
-
-### 10. skill-issue-intake
-
-**Issue作成とトリアージの実践ガイド**
-
-- 今直すかIssue化するかの判断基準
-- タイトル/本文テンプレと優先度ラベル
-- GitHub CLI/GUIでの作成手順
-
-**使い方**:
-```
-@workspace /skill-issue-intake スコープ外作業をIssue化したい
-```
-
-詳細: [skill-issue-intake/SKILL.md](skill-issue-intake/SKILL.md) | [日本語版](skill-issue-intake/references/SKILL.ja.md)
+詳細: [skills-generate-skill-template/SKILL.md](skills-generate-skill-template/SKILL.md) | [日本語版](skills-generate-skill-template/references/SKILL.ja.md)
 
 ## 🚀 ワークフロー例
 
 ### 新しいSkillを作成する場合
 
-1. **テンプレート生成** - `skill-template-generator`で雛形作成
-2. **執筆ガイド参照** - `skill-writing-guide`でベストプラクティス確認
-3. **内容作成** - 実際のSkill内容を記述
-4. **品質検証** - `skill-quality-validation`で64項目チェック
-5. **改善反映** - スコア80点以上を目指して修正
-6. **完成・公開**
+1. **テンプレート生成** - `skills-generate-skill-template`で骨格作成
+2. **執筆** - `skills-author-skill`でエンドツーエンドの執筆ワークフロー
+3. **品質検証** - `skills-validate-skill`で37項目チェック
+4. **修正** - `skills-remediate-validation-findings`で検証結果に基づく修正
+5. **完成・公開**
+
+### 関連スキル群を作成する場合
+
+1. **スイート設計** - `skills-generate-skill-suite`で複数スキルを一括生成
+2. **各スキル執筆** - `skills-author-skill`で個別に執筆
+3. **発見性最適化** - `skills-optimize-skill-discoverability`で命名・タグ調整
+4. **品質検証** - `skills-validate-skill`で一括検証
+
+### レガシースキルを移行する場合
+
+1. **分析** - `skills-refactor-skill-to-single-workflow`で移行方法を決定
+2. **分割・再構成** - 複数パターンを単一ワークフローに分割
+3. **ルーター作成** - 元スキルをルータースキルに変換
+4. **検証** - `skills-validate-skill`で新基準に適合確認
 
 ### 既存Skillを更新する場合
 
 1. **修正ガイド参照** - `skill-revision-guide`で変更管理手法確認
 2. **内容修正** - 必要な変更を実施
-3. **品質再検証** - `skill-quality-validation`で品質維持確認
+3. **品質再検証** - `skills-validate-skill`で品質維持確認
 4. **CHANGELOG更新** - 変更内容を記録
-5. **英日同期** - 両言語版の整合性確保
 
 ## 📊 品質基準
 
 このMeta-Skillsシステムを使用することで、以下の品質基準を達成できます：
 
-- ✅ **構造の完全性**: 必須セクションの完備
-- ✅ **内容の充実度**: 具体例、サンプルコードの提供
-- ✅ **保守性**: 明確なバージョン管理、変更履歴
-- ✅ **国際化**: 日英両言語対応
-- ✅ **ベストプラクティス準拠**: 業界標準に沿った記述
+- ✅ **1 Skill = 1 Workflow**: 単一ワークフローに特化
+- ✅ **500行以内**: SKILL.md本体は簡潔に（超過分はreferences/へ）
+- ✅ **構造の完全性**: 必須セクション完備（frontmatter, When to Use, Core Principles, Workflow）
+- ✅ **憲法との整合**: PHILOSOPHY.md の Values と明示的に接続
+- ✅ **国際化**: 英日両言語対応
+- ✅ **作者帰属**: `author: RyoMurakami1983`
 
-目標スコア: **80点以上** (skill-quality-validationの評価)
+## 🏗️ 命名規則
+
+新規スキルは `<context>-<workflow>` 形式で命名：
+
+| コンテキスト | 対象領域 | 例 |
+|-------------|---------|-----|
+| `skills-` | スキルシステム | skills-author-skill, skills-validate-skill |
+| `git-` | ローカルGit操作 | git-protect-main |
+| `github-` | GitHub操作 | github-review-pr |
+| `dotnet-` | .NET実装 | dotnet-apply-mvvm |
+| `python-` | Python実装 | python-create-cli |
+
+ワークフロー名は動詞で開始（generate-, validate-, author-, refactor-, optimize-）
 
 ## 🔗 関連リソース
 
@@ -255,5 +163,5 @@ Meta-Skillsの改善提案や新機能追加のアイデアがありましたら
 
 ---
 
-**最終更新**: 2026-02-12  
+**最終更新**: 2026-02-13
 **管理者**: RyoMurakami1983
