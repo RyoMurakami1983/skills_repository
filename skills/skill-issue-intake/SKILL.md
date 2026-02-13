@@ -28,7 +28,7 @@ Use this skill when:
 - **`skill-git-review-standards`** - Review quality and PR sizing
 - **`skill-git-initial-setup`** - Default repo protections for new repos
 - **`skill-revision-guide`** - Revision and change log practices
-- **`skill-quality-validation`** - Validate documentation quality
+- **`skills-validate-skill`** - Validate documentation quality
 
 ---
 

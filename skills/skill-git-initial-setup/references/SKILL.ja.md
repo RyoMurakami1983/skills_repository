@@ -26,8 +26,8 @@ git init/clone後のmain保護をデフォルト化するため、GitHubブラ�
 - **`skill-git-commit-practices`** - コミット運用と規約
 - **`skill-github-pr-workflow`** - PR作成とマージフロー
 - **`skill-git-review-standards`** - レビュー品質とPRサイズ基準
-- **`skill-writing-guide`** - Skill執筆の標準
-- **`skill-quality-validation`** - Skill品質の検証
+- **`skills-author-skill`** - Skill執筆の標準
+- **`skills-validate-skill`** - Skill品質の検証
 
 ---
 

@@ -25,7 +25,7 @@ class TemplateGenerator:
         self.skill_name = ""
         self.description = ""
         self.tags = []
-        self.pattern_count = 8
+        self.step_count = 5
         self.bilingual = True
         self.output_dir = ""
         
@@ -69,16 +69,16 @@ class TemplateGenerator:
                 break
             print("   ❌ Enter at least 1 tag.")
             
-        # 4. Pattern count
+        # 4. Step count
         while True:
             try:
-                count_input = input("4. Number of patterns (7-10): ").strip()
-                self.pattern_count = int(count_input)
-                if 1 <= self.pattern_count <= 20:
-                    if self.pattern_count < 7 or self.pattern_count > 10:
-                        print(f"   ⚠️  Recommended: 7-10 patterns")
+                count_input = input("4. Number of steps (3-8): ").strip()
+                self.step_count = int(count_input)
+                if 1 <= self.step_count <= 15:
+                    if self.step_count < 3 or self.step_count > 8:
+                        print(f"   ⚠️  Recommended: 3-8 steps")
                     break
-                print("   ❌ Enter a number between 1 and 20.")
+                print("   ❌ Enter a number between 1 and 15.")
             except ValueError:
                 print("   ❌ Enter a valid number.")
                 
@@ -109,7 +109,7 @@ class TemplateGenerator:
         print(f"  Name: {self.skill_name}")
         print(f"  Description: {self.description}")
         print(f"  Tags: {', '.join(self.tags)}")
-        print(f"  Patterns: {self.pattern_count}")
+        print(f"  Steps: {self.step_count}")
         print(f"  Bilingual: {'Yes' if self.bilingual else 'No'}")
         print(f"  Output: {self.output_dir}")
         print("-" * 50)
@@ -155,10 +155,12 @@ class TemplateGenerator:
     def generate_skill_md(self):
         """Generate English SKILL.md content."""
         tags_str = ", ".join(self.tags)
+        today = datetime.now().strftime("%Y-%m-%d")
         
         content = f"""---
 name: {self.skill_name}
 description: {self.description}
+version: 1.0.0
 invocable: false
 tags: [{tags_str}]
 author: {self.AUTHOR}
@@ -179,90 +181,91 @@ Use this skill when:
 - [Add specific scenario 1]
 - [Add specific scenario 2]
 - [Add specific scenario 3]
-- [Add specific scenario 4]
-- [Add specific scenario 5]
 
 ---
 
 ## Core Principles
 
+<!-- Values alignment: 基礎と型の追求, 成長の複利, ニュートラルな視点 -->
+
 1. **[Principle 1]** - One-line summary of key concept
 2. **[Principle 2]** - One-line summary of key concept
 3. **[Principle 3]** - One-line summary of key concept
-4. **[Principle 4]** - One-line summary of key concept (optional)
-5. **[Principle 5]** - One-line summary of key concept (optional)
 
 ---
 
+## Workflow: [Workflow Name]
+
 """
         
-        # Generate pattern sections
-        for i in range(1, self.pattern_count + 1):
-            content += self.generate_pattern_section(i)
+        # Generate step sections
+        for i in range(1, self.step_count + 1):
+            content += self.generate_step_section(i)
             
-        # Add Common Pitfalls section
-        content += """## Common Pitfalls
+        content += f"""## Best Practices
 
-### 1. [Pitfall Name] - Brief Description
+- [Best practice 1]
+- [Best practice 2]
+- [Best practice 3]
+- [Best practice 4]
+- [Best practice 5]
 
-**Problem**: What users typically do wrong and why it fails.
+---
 
-```
-// ❌ WRONG - What not to do
-// Add anti-pattern example
-```
+## Common Pitfalls
 
-**Solution**: How to fix it and why this approach works.
-
-```
-// ✅ CORRECT - The right approach
-// Add correct pattern example
-```
-
-### 2. [Another Pitfall Name]
-
-[Add more pitfalls as needed...]
+- **[Pitfall 1]** - Why it happens and how to avoid it
+- **[Pitfall 2]** - Why it happens and how to avoid it
+- **[Pitfall 3]** - Why it happens and how to avoid it
 
 ---
 
 ## Anti-Patterns
 
-### [Anti-Pattern Name]
-
-**What**: Description of the anti-pattern at an architectural level.
-
-```
-// ❌ WRONG - Architectural mistake
-// Add anti-pattern example
-```
-
-**Why It's Wrong**:
-- Reason 1: [Explain violation]
-- Reason 2: [Explain problem]
-- Reason 3: [Explain scalability issue]
-
-**Better Approach**:
-
-```
-// ✅ CORRECT - Recommended architecture
-// Add correct pattern example
-```
+- **[Anti-pattern 1]** - What it looks like and why it fails
+- **[Anti-pattern 2]** - What it looks like and why it fails
+- **[Anti-pattern 3]** - What it looks like and why it fails
 
 ---
 
-## Related Patterns & Further Reading
+## Quick Reference
 
-### Related Design Patterns
-- [Pattern 1]: Brief description and when to use
-- [Pattern 2]: Brief description and when to use
+### Checklist
 
-### Official Documentation
+- [ ] [Step/check 1]
+- [ ] [Step/check 2]
+- [ ] [Step/check 3]
+- [ ] [Step/check 4]
+- [ ] [Step/check 5]
+
+### Summary Table
+
+| Step | Action | Key Point |
+|------|--------|-----------|
+| 1 | [Action] | [Key point] |
+| 2 | [Action] | [Key point] |
+| 3 | [Action] | [Key point] |
+
+---
+
+## FAQ
+
+**Q: [Common question 1]?**
+A: [Answer]
+
+**Q: [Common question 2]?**
+A: [Answer]
+
+**Q: [Common question 3]?**
+A: [Answer]
+
+---
+
+## Resources
+
 - [Link to official docs]
-- [Link to relevant API reference]
-
-### Community Resources
-- [Relevant blog post or tutorial]
-- [GitHub repository or example]
+- [Link to relevant tutorial]
+- [Link to example repository]
 
 ---
 
@@ -280,68 +283,34 @@ This skill documentation is provided as-is for use with GitHub Copilot.
 
 **Generated by**: GitHub Copilot Skill Template Generator
 **Author**: {self.AUTHOR}
-**Last Updated**: {datetime.now().strftime("%Y-%m-%d")}
+**Last Updated**: {today}
 """
         
         return content
         
-    def generate_pattern_section(self, pattern_num):
-        """Generate a single pattern section."""
-        return f"""## Pattern {pattern_num}: [Pattern Name Here]
+    def generate_step_section(self, step_num):
+        """Generate a single step section."""
+        return f"""### Step {step_num}: [Step Name Here]
 
-### Overview
-
-[Brief explanation of what this pattern solves and why it matters - 2-3 sentences]
-
-### Basic Example
+[Brief explanation of what this step does and why - 1-2 sentences]
 
 ```
-// ✅ CORRECT - Simple, most common case
-// Add basic implementation example
+// Add code example for this step
 ```
 
-### When to Use
-
-Use this pattern when:
-- [Specific condition A]
-- [Specific condition B]
-- [Specific condition C]
-
-| Scenario | Recommendation | Why |
-|----------|----------------|-----|
-| [Scenario A] | Use Pattern {pattern_num} | [Brief explanation] |
-| [Scenario B] | Consider alternatives | [Brief explanation] |
-| [Scenario C] | See Pattern {pattern_num + 1 if pattern_num < self.pattern_count else 1} | [Brief explanation] |
-
-### With Configuration
-
-```
-// ✅ CORRECT - With options/configuration
-// Add configuration example
-```
-
-### Advanced Pattern
-
-```
-// ✅ CORRECT - Production-grade with error handling
-// Add advanced implementation with:
-// - Error handling
-// - Cancellation support
-// - Resource management
-// - Logging/monitoring
-```
-
----
+**Use when**: [Describe when this step applies or is needed]
 
 """
 
     def generate_skill_ja_md(self):
         """Generate Japanese SKILL.ja.md content."""
         tags_str = ", ".join(self.tags)
+        today = datetime.now().strftime("%Y-%m-%d")
         
         content = f"""---
 name: {self.skill_name}
 description: {self.description}
+version: 1.0.0
 invocable: false
 tags: [{tags_str}]
 author: {self.AUTHOR}
@@ -362,92 +331,93 @@ author: {self.AUTHOR}
 - [具体的なシナリオ1を追加]
 - [具体的なシナリオ2を追加]
 - [具体的なシナリオ3を追加]
-- [具体的なシナリオ4を追加]
-- [具体的なシナリオ5を追加]
 
 ---
 
 ## Core Principles
+
+<!-- Values整合: 基礎と型の追求, 成長の複利, ニュートラルな視点 -->
 
 このスキルの基盤となる原則：
 
 1. **[原則1]** - 重要な概念の1行サマリー
 2. **[原則2]** - 重要な概念の1行サマリー
 3. **[原則3]** - 重要な概念の1行サマリー
-4. **[原則4]** - 重要な概念の1行サマリー（オプション）
-5. **[原則5]** - 重要な概念の1行サマリー（オプション）
 
 ---
 
+## ワークフロー: [ワークフロー名]
+
 """
         
-        # Generate pattern sections in Japanese
-        for i in range(1, self.pattern_count + 1):
-            content += self.generate_pattern_section_ja(i)
+        # Generate step sections in Japanese
+        for i in range(1, self.step_count + 1):
+            content += self.generate_step_section_ja(i)
             
-        # Add Common Pitfalls section in Japanese
-        content += """## Common Pitfalls
+        content += f"""## Best Practices
 
-### 1. [よくある問題名] - 簡単な説明
+- [ベストプラクティス1]
+- [ベストプラクティス2]
+- [ベストプラクティス3]
+- [ベストプラクティス4]
+- [ベストプラクティス5]
 
-**問題**: ユーザーが通常行う誤りとその理由。
+---
 
-```
-// ❌ WRONG - やってはいけないこと
-// アンチパターンの例を追加
-```
+## Common Pitfalls
 
-**解決策**: 修正方法とこのアプローチが機能する理由。
-
-```
-// ✅ CORRECT - 正しいアプローチ
-// 正しいパターンの例を追加
-```
-
-### 2. [別のよくある問題名]
-
-[必要に応じて問題を追加...]
+- **[よくある問題1]** - 発生理由と回避方法
+- **[よくある問題2]** - 発生理由と回避方法
+- **[よくある問題3]** - 発生理由と回避方法
 
 ---
 
 ## Anti-Patterns
 
-### [アンチパターン名]
-
-**内容**: アーキテクチャレベルでのアンチパターンの説明。
-
-```
-// ❌ WRONG - アーキテクチャ上の誤り
-// アンチパターンの例を追加
-```
-
-**なぜ間違っているか**:
-- 理由1: [違反の説明]
-- 理由2: [問題の説明]
-- 理由3: [スケーラビリティの問題]
-
-**より良いアプローチ**:
-
-```
-// ✅ CORRECT - 推奨されるアーキテクチャ
-// 正しいパターンの例を追加
-```
+- **[アンチパターン1]** - どう見えるか、なぜ失敗するか
+- **[アンチパターン2]** - どう見えるか、なぜ失敗するか
+- **[アンチパターン3]** - どう見えるか、なぜ失敗するか
 
 ---
 
-## Related Patterns & Further Reading
+## Quick Reference
 
-### 関連する設計パターン
-- [パターン1]: 簡単な説明と使用時期
-- [パターン2]: 簡単な説明と使用時期
+### チェックリスト
 
-### 公式ドキュメント
+- [ ] [ステップ/確認1]
+- [ ] [ステップ/確認2]
+- [ ] [ステップ/確認3]
+- [ ] [ステップ/確認4]
+- [ ] [ステップ/確認5]
+
+### サマリーテーブル
+
+| ステップ | アクション | ポイント |
+|----------|-----------|---------|
+| 1 | [アクション] | [ポイント] |
+| 2 | [アクション] | [ポイント] |
+| 3 | [アクション] | [ポイント] |
+
+---
+
+## FAQ
+
+**Q: [よくある質問1]？**
+A: [回答]
+
+**Q: [よくある質問2]？**
+A: [回答]
+
+**Q: [よくある質問3]？**
+A: [回答]
+
+---
+
+## Resources
+
 - [公式ドキュメントへのリンク]
-- [関連するAPIリファレンスへのリンク]
-
-### コミュニティリソース
-- [関連するブログ投稿やチュートリアル]
-- [GitHubリポジトリや例]
+- [関連するチュートリアルへのリンク]
+- [サンプルリポジトリへのリンク]
 
 ---
 
@@ -465,58 +435,22 @@ author: {self.AUTHOR}
 
 **生成者**: GitHub Copilot Skill Template Generator
 **Author**: {self.AUTHOR}
-**最終更新**: {datetime.now().strftime("%Y-%m-%d")}
+**最終更新**: {today}
 """
         
         return content
         
-    def generate_pattern_section_ja(self, pattern_num):
-        """Generate a single pattern section in Japanese."""
-        return f"""## Pattern {pattern_num}: [パターン名]
+    def generate_step_section_ja(self, step_num):
+        """Generate a single step section in Japanese."""
+        return f"""### Step {step_num}: [ステップ名]
 
-### Overview
-
-[このパターンが何を解決するか、なぜ重要かの簡単な説明 - 2-3文]
-
-### Basic Example
+[このステップの内容と理由の簡単な説明 - 1-2文]
 
 ```
-// ✅ CORRECT - Simple, most common case
-// 基本的な実装例を追加
+// このステップのコード例を追加
 ```
 
-### When to Use
-
-このパターンを使用する場面：
-- [特定の条件A]
-- [特定の条件B]
-- [特定の条件C]
-
-| シナリオ | 推奨 | 理由 |
-|----------|------|------|
-| [シナリオA] | パターン{pattern_num}を使用 | [簡単な説明] |
-| [シナリオB] | 代替案を検討 | [簡単な説明] |
-| [シナリオC] | パターン{pattern_num + 1 if pattern_num < self.pattern_count else 1}を参照 | [簡単な説明] |
-
-### With Configuration
-
-```
-// ✅ CORRECT - With options/configuration
-// 設定例を追加
-```
-
-### Advanced Pattern
-
-```
-// ✅ CORRECT - Production-grade with error handling
-// 以下を含む高度な実装を追加：
-// - エラーハンドリング
-// - キャンセルサポート
-// - リソース管理
-// - ロギング/モニタリング
-```
-
----
+**使用場面**: [このステップが適用される場面・条件]
 
 """
 
@@ -534,16 +468,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial skill structure with {self.pattern_count} patterns
+- Initial skill structure with {self.step_count} steps
 
 ## [1.0.0] - {today}
 
 ### Added
 - Initial release of {self.skill_name} skill
-- {self.pattern_count} core patterns
-- Basic examples and advanced patterns
-- Common pitfalls and anti-patterns
-- Related patterns and further reading
+- Single workflow with {self.step_count} steps
+- Best practices, common pitfalls, and anti-patterns
+- Quick reference checklist and FAQ
 
 ### Notes
 - Generated using GitHub Copilot Skill Template Generator
@@ -561,10 +494,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         print("✅ Template generation complete!")
         print("=" * 50)
         print("\nNext steps:")
-        print(f"1. Fill in Pattern 1-{self.pattern_count} sections with examples")
+        print(f"1. Fill in Step 1-{self.step_count} sections with examples")
         print("2. Add code examples in your target language")
         print("3. Review and customize Core Principles")
-        print("4. Add Common Pitfalls from real-world experience")
+        print("4. Complete Best Practices, Pitfalls, and Anti-Patterns")
         
         # Check if validation script exists
         validation_script = Path("../skill-quality-validation/scripts/validate_skill.py")

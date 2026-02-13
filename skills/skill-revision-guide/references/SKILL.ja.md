@@ -23,9 +23,9 @@ GitHub Copilot agentスキルの修正、バージョン管理、メンテナン
 
 ## Related Skills
 
-- **`skill-writing-guide`** - スキル執筆標準を参照
-- **`skill-quality-validation`** - 公開前に修正内容を検証
-- **`skill-template-generator`** - 新しいスキルを生成
+- **`skills-author-skill`** - スキル執筆標準を参照
+- **`skills-validate-skill`** - 公開前に修正内容を検証
+- **`skills-generate-skill-template`** - 新しいスキルを生成
 
 ---
 
@@ -274,7 +274,7 @@ def batch_revise(skill_paths: list[Path], description: str):
 
 5. バージョンアップ（破壊的→MAJOR、機能→MINOR、修正→PATCH）
 
-6. skill-quality-validationを実行 → コミット
+6. skills-validate-skillを実行 → コミット
 ```
 
 **システムスキル**（`author: RyoMurakami1983`）: EN/JA同期 + CHANGELOG + 強化検証。
@@ -286,7 +286,7 @@ def batch_revise(skill_paths: list[Path], description: str):
 
 - [Semantic Versioning 2.0.0](https://semver.org/)
 - [Keep a Changelog](https://keepachangelog.com/)
-- [skill-quality-validation](../skill-quality-validation/SKILL.md) - 改訂を検証
+- [skills-validate-skill](../skills-validate-skill/SKILL.md) - 改訂を検証
 - [CHANGELOG_TEMPLATE.md](assets/CHANGELOG_TEMPLATE.md) - Changelogテンプレート
 
 ---

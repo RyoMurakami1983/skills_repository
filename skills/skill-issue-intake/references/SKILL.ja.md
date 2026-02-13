@@ -28,7 +28,7 @@ version: 1.0.0
 - **`skill-git-review-standards`** - レビュー標準とPRサイズ
 - **`skill-git-initial-setup`** - リポジトリ初期保護
 - **`skill-revision-guide`** - 変更管理と履歴整理
-- **`skill-quality-validation`** - ドキュメント品質検証
+- **`skills-validate-skill`** - ドキュメント品質検証
 
 ---
 

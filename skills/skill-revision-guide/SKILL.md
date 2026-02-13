@@ -23,9 +23,9 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skill-writing-guide`** - Reference skill writing standards
-- **`skill-quality-validation`** - Validate revisions before publishing
-- **`skill-template-generator`** - Generate new skills
+- **`skills-author-skill`** - Skill writing workflow
+- **`skills-validate-skill`** - Validate revisions before publishing
+- **`skills-generate-skill-template`** - Generate new skills
 
 ---
 
@@ -274,7 +274,7 @@ def batch_revise(skill_paths: list[Path], description: str):
 
 5. Bump version (Breaking→MAJOR, Feature→MINOR, Fix→PATCH)
 
-6. Run skill-quality-validation → Commit
+6. Run skills-validate-skill → Commit
 ```
 
 **System Skill** (`author: RyoMurakami1983`): EN/JA sync + CHANGELOG + enhanced validation.
@@ -286,7 +286,7 @@ def batch_revise(skill_paths: list[Path], description: str):
 
 - [Semantic Versioning 2.0.0](https://semver.org/)
 - [Keep a Changelog](https://keepachangelog.com/)
-- [skill-quality-validation](../skill-quality-validation/SKILL.md) - Validate revisions
+- [skills-validate-skill](../skills-validate-skill/SKILL.md) - Validate revisions
 - [CHANGELOG_TEMPLATE.md](assets/CHANGELOG_TEMPLATE.md) - Changelog template
 
 ---

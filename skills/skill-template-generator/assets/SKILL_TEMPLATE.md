@@ -1,338 +1,165 @@
 <!-- 
-This template is designed to be a single SKILL.md file.
-Additional support files (references/, assets/, etc.) should only be created
-when following GitHub Copilot's official guidelines. Prefer single-file completion.
-
-Note: This template shows structural examples only. Actual skills should contain 7-10 pattern sections.
+This template follows the "1 Skill = 1 Workflow" standard.
+Each skill has a single Workflow section with sequential Steps.
+Target: ≤500 lines. See skills-author-skill for the full authoring workflow.
 -->
 
 ---
 name: your-skill-name-here
 description: One-line description of what problem this skill solves (100 chars max)
 invocable: false
-tags: [tag1, tag2, tag3]  # Add 3-5 technology stack-focused tags
-author: RyoMurakami1983  # For identifying skills created by this system (optional)
+tags: [tag1, tag2, tag3]
+author: RyoMurakami1983
+version: 1.0.0
 ---
 
 # Your Skill Title Here
+
+Brief introduction (1-2 sentences) explaining what this skill covers.
+
+## When to Use This Skill
+
+Use this skill when:
+- Scenario 1 - Action-oriented description
+- Scenario 2 - Problem domain description
+- Scenario 3 - Team/workflow scenario
+- Scenario 4 - Technical decision point
+- Scenario 5 - Implementation use case
 
 ## Related Skills
 
 - **`related-skill-1`** - Brief description of how it relates
 - **`related-skill-2`** - Brief description of how it relates
 
-## When to Use This Skill
-
-Use this skill when:
-- Scenario 1 - Action-oriented description (50-100 chars)
-- Scenario 2 - Problem domain description
-- Scenario 3 - Team/workflow scenario
-- Scenario 4 - Technical decision point
-- Scenario 5 - Implementation use case
-
 ---
+
+## Dependencies
+
+- Required tool/version
+- Optional dependency (if applicable)
 
 ## Core Principles
 
-1. **Principle 1** - One-line summary of key concept
-2. **Principle 2** - One-line summary of key concept
-3. **Principle 3** - One-line summary of key concept
-4. **Principle 4** - One-line summary of key concept (optional)
-5. **Principle 5** - One-line summary of key concept (optional)
+1. **Principle 1** - Brief description (Values tag in Japanese)
+2. **Principle 2** - Brief description (Values tag in Japanese)
+3. **Principle 3** - Brief description (Values tag in Japanese)
+4. **Principle 4** - Brief description (optional)
+5. **Principle 5** - Brief description (optional)
+
+<!-- Values: 基礎と型, 成長の複利, 温故知新, 継続は力, ニュートラル -->
 
 ---
 
-## Pattern 1: [Pattern Name]
+## Workflow: [Workflow Name Here]
 
-### Overview
+### Step 1: [First Step Name]
 
-Brief explanation of what this pattern solves and why it matters.
+Brief explanation of what this step accomplishes and why.
 
-### Basic Example
+```bash
+# ✅ CORRECT - Clear example
+example-command --with-options
 
-```csharp
-// ✅ CORRECT - Simple, most common case
-public class Example
-{
-    // Implementation with inline comments explaining WHY
-    public void DoSomething()
-    {
-        // Key decision explained
-    }
-}
+# ❌ WRONG - Anti-pattern
+bad-command
 ```
 
-### When to Use
+Use when [specific condition applies].
 
-Use this pattern when:
-- Specific condition A
-- Specific condition B
-- Specific condition C
+### Step 2: [Second Step Name]
 
-| Scenario | Recommendation | Why |
-|----------|----------------|-----|
-| Scenario A | Use Pattern X | Brief explanation |
-| Scenario B | Use Pattern Y | Brief explanation |
-| Scenario C | See Pattern 2 | Brief explanation |
+Brief explanation of this step.
 
-### With Configuration
-
-```csharp
-// ✅ CORRECT - With options/configuration
-public class ConfiguredExample
-{
-    private readonly IOptions<Settings> _options;
-    
-    public ConfiguredExample(IOptions<Settings> options)
-    {
-        _options = options;
-    }
-    
-    public void DoSomething()
-    {
-        var setting = _options.Value.SomeSetting;
-        // Use setting with explanation
-    }
-}
-
-// In Program.cs or Startup
-builder.Services.Configure<Settings>(
-    builder.Configuration.GetSection("Settings"));
+```bash
+# Example showing the key technique
+example-command
 ```
 
-### Advanced Pattern
+Use when [specific condition applies].
 
-```csharp
-// ✅ CORRECT - Production-grade with error handling
-public class AdvancedExample
-{
-    public async Task DoSomethingAsync(CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            // Complex implementation with:
-            // - Error handling
-            // - Cancellation support
-            // - Resource management
-        }
-        catch (SpecificException ex)
-        {
-            // Specific error handling
-            throw;
-        }
-    }
-}
-```
+### Step 3: [Third Step Name]
 
----
+Brief explanation of this step.
 
-## Pattern 2: [Another Pattern Name]
+| Option | When to Use | Example |
+|--------|-------------|---------|
+| Option A | Condition | `command-a` |
+| Option B | Condition | `command-b` |
 
-### Overview
-
-Brief explanation of this pattern and when it differs from Pattern 1.
-
-### Simple Example
-
-```csharp
-// ✅ CORRECT - Basic usage
-```
-
-### Common Variation
-
-```csharp
-// ✅ CORRECT - Alternative approach for different scenario
-```
-
-### Comparison with Pattern 1
-
-| Aspect | Pattern 1 | Pattern 2 |
-|--------|-----------|-----------|
-| Use Case | Description | Description |
-| Performance | Metric/description | Metric/description |
-| Complexity | Low/Medium/High | Low/Medium/High |
-| When to Use | Scenario | Scenario |
-
----
-
-## Pattern 3: [Third Pattern Name]
-
-[Similar structure to Pattern 1 and 2...]
-
----
+Use when [specific condition applies].
 
 <!-- 
-Note: This template includes only Patterns 1-3 for brevity.
-Actual skills should contain 7-10 pattern sections following the same structure:
-- Overview
-- Basic Example
-- When to Use
-- With Configuration
-- Advanced Pattern (Production-Grade)
+Add Steps 4-7 as needed for your workflow.
+Each step: title + brief paragraph + one example + when guidance.
+Most workflows have 5-8 steps.
 -->
+
+## Best Practices
+
+- Practice 1 - Brief description
+- Practice 2 - Brief description
+- Practice 3 - Brief description
+- Practice 4 - Brief description
+- Practice 5 - Brief description
+
+---
 
 ## Common Pitfalls
 
-### 1. Pitfall Name - Brief Description
+1. **Pitfall name**  
+Fix: Brief solution.
 
-**Problem**: What users typically do wrong and why it fails.
+2. **Another pitfall**  
+Fix: Brief solution.
 
-```csharp
-// ❌ WRONG - What not to do
-public class BadExample
-{
-    public void DoSomethingWrong()
-    {
-        // Anti-pattern with explanation of why it's bad
-    }
-}
-```
-
-**Solution**: How to fix it and why this approach works.
-
-```csharp
-// ✅ CORRECT - The right approach
-public class GoodExample
-{
-    public void DoSomethingRight()
-    {
-        // Correct pattern with explanation
-    }
-}
-```
-
-### 2. Another Common Pitfall
-
-```csharp
-// ❌ WRONG - Silent failure example
-var result = SomeOperation(); // Missing error handling
-
-// ✅ CORRECT - Explicit error handling
-try
-{
-    var result = SomeOperation();
-    // Success path
-}
-catch (SpecificException ex)
-{
-    // Handle specific error
-}
-```
-
-### 3. Third Common Pitfall
-
-[Similar format...]
+3. **Third pitfall**  
+Fix: Brief solution.
 
 ---
 
 ## Anti-Patterns
 
-### Architectural Anti-Pattern Name
-
-**What**: Description of the anti-pattern at an architectural level.
-
-```csharp
-// ❌ WRONG - Architectural mistake
-public class AntiPatternExample
-{
-    // Design flaw that causes problems at scale
-    // or violates core principles
-}
-```
-
-**Why It's Wrong**:
-- Reason 1: Violates principle X
-- Reason 2: Causes problem Y
-- Reason 3: Doesn't scale
-
-**Better Approach**:
-
-```csharp
-// ✅ CORRECT - Architectural solution
-public class BetterDesign
-{
-    // Proper design that follows core principles
-}
-```
-
-### Breaking Changes Pattern
-
-```csharp
-// ❌ WRONG - "Bug fix" that breaks users
-public async Task<Result> GetResultAsync(int id)  // Was sync!
-{
-    // "Fixed" to be async - but breaks all existing callers
-}
-
-// ✅ CORRECT - Add new method, deprecate old
-[Obsolete("Use GetResultAsync instead")]
-public Result GetResult(int id) => GetResultAsync(id).GetAwaiter().GetResult();
-
-public async Task<Result> GetResultAsync(int id)
-{
-    // New async implementation
-}
-```
+- Anti-pattern 1 - Why it's harmful
+- Anti-pattern 2 - Why it's harmful
+- Anti-pattern 3 - Why it's harmful
 
 ---
 
 ## Quick Reference
 
-### Decision Tree
+### Workflow Checklist
 
-```
-Start: What do you need?
-├─► Need A? → Use Pattern 1
-├─► Need B? → Use Pattern 2
-├─► Need C? → Use Pattern 3
-└─► Complex scenario? → Combine patterns (see Advanced section)
-```
+- [ ] Step 1 action
+- [ ] Step 2 action
+- [ ] Step 3 action
 
-### Common Scenarios Cheat Sheet
+### Decision Table
 
-| Scenario | Pattern | Code Snippet |
-|----------|---------|--------------|
-| Simple case | Pattern 1 | `new Example()` |
-| With config | Pattern 1 + Config | `services.Configure<Settings>()` |
-| Async operation | Pattern 2 | `await DoAsync()` |
-| Error handling | Pattern 3 | `try/catch` with specific exceptions |
+| Situation | Action | Why |
+|-----------|--------|-----|
+| Scenario A | Recommended action | Brief reason |
+| Scenario B | Alternative action | Brief reason |
 
 ---
 
-## Best Practices Summary
+## FAQ
 
-1. **Practice 1** - Brief description of recommendation
-2. **Practice 2** - Brief description of recommendation
-3. **Practice 3** - Brief description of recommendation
-4. **Practice 4** - Brief description of recommendation
-5. **Practice 5** - Brief description of recommendation
+**Q: Common question 1?**  
+A: Concise answer.
+
+**Q: Common question 2?**  
+A: Concise answer.
 
 ---
 
 ## Resources
 
-- [Official Documentation Name](https://example.com/docs)
-- [Related Article/Blog Post](https://example.com/article)
-- [Reference Implementation](https://github.com/example/repo)
-- [Community Discussion](https://example.com/discussion)
+- [Official Documentation](https://example.com/docs)
+- [Related Guide](https://example.com/guide)
 
 ---
 
 ## Changelog
 
-Change history (only substantial changes recorded. See CHANGELOG.md for details):
-
 ### Version 1.0.0 (YYYY-MM-DD)
-- Initial version
-- Patterns 1-3 documented
-- Common pitfalls identified
-
-### Version 1.1.0 (YYYY-MM-DD) (Optional)
-- Added Pattern 4
-- Updated examples for .NET X
-- Clarified anti-pattern Y
-
-<!-- 
-When changelog grows large, move to CHANGELOG.md.
-Keep only the latest 3-5 versions in SKILL.md and note "See CHANGELOG.md for full history."
--->
+- Initial release

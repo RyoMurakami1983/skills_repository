@@ -26,8 +26,8 @@ Use this skill when:
 - **`skill-git-commit-practices`** - Commit workflow and conventions
 - **`skill-github-pr-workflow`** - PR creation and merge flow
 - **`skill-git-review-standards`** - Review quality and PR sizing
-- **`skill-writing-guide`** - Skill documentation standards
-- **`skill-quality-validation`** - Validate skill quality
+- **`skills-author-skill`** - Skill documentation standards
+- **`skills-validate-skill`** - Validate skill quality
 
 ---
 
