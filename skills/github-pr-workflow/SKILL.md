@@ -1,6 +1,6 @@
 ---
 name: github-pr-workflow
-description: "PRを作成しIssueをクローズする。「プルリクして」「PR作成」で使う。"
+description: "Create a PR and close linked issues. State-driven routing from uncommitted changes to PR creation."
 author: RyoMurakami1983
 tags: [github, pull-requests, workflow, git, pr-create]
 invocable: false
@@ -9,14 +9,14 @@ version: 2.0.0
 
 # GitHub PR Workflow
 
-状態検知からPR作成・Issueクローズまでを自動化するワークフロー。
+A state-driven workflow that routes from uncommitted changes through PR creation and Issue close.
 
 **Pull Request (PR)**: A reviewed change proposal in GitHub.
 
 ## When to Use This Skill
 
 Use this skill when:
-- The user says "プルリクして", "PR作成して", "PRを作って", or "create a PR"
+- The user requests PR creation (see Glossary in `copilot-instructions.md` for trigger phrases)
 - Work on a feature branch is ready to be proposed for merge
 - You need to push a branch and open a PR with issue links
 - Uncommitted or unpushed changes need routing before PR creation
@@ -90,7 +90,7 @@ gh pr list --head $Branch --state open
 
 > **Important**: If uncommitted changes exist, delegate to `git-commit-practices` first. If on main, create a feature branch before any commits.
 
-Use when the user says "プルリクして", "PR作成して", or any PR-related request.
+Use when any PR-related request is received.
 
 > **Values**: 基礎と型 / 継続は力
 
@@ -111,7 +111,7 @@ Use when starting new work or when Step 1 detected you are on main.
 
 ### Step 3: Open PR and Link Issues
 
-Create a PR with a Japanese body. Use `Closes` to auto-close issues on merge.
+Create a PR with a Japanese body (team policy). Use `Closes` to auto-close issues on merge.
 
 **Inline body** (short PRs):
 
@@ -156,8 +156,8 @@ gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file
 
 | Keyword | Effect |
 |---------|--------|
-| `Closes #N` | マージ時に Issue #N を自動クローズ |
-| `Refs #N` | Issue #N へのリンク（クローズしない） |
+| `Closes #N` | Auto-closes Issue #N on merge |
+| `Refs #N` | Links to Issue #N without closing |
 
 Use when the branch is pushed and no PR exists yet.
 
@@ -167,32 +167,32 @@ Use when the branch is pushed and no PR exists yet.
 
 ## Best Practices
 
-- PR本文は日本語で記述する（チーム標準）
-- タイトルは Conventional Commits 形式（`feat:`, `fix:` 等）
-- `Closes #N` で Issue を自動クローズする
-- Windows では `--body-file` で UTF-8 を確実に扱う
-- `gh auth status` で認証を事前確認する
+- Write PR body in Japanese (team policy)
+- Use Conventional Commits format for titles (`feat:`, `fix:`, etc.)
+- Always include `Closes #N` to auto-close linked issues
+- Use `--body-file` on Windows for reliable UTF-8 handling
+- Verify authentication with `gh auth status` before creating PRs
 
 ---
 
 ## Common Pitfalls
 
-1. **PR body が英語になる**
-   Fix: テンプレ見出しを日本語で統一（概要/理由/テスト/関連）。
+1. **PR body written in English**
+   Fix: Use the Japanese template headings (概要/理由/テスト/関連).
 
-2. **Issue リンクの忘れ**
-   Fix: `## 関連` セクションに `Closes #N` を必ず含める。
+2. **Missing issue link**
+   Fix: Always include `Closes #N` in the Related section.
 
-3. **main ブランチから直接 PR を作る**
-   Fix: Step 1 の状態検知で feature branch 作成に誘導。
+3. **Creating PR from main branch**
+   Fix: Step 1 state detection routes to feature branch creation first.
 
 ---
 
 ## Anti-Patterns
 
-- main に直接 push してから PR を作る
-- Issue 番号なしで PR を作成する
-- PR 本文を空にする
+- Pushing directly to main, then creating a PR
+- Creating PRs without issue numbers
+- Leaving PR body empty
 
 ---
 
@@ -200,23 +200,23 @@ Use when the branch is pushed and no PR exists yet.
 
 ### PR Flow Checklist
 
-- [ ] `gh auth status` で認証を確認
-- [ ] 状態を検知（未コミット / 未push / PR無し）
-- [ ] 必要なら `git-commit-practices` でコミット
-- [ ] ブランチを origin に push
-- [ ] `gh pr create` で PR 作成（日本語本文 + `Closes #N`）
+- [ ] Verify `gh auth status`
+- [ ] Detect state (uncommitted / unpushed / no PR)
+- [ ] Commit via `git-commit-practices` if needed
+- [ ] Push branch to origin
+- [ ] Create PR with `gh pr create` (Japanese body + `Closes #N`)
 
 ### PR Body Template
 
 ```markdown
 ## 概要
-（何を変更したか）
+(What changed)
 
 ## 理由
-（なぜこの変更が必要か）
+(Why this change is needed)
 
 ## テスト
-（どう検証したか）
+(How it was verified)
 
 ## 関連
 Closes #N
@@ -226,14 +226,14 @@ Closes #N
 
 ## FAQ
 
-**Q: PR本文は英語でも良い？**
-A: チームポリシーとして日本語で統一しています。
+**Q: Can PR body be written in English?**
+A: No. Team policy requires Japanese PR descriptions.
 
-**Q: レビューやマージはこのスキルで扱う？**
-A: このスキルはPR作成までです。レビュー対応・マージは将来の別スキルで扱います。
+**Q: Does this skill handle reviews and merges?**
+A: No. This skill covers PR creation only. Review and merge will be a separate skill.
 
-**Q: `gh` が未インストールの場合は？**
-A: `gh auth status` でエラーになります。[GitHub CLI](https://cli.github.com/) をインストールしてください。
+**Q: What if `gh` is not installed?**
+A: `gh auth status` will fail. Install [GitHub CLI](https://cli.github.com/) first.
 
 ---
 
