@@ -34,6 +34,14 @@ if sys.platform == 'win32':
 
 
 @dataclass
+class WarningResult:
+    """Warning-level check result (does not affect pass/fail)"""
+    id: str
+    description: str
+    details: str = ""
+
+
+@dataclass
 class CheckResult:
     """Individual check result"""
     id: str
@@ -68,6 +76,11 @@ class ValidationReport:
     overall_percentage: float
     overall_passed: bool
     overall_threshold: float = 85.0
+    warnings: List[WarningResult] = None
+
+    def __post_init__(self):
+        if self.warnings is None:
+            self.warnings = []
 
 
 class SkillValidator:
@@ -999,6 +1012,169 @@ class LanguageValidator(SkillValidator):
         return checks
 
 
+class WarningValidator:
+    """Generates warning-level checks (EN/JA parity, Values, safety risks)"""
+
+    def __init__(self, content: str, file_path: str):
+        self.content = content
+        self.file_path = file_path
+        self.lines = content.split('\n')
+
+    def _find_ja_file(self) -> Optional[Path]:
+        """Locate Japanese version file"""
+        skill_dir = Path(self.file_path).parent
+        for candidate in [
+            skill_dir / "references" / "SKILL.ja.md",
+            skill_dir / "SKILL.ja.md",
+        ]:
+            if candidate.exists():
+                return candidate
+        return None
+
+    def _extract_headings(self, text: str) -> List[Tuple[int, str]]:
+        """Extract (level, title) pairs outside code blocks"""
+        cleaned = re.sub(r'^```.*?^```', '', text, flags=re.DOTALL | re.MULTILINE)
+        return [
+            (len(m.group(1)), m.group(2).strip())
+            for m in re.finditer(r'^(#{2,3})\s+(.+)', cleaned, re.MULTILINE)
+        ]
+
+    def _count_steps(self, text: str) -> int:
+        """Count workflow step headings"""
+        cleaned = re.sub(r'^```.*?^```', '', text, flags=re.DOTALL | re.MULTILINE)
+        return len(re.findall(r'^##\s+Step\s+\d+', cleaned, re.MULTILINE | re.IGNORECASE))
+
+    def _has_decision_table(self, text: str) -> bool:
+        """Check for decision table presence"""
+        cleaned = re.sub(r'^```.*?^```', '', text, flags=re.DOTALL | re.MULTILINE)
+        return bool(re.search(r'decision\s+table|判断テーブル|判断表', cleaned, re.IGNORECASE))
+
+    def validate(self) -> List[WarningResult]:
+        warnings: List[WarningResult] = []
+        warnings.extend(self._check_en_ja_parity())
+        warnings.extend(self._check_step_values())
+        warnings.extend(self._check_ja_safety_risks())
+        return warnings
+
+    # --- W1: EN/JA structural parity ---
+
+    def _check_en_ja_parity(self) -> List[WarningResult]:
+        warnings: List[WarningResult] = []
+        ja_path = self._find_ja_file()
+        if ja_path is None:
+            return warnings  # no JA file → already caught by fail check 1.12
+
+        ja_content = ja_path.read_text(encoding='utf-8')
+
+        en_headings = self._extract_headings(self.content)
+        ja_headings = self._extract_headings(ja_content)
+
+        # W1.1 H2 count
+        en_h2 = [h for lv, h in en_headings if lv == 2]
+        ja_h2 = [h for lv, h in ja_headings if lv == 2]
+        if len(en_h2) != len(ja_h2):
+            warnings.append(WarningResult(
+                "W1.1",
+                "EN/JA H2 section count mismatch",
+                f"EN has {len(en_h2)} H2 sections, JA has {len(ja_h2)}"
+            ))
+
+        # W1.2 H3 count
+        en_h3 = [h for lv, h in en_headings if lv == 3]
+        ja_h3 = [h for lv, h in ja_headings if lv == 3]
+        if len(en_h3) != len(ja_h3):
+            warnings.append(WarningResult(
+                "W1.2",
+                "EN/JA H3 section count mismatch",
+                f"EN has {len(en_h3)} H3 sections, JA has {len(ja_h3)}"
+            ))
+
+        # W1.3 Step count
+        en_steps = self._count_steps(self.content)
+        ja_steps = self._count_steps(ja_content)
+        if en_steps != ja_steps:
+            warnings.append(WarningResult(
+                "W1.3",
+                "EN/JA workflow Step count mismatch",
+                f"EN has {en_steps} steps, JA has {ja_steps}"
+            ))
+
+        # W1.4 Decision table parity
+        en_dt = self._has_decision_table(self.content)
+        ja_dt = self._has_decision_table(ja_content)
+        if en_dt != ja_dt:
+            warnings.append(WarningResult(
+                "W1.4",
+                "EN/JA decision table presence mismatch",
+                f"EN: {'present' if en_dt else 'absent'}, JA: {'present' if ja_dt else 'absent'}"
+            ))
+
+        return warnings
+
+    # --- W2: Workflow Step Values presence ---
+
+    def _check_step_values(self) -> List[WarningResult]:
+        warnings: List[WarningResult] = []
+        cleaned = re.sub(r'^```.*?^```', '', self.content, flags=re.DOTALL | re.MULTILINE)
+        step_matches = list(re.finditer(r'^##\s+(Step\s+\d+[^\n]*)', cleaned, re.MULTILINE | re.IGNORECASE))
+
+        for i, match in enumerate(step_matches):
+            step_title = match.group(1).strip()
+            start = match.end()
+            end = step_matches[i + 1].start() if i + 1 < len(step_matches) else len(cleaned)
+            section = cleaned[start:end]
+
+            if not re.search(r'>\s*\*\*Values\*\*', section):
+                warnings.append(WarningResult(
+                    f"W2.{i + 1}",
+                    f"Step missing Values marker: {step_title}",
+                    "Expected '> **Values**: ...' at end of step section"
+                ))
+
+        return warnings
+
+    # --- W3: JP safety-risk vocabulary alignment ---
+
+    SAFETY_KEYWORDS_JA = [
+        'セキュリティ', '認証', '認可', '削除', '破壊的', '秘密',
+        '機密', 'トークン', 'パスワード', 'クレデンシャル', '危険',
+        '禁止', '絶対にしない', '必ず確認',
+    ]
+    NEGATION_PATTERNS_JA = [
+        r'しない', r'してはいけない', r'禁止', r'不可',
+        r'使わない', r'避ける', r'やめる',
+    ]
+
+    def _check_ja_safety_risks(self) -> List[WarningResult]:
+        warnings: List[WarningResult] = []
+        ja_path = self._find_ja_file()
+        if ja_path is None:
+            return warnings
+
+        ja_content = ja_path.read_text(encoding='utf-8')
+
+        # W3.1 Safety keywords in JA
+        found_keywords = [kw for kw in self.SAFETY_KEYWORDS_JA if kw in ja_content]
+        if found_keywords:
+            warnings.append(WarningResult(
+                "W3.1",
+                "JA contains safety-critical vocabulary — verify EN alignment",
+                f"Found: {', '.join(found_keywords[:5])}"
+                + (f" (+{len(found_keywords) - 5} more)" if len(found_keywords) > 5 else "")
+            ))
+
+        # W3.2 Negation patterns in JA (meaning reversal risk)
+        found_negations = [p for p in self.NEGATION_PATTERNS_JA if re.search(p, ja_content)]
+        if found_negations:
+            warnings.append(WarningResult(
+                "W3.2",
+                "JA contains negation patterns — check EN for meaning alignment",
+                f"Patterns: {', '.join(found_negations[:5])}"
+            ))
+
+        return warnings
+
+
 def validate_skill_file(file_path: str) -> ValidationReport:
     """Main validation function"""
     path = Path(file_path)
@@ -1085,13 +1261,18 @@ def validate_skill_file(file_path: str) -> ValidationReport:
     overall_percentage = total_score / total_max * 100 if total_max > 0 else 0
     overall_passed = overall_percentage >= 85 and all(c.passed for c in categories)
     
+    # Warning checks (do not affect pass/fail)
+    warning_validator = WarningValidator(content, file_path)
+    warnings = warning_validator.validate()
+
     return ValidationReport(
         file_path=file_path,
         categories=categories,
         total_score=total_score,
         total_max_score=total_max,
         overall_percentage=overall_percentage,
-        overall_passed=overall_passed
+        overall_passed=overall_passed,
+        warnings=warnings
     )
 
 
@@ -1130,6 +1311,16 @@ def format_text_report(report: ValidationReport) -> str:
                     lines.append(f"  ❌ {check.id} {check.description}")
                     if check.details:
                         lines.append(f"     {check.details}")
+
+    if report.warnings:
+        lines.append("")
+        lines.append("=" * 60)
+        lines.append(f"⚠️  WARNINGS ({len(report.warnings)}):")
+        lines.append("=" * 60)
+        for w in report.warnings:
+            lines.append(f"  ⚠️  {w.id} {w.description}")
+            if w.details:
+                lines.append(f"     {w.details}")
     
     return "\n".join(lines)
 
@@ -1167,6 +1358,15 @@ def format_json_report(report: ValidationReport) -> str:
             ]
         }
         data["categories"].append(cat_data)
+
+    data["warnings"] = [
+        {
+            "id": w.id,
+            "description": w.description,
+            "details": w.details
+        }
+        for w in (report.warnings or [])
+    ]
     
     return json.dumps(data, indent=2, ensure_ascii=False)
 
@@ -1177,10 +1377,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python validate_skill.py path/to/SKILL.md
-  python validate_skill.py path/to/SKILL.md --json
-  python validate_skill.py path/to/SKILL.md --output report.txt
-  python validate_skill.py path/to/SKILL.md --json --output report.json
+  uv run python validate_skill.py path/to/SKILL.md
+  uv run python validate_skill.py path/to/SKILL.md --json
+  uv run python validate_skill.py path/to/SKILL.md --output report.txt
+  uv run python validate_skill.py path/to/SKILL.md --json --output report.json
         """
     )
     
