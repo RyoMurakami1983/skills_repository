@@ -55,7 +55,7 @@ version: 1.0.0
 git branch --show-current
 
 # main にいる場合は feature branch を作成
-git checkout -b feature/your-change
+git switch -c feature/your-change
 ```
 
 新しい作業を開始するとき、またはエージェントがコミットワークフローを始めるときに使います。

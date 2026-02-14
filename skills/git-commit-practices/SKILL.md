@@ -55,7 +55,7 @@ Verify you are on a feature branch before committing. Never commit directly to m
 git branch --show-current
 
 # If on main, create a feature branch first
-git checkout -b feature/your-change
+git switch -c feature/your-change
 ```
 
 Use when starting any new work, or when the agent begins a commit workflow.

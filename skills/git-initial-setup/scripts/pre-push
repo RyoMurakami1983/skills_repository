@@ -16,7 +16,7 @@ for branch in "${protected_branches[@]}"; do
         echo "❌ ERROR: Direct push to '$branch' is not allowed."
         echo ""
         echo "Use a feature branch and open a Pull Request:"
-        echo "  1. git checkout -b feature/your-change"
+        echo "  1. git switch -c feature/your-change"
         echo "  2. git push origin feature/your-change"
         echo ""
         exit 1

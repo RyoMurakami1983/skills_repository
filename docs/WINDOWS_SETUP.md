@@ -49,7 +49,7 @@ git config --global core.autocrlf
 # 2. 変更後、インデックスを再正規化
 git rm --cached -r .
 git reset HEAD
-git checkout .
+git restore .
 ```
 
 ## 🔤 UTF-8 標準化

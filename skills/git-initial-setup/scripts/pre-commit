@@ -16,7 +16,7 @@ for branch in "${protected_branches[@]}"; do
         echo "❌ ERROR: Direct commits to '$branch' are not allowed."
         echo ""
         echo "Use a feature branch instead:"
-        echo "  1. git checkout -b feature/your-change"
+        echo "  1. git switch -c feature/your-change"
         echo ""
         exit 1
     fi
