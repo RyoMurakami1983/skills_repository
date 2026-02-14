@@ -165,6 +165,14 @@ Run `skills-validate-skill` one final time to confirm:
 
 **Values**: 成長の複利（改善を記録し共有する）
 
+### 4. Remediate EN as Source, Mirror JP Structure
+
+**What**: Apply remediation to `SKILL.md` first, then synchronize `references/SKILL.ja.md` with the same structural updates.
+
+**Why**: Keeps source-of-truth review stable and avoids bilingual drift.
+
+**Values**: 基礎と型 / ニュートラル
+
 ---
 
 ## Common Pitfalls

@@ -193,6 +193,14 @@ After applying fixes (via `skills-remediate-validation-findings`), re-run the fu
 
 **Values**: 成長の複利（ドキュメントを学習資産として設計）
 
+### 4. Review EN First, Check JA Structure Parity
+
+**What**: Use `SKILL.md` as the primary review target, then check `references/SKILL.ja.md` for structural equivalence (same major sections/steps/tables).
+
+**Why**: This keeps review focus high while preserving bilingual consistency.
+
+**Values**: ニュートラル（判断基準を明示） / 基礎と型（構造の型を守る）
+
 ---
 
 ## Common Pitfalls
@@ -214,6 +222,12 @@ After applying fixes (via `skills-remediate-validation-findings`), re-run the fu
 **Problem**: Fixing one issue introduces another (regression).
 
 **Solution**: Always re-run full validation after any changes.
+
+### 4. Over-Reviewing Japanese Wording While Missing Risk Mismatch
+
+**Problem**: Spending time on JP phrasing details but missing safety-risk reversals, meaning inversion, or broken procedures between EN/JA.
+
+**Solution**: Prioritize structural parity and risk-critical meaning alignment; treat style wording differences as secondary.
 
 ---
 
