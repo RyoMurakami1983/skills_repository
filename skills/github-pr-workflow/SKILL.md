@@ -156,7 +156,7 @@ gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file
 
 | Keyword | Effect |
 |---------|--------|
-| `Closes #N` | Merges時にIssue #N を自動クローズ |
+| `Closes #N` | マージ時に Issue #N を自動クローズ |
 | `Refs #N` | Issue #N へのリンク（クローズしない） |
 
 Use when the branch is pushed and no PR exists yet.
