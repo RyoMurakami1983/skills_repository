@@ -118,6 +118,30 @@ invocable: true
     assert "Core Principles" not in section
 
 
+def test_get_section_content_does_not_treat_4space_fence_as_real_fence():
+    mod = _load_validator_module()
+    content = """---
+name: extraction-skill
+description: Four-space indented fence marker should be treated as code text.
+author: Tester
+invocable: true
+---
+
+## Quick Reference
+    ```
+## Summary
+- This should be treated as a real H2 boundary.
+
+## Core Principles
+- Keep fixtures small and explicit.
+"""
+    validator = mod.SkillValidator(content=content, file_path="C:\\tmp\\SKILL.md")
+    section = validator.get_section_content("Quick Reference")
+    assert section is not None
+    assert "Core Principles" not in section
+    assert "Summary" not in section
+
+
 @pytest.mark.parametrize(
     "folder_name, skill_name, body, expected_substring",
     [

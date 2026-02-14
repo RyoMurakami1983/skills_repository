@@ -114,8 +114,8 @@ class SkillValidator:
         fence_len = 0
 
         for idx, line in enumerate(lines):
-            stripped = line.lstrip()
-            fence_match = re.match(r'^([`~]{3,})', stripped)
+            # CommonMark: fenced code blocks are recognized with up to 3 leading spaces.
+            fence_match = re.match(r'^ {0,3}([`~]{3,})', line)
             if fence_match:
                 marker = fence_match.group(1)
                 if not in_fence:
