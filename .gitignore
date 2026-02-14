@@ -128,5 +128,5 @@ site/
 
 # RyoMurakami1983独自
 ## AI・LLM・Agentに参照してもらうためのローカル開発資料置き場
-dev_docs/
+local_docs/
 .github/skills/
