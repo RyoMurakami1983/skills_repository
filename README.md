@@ -27,6 +27,43 @@
 - **dotnet/** - .NET/C#開発ワークフロー（WPF、EF Core等）
 - **typescript/** - TypeScript/Node.js開発ワークフロー
 
+## 🏁 Developer Quickstart
+
+### 前提ツール
+
+- **Git** — バージョン管理
+- **[uv](https://docs.astral.sh/uv/)** — Python ランタイム管理（`winget install astral-sh.uv`）
+- **[gh](https://cli.github.com/)** — GitHub CLI（`winget install GitHub.cli`）
+
+### セットアップ（Windows PowerShell）
+
+```powershell
+# 1. クローン
+git clone https://github.com/RyoMurakami1983/skills_repository.git
+cd skills_repository
+
+# 2. 依存関係の同期
+uv sync
+
+# 3. 動作確認：スキル検証を実行
+uv run python skills\skill-quality-validation\scripts\validate_skill.py skills\git-initial-setup\SKILL.md
+```
+
+### よく使うコマンド
+
+```powershell
+# スキル検証
+uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\SKILL.md
+
+# テスト実行
+uv run pytest
+
+# JSON形式で出力
+uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\SKILL.md --json
+```
+
+> 📖 Windows固有の設定（UTF-8、改行コード等）は [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md) を参照
+
 ## 🚀 インストール
 
 ### グローバルインストール（全プロジェクト共通）
@@ -87,12 +124,12 @@ cp -r /tmp/skills-repository/production/* .github/skills/
 
 #### 1. テンプレート生成
 ```bash
-python ~/.copilot/skills/skill-template-generator/scripts/generate_template.py
+uv run python ~/.copilot/skills/skill-template-generator/scripts/generate_template.py
 ```
 
 #### 2. 品質検証
 ```bash
-python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
+uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
 ```
 
 #### 3. GitHub Copilot Chat内で使用

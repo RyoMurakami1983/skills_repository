@@ -12,7 +12,7 @@ if ($protectedBranches -contains $currentBranch) {
     Write-Host "❌ ERROR: Direct push to '$currentBranch' is not allowed." -ForegroundColor Red
     Write-Host "" 
     Write-Host "Use a feature branch and open a Pull Request:" -ForegroundColor Yellow
-    Write-Host "  1. git checkout -b feature/your-change"
+    Write-Host "  1. git switch -c feature/your-change"
     Write-Host "  2. git push origin feature/your-change"
     Write-Host "" 
     exit 1

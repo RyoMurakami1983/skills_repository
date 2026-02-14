@@ -265,3 +265,125 @@ Route to the best matching skill.
     assert {"Structure", "Content", "Code Quality", "Language"}.issubset(category_names)
     assert report.total_score == sum(c.score for c in report.categories)
     assert report.total_max_score == sum(c.max_score for c in report.categories)
+
+
+# --- Warning system tests ---
+
+
+def _write_skill_with_ja(tmp_path: Path, folder_name: str, en_content: str, ja_content: str) -> Path:
+    """Write both EN and JA skill files, return path to EN SKILL.md"""
+    skill_dir = tmp_path / folder_name
+    (skill_dir / "references").mkdir(parents=True, exist_ok=True)
+    (skill_dir / "SKILL.md").write_text(en_content, encoding="utf-8")
+    (skill_dir / "references" / "SKILL.ja.md").write_text(ja_content, encoding="utf-8")
+    return skill_dir / "SKILL.md"
+
+
+def test_warning_en_ja_h2_mismatch(tmp_path: Path):
+    """W1.1: H2 count mismatch between EN and JA triggers warning"""
+    mod = _load_validator_module()
+    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n## B\n## C\n"
+    ja = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n## B\n"
+    file_path = _write_skill_with_ja(tmp_path, "h2-mismatch", en, ja)
+    report = mod.validate_skill_file(str(file_path))
+    w_ids = [w.id for w in report.warnings]
+    assert "W1.1" in w_ids
+
+
+def test_warning_en_ja_step_mismatch(tmp_path: Path):
+    """W1.3: Step count mismatch triggers warning"""
+    mod = _load_validator_module()
+    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n### Step 1\nDo A\n### Step 2\nDo B\n"
+    ja = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n### Step 1\nDo A\n"
+    file_path = _write_skill_with_ja(tmp_path, "step-mismatch", en, ja)
+    report = mod.validate_skill_file(str(file_path))
+    w_ids = [w.id for w in report.warnings]
+    assert "W1.3" in w_ids
+
+
+def test_warning_step_missing_values(tmp_path: Path):
+    """W2: Step without Values marker triggers warning"""
+    mod = _load_validator_module()
+    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n### Step 1: Setup\nDo setup\n### Step 2: Run\nDo run\n> **Values**: 基礎と型\n"
+    ja = "# dummy\n"
+    file_path = _write_skill_with_ja(tmp_path, "missing-values", en, ja)
+    report = mod.validate_skill_file(str(file_path))
+    w_ids = [w.id for w in report.warnings]
+    # Step 1 has no Values, Step 2 has Values
+    assert "W2.1" in w_ids
+    assert "W2.2" not in w_ids
+
+
+def test_warning_ja_safety_keywords(tmp_path: Path):
+    """W3.1: Safety keywords in JA trigger warning"""
+    mod = _load_validator_module()
+    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\nContent\n"
+    ja = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\nセキュリティに注意。削除は禁止。\n"
+    file_path = _write_skill_with_ja(tmp_path, "safety-kw", en, ja)
+    report = mod.validate_skill_file(str(file_path))
+    w_ids = [w.id for w in report.warnings]
+    assert "W3.1" in w_ids
+    assert "W3.2" in w_ids
+
+
+def test_no_warnings_when_aligned(tmp_path: Path):
+    """No warnings when EN/JA are structurally aligned and no safety keywords"""
+    mod = _load_validator_module()
+    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n## B\n"
+    ja = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n## B\n"
+    file_path = _write_skill_with_ja(tmp_path, "aligned", en, ja)
+    report = mod.validate_skill_file(str(file_path))
+    assert len(report.warnings) == 0
+
+
+def test_warnings_do_not_affect_pass_fail(tmp_path: Path):
+    """Warnings must not change overall_passed result"""
+    mod = _load_validator_module()
+    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n## B\n## C\n"
+    ja = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\nセキュリティ削除禁止\n"
+    file_path = _write_skill_with_ja(tmp_path, "no-affect", en, ja)
+    report = mod.validate_skill_file(str(file_path))
+    # There should be warnings
+    assert len(report.warnings) > 0
+    # But overall_passed should be based only on category scores, not warnings
+    expected_passed = (report.overall_percentage >= 85 and
+                       all(c.passed for c in report.categories))
+    assert report.overall_passed == expected_passed
+
+
+def test_warning_glossary_missing_date(tmp_path: Path):
+    """W4: Missing glossary date triggers warning"""
+    mod = _load_validator_module()
+    # Create .github/copilot-instructions.md without glossary date
+    github_dir = tmp_path / "test-skill" / ".github"
+    # We need repo root detection to work: place .github at parent of skill dir
+    repo_root = tmp_path / "repo"
+    (repo_root / ".github").mkdir(parents=True, exist_ok=True)
+    (repo_root / ".github" / "copilot-instructions.md").write_text(
+        "# Instructions\nNo glossary here.\n", encoding="utf-8"
+    )
+    skill_dir = repo_root / "skills" / "test-skill"
+    (skill_dir / "references").mkdir(parents=True, exist_ok=True)
+    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n"
+    (skill_dir / "SKILL.md").write_text(en, encoding="utf-8")
+    report = mod.validate_skill_file(str(skill_dir / "SKILL.md"))
+    w_ids = [w.id for w in report.warnings]
+    assert "W4" in w_ids
+
+
+def test_warning_glossary_stale(tmp_path: Path):
+    """W4: Stale glossary date triggers warning when skill is newer"""
+    mod = _load_validator_module()
+    import time
+    repo_root = tmp_path / "repo2"
+    (repo_root / ".github").mkdir(parents=True, exist_ok=True)
+    (repo_root / ".github" / "copilot-instructions.md").write_text(
+        "# Instructions\nGlossary Last Updated: 2020-01-01\n", encoding="utf-8"
+    )
+    skill_dir = repo_root / "skills" / "test-skill"
+    (skill_dir / "references").mkdir(parents=True, exist_ok=True)
+    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n"
+    (skill_dir / "SKILL.md").write_text(en, encoding="utf-8")
+    report = mod.validate_skill_file(str(skill_dir / "SKILL.md"))
+    w_ids = [w.id for w in report.warnings]
+    assert "W4" in w_ids

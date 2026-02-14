@@ -1,33 +1,31 @@
 ---
 name: github-pr-workflow
-description: ブランチからマージまでのPR運用ガイド。GitHub Flow標準化に使う。
+description: "PRを作成しIssueをクローズする。「プルリクして」「PR作成」で使う。"
 author: RyoMurakami1983
-tags: [github, pull-requests, workflow, git, collaboration]
+tags: [github, pull-requests, workflow, git, pr-create]
 invocable: false
-version: 1.0.0
+version: 2.0.0
 ---
 
 # GitHub PR Workflow
 
-再現可能なPRワークフロー：ブランチ作成、push、レビュー、マージ、main同期を安全に行います。
+状態検知からPR作成・Issueクローズまでを自動化するワークフロー。
 
 **Pull Request (PR)**: GitHub上でレビューする変更提案。
-**Branch Protection**: 直接pushや未承認マージを防ぐルール。
-**Continuous Integration (CI)**: PRに対する自動チェック。
 
 ## このスキルを使うとき
 
 以下の状況で活用してください：
-- 複数リポジトリ・チーム間でPRフローを統一し、共有オーナーシップを確立したい
-- タイトル・本文・Issue連携を標準化し、追跡性を確保したい
-- mainへのマージ前にレビューとCI（継続的インテグレーション）チェックを必須化したい
-- マージ時にIssueを自動クローズし、計画ボードを最新に保ちたい
-- レビュアーがマージした後にローカルmainを同期し、古い履歴での作業を避けたい
-- hotfixを保護ルールや必須承認を迂回せずに運用したい
+- 「プルリクして」「PR作成して」「PRを作って」と指示されたとき
+- feature branchでの作業が完了し、マージ提案の準備ができたとき
+- ブランチをpushしてIssue連携付きのPRを作成したいとき
+- 未コミット・未pushの変更があり、PR作成前にルーティングが必要なとき
+
+> **スコープ**: このスキルは状態検知からPR作成・Issueクローズまでを扱います。レビュー対応・CIゲート・マージ戦略・マージ後同期はスコープ外です（将来の別スキルで対応）。
 
 ## 関連スキル
 
-- **`git-commit-practices`** - コミット形式と原子的コミット
+- **`git-commit-practices`** - コミット形式と原子的コミット（Step 1から委譲）
 - **`git-initial-setup`** - ブランチ保護の初期設定
 - **`github-issue-intake`** - Issue作成とトリアージ
 
@@ -36,155 +34,165 @@ version: 1.0.0
 ## 依存関係
 
 - Git 2.30+
-- GitHubリポジトリ権限
-- GitHub CLI (gh)（CLIワークフロー用、任意）
+- GitHub CLI (`gh`) — `gh auth status` で事前確認
+- GitHubリポジトリへのpush権限
 
 ---
 
 ## コア原則
 
-1. **ブランチ優先** (基礎と型) - mainはレビュー済みのみ。ブランチ優先パターンがすべてのPRの基盤
-2. **追跡性** (成長の複利) - PRとIssueを紐付け、将来の開発者が変更理由を学べるようにする
-3. **レビューゲート** (ニュートラル) - 承認とCIチェックで偏りのない品質基準でmainを守る
-4. **mainを清潔に** (継続は力) - 検証済みの変更のみマージ。着実な規律がコードベースを健全に保つ
-5. **即座に同期** (温故知新) - マージ後にローカルmainを更新し、最新の共有履歴の上に構築する
+1. **ブランチ優先** (基礎と型) - mainはレビュー済みのみ
+2. **追跡性** (成長の複利) - PRとIssueを紐付け、将来の開発者が変更理由を学べるように
+3. **日本語PR本文** (ニュートラル) - チーム標準としてPR本文を日本語で記述
+4. **mainを清潔に** (継続は力) - 検証済みの変更のみmainに到達させる
+5. **状態駆動** (温故知新) - 現在の状態を検知し、適切なアクションにルーティング
 
 ---
 
 ## ワークフロー: プルリクエストで出荷する
 
-### Step 1: フィーチャーブランチの作成
+### Step 1: 状態を検知してルーティングする
 
-作業開始前に最新のmainからブランチを作成します。追跡性のためにIssue番号付きの説明的プレフィックス（`feature/`、`fix/`、`docs/`）を使用します。
+現在のgit状態を確認し、適切なアクションを取ります。
 
 ```bash
-git checkout main
+# 1. 現在のブランチを確認
+BRANCH=$(git branch --show-current)
+
+# 2. 未コミットの変更を確認
+git status --short
+
+# 3. 未pushのコミットを確認
+git log "origin/${BRANCH}..HEAD" --oneline 2>/dev/null
+
+# 4. 既存PRの確認
+gh pr list --head "$BRANCH" --state open
+```
+
+```powershell
+# PowerShell版
+$Branch = git branch --show-current
+
+git status --short
+
+git log "origin/$Branch..HEAD" --oneline 2>$null
+
+gh pr list --head $Branch --state open
+```
+
+| 状態 | アクション |
+|------|-----------|
+| mainブランチにいる | feature branch を作成（Step 2） |
+| 未コミットの変更あり | `git-commit-practices` に委譲してコミット後、戻る |
+| コミット済・未push | `git push -u origin BRANCH` してから Step 3 へ |
+| push済・PR未作成 | Step 3（PR作成）へ進む |
+| PR既存 | PRステータスとURLを報告 |
+
+> **重要**: 未コミットの変更がある場合は `git-commit-practices` ワークフローに委譲してください（先にコミット、その後戻る）。mainにいる場合は、コミット前に必ず feature branch を作成してください。
+
+「プルリクして」「PR作成して」等のPR関連リクエスト時に使用します。
+
+> **Values**: 基礎と型 / 継続は力
+
+### Step 2: フィーチャーブランチの作成
+
+最新のmainからブランチを作成します。追跡性のためにIssue番号付きの説明的プレフィックス（`feature/`、`fix/`、`docs/`）を使用します。
+
+```bash
+git switch main
 git pull --ff-only
-git checkout -b feature/issue-123
+git switch -c feature/issue-123
 git push -u origin feature/issue-123
 ```
 
-複数の開発者が同じリポジトリで共同作業する場合や、ブランチ保護がmainへの直接pushをブロックしている場合に使用します。
+新しい作業を開始するとき、または Step 1 で main にいることが検知された場合に使用します。
 
-### Step 2: 明確な文脈でPRを作成
+> **Values**: 基礎と型
 
-アクション指向のタイトルと、レビュアーに全体像を伝える本文でPRを作成します。Summary、Why、Testing、関連Issueを含めます。
+### Step 3: PR作成とIssue連携
+
+日本語の本文でPRを作成します。`Closes` でマージ時にIssueを自動クローズします。
+
+**インライン本文**（短いPR向け）:
 
 ```bash
-gh pr create --title "feat: 支払い画面を改善" --body "## Summary
-Redesigned payment form layout.
+gh pr create \
+  --title "feat: 支払い画面にフィルタを追加" \
+  --body "## 概要
+注文履歴画面に検索フィルタを追加。
 
-## Why
-Current layout causes 15% drop-off at checkout.
+## 理由
+サポートから検索要求が多く、対応工数を削減するため。
 
-## Testing
-Manual test on staging.
+## テスト
+ローカルで動作確認済み。
 
-## Related
-Closes #123"
+## 関連
+Closes #123
+Refs #130"
 ```
 
-レビュアーが素早く文脈を把握する必要がある場合や、チーム全体でPR内容を統一したい場合に使用します。
+**ファイル経由の本文**（Windowsでの UTF-8 安全推奨）:
 
-### Step 3: レビューとCIゲートを通過
+```bash
+# 本文を一時ファイルに書き出す
+cat > pr_body.md << 'EOF'
+## 概要
+注文履歴画面に検索フィルタを追加。
 
-マージ前に承認とCIチェックの通過を必須化します。ブランチ保護でこれらのゲートを自動的に強制します。
+## 理由
+サポートから検索要求が多く、対応工数を削減するため。
 
-```yaml
-# .github/workflows/ci.yml
-name: ci
-on: [pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm test
-```
+## テスト
+ローカルで動作確認済み。
 
-mainを常にデプロイ可能に保つ必要がある場合や、監査対応のレビュー証跡が必要な場合に使用します。
-
-### Step 4: クローズキーワードでIssueを連携
-
-PR本文にクローズキーワードを追加し、マージ時にIssueを自動クローズします。解決済みには`Closes`、関連文脈には`Refs`を使用します。
-
-```markdown
-## Related
+## 関連
 Closes #123
 Refs #130
+EOF
+
+gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file pr_body.md
 ```
 
-Issue起点の作業で、Issueからマージ済みコードまでのエンドツーエンドの追跡性が必要な場合に使用します。
+| キーワード | 効果 |
+|-----------|------|
+| `Closes #N` | マージ時にIssue #N を自動クローズ |
+| `Refs #N` | Issue #N へのリンク（クローズしない） |
 
-### Step 5: マージ戦略を選択
+ブランチがpush済みでPRが未作成の場合に使用します。
 
-リポジトリポリシーに合ったマージ戦略を選択します。
-
-| 戦略 | 使う場面 | 結果 |
-|------|---------|------|
-| Squash | 小さなPR | 1コミット化 |
-| Merge | 履歴保持 | 全コミット保持 |
-| Rebase | 直線履歴 | マージコミットなし |
-
-一貫した履歴パターンが必要な場合や、コンプライアンスで特定のマージ方式が求められる場合に使用します。
-
-### Step 6: 同期と整理
-
-マージ後にローカルmainを同期し、マージ済みブランチを削除してワークスペースを整理します。
-
-```bash
-git checkout main
-git pull --ff-only
-git branch -d feature/issue-123
-git push origin --delete feature/issue-123
-```
-
-古い履歴での作業を避けるため、PRマージ後に毎回実行します。
-
-### Step 7: Hotfix対応
-
-緊急の本番修正にはhotfixブランチを作成します。通常のPRプロセスに従い、ブランチ保護を決して迂回しません。
-
-```bash
-git checkout main
-git pull --ff-only
-git checkout -b hotfix/issue-999
-# 修正、コミット、pushし、通常通りPRを作成
-git push -u origin hotfix/issue-999
-```
-
-本番がダウンしているがブランチ保護を維持する必要がある場合に使用します。
+> **Values**: 成長の複利 / ニュートラル
 
 ---
 
 ## ベストプラクティス
 
-- アクション指向のPRタイトルで素早く内容を把握
-- PRテンプレートでテスト結果の記載を必須化
-- クローズキーワードでIssueを最新に保つ
-- 承認またはCIなしのマージを避ける
-- マージ後に毎回ローカルmainを同期
+- PR本文は日本語で記述する（チーム標準）
+- タイトルは Conventional Commits 形式（`feat:`, `fix:` 等）
+- `Closes #N` で Issue を自動クローズする
+- Windows では `--body-file` で UTF-8 を確実に扱う
+- `gh auth status` で認証を事前確認する
 
 ---
 
 ## よくある落とし穴
 
-1. **CIチェックのスキップ**
-   修正: ブランチ保護でCIを必須化する。
+1. **PR本文が英語になる**
+   修正: テンプレ見出しを日本語で統一（概要/理由/テスト/関連）。
 
-2. **レビューなしでマージ**
-   修正: 承認とコードオーナーを必須化する。
+2. **Issueリンクの忘れ**
+   修正: `## 関連` セクションに `Closes #N` を必ず含める。
 
-3. **main同期の忘れ**
-   修正: マージ後に`--ff-only`でmainをpullする。
+3. **mainブランチから直接PRを作る**
+   修正: Step 1 の状態検知で feature branch 作成に誘導。
 
 ---
 
 ## アンチパターン
 
-- ブランチ保護なしでmainへ直接push
-- 失敗したチェックのままマージ
-- マージ済みブランチの放置
+- main に直接 push してから PR を作る
+- Issue 番号なしで PR を作成する
+- PR 本文を空にする
 
 ---
 
@@ -192,33 +200,40 @@ git push -u origin hotfix/issue-999
 
 ### PRフローチェックリスト
 
-- [ ] 最新のmainからブランチを作成
-- [ ] ブランチをpushしてPRを作成
-- [ ] `Closes #` キーワードを追加
-- [ ] CIと承認を通過
-- [ ] ポリシーに従いマージ
-- [ ] mainをpullしブランチを削除
+- [ ] `gh auth status` で認証を確認
+- [ ] 状態を検知（未コミット / 未push / PR無し）
+- [ ] 必要なら `git-commit-practices` でコミット
+- [ ] ブランチを origin に push
+- [ ] `gh pr create` で PR 作成（日本語本文 + `Closes #N`）
 
-### マージ判断テーブル
+### PR本文テンプレート
 
-| 状況 | マージ方式 | 理由 |
-|------|-----------|------|
-| 小さな機能 | Squash | ノイズ削減 |
-| リリースブランチ | Merge | コミット保持 |
-| 線形履歴が必須 | Rebase | マージコミット回避 |
+```markdown
+## 概要
+（何を変更したか）
+
+## 理由
+（なぜこの変更が必要か）
+
+## テスト
+（どう検証したか）
+
+## 関連
+Closes #N
+```
 
 ---
 
 ## FAQ
 
-**Q: すべてのPRでIssueをクローズすべき？**
-A: Issue起点の作業ならクローズキーワードを使用します。
+**Q: PR本文は英語でも良い？**
+A: チームポリシーとして日本語で統一しています。
 
-**Q: CIが失敗していてもマージできる？**
-A: できません。CIを修正するか例外を記録してください。
+**Q: レビューやマージはこのスキルで扱う？**
+A: このスキルはPR作成までです。レビュー対応・マージは将来の別スキルで扱います。
 
-**Q: ブランチはいつ削除する？**
-A: マージ後に削除してリモートを整理します。
+**Q: `gh` が未インストールの場合は？**
+A: `gh auth status` でエラーになります。[GitHub CLI](https://cli.github.com/) をインストールしてください。
 
 ---
 

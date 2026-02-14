@@ -46,7 +46,23 @@ Use this skill when:
 
 ## Workflow: Write Quality Commits
 
-### Step 1: Use Conventional Commits Format
+### Step 1: Confirm Feature Branch
+
+Verify you are on a feature branch before committing. Never commit directly to main.
+
+```bash
+# Check current branch
+git branch --show-current
+
+# If on main, create a feature branch first
+git switch -c feature/your-change
+```
+
+Use when starting any new work, or when the agent begins a commit workflow.
+
+> **Values**: 基礎と型 / 継続は力
+
+### Step 2: Use Conventional Commits Format
 
 Follow the `type(scope): subject` structure so every commit is parseable by humans and tools.
 
@@ -58,7 +74,7 @@ BREAKING CHANGE: /auth/login を /oauth/authorize に変更"
 
 Use when multiple contributors need consistent messages or you want automated changelogs.
 
-### Step 2: Select Type and Scope
+### Step 3: Select Type and Scope
 
 Pick the type that matches your intent, and add a scope when modules are clearly separated.
 
@@ -77,7 +93,7 @@ git commit -m "feat(api): 決済APIを追加"
 
 Use when the repo has multiple modules or domains that benefit from explicit scope labels.
 
-### Step 3: Write Clear Japanese Subjects
+### Step 4: Write Clear Japanese Subjects
 
 Be specific so subjects are searchable and self-explanatory in `git log`.
 
@@ -93,7 +109,7 @@ git commit -m "fix: バグ修正"
 
 Use when Japanese is the primary team language or commit history will be used for audits.
 
-### Step 4: Split Into Atomic Commits
+### Step 5: Split Into Atomic Commits
 
 Each commit should address one concern so it can be reviewed and reverted independently.
 
@@ -109,7 +125,7 @@ git commit -m "test: 認証フローのテストを追加"
 
 Use when reviewers need to verify changes incrementally or you want safe rollbacks.
 
-### Step 5: Add Body with Why
+### Step 6: Add Body with Why
 
 Explain "why" in the commit body so future readers understand the decision, not just the diff.
 
@@ -123,7 +139,7 @@ Why: SLA達成率が低下していたため"
 
 Use when a change might be questioned later or you need to preserve decision context.
 
-### Step 6: Run Pre-Commit Checks
+### Step 7: Run Pre-Commit Checks
 
 Review your diff and run tests before committing to keep history clean.
 
@@ -142,7 +158,7 @@ rules:
 
 Use before pushing a branch to open a PR or when onboarding new contributors.
 
-### Step 7: Amend and Rebase Safely
+### Step 8: Amend and Rebase Safely
 
 Rewrite history only before it is shared. After pushing, prefer a new commit.
 
@@ -192,6 +208,7 @@ Fix: Add a "Why" line for decisions.
 
 ### Commit Checklist
 
+- [ ] Confirm on feature branch (not main)
 - [ ] Review `git diff`
 - [ ] Ensure one logical change per commit
 - [ ] Use Conventional Commits format
