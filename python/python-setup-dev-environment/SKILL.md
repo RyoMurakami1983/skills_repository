@@ -66,6 +66,8 @@ uv add --dev ruff mypy
 
 Use when starting new Python work or normalizing an existing project.
 
+**Values**: 基礎と型 / 継続は力
+
 ### Step 2: Standardize Daily Command Entry
 
 Use `uv run` as the default command prefix for Python tooling.
@@ -90,6 +92,8 @@ python path\to\script.py
 
 Use when avoiding local interpreter/version mismatch.
 
+**Values**: ニュートラル / 基礎と型
+
 ### Step 3: Run Quality Checks in a Safe Order
 
 Follow a predictable order that minimizes churn and review noise. The order matters because it explains why each step comes next.
@@ -106,6 +110,8 @@ Why this sequence works:
 | 3 | `uv run mypy .` | Validate type-level correctness last |
 
 Use when preparing changes for commit or pull request.
+
+**Values**: 継続は力 / 成長の複利
 
 ### Step 4: Configure VSCode Save-Time Guardrails
 
@@ -126,6 +132,8 @@ Use Ruff formatter with explicit code actions to prevent unexpected rewrite beha
 
 Use when save-time behavior causes unstable or surprising diffs.
 
+**Values**: ニュートラル / 継続は力
+
 ### Step 5: Verify Reproducibility
 
 Confirm that another machine/session can recreate the same environment.
@@ -141,6 +149,8 @@ uv run mypy .
 
 Use when onboarding collaborators or validating CI parity.
 
+**Values**: 温故知新 / 基礎と型
+
 ### Step 6: Define Terms Before Team Rollout
 
 Use explicit definitions so everyone reads commands and settings the same way.
@@ -150,6 +160,8 @@ Use explicit definitions so everyone reads commands and settings the same way.
 - **CI**: Continuous Integration pipeline that should reproduce local checks.
 
 Use when writing onboarding docs or handing off to another contributor.
+
+**Values**: ニュートラル / 成長の複利
 
 ---
 
@@ -181,6 +193,7 @@ Fix: Use `uv add`/`uv remove` and commit resulting `uv.lock` changes.
 - Adding convenience tools before team baseline is stable (e.g., early task-runner sprawl)
 - Mixing multiple formatters for Python in the same repository
 - Treating type checks as optional after lint passes
+- Using `uv pip install` as a default workflow command without documentation
 
 ---
 
@@ -214,7 +227,7 @@ uv sync
 |-----------|--------|-----|
 | Need quick local check | `uv run ruff check .` | Catch style/lint issues fast |
 | Need commit-ready diff | `uv run ruff format .` then `uv run ruff check .` | Format first, then enforce rules |
-| Need confidence before PR | `uv run mypy .` | Why: catch type-level regressions early |
+| Need confidence before PR | `uv run mypy .` | Catch type-level regressions early |
 
 ---
 
@@ -225,6 +238,9 @@ A: No. This workflow intentionally stays minimal; add task runners in a separate
 
 **Q: Why keep `codeActionsOnSave` as `explicit`?**  
 A: It prevents unintended broad rewrites while still allowing controlled fixes.
+
+**Q: Is `uv pip install` allowed?**  
+A: As a rule, avoid it for normal workflow; prefer `uv add` / `uv remove` to keep project state reproducible. If an exception is unavoidable, document the reason and command in `README.md` (or equivalent project docs).
 
 ---
 
