@@ -1031,22 +1031,47 @@ class WarningValidator:
                 return candidate
         return None
 
+    @staticmethod
+    def _strip_fenced_code(text: str) -> str:
+        """Remove fenced code blocks (CommonMark: up to 3 leading spaces, ``` or ~~~)."""
+        lines = text.split('\n')
+        result: List[str] = []
+        in_fence = False
+        fence_char = ''
+        fence_len = 0
+
+        for line in lines:
+            fence_match = re.match(r'^ {0,3}([`~]{3,})', line)
+            if fence_match:
+                marker = fence_match.group(1)
+                if not in_fence:
+                    in_fence = True
+                    fence_char = marker[0]
+                    fence_len = len(marker)
+                elif marker[0] == fence_char and len(marker) >= fence_len:
+                    in_fence = False
+                continue
+            if not in_fence:
+                result.append(line)
+
+        return '\n'.join(result)
+
     def _extract_headings(self, text: str) -> List[Tuple[int, str]]:
         """Extract (level, title) pairs outside code blocks"""
-        cleaned = re.sub(r'^```.*?^```', '', text, flags=re.DOTALL | re.MULTILINE)
+        cleaned = self._strip_fenced_code(text)
         return [
             (len(m.group(1)), m.group(2).strip())
             for m in re.finditer(r'^(#{2,3})\s+(.+)', cleaned, re.MULTILINE)
         ]
 
     def _count_steps(self, text: str) -> int:
-        """Count workflow step headings"""
-        cleaned = re.sub(r'^```.*?^```', '', text, flags=re.DOTALL | re.MULTILINE)
-        return len(re.findall(r'^##\s+Step\s+\d+', cleaned, re.MULTILINE | re.IGNORECASE))
+        """Count workflow step headings (supports both ## and ### levels)"""
+        cleaned = self._strip_fenced_code(text)
+        return len(re.findall(r'^#{2,3}\s+Step\s+\d+', cleaned, re.MULTILINE | re.IGNORECASE))
 
     def _has_decision_table(self, text: str) -> bool:
         """Check for decision table presence"""
-        cleaned = re.sub(r'^```.*?^```', '', text, flags=re.DOTALL | re.MULTILINE)
+        cleaned = self._strip_fenced_code(text)
         return bool(re.search(r'decision\s+table|判断テーブル|判断表', cleaned, re.IGNORECASE))
 
     def validate(self) -> List[WarningResult]:
@@ -1054,6 +1079,7 @@ class WarningValidator:
         warnings.extend(self._check_en_ja_parity())
         warnings.extend(self._check_step_values())
         warnings.extend(self._check_ja_safety_risks())
+        warnings.extend(self._check_glossary_freshness())
         return warnings
 
     # --- W1: EN/JA structural parity ---
@@ -1115,8 +1141,8 @@ class WarningValidator:
 
     def _check_step_values(self) -> List[WarningResult]:
         warnings: List[WarningResult] = []
-        cleaned = re.sub(r'^```.*?^```', '', self.content, flags=re.DOTALL | re.MULTILINE)
-        step_matches = list(re.finditer(r'^##\s+(Step\s+\d+[^\n]*)', cleaned, re.MULTILINE | re.IGNORECASE))
+        cleaned = self._strip_fenced_code(self.content)
+        step_matches = list(re.finditer(r'^#{2,3}\s+(Step\s+\d+[^\n]*)', cleaned, re.MULTILINE | re.IGNORECASE))
 
         for i, match in enumerate(step_matches):
             step_title = match.group(1).strip()
@@ -1170,6 +1196,59 @@ class WarningValidator:
                 "W3.2",
                 "JA contains negation patterns — check EN for meaning alignment",
                 f"Patterns: {', '.join(found_negations[:5])}"
+            ))
+
+        return warnings
+
+    # --- W4: Glossary freshness check ---
+
+    def _check_glossary_freshness(self) -> List[WarningResult]:
+        """Warn if the glossary in copilot-instructions.md is older than this skill file."""
+        warnings: List[WarningResult] = []
+
+        # Walk up from skill file to find repo root (contains .github/)
+        skill_path = Path(self.file_path).resolve()
+        repo_root = skill_path.parent
+        while repo_root != repo_root.parent:
+            if (repo_root / ".github" / "copilot-instructions.md").exists():
+                break
+            repo_root = repo_root.parent
+        else:
+            return warnings
+
+        instructions_path = repo_root / ".github" / "copilot-instructions.md"
+        if not instructions_path.exists():
+            return warnings
+
+        try:
+            instructions_text = instructions_path.read_text(encoding='utf-8')
+        except OSError:
+            return warnings
+
+        # Extract "Glossary Last Updated: YYYY-MM-DD"
+        date_match = re.search(
+            r'Glossary Last Updated[:\s]*(\d{4}-\d{2}-\d{2})', instructions_text
+        )
+        if not date_match:
+            warnings.append(WarningResult(
+                "W4",
+                "Glossary date not found in copilot-instructions.md",
+                "Expected 'Glossary Last Updated: YYYY-MM-DD' in the glossary section"
+            ))
+            return warnings
+
+        from datetime import datetime
+
+        glossary_date = datetime.strptime(date_match.group(1), '%Y-%m-%d').date()
+
+        # Compare with skill file modification time
+        skill_mtime = datetime.fromtimestamp(skill_path.stat().st_mtime).date()
+
+        if skill_mtime > glossary_date:
+            warnings.append(WarningResult(
+                "W4",
+                "Glossary may be outdated — skill file is newer than glossary date",
+                f"Skill modified: {skill_mtime}, Glossary: {glossary_date}"
             ))
 
         return warnings
