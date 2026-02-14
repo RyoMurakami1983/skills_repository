@@ -97,10 +97,49 @@ class SkillValidator:
         return match.group(1) if match else None
 
     def get_section_content(self, heading: str) -> Optional[str]:
-        """Extract content of a specific section"""
-        pattern = rf'^##\s+{re.escape(heading)}.*?\n(.*?)(?=^##\s|\Z)'
-        match = re.search(pattern, self.content, re.MULTILINE | re.DOTALL | re.IGNORECASE)
-        return match.group(1).strip() if match else None
+        """Extract a section body while ignoring headings inside fenced code blocks."""
+        lines = self.content.split('\n')
+        heading_prefix = heading.strip().lower()
+        start_line: Optional[int] = None
+        end_line: Optional[int] = None
+
+        in_fence = False
+        fence_char = ''
+        fence_len = 0
+
+        for idx, line in enumerate(lines):
+            stripped = line.lstrip()
+            fence_match = re.match(r'^([`~]{3,})', stripped)
+            if fence_match:
+                marker = fence_match.group(1)
+                if not in_fence:
+                    in_fence = True
+                    fence_char = marker[0]
+                    fence_len = len(marker)
+                elif marker[0] == fence_char and len(marker) >= fence_len:
+                    in_fence = False
+                continue
+
+            if in_fence:
+                continue
+
+            h2_match = re.match(r'^##\s+(.+?)\s*$', line)
+            if not h2_match:
+                continue
+
+            h2_title = h2_match.group(1).strip().lower()
+            if start_line is None:
+                if h2_title.startswith(heading_prefix):
+                    start_line = idx + 1
+            else:
+                end_line = idx
+                break
+
+        if start_line is None:
+            return None
+
+        section_lines = lines[start_line:end_line] if end_line is not None else lines[start_line:]
+        return '\n'.join(section_lines).strip()
 
 
 class StructureValidator(SkillValidator):

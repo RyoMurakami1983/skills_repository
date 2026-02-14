@@ -66,6 +66,33 @@ invocable: true
     assert "Core Principles" not in section
 
 
+def test_get_section_content_ignores_h2_inside_fenced_code_block():
+    mod = _load_validator_module()
+    content = """---
+name: extraction-skill
+description: Ensure fenced headings do not truncate section extraction.
+author: Tester
+invocable: true
+---
+
+## Quick Reference
+```markdown
+## Summary
+- This heading is inside a code fence.
+```
+- Keep this line in Quick Reference.
+
+## Core Principles
+- Keep fixtures small and explicit.
+"""
+    validator = mod.SkillValidator(content=content, file_path="C:\\tmp\\SKILL.md")
+    section = validator.get_section_content("Quick Reference")
+    assert section is not None
+    assert "## Summary" in section
+    assert "Keep this line in Quick Reference." in section
+    assert "Core Principles" not in section
+
+
 @pytest.mark.parametrize(
     "folder_name, skill_name, body, expected_substring",
     [
