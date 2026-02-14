@@ -120,10 +120,10 @@ $OutputEncoding
 
 ```powershell
 # ✅ 推奨
-uv run python scripts/validate_skill.py path/to/SKILL.md
+uv run python skills/skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
 
 # ❌ 非推奨（直接呼び出し）
-python scripts/validate_skill.py path/to/SKILL.md
+python skills/skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
 ```
 
 ### 理由
