@@ -4,15 +4,16 @@ description: Set up and run a reproducible Python dev environment with uv, ruff,
 author: RyoMurakami1983
 tags: [python, uv, ruff, mypy, vscode]
 invocable: false
+version: 1.0.0
 ---
 
 # Python開発環境をセットアップする
 
 `uv`・`ruff`・`mypy`・VSCode保存時ガードを使って、再現可能なPython開発環境を構築・運用するための単一ワークフローです。
 
-## When to Use This Skill
+## このスキルを使うとき
 
-Use this skill when:
+このスキルは次のときに使います:
 - 新しいPythonプロジェクトを立ち上げ、実行方法を `uv run` に統一したいとき
 - lint/format/type-check の順序を固定して品質を安定させたいとき
 - VSCode保存時の自動整形で差分が崩れる問題を回避したいとき
@@ -64,7 +65,7 @@ uv run python --version
 uv add --dev ruff mypy
 ```
 
-Use when: 新規立ち上げ時、または既存環境を標準化するとき。
+使うとき: 新規立ち上げ時、または既存環境を標準化するとき。
 
 **Values**: 基礎と型 / 継続は力
 
@@ -79,7 +80,7 @@ uv run ruff format .
 uv run mypy .
 ```
 
-Use when: ローカルPythonやPATH差分で実行結果がぶれるとき。
+使うとき: ローカルPythonやPATH差分で実行結果がぶれるとき。
 
 **Values**: ニュートラル / 基礎と型
 
@@ -93,7 +94,7 @@ Use when: ローカルPythonやPATH差分で実行結果がぶれるとき。
 | 2 | `uv run ruff check .` | 整形後のlint違反を確認 |
 | 3 | `uv run mypy .` | 型整合性を最後に確認 |
 
-Use when: コミット前、PR作成前の最終確認をするとき。
+使うとき: コミット前、PR作成前の最終確認をするとき。
 
 **Values**: 継続は力 / 成長の複利
 
@@ -114,7 +115,7 @@ Ruff formatterを使いつつ、保存時の自動修正を明示実行に限定
 }
 ```
 
-Use when: 「保存しただけでコードが崩れた」問題を防ぎたいとき。
+使うとき: 「保存しただけでコードが崩れた」問題を防ぎたいとき。
 
 **Values**: ニュートラル / 継続は力
 
@@ -128,7 +129,7 @@ uv run ruff check .
 uv run mypy .
 ```
 
-Use when: 新規メンバー参加時、CI前提の再現性確認時。
+使うとき: 新規メンバー参加時、CI前提の再現性確認時。
 
 **Values**: 温故知新 / 基礎と型
 
@@ -140,7 +141,7 @@ Use when: 新規メンバー参加時、CI前提の再現性確認時。
 - **LSP (Language Server Protocol)**: エディタと診断・補完機能の連携仕様。開発体験の一貫性に直結する。
 - **CI**: Continuous Integration。ローカルで使うチェック手順を自動検証へ再利用する基盤。
 
-Use when: チームへ運用ルールを共有する前、またはオンボーディング資料を作成するとき。
+使うとき: チームへ運用ルールを共有する前、またはオンボーディング資料を作成するとき。
 
 **Values**: ニュートラル / 成長の複利
 

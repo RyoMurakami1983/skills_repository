@@ -4,6 +4,7 @@ description: Set up and run a reproducible Python dev environment with uv, ruff,
 author: RyoMurakami1983
 tags: [python, uv, ruff, mypy, vscode]
 invocable: false
+version: 1.0.0
 ---
 
 # Set Up a Python Dev Environment
