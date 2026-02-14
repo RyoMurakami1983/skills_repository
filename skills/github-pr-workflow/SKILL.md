@@ -1,33 +1,31 @@
 ---
 name: github-pr-workflow
-description: PR workflow from branch to merge and main sync. Use when standardizing GitHub Flow.
+description: "PRを作成しIssueをクローズする。「プルリクして」「PR作成」で使う。"
 author: RyoMurakami1983
-tags: [github, pull-requests, workflow, git, collaboration]
+tags: [github, pull-requests, workflow, git, pr-create]
 invocable: false
-version: 1.0.0
+version: 2.0.0
 ---
 
 # GitHub PR Workflow
 
-A repeatable Pull Request workflow: branch, push, review, merge, and sync main safely.
+状態検知からPR作成・Issueクローズまでを自動化するワークフロー。
 
 **Pull Request (PR)**: A reviewed change proposal in GitHub.
-**Branch Protection**: Repository rules that block unsafe merges or direct pushes.
-**Continuous Integration (CI)**: Automated checks that run on pull requests.
 
 ## When to Use This Skill
 
 Use this skill when:
-- Standardizing PR flow across multiple repositories and teams with shared ownership
-- Creating PRs with consistent titles, bodies, and issue links for traceability
-- Enforcing review and continuous integration (CI) checks before merge to main
-- Closing issues automatically on merge to keep planning boards up to date
-- Syncing local main after reviewers merge to avoid working on stale history
-- Handling hotfixes without bypassing protections or skipping required approvals
+- The user says "プルリクして", "PR作成して", "PRを作って", or "create a PR"
+- Work on a feature branch is ready to be proposed for merge
+- You need to push a branch and open a PR with issue links
+- Uncommitted or unpushed changes need routing before PR creation
+
+> **Scope**: This skill covers state detection through PR creation and Issue close. Review handling, CI gates, merge strategy, and post-merge sync are out of scope (future skill).
 
 ## Related Skills
 
-- **`git-commit-practices`** - Commit formatting and atomic changes
+- **`git-commit-practices`** - Commit formatting and atomic changes (delegated from Step 1)
 - **`git-initial-setup`** - Branch protection defaults
 - **`github-issue-intake`** - Issue creation and triage
 
@@ -36,18 +34,18 @@ Use this skill when:
 ## Dependencies
 
 - Git 2.30+
-- GitHub repository access
-- GitHub CLI (gh) for CLI workflow (optional)
+- GitHub CLI (`gh`) — verify with `gh auth status`
+- GitHub repository with push access
 
 ---
 
 ## Core Principles
 
-1. **Branch First** (基礎と型) - Work stays off main until reviewed; the branch-first pattern is the foundation every PR builds on
-2. **Traceability** (成長の複利) - Link PRs to issues so future developers learn why changes were made
-3. **Review Gates** (ニュートラル) - Approvals and CI checks protect main with unbiased quality standards
-4. **Clean Main** (継続は力) - Merge only verified changes; steady discipline keeps the codebase healthy
-5. **Fast Sync** (温故知新) - Update local main after merge to build on the latest shared history
+1. **Branch First** (基礎と型) - Work stays off main until reviewed
+2. **Traceability** (成長の複利) - Link PRs to issues so future developers learn why
+3. **Japanese PR Body** (ニュートラル) - Write PR descriptions in Japanese for the team
+4. **Clean Main** (継続は力) - Only verified changes reach main
+5. **State-Driven** (温故知新) - Detect current state and route to the right action
 
 ---
 
@@ -55,168 +53,146 @@ Use this skill when:
 
 ### Step 1: Detect State and Route
 
-Before starting, check the current git state and take the appropriate action.
+Check the current git state and take the appropriate action.
 
 ```bash
 # 1. Check current branch
-git branch --show-current
+BRANCH=$(git branch --show-current)
 
 # 2. Check for uncommitted changes
 git status --short
 
 # 3. Check for unpushed commits
-git log origin/$(git branch --show-current)..HEAD --oneline 2>/dev/null
+git log "origin/${BRANCH}..HEAD" --oneline 2>/dev/null
 
 # 4. Check for existing PR
-gh pr list --head $(git branch --show-current) --state open
+gh pr list --head "$BRANCH" --state open
+```
+
+```powershell
+# PowerShell equivalent
+$Branch = git branch --show-current
+
+git status --short
+
+git log "origin/$Branch..HEAD" --oneline 2>$null
+
+gh pr list --head $Branch --state open
 ```
 
 | State | Action |
 |-------|--------|
-| On main | Create feature branch first (Step 2) |
-| Uncommitted changes | Commit using `git-commit-practices`, then return here |
-| Committed but not pushed | `git push -u origin BRANCH`, then proceed to Step 3 |
-| Pushed but no PR | Proceed to Step 3 (Open PR) |
+| On main | Create feature branch (Step 2) |
+| Uncommitted changes | Delegate to `git-commit-practices`, then return |
+| Committed but not pushed | `git push -u origin BRANCH`, then Step 3 |
+| Pushed but no PR | Proceed to Step 3 |
 | PR already exists | Report PR status and URL |
 
-> **Important**: If uncommitted changes exist, delegate to `git-commit-practices` workflow (commit first, then come back). If on main, create a feature branch before any commits.
+> **Important**: If uncommitted changes exist, delegate to `git-commit-practices` first. If on main, create a feature branch before any commits.
 
-Use when the user says "プルリクして", "create a PR", or any PR-related request.
+Use when the user says "プルリクして", "PR作成して", or any PR-related request.
 
 > **Values**: 基礎と型 / 継続は力
 
 ### Step 2: Create Feature Branch
 
-Branch from the latest main before starting work. Use descriptive prefixes (`feature/`, `fix/`, `docs/`) with the issue number for traceability.
+Branch from the latest main. Use descriptive prefixes (`feature/`, `fix/`, `docs/`) with the issue number.
 
 ```bash
-git checkout main
+git switch main
 git pull --ff-only
-git checkout -b feature/issue-123
+git switch -c feature/issue-123
 git push -u origin feature/issue-123
 ```
 
-Use when multiple developers collaborate on the same repository or when branch protection blocks direct pushes to main.
+Use when starting new work or when Step 1 detected you are on main.
 
-### Step 3: Open PR with Clear Context
+> **Values**: 基礎と型
 
-Create a PR with an action-oriented title and a body that gives reviewers the full picture. Include Summary, Why, Testing, and linked issues.
+### Step 3: Open PR and Link Issues
+
+Create a PR with a Japanese body. Use `Closes` to auto-close issues on merge.
+
+**Inline body** (short PRs):
 
 ```bash
-gh pr create --title "feat: 支払い画面を改善" --body "## Summary
-Redesigned payment form layout.
+gh pr create \
+  --title "feat: 支払い画面にフィルタを追加" \
+  --body "## 概要
+注文履歴画面に検索フィルタを追加。
 
-## Why
-Current layout causes 15% drop-off at checkout.
+## 理由
+サポートから検索要求が多く、対応工数を削減するため。
 
-## Testing
-Manual test on staging.
+## テスト
+ローカルで動作確認済み。
 
-## Related
-Closes #123"
+## 関連
+Closes #123
+Refs #130"
 ```
 
-Use when reviewers need context quickly and you want consistent PR content across the team.
+**File-based body** (recommended for UTF-8 safety on Windows):
 
-### Step 4: Pass Review and CI Gates
+```bash
+# Write body to a temp file
+cat > pr_body.md << 'EOF'
+## 概要
+注文履歴画面に検索フィルタを追加。
 
-Require approvals and passing CI checks before merging. Configure branch protection to enforce these gates automatically.
+## 理由
+サポートから検索要求が多く、対応工数を削減するため。
 
-```yaml
-# .github/workflows/ci.yml
-name: ci
-on: [pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm test
-```
+## テスト
+ローカルで動作確認済み。
 
-Use when main must stay deployable and you need audit-ready review evidence.
-
-### Step 5: Link Issues with Closing Keywords
-
-Add closing keywords in the PR body so issues are auto-closed on merge. Use `Closes` for resolved issues and `Refs` for related context.
-
-```markdown
-## Related
+## 関連
 Closes #123
 Refs #130
+EOF
+
+gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file pr_body.md
 ```
 
-Use when work originates from an issue and you need end-to-end traceability from issue to merged code.
+| Keyword | Effect |
+|---------|--------|
+| `Closes #N` | Merges時にIssue #N を自動クローズ |
+| `Refs #N` | Issue #N へのリンク（クローズしない） |
 
-### Step 6: Choose Merge Strategy
+Use when the branch is pushed and no PR exists yet.
 
-Select the merge strategy that matches your repository policy.
-
-| Strategy | Use When | Result |
-|----------|----------|--------|
-| Squash | Small PRs | Single commit |
-| Merge | Preserve history | Full commits |
-| Rebase | Linear history | No merge commit |
-
-Use when you need consistent history patterns or compliance requires a specific merge type.
-
-### Step 7: Sync and Clean Up
-
-After merge, sync your local main and delete the merged branch to keep your workspace clean.
-
-```bash
-git checkout main
-git pull --ff-only
-git branch -d feature/issue-123
-git push origin --delete feature/issue-123
-```
-
-Use after every merged PR to avoid working on stale history.
-
-### Step 8: Handle Hotfixes
-
-Create a hotfix branch for urgent production fixes. Follow the same PR process — never bypass branch protection.
-
-```bash
-git checkout main
-git pull --ff-only
-git checkout -b hotfix/issue-999
-# Fix, commit, push, then open PR as usual
-git push -u origin hotfix/issue-999
-```
-
-Use when production is down but branch protections must remain intact.
+> **Values**: 成長の複利 / ニュートラル
 
 ---
 
 ## Best Practices
 
-- Use action-oriented PR titles for quick scanning
-- Define required testing notes in the PR template
-- Apply closing keywords to keep issues updated
-- Avoid merging without approvals or passing CI
-- Sync main locally after every merge
+- PR本文は日本語で記述する（チーム標準）
+- タイトルは Conventional Commits 形式（`feat:`, `fix:` 等）
+- `Closes #N` で Issue を自動クローズする
+- Windows では `--body-file` で UTF-8 を確実に扱う
+- `gh auth status` で認証を事前確認する
 
 ---
 
 ## Common Pitfalls
 
-1. **Skipping CI checks**
-   Fix: Require CI in branch protection.
+1. **PR body が英語になる**
+   Fix: テンプレ見出しを日本語で統一（概要/理由/テスト/関連）。
 
-2. **Merging without review**
-   Fix: Require approvals and code owners.
+2. **Issue リンクの忘れ**
+   Fix: `## 関連` セクションに `Closes #N` を必ず含める。
 
-3. **Forgetting main sync**
-   Fix: Pull main with `--ff-only` after every merge.
+3. **main ブランチから直接 PR を作る**
+   Fix: Step 1 の状態検知で feature branch 作成に誘導。
 
 ---
 
 ## Anti-Patterns
 
-- Direct push to main without branch protection
-- Merging with failed checks
-- Leaving merged branches undeleted
+- main に直接 push してから PR を作る
+- Issue 番号なしで PR を作成する
+- PR 本文を空にする
 
 ---
 
@@ -224,34 +200,40 @@ Use when production is down but branch protections must remain intact.
 
 ### PR Flow Checklist
 
-- [ ] Detect state (uncommitted / unpushed / no PR)
-- [ ] Commit via `git-commit-practices` if needed
-- [ ] Push branch to origin
-- [ ] Open PR with `Closes #` keywords
-- [ ] Pass CI and get approvals
-- [ ] Merge via policy
-- [ ] Pull main and delete branch
+- [ ] `gh auth status` で認証を確認
+- [ ] 状態を検知（未コミット / 未push / PR無し）
+- [ ] 必要なら `git-commit-practices` でコミット
+- [ ] ブランチを origin に push
+- [ ] `gh pr create` で PR 作成（日本語本文 + `Closes #N`）
 
-### Merge Decision Table
+### PR Body Template
 
-| Situation | Merge Type | Reason |
-|-----------|------------|--------|
-| Small feature | Squash | Reduce noise |
-| Release branch | Merge | Preserve commits |
-| Linear history required | Rebase | Avoid merge commit |
+```markdown
+## 概要
+（何を変更したか）
+
+## 理由
+（なぜこの変更が必要か）
+
+## テスト
+（どう検証したか）
+
+## 関連
+Closes #N
+```
 
 ---
 
 ## FAQ
 
-**Q: Should every PR close an issue?**
-A: Use closing keywords when work is issue-driven.
+**Q: PR本文は英語でも良い？**
+A: チームポリシーとして日本語で統一しています。
 
-**Q: Can I merge if CI fails?**
-A: No. Fix CI or document the exception.
+**Q: レビューやマージはこのスキルで扱う？**
+A: このスキルはPR作成までです。レビュー対応・マージは将来の別スキルで扱います。
 
-**Q: When should I delete branches?**
-A: After merge to keep remotes clean.
+**Q: `gh` が未インストールの場合は？**
+A: `gh auth status` でエラーになります。[GitHub CLI](https://cli.github.com/) をインストールしてください。
 
 ---
 
