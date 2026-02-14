@@ -84,6 +84,12 @@ Critical項目はすべてをブロック。YAML frontmatter欠損、name不一�
 **Why**: 複合修正で退行が発生した場合、原因を特定できない。
 **Values**: 継続は力
 
+### 3. 英語版を修正の起点にし、日本語版は構造を同期
+
+**What**: 修復作業は `SKILL.md` を起点に行い、同じ構造変更を `references/SKILL.ja.md` に同期する。
+**Why**: 主レビュー対象を固定し、英日ドリフトを防げる。
+**Values**: 基礎と型 / ニュートラル
+
 ---
 
 ## Quick Reference
