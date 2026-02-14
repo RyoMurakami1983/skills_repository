@@ -100,6 +100,12 @@ class SkillValidator:
         """Extract a section body while ignoring headings inside fenced code blocks."""
         lines = self.content.split('\n')
         heading_prefix = heading.strip().lower()
+        section_boundary_pattern = re.compile(
+            r'^(when to use|core principles|the philosophy|workflow:|related skills|dependencies|'
+            r'best practices|good practices|common pitfalls|anti-patterns|quick reference|decision tree|'
+            r'resources|validation scripts|migration notice|changelog|pattern\s+\d+:)',
+            re.IGNORECASE,
+        )
         start_line: Optional[int] = None
         end_line: Optional[int] = None
 
@@ -121,6 +127,14 @@ class SkillValidator:
                 continue
 
             if in_fence:
+                # Guardrail for malformed markdown: if a known top-level section appears while
+                # a fence remains unclosed, stop the current section at that boundary.
+                h2_in_fence = re.match(r'^##\s+(.+?)\s*$', line)
+                if start_line is not None and h2_in_fence:
+                    h2_title = h2_in_fence.group(1).strip()
+                    if section_boundary_pattern.match(h2_title):
+                        end_line = idx
+                        break
                 continue
 
             h2_match = re.match(r'^##\s+(.+?)\s*$', line)

@@ -93,6 +93,31 @@ invocable: true
     assert "Core Principles" not in section
 
 
+def test_get_section_content_stops_at_known_h2_when_fence_is_unclosed():
+    mod = _load_validator_module()
+    content = """---
+name: extraction-skill
+description: Unclosed fence should not consume subsequent sections.
+author: Tester
+invocable: true
+---
+
+## Quick Reference
+```markdown
+## Summary
+- Fence is intentionally left unclosed.
+- This content should remain in Quick Reference.
+
+## Core Principles
+- Keep fixtures small and explicit.
+"""
+    validator = mod.SkillValidator(content=content, file_path="C:\\tmp\\SKILL.md")
+    section = validator.get_section_content("Quick Reference")
+    assert section is not None
+    assert "Fence is intentionally left unclosed." in section
+    assert "Core Principles" not in section
+
+
 @pytest.mark.parametrize(
     "folder_name, skill_name, body, expected_substring",
     [
