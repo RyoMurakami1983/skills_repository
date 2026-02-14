@@ -75,8 +75,8 @@ Prompt the user:
 - "What did we work on today?"
 - "Walk me through the timeline of this session."
 
-> **Use when**: Starting any furikaeri. Always do this step first.
->
+Use when starting any furikaeri. Always do this step first.
+
 > **Values**: 温故知新 / ニュートラル
 
 ### Step 2: Analyze with KPT or YWT
@@ -99,9 +99,9 @@ Try items have two purposes:
 
 | Category | Description | Example |
 |----------|------------|---------|
-| **Y** (やったこと) | What you did | Wrote 5 unit tests, 1 integration test |
-| **W** (わかったこと) | What you learned | Mock-first is faster for unstable APIs |
-| **T** (つぎにやること) | What to do next | Create a mock library for the team |
+| **Y** | What you did | Wrote 5 unit tests, 1 integration test |
+| **W** | What you learned | Mock-first is faster for unstable APIs |
+| **T** | What to do next | Create a mock library for the team |
 
 ```markdown
 ## KPT
@@ -125,8 +125,8 @@ Prompt the user:
 - "What Problems did we hit?"
 - "What should we Try next time?"
 
-> **Use when**: Always. This is the core analysis step.
->
+Use when analyzing any session. This is the core analysis step.
+
 > **Values**: 基礎と型 / 成長の複利
 
 ### Step 3: Pick the Most Important Items
@@ -152,8 +152,8 @@ Rules:
 - At least 1 item must be actionable (Problem or Try)
 - Keep items are acknowledged but don't need action plans
 
-> **Use when**: Always. Forces focus on what matters most.
->
+Use when prioritizing action items. Forces focus on what matters most.
+
 > **Values**: ニュートラル / 継続は力
 
 ### Step 4: Dig Deeper (When Needed)
@@ -189,8 +189,8 @@ Root cause: No formalized API change process.
 | **R**elevant | Directly prevents stale documentation |
 | **T**ime-bound | Add to checklist by next sprint |
 
-> **Use when**: A Problem item has unclear root cause, or a Try item needs a concrete plan.
->
+Use when a Problem item has unclear root cause, or a Try item needs a concrete plan.
+
 > **Values**: 温故知新 / 基礎と型
 
 ### Step 5: Furikaeri the Furikaeri
@@ -213,8 +213,8 @@ Record the answer for the next session.
 Next time: Try YWT format — KPT felt repetitive for this type of session.
 ```
 
-> **Use when**: Always. Even 1 sentence improves the next furikaeri.
->
+Use when finishing any furikaeri. Even 1 sentence improves the next one.
+
 > **Values**: 継続は力 / 成長の複利
 
 ---
@@ -285,13 +285,13 @@ Next time: Try YWT format — KPT felt repetitive for this type of session.
 ```markdown
 ## YWT — [Date/Session]
 
-### Y (やったこと / What I Did)
+### Y (What I Did)
 - 
 
-### W (わかったこと / What I Learned)
+### W (What I Learned)
 - 
 
-### T (つぎにやること / What To Do Next)
+### T (What To Do Next)
 - 
 
 ### Priority (top 1-3)
