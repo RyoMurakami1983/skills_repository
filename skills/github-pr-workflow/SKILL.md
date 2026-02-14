@@ -53,7 +53,39 @@ Use this skill when:
 
 ## Workflow: Ship via Pull Request
 
-### Step 1: Create Feature Branch
+### Step 1: Detect State and Route
+
+Before starting, check the current git state and take the appropriate action.
+
+```bash
+# 1. Check current branch
+git branch --show-current
+
+# 2. Check for uncommitted changes
+git status --short
+
+# 3. Check for unpushed commits
+git log origin/$(git branch --show-current)..HEAD --oneline 2>/dev/null
+
+# 4. Check for existing PR
+gh pr list --head $(git branch --show-current) --state open
+```
+
+| State | Action |
+|-------|--------|
+| On main | Create feature branch first (Step 2) |
+| Uncommitted changes | Commit using `git-commit-practices`, then return here |
+| Committed but not pushed | `git push -u origin BRANCH`, then proceed to Step 3 |
+| Pushed but no PR | Proceed to Step 3 (Open PR) |
+| PR already exists | Report PR status and URL |
+
+> **Important**: If uncommitted changes exist, delegate to `git-commit-practices` workflow (commit first, then come back). If on main, create a feature branch before any commits.
+
+Use when the user says "プルリクして", "create a PR", or any PR-related request.
+
+> **Values**: 基礎と型 / 継続は力
+
+### Step 2: Create Feature Branch
 
 Branch from the latest main before starting work. Use descriptive prefixes (`feature/`, `fix/`, `docs/`) with the issue number for traceability.
 
@@ -66,7 +98,7 @@ git push -u origin feature/issue-123
 
 Use when multiple developers collaborate on the same repository or when branch protection blocks direct pushes to main.
 
-### Step 2: Open PR with Clear Context
+### Step 3: Open PR with Clear Context
 
 Create a PR with an action-oriented title and a body that gives reviewers the full picture. Include Summary, Why, Testing, and linked issues.
 
@@ -86,7 +118,7 @@ Closes #123"
 
 Use when reviewers need context quickly and you want consistent PR content across the team.
 
-### Step 3: Pass Review and CI Gates
+### Step 4: Pass Review and CI Gates
 
 Require approvals and passing CI checks before merging. Configure branch protection to enforce these gates automatically.
 
@@ -104,7 +136,7 @@ jobs:
 
 Use when main must stay deployable and you need audit-ready review evidence.
 
-### Step 4: Link Issues with Closing Keywords
+### Step 5: Link Issues with Closing Keywords
 
 Add closing keywords in the PR body so issues are auto-closed on merge. Use `Closes` for resolved issues and `Refs` for related context.
 
@@ -116,7 +148,7 @@ Refs #130
 
 Use when work originates from an issue and you need end-to-end traceability from issue to merged code.
 
-### Step 5: Choose Merge Strategy
+### Step 6: Choose Merge Strategy
 
 Select the merge strategy that matches your repository policy.
 
@@ -128,7 +160,7 @@ Select the merge strategy that matches your repository policy.
 
 Use when you need consistent history patterns or compliance requires a specific merge type.
 
-### Step 6: Sync and Clean Up
+### Step 7: Sync and Clean Up
 
 After merge, sync your local main and delete the merged branch to keep your workspace clean.
 
@@ -141,7 +173,7 @@ git push origin --delete feature/issue-123
 
 Use after every merged PR to avoid working on stale history.
 
-### Step 7: Handle Hotfixes
+### Step 8: Handle Hotfixes
 
 Create a hotfix branch for urgent production fixes. Follow the same PR process — never bypass branch protection.
 
@@ -192,9 +224,10 @@ Use when production is down but branch protections must remain intact.
 
 ### PR Flow Checklist
 
-- [ ] Branch from latest main
-- [ ] Push branch and open PR
-- [ ] Add `Closes #` keywords
+- [ ] Detect state (uncommitted / unpushed / no PR)
+- [ ] Commit via `git-commit-practices` if needed
+- [ ] Push branch to origin
+- [ ] Open PR with `Closes #` keywords
 - [ ] Pass CI and get approvals
 - [ ] Merge via policy
 - [ ] Pull main and delete branch
