@@ -91,6 +91,10 @@ Choose one framework and categorize the session story.
 | **Problem** | What went wrong — needs fixing | API docs were outdated |
 | **Try** | What to experiment with next | Add integration test timeout config |
 
+Try items have two purposes:
+- **Keep strengthening** — Amplify what already works (marked ← K)
+- **Problem kaizen** — Fix or prevent what went wrong (marked ← P)
+
 **YWT (Y: did / W: learned / T: next)**
 
 | Category | Description | Example |
@@ -111,8 +115,8 @@ Choose one framework and categorize the session story.
 - Spent 30 min debugging timeout
 
 ### Try
-- Add timeout configuration to test setup
-- Update API docs as part of definition of done
+- (← K) Add timeout configuration to test setup
+- (← P) Update API docs as part of definition of done
 ```
 
 Prompt the user:
@@ -263,7 +267,8 @@ Next time: Try YWT format — KPT felt repetitive for this type of session.
 - 
 
 ### Try
-- 
+- (← K) Keep strengthening idea
+- (← P) Problem kaizen idea
 
 ### Priority (top 1-3)
 1. 
