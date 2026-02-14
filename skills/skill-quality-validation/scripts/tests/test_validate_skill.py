@@ -66,6 +66,82 @@ invocable: true
     assert "Core Principles" not in section
 
 
+def test_get_section_content_ignores_h2_inside_fenced_code_block():
+    mod = _load_validator_module()
+    content = """---
+name: extraction-skill
+description: Ensure fenced headings do not truncate section extraction.
+author: Tester
+invocable: true
+---
+
+## Quick Reference
+```markdown
+## Summary
+- This heading is inside a code fence.
+```
+- Keep this line in Quick Reference.
+
+## Core Principles
+- Keep fixtures small and explicit.
+"""
+    validator = mod.SkillValidator(content=content, file_path="C:\\tmp\\SKILL.md")
+    section = validator.get_section_content("Quick Reference")
+    assert section is not None
+    assert "## Summary" in section
+    assert "Keep this line in Quick Reference." in section
+    assert "Core Principles" not in section
+
+
+def test_get_section_content_stops_at_known_h2_when_fence_is_unclosed():
+    mod = _load_validator_module()
+    content = """---
+name: extraction-skill
+description: Unclosed fence should not consume subsequent sections.
+author: Tester
+invocable: true
+---
+
+## Quick Reference
+```markdown
+## Summary
+- Fence is intentionally left unclosed.
+- This content should remain in Quick Reference.
+
+## Core Principles
+- Keep fixtures small and explicit.
+"""
+    validator = mod.SkillValidator(content=content, file_path="C:\\tmp\\SKILL.md")
+    section = validator.get_section_content("Quick Reference")
+    assert section is not None
+    assert "Fence is intentionally left unclosed." in section
+    assert "Core Principles" not in section
+
+
+def test_get_section_content_does_not_treat_4space_fence_as_real_fence():
+    mod = _load_validator_module()
+    content = """---
+name: extraction-skill
+description: Four-space indented fence marker should be treated as code text.
+author: Tester
+invocable: true
+---
+
+## Quick Reference
+    ```
+## Summary
+- This should be treated as a real H2 boundary.
+
+## Core Principles
+- Keep fixtures small and explicit.
+"""
+    validator = mod.SkillValidator(content=content, file_path="C:\\tmp\\SKILL.md")
+    section = validator.get_section_content("Quick Reference")
+    assert section is not None
+    assert "Core Principles" not in section
+    assert "Summary" not in section
+
+
 @pytest.mark.parametrize(
     "folder_name, skill_name, body, expected_substring",
     [
