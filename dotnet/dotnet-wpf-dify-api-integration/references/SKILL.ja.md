@@ -24,6 +24,8 @@ WPFアプリケーションにDify API連携を追加するためのエンドツ
 
 ## 関連スキル
 
+- **`dotnet-wpf-secure-config`** — 必須：DPAPI暗号化基盤（先に適用）
+- **`dotnet-oracle-wpf-integration`** — 同じアプリでSecureConfigServiceを共有
 - **`tdd-standard-practice`** — Red-Green-Refactorで生成コードをテスト
 - **`git-commit-practices`** — 各ステップをアトミックな変更としてコミット
 - **`skills-validate-skill`** — このスキルの品質を検証
@@ -44,27 +46,36 @@ WPFアプリケーションにDify API連携を追加するためのエンドツ
 
 ### Step 1 — プロジェクト構造のセットアップ
 
-ソリューション構造とDify連携用の依存関係を初期化するときに使用します。
+### Step 1 — 前提条件確認とDify固有ファイル追加
 
-階層化フォルダ構造を作成し、NuGetパッケージをインストールします。
+`dotnet-wpf-secure-config` 適用済みプロジェクトにDify固有ファイルを追加するときに使用します。
+
+**前提条件**（先に完了必須）:
+- `dotnet-wpf-secure-config` スキル適用済み
+- `Infrastructure/Configuration/` フォルダに以下が存在:
+  - `DpapiEncryptor.cs`
+  - `SecureConfigService.cs`
+  - `ISecureConfigService.cs`
+  - `AppConfigModel.cs`
+
+**追加するファイル**（Dify固有）:
 
 ```
 YourApp/
 ├── Infrastructure/
 │   ├── Configuration/
-│   │   ├── DifyConfigModel.cs
-│   │   ├── DpapiEncryptor.cs
-│   │   ├── SecureConfigService.cs
-│   │   └── ISecureConfigService.cs
-│   └── Difys/
-│       └── DifyApiService.cs
+│   │   └── DifyConfigModel.cs           # 🆕 追加
+│   └── Difys/                            # 🆕 フォルダ作成
+│       └── DifyApiService.cs             # 🆕 追加
 └── Presentation/
     ├── ViewModels/
-    │   └── DifyConfigViewModel.cs
+    │   └── DifyConfigViewModel.cs        # 🆕 追加
     └── Views/
-        ├── DifyConfigDialog.xaml
-        └── DifyConfigDialog.xaml.cs
+        ├── DifyConfigDialog.xaml         # 🆕 追加
+        └── DifyConfigDialog.xaml.cs      # 🆕 追加
 ```
+
+**NuGetパッケージ**（未インストールの場合）:
 
 ```powershell
 Install-Package CommunityToolkit.Mvvm
@@ -73,13 +84,13 @@ Install-Package Microsoft.Extensions.DependencyInjection
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 2 — セキュア設定の実装
+### Step 2 — Dify設定モデルの追加
 
-Dify APIの認証情報をDPAPI暗号化で安全に保存するときに使用します。
+DPAPI暗号化APIキー付きのDify API設定を定義するときに使用します。
 
-DPAPI暗号化の設定モデルとJSON永続化サービスを作成します。
+**前提条件**：先に`dotnet-wpf-secure-config`を適用して`DpapiEncryptor`、`SecureConfigService`、`AppConfigModel`をセットアップしてください。
 
-**DifyConfigModel.cs** — 暗号化APIキーと社員番号付き設定データ：
+**DifyConfigModel.cs** — Dify固有の設定データ（`Infrastructure/Configuration/`に追加）：
 
 ```csharp
 public class DifyConfigModel
@@ -101,67 +112,40 @@ public class DifyConfigModel
 }
 ```
 
-**DpapiEncryptor.cs** — Windows DPAPIラッパー：
+**AppConfigModelを更新**（Difyプロパティを追加）：
 
 ```csharp
-public class DpapiEncryptor
+public class AppConfigModel
 {
-    // ✅ アプリケーションごとにこのソルト値を変更すること
-    private static readonly byte[] Entropy
-        = Encoding.UTF8.GetBytes("YourApp_Config_Salt_2026");
-
-    public static string Encrypt(string plainText)
-    {
-        if (string.IsNullOrEmpty(plainText)) return string.Empty;
-        byte[] encrypted = ProtectedData.Protect(
-            Encoding.UTF8.GetBytes(plainText),
-            Entropy, DataProtectionScope.CurrentUser);
-        return Convert.ToBase64String(encrypted);
-    }
-
-    public static string Decrypt(string encryptedText)
-    {
-        if (string.IsNullOrEmpty(encryptedText)) return string.Empty;
-        byte[] decrypted = ProtectedData.Unprotect(
-            Convert.FromBase64String(encryptedText),
-            Entropy, DataProtectionScope.CurrentUser);
-        return Encoding.UTF8.GetString(decrypted);
-    }
+    public DifyConfigModel DifyApi { get; set; } = new();  // 🆕 追加
+    // public OracleConfigModel OracleDb { get; set; } = new();  // Oracleスキルが追加
+    public string Version { get; set; } = "1.0";
 }
 ```
 
-**SecureConfigService.cs** — `%LOCALAPPDATA%`へのJSON永続化：
+**ISecureConfigServiceとSecureConfigServiceを更新**（Difyメソッドを追加）：
 
 ```csharp
-public class SecureConfigService : ISecureConfigService
+// ISecureConfigService — 追加:
+Task<DifyConfigModel> LoadDifyConfigAsync();
+Task SaveDifyConfigAsync(DifyConfigModel config);
+
+// SecureConfigService — 実装:
+public async Task<DifyConfigModel> LoadDifyConfigAsync()
 {
-    private readonly string _configFilePath;
+    var appConfig = await LoadAppConfigAsync();
+    return appConfig.DifyApi;
+}
 
-    public SecureConfigService()
-    {
-        string dir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "YourAppName", "config");
-        Directory.CreateDirectory(dir);
-        _configFilePath = Path.Combine(dir, "config.json");
-    }
-
-    public async Task<DifyConfigModel> LoadDifyConfigAsync()
-    {
-        if (!File.Exists(_configFilePath)) return new DifyConfigModel();
-        string json = await File.ReadAllTextAsync(_configFilePath);
-        return JsonSerializer.Deserialize<DifyConfigModel>(json)
-               ?? new DifyConfigModel();
-    }
-
-    public async Task SaveDifyConfigAsync(DifyConfigModel config)
-    {
-        await File.WriteAllTextAsync(_configFilePath,
-            JsonSerializer.Serialize(config,
-                new JsonSerializerOptions { WriteIndented = true }));
-    }
+public async Task SaveDifyConfigAsync(DifyConfigModel config)
+{
+    var appConfig = await LoadAppConfigAsync();
+    appConfig.DifyApi = config;
+    await SaveAppConfigAsync(appConfig);
 }
 ```
+
+`DpapiEncryptor`、`SecureConfigService`フレームワーク、`AppConfigModel`ベースについては`dotnet-wpf-secure-config`を参照してください。
 
 > **Values**: 基礎と型 / ニュートラル
 
