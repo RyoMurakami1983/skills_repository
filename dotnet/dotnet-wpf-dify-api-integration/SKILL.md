@@ -24,6 +24,8 @@ Use this skill when:
 
 ## Related Skills
 
+- **`dotnet-wpf-secure-config`** — Required: DPAPI encryption foundation (apply first)
+- **`dotnet-oracle-wpf-integration`** — Shares SecureConfigService when used in the same app
 - **`tdd-standard-practice`** — Test generated code with Red-Green-Refactor
 - **`git-commit-practices`** — Commit each step as an atomic change
 - **`skills-validate-skill`** — Validate this skill's quality
@@ -73,13 +75,13 @@ Install-Package Microsoft.Extensions.DependencyInjection
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 2 — Implement Secure Configuration
+### Step 2 — Add Dify Config Model
 
-Use when storing Dify API credentials securely with DPAPI encryption.
+Use when defining the Dify API configuration with DPAPI-encrypted API key.
 
-Create the DPAPI-encrypted config model and JSON persistence service.
+**Prerequisite**: Apply `dotnet-wpf-secure-config` first to set up `DpapiEncryptor`, `SecureConfigService`, and `AppConfigModel`.
 
-**DifyConfigModel.cs** — Setting data with encrypted API key and employee ID:
+**DifyConfigModel.cs** — Dify-specific setting data (add to `Infrastructure/Configuration/`):
 
 ```csharp
 public class DifyConfigModel
@@ -101,67 +103,40 @@ public class DifyConfigModel
 }
 ```
 
-**DpapiEncryptor.cs** — Windows DPAPI wrapper:
+**Update AppConfigModel** (add Dify property):
 
 ```csharp
-public class DpapiEncryptor
+public class AppConfigModel
 {
-    // ✅ Change this salt per application
-    private static readonly byte[] Entropy
-        = Encoding.UTF8.GetBytes("YourApp_Config_Salt_2026");
-
-    public static string Encrypt(string plainText)
-    {
-        if (string.IsNullOrEmpty(plainText)) return string.Empty;
-        byte[] encrypted = ProtectedData.Protect(
-            Encoding.UTF8.GetBytes(plainText),
-            Entropy, DataProtectionScope.CurrentUser);
-        return Convert.ToBase64String(encrypted);
-    }
-
-    public static string Decrypt(string encryptedText)
-    {
-        if (string.IsNullOrEmpty(encryptedText)) return string.Empty;
-        byte[] decrypted = ProtectedData.Unprotect(
-            Convert.FromBase64String(encryptedText),
-            Entropy, DataProtectionScope.CurrentUser);
-        return Encoding.UTF8.GetString(decrypted);
-    }
+    public DifyConfigModel DifyApi { get; set; } = new();  // 🆕 Add this
+    // public OracleConfigModel OracleDb { get; set; } = new();  // Added by Oracle skill
+    public string Version { get; set; } = "1.0";
 }
 ```
 
-**SecureConfigService.cs** — JSON persistence to `%LOCALAPPDATA%`:
+**Update ISecureConfigService and SecureConfigService** (add Dify methods):
 
 ```csharp
-public class SecureConfigService : ISecureConfigService
+// ISecureConfigService — add:
+Task<DifyConfigModel> LoadDifyConfigAsync();
+Task SaveDifyConfigAsync(DifyConfigModel config);
+
+// SecureConfigService — implement:
+public async Task<DifyConfigModel> LoadDifyConfigAsync()
 {
-    private readonly string _configFilePath;
+    var appConfig = await LoadAppConfigAsync();
+    return appConfig.DifyApi;
+}
 
-    public SecureConfigService()
-    {
-        string dir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "YourAppName", "config");
-        Directory.CreateDirectory(dir);
-        _configFilePath = Path.Combine(dir, "config.json");
-    }
-
-    public async Task<DifyConfigModel> LoadDifyConfigAsync()
-    {
-        if (!File.Exists(_configFilePath)) return new DifyConfigModel();
-        string json = await File.ReadAllTextAsync(_configFilePath);
-        return JsonSerializer.Deserialize<DifyConfigModel>(json)
-               ?? new DifyConfigModel();
-    }
-
-    public async Task SaveDifyConfigAsync(DifyConfigModel config)
-    {
-        await File.WriteAllTextAsync(_configFilePath,
-            JsonSerializer.Serialize(config,
-                new JsonSerializerOptions { WriteIndented = true }));
-    }
+public async Task SaveDifyConfigAsync(DifyConfigModel config)
+{
+    var appConfig = await LoadAppConfigAsync();
+    appConfig.DifyApi = config;
+    await SaveAppConfigAsync(appConfig);
 }
 ```
+
+For `DpapiEncryptor`, `SecureConfigService` framework, and `AppConfigModel` base — see `dotnet-wpf-secure-config`.
 
 > **Values**: 基礎と型 / ニュートラル
 
