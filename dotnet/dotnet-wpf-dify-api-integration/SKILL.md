@@ -46,27 +46,36 @@ Use this skill when:
 
 ### Step 1 — Set Up Project Structure
 
-Use when initializing the solution structure and dependencies for Dify integration.
+### Step 1 — Verify Prerequisites and Add Dify Files
 
-Create the layered folder structure and install NuGet packages.
+Use when adding Dify-specific files to a project that already has `dotnet-wpf-secure-config` applied.
+
+**Prerequisites** (must be completed first):
+- `dotnet-wpf-secure-config` skill applied
+- `Infrastructure/Configuration/` folder exists with:
+  - `DpapiEncryptor.cs`
+  - `SecureConfigService.cs`
+  - `ISecureConfigService.cs`
+  - `AppConfigModel.cs`
+
+**Files to add** (Dify-specific):
 
 ```
 YourApp/
 ├── Infrastructure/
 │   ├── Configuration/
-│   │   ├── DifyConfigModel.cs
-│   │   ├── DpapiEncryptor.cs
-│   │   ├── SecureConfigService.cs
-│   │   └── ISecureConfigService.cs
-│   └── Difys/
-│       └── DifyApiService.cs
+│   │   └── DifyConfigModel.cs          # 🆕 Add this
+│   └── Difys/                           # 🆕 Create this folder
+│       └── DifyApiService.cs            # 🆕 Add this
 └── Presentation/
     ├── ViewModels/
-    │   └── DifyConfigViewModel.cs
+    │   └── DifyConfigViewModel.cs       # 🆕 Add this
     └── Views/
-        ├── DifyConfigDialog.xaml
-        └── DifyConfigDialog.xaml.cs
+        ├── DifyConfigDialog.xaml        # 🆕 Add this
+        └── DifyConfigDialog.xaml.cs     # 🆕 Add this
 ```
+
+**NuGet packages** (if not already installed):
 
 ```powershell
 Install-Package CommunityToolkit.Mvvm

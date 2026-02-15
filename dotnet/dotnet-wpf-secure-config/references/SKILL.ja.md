@@ -20,9 +20,9 @@ version: 1.0.0
 - 既存の`Infrastructure/Configuration/`層を新しいWPFプロジェクトに移植する場合
 - 平文の`appsettings.json`資格情報をDPAPI暗号化に置き換える場合
 
-**前提スキル（これを先に適用）**：
-- `dotnet-oracle-wpf-integration` — Oracle DB接続（暗号化資格情報使用）
-- `dotnet-wpf-dify-api-integration` — Dify API統合（暗号化APIキー使用）
+**このスキルが前提となるスキル**：
+- `dotnet-oracle-wpf-integration` — このセキュリティ基盤を使用してOracle DB接続を追加
+- `dotnet-wpf-dify-api-integration` — このセキュリティ基盤を使用してDify API統合を追加
 
 ---
 
@@ -513,4 +513,5 @@ logger.LogInformation($"Password: {DpapiEncryptor.MaskSensitive(password)}");
 
 ## Resources
 
-- `local_docs/共通セキュリティコンポーネント.md` — 日本語での完全な実装リファレンス（内部ドキュメント、このリポジトリでは追跡対象外）
+- 共通セキュリティコンポーネント — 完全な実装リファレンス（内部ドキュメント、このリポジトリ外で管理）
+- [Microsoft: Data Protection API (DPAPI)](https://docs.microsoft.com/windows/win32/seccng/data-protection-api)

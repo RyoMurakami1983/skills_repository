@@ -46,27 +46,36 @@ WPFアプリケーションにDify API連携を追加するためのエンドツ
 
 ### Step 1 — プロジェクト構造のセットアップ
 
-ソリューション構造とDify連携用の依存関係を初期化するときに使用します。
+### Step 1 — 前提条件確認とDify固有ファイル追加
 
-階層化フォルダ構造を作成し、NuGetパッケージをインストールします。
+`dotnet-wpf-secure-config` 適用済みプロジェクトにDify固有ファイルを追加するときに使用します。
+
+**前提条件**（先に完了必須）:
+- `dotnet-wpf-secure-config` スキル適用済み
+- `Infrastructure/Configuration/` フォルダに以下が存在:
+  - `DpapiEncryptor.cs`
+  - `SecureConfigService.cs`
+  - `ISecureConfigService.cs`
+  - `AppConfigModel.cs`
+
+**追加するファイル**（Dify固有）:
 
 ```
 YourApp/
 ├── Infrastructure/
 │   ├── Configuration/
-│   │   ├── DifyConfigModel.cs
-│   │   ├── DpapiEncryptor.cs
-│   │   ├── SecureConfigService.cs
-│   │   └── ISecureConfigService.cs
-│   └── Difys/
-│       └── DifyApiService.cs
+│   │   └── DifyConfigModel.cs           # 🆕 追加
+│   └── Difys/                            # 🆕 フォルダ作成
+│       └── DifyApiService.cs             # 🆕 追加
 └── Presentation/
     ├── ViewModels/
-    │   └── DifyConfigViewModel.cs
+    │   └── DifyConfigViewModel.cs        # 🆕 追加
     └── Views/
-        ├── DifyConfigDialog.xaml
-        └── DifyConfigDialog.xaml.cs
+        ├── DifyConfigDialog.xaml         # 🆕 追加
+        └── DifyConfigDialog.xaml.cs      # 🆕 追加
 ```
+
+**NuGetパッケージ**（未インストールの場合）:
 
 ```powershell
 Install-Package CommunityToolkit.Mvvm
