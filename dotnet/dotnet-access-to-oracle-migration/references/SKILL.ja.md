@@ -84,6 +84,7 @@ ORA-*エラーコードを学習シグナルとして活用し、DSN・認証・
 
 ```powershell
 # ✅ 正解 — エラーハンドリング付き接続テスト
+Add-Type -Path "Oracle.ManagedDataAccess.dll"
 $conn = New-Object Oracle.ManagedDataAccess.Client.OracleConnection
 $conn.ConnectionString = "User Id=SCHEMA_A;Password=your_password;Data Source=192.0.2.10:1521/prod_service"
 
@@ -183,7 +184,7 @@ WHERE s."ship_date" >= '202601'
 ```powershell
 # ✅ 正解 — Oracleレコード数を取得して比較
 $cmd = $conn.CreateCommand()
-$cmd.CommandText = "SELECT COUNT(*) FROM SCHEMA_A.\`"production_info\`" s WHERE s.\`"ship_date\`" >= '202601'"
+$cmd.CommandText = 'SELECT COUNT(*) FROM SCHEMA_A."production_info" s WHERE s."ship_date" >= ''202601'''
 $oracleCount = [int]$cmd.ExecuteScalar()
 $accessCount = 178
 

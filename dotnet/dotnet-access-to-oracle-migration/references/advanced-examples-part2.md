@@ -98,7 +98,7 @@ if ($missingColumns.Count -eq 0) {
 │ 5. VALIDATE COLUMNS                                             │
 │    → all_tab_columns WHERE owner='SCHEMA_B' AND table_name='...'│
 │    → Compare with Access column list                            │
-│    → ✓ All 178 columns exist                                   │
+│    → ✓ All required columns exist                               │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐

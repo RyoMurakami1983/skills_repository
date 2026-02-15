@@ -20,7 +20,7 @@ foreach ($dsn in $dsnNames) {
     $tnspingOutput = tnsping $dsn 2>&1
     
     if ($tnspingOutput -match 'HOST = ([^)]+)') {
-        $host = $Matches[1]
+        $dbHost = $Matches[1]
     }
     if ($tnspingOutput -match 'PORT = ([^)]+)') {
         $port = $Matches[1]
@@ -30,7 +30,7 @@ foreach ($dsn in $dsnNames) {
     }
     
     # Build EZ Connect string
-    $ezConnect = "$host`:$port/$serviceName"
+    $ezConnect = "$dbHost`:$port/$serviceName"
     Write-Host "EZ Connect: $ezConnect" -ForegroundColor Green
 }
 ```
@@ -145,7 +145,7 @@ ORDER BY
 
 ---
 
-## Pattern 9: Advanced - Resource Disposal with using Statements
+## Pattern 10: Advanced - Resource Disposal with using Statements
 
 **Use Case**: Proper IDisposable management for Oracle connections
 
@@ -212,9 +212,4 @@ Console.WriteLine($"Retrieved {results.Rows.Count} records");
 
 **See Also**:
 - [SKILL.md](../SKILL.md) - Main skill documentation
-- [anti-patterns.md](anti-patterns.md) - Common mistakes to avoid
 - [SKILL.ja.md](SKILL.ja.md) - 日本語版
-
-**Related Files**:
-- [OracleApp/SampleDataExtractor.cs](../../../OracleApp/SampleDataExtractor.cs) - Production implementation
-- [OracleApp/BaseExtractor.cs](../../../OracleApp/BaseExtractor.cs) - Reference implementation

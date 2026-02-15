@@ -141,7 +141,7 @@ ORDER BY owner, object_name;
 
 > **Values**: ニュートラル / 基礎と型
 
-> 📚 **Advanced**: SYNONYM referent resolution and multi-owner scenarios → See [references/advanced-examples.md](references/advanced-examples.md#pattern-5-advanced---synonym-resolution)
+> 📚 **Advanced**: SYNONYM referent resolution and multi-owner scenarios → See [references/advanced-examples-part2.md](references/advanced-examples-part2.md#pattern-5-advanced---synonym-resolution)
 
 ### Step 6 — Validate Column Existence
 
@@ -165,7 +165,7 @@ ORDER BY column_id;
 
 > **Values**: 基礎と型 / 継続は力
 
-> 📚 **Advanced**: Batch column verification → See [references/advanced-examples.md](references/advanced-examples.md#pattern-6-advanced---batch-column-verification)
+> 📚 **Advanced**: Batch column verification → See [references/advanced-examples-part2.md](references/advanced-examples-part2.md#pattern-6-advanced---batch-column-verification)
 
 ### Step 7 — Convert SQL Syntax (3 Rules)
 
@@ -191,7 +191,7 @@ WHERE s."ship_date" >= '202601'
 
 > **Values**: 基礎と型 / ニュートラル
 
-> 📚 **Advanced**: Multi-table JOIN conversion → See [references/advanced-examples.md](references/advanced-examples.md#pattern-7-intermediate---multi-table-join)
+> 📚 **Advanced**: Multi-table JOIN conversion → See [references/advanced-examples.md](references/advanced-examples.md)
 
 ### Step 8 — Validate with Near Equal
 
@@ -199,9 +199,8 @@ Execute converted SQL in Oracle and compare record count to Access count. Accept
 
 ```powershell
 # ✅ CORRECT — Count Oracle records and compare
-$sql = "SELECT COUNT(*) FROM SCHEMA_A.\`"production_info\`" s WHERE s.\`"ship_date\`" >= '202601'"
 $cmd = $conn.CreateCommand()
-$cmd.CommandText = $sql
+$cmd.CommandText = 'SELECT COUNT(*) FROM SCHEMA_A."production_info" s WHERE s."ship_date" >= ''202601'''
 $oracleCount = [int]$cmd.ExecuteScalar()
 $accessCount = 178  # From user
 
