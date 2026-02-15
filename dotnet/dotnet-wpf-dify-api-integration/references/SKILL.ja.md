@@ -44,6 +44,8 @@ WPFアプリケーションにDify API連携を追加するためのエンドツ
 
 ### Step 1 — プロジェクト構造のセットアップ
 
+ソリューション構造とDify連携用の依存関係を初期化するときに使用します。
+
 階層化フォルダ構造を作成し、NuGetパッケージをインストールします。
 
 ```
@@ -73,15 +75,19 @@ Install-Package Microsoft.Extensions.DependencyInjection
 
 ### Step 2 — セキュア設定の実装
 
+Dify APIの認証情報をDPAPI暗号化で安全に保存するときに使用します。
+
 DPAPI暗号化の設定モデルとJSON永続化サービスを作成します。
 
-**DifyConfigModel.cs** — 暗号化APIキー付き設定データ：
+**DifyConfigModel.cs** — 暗号化APIキーと社員番号付き設定データ：
 
 ```csharp
 public class DifyConfigModel
 {
     public string BaseUrl { get; set; } = string.Empty;
     public string ApiKeyEncrypted { get; set; } = string.Empty;
+    // ✅ Difyログ用に社員番号を使用（Windows ユーザー名はPII漏洩リスク）
+    public string EmployeeId { get; set; } = string.Empty;
 
     public string GetDecryptedApiKey()
         => DpapiEncryptor.Decrypt(ApiKeyEncrypted);
@@ -144,19 +150,15 @@ public class SecureConfigService : ISecureConfigService
     {
         if (!File.Exists(_configFilePath)) return new DifyConfigModel();
         string json = await File.ReadAllTextAsync(_configFilePath);
-        var app = JsonSerializer.Deserialize<AppConfigModel>(json);
-        return app?.DifyApi ?? new DifyConfigModel();
+        return JsonSerializer.Deserialize<DifyConfigModel>(json)
+               ?? new DifyConfigModel();
     }
 
     public async Task SaveDifyConfigAsync(DifyConfigModel config)
     {
-        var app = File.Exists(_configFilePath)
-            ? JsonSerializer.Deserialize<AppConfigModel>(
-                await File.ReadAllTextAsync(_configFilePath)) ?? new()
-            : new AppConfigModel();
-        app.DifyApi = config;
         await File.WriteAllTextAsync(_configFilePath,
-            JsonSerializer.Serialize(app, new JsonSerializerOptions { WriteIndented = true }));
+            JsonSerializer.Serialize(config,
+                new JsonSerializerOptions { WriteIndented = true }));
     }
 }
 ```
@@ -165,7 +167,11 @@ public class SecureConfigService : ISecureConfigService
 
 ### Step 3 — APIクライアントの実装（アップロード + SSE）
 
+Dify APIへのファイルアップロードとワークフロー実行を接続するときに使用します。
+
 ファイルアップロードとストリーミングワークフロー実行を持つ`DifyApiService`を作成します。
+
+> **注意**: サンプルでは簡潔さのため`using var client = new HttpClient()`を使用しています。本番環境ではソケット枯渇を防ぐため、DIに登録した`IHttpClientFactory`の使用を推奨します。
 
 **ファイルアップロード** (`/v1/files/upload`)：
 
@@ -187,7 +193,8 @@ public class DifyApiService
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
 
         using var form = new MultipartFormDataContent();
-        form.Add(new StringContent($"{Environment.UserName}"), "user");
+        // ✅ 社員番号を使用 — Windowsユーザー名の外部サービスへの漏洩を防止
+        form.Add(new StringContent(config.EmployeeId), "user");
         var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
         form.Add(fileContent, "file", Path.GetFileName(filePath));
@@ -218,8 +225,9 @@ public async Task<string> RunWorkflowStreamingAsync(
     inputs["pdf_file"] = new {
         transfer_method = "local_file", upload_file_id = uploadFileId, type = "document"
     };
+    // ✅ Difyログ用に社員番号を使用（追跡可能だが悪用不可）
     var body = new { inputs, response_mode = "streaming",
-        user = $"{Environment.UserName}-{Environment.MachineName}" };
+        user = config.EmployeeId };
 
     var content = new StringContent(
         JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
@@ -282,6 +290,8 @@ private async Task<string> ReadSseStreamAsync(
 
 ### Step 4 — MVVM設定UIの構築
 
+Dify API設定ダイアログを作成・更新するときに使用します。
+
 Dify API設定用のViewModelとXAMLダイアログを作成します。
 
 **DifyConfigViewModel.cs**：
@@ -293,6 +303,7 @@ public partial class DifyConfigViewModel : ObservableObject
 
     [ObservableProperty] private string baseUrl = string.Empty;
     [ObservableProperty] private string apiKey = string.Empty;
+    [ObservableProperty] private string employeeId = string.Empty;
     [ObservableProperty] private string statusMessage = string.Empty;
     [ObservableProperty] private bool isSaving;
 
@@ -303,7 +314,17 @@ public partial class DifyConfigViewModel : ObservableObject
     {
         var cfg = await _configService.LoadDifyConfigAsync();
         BaseUrl = cfg.BaseUrl;
-        ApiKey = cfg.GetDecryptedApiKey();
+        EmployeeId = cfg.EmployeeId;
+        try
+        {
+            ApiKey = cfg.GetDecryptedApiKey();
+        }
+        catch (CryptographicException)
+        {
+            // ユーザープロファイルやマシンが変更された場合、DPAPI復号化に失敗
+            ApiKey = string.Empty;
+            StatusMessage = "保存されたAPIキーの復号化に失敗しました。再入力してください。";
+        }
     }
 
     [RelayCommand]
@@ -313,11 +334,22 @@ public partial class DifyConfigViewModel : ObservableObject
         { StatusMessage = "ベースURLとAPIキーは必須です。"; return; }
 
         IsSaving = true;
-        var config = new DifyConfigModel { BaseUrl = BaseUrl };
-        config.SetApiKey(ApiKey);
-        await _configService.SaveDifyConfigAsync(config);
-        StatusMessage = "保存しました。";
-        IsSaving = false;
+        try
+        {
+            var config = new DifyConfigModel
+                { BaseUrl = BaseUrl, EmployeeId = EmployeeId };
+            config.SetApiKey(ApiKey);
+            await _configService.SaveDifyConfigAsync(config);
+            StatusMessage = "保存しました。";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"保存に失敗しました: {ex.Message}";
+        }
+        finally
+        {
+            IsSaving = false;
+        }
     }
 }
 ```
@@ -345,6 +377,8 @@ public partial class DifyConfigDialog : Window
 
 ### Step 5 — DI配線と起動
 
+サービスを登録し、設定ダイアログを初めて起動するときに使用します。
+
 `App.xaml.cs`でサービスを登録し、設定ダイアログを接続します。
 
 ```csharp
@@ -370,6 +404,8 @@ new DifyConfigDialog(vm).ShowDialog();
 
 ### Step 6 — アプリケーション固有のカスタマイズ
 
+生成されたコードを本番デプロイ用に準備するときに使用します。
+
 出荷前にこれらのプレースホルダーを置き換えてください：
 
 | 項目 | ファイル | 変更内容 |
@@ -378,6 +414,7 @@ new DifyConfigDialog(vm).ShowDialog();
 | ソルト値 | `DpapiEncryptor.cs` | `Entropy`バイト配列の値 |
 | 名前空間 | 全`.cs`ファイル | `YourApp` → 実際の名前空間 |
 | ワークフロー入力 | `DifyApiService.cs` | `inputs`辞書のキー |
+| 社員番号 | `DifyConfigDialog.xaml` | 社員番号入力用TextBox追加 |
 
 > **Values**: ニュートラル / 基礎と型
 
@@ -493,8 +530,8 @@ var result = await difyService.RunWorkflowStreamingAsync(..., progress);
 
 ## リソース
 
-- [local_docs/DifyAPI実装ガイド.md](../../local_docs/DifyAPI実装ガイド.md) — 完全な実装リファレンス
-- [local_docs/共通セキュリティコンポーネント.md](../../local_docs/共通セキュリティコンポーネント.md) — DPAPI詳細
+- `local_docs/DifyAPI実装ガイド.md` — 完全な実装リファレンス（社内限定ドキュメント、本リポジトリ外）
+- `local_docs/共通セキュリティコンポーネント.md` — DPAPI詳細（社内限定ドキュメント、本リポジトリ外）
 - [CommunityToolkit.Mvvm ドキュメント](https://learn.microsoft.com/ja-jp/dotnet/communitytoolkit/mvvm/)
 - [Dify APIドキュメント](https://docs.dify.ai/)
 
