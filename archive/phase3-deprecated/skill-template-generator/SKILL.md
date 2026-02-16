@@ -1,9 +1,10 @@
 ---
 name: skill-template-generator
 description: Router skill. Use when unsure which template generation workflow to use.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, router, templates]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, router, templates]
+  invocable: false
 ---
 
 # Skill Template Generator (Router)
@@ -111,20 +112,3 @@ For the original reference materials, see `references/`.
 - [assets/SKILL_TEMPLATE.ja.md](assets/SKILL_TEMPLATE.ja.md) — Japanese template
 
 ---
-
-## Changelog
-
-### Version 2.0.0 (2026-02-13)
-- **Breaking**: Converted to router skill (single workflow)
-- **Migrated**: 7 patterns → `skills-generate-skill-template`, `skills-generate-skill-suite`
-- **Preserved**: Generator script and template assets in this directory
-
-### Version 1.0.0 (2026-02-12)
-- Initial release with 7 pattern sections
-- Basic and bilingual template generation
-- Customization support
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

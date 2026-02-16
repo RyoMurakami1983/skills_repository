@@ -1,9 +1,10 @@
 ---
 name: skills-optimize-skill-discoverability
 description: Improve skill name, description, and tags for better agent activation. Use when skills are not being found.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, discoverability, naming]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, discoverability, naming]
+  invocable: false
 ---
 
 # Optimize Skill Discoverability
@@ -211,15 +212,3 @@ Test that agents can find the skill:
 - [Agent Skills Specification](https://agentskills.io/specification) — Official metadata rules
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- Initial release: discoverability optimization workflow
-- Naming convention reference (`<context>-<workflow>`)
-- Description, tags, and "When to Use" optimization steps
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

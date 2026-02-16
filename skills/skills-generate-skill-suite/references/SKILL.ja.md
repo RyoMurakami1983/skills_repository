@@ -6,9 +6,10 @@
 ---
 name: skills-generate-skill-suite
 description: Generate multiple related skills as a coordinated suite. Use when splitting a domain into workflow skills.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, generator, suite, migration]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, generator, suite, migration]
+  invocable: false
 ---
 
 # スキルスイートを生成する
@@ -96,9 +97,3 @@ invocable: false
 - [ ] 各スキルを`skills-validate-skill`で検証
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- 初版リリース：スイート生成ワークフロー
-- レガシー`skill-template-generator`のマルチパターン生成概念から移行

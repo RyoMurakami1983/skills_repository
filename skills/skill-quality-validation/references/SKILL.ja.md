@@ -1,9 +1,10 @@
 ---
 name: skill-quality-validation
 description: GitHub Copilot agentスキルの品質を検証する。SKILL.mdのレビュー時に使用する。
-author: RyoMurakami1983
-tags: [copilot, agent-skills, quality, validation, testing]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, quality, validation, testing]
+  invocable: false
 ---
 
 # Skill品質検証
@@ -552,35 +553,3 @@ python validate_skill.py --skill my-skill --full-check
 - **[Development Philosophy](../../.github/copilot-instructions.md)** - Valuesと規範
 
 ---
-
-## 変更履歴
-
-### Version 3.0.0 (2026-02-12)
-- **チェックリスト拡張**: 56 → 64項目（+8）
-- **行数最適化追加**: 500行推奨、550行許容
-- **references/検証追加**: ディレクトリ構造の検証
-- **日英対応追加**: 日本語版ボーナス
-- **Values統合追加**: 開発哲学整合チェック
-- **コード長制限追加**: 例は15行以内推奨
-- **Progressive Disclosure追加**: >500行はreferences/へ
-- **しきい値更新**: 全体85% → 80%（51/64）
-- **新スクリプト**: PowerShell/Bashラッパー追加
-
-### Version 2.0.0 (2026-02-12)
-- **行数最適化**: 780行 → 335行（57%削減）
-- **アンチパターン移動**: `references/anti-patterns.md`へ
-- **検証ロジック簡略化**: 擬似コード化
-- **56項目維持**: 既存基準を保持
-- **相互参照追加**: anti-patterns/validation-examples
-
-### Version 1.0.0 (2026-02-12)
-- 初版リリース
-- 56項目チェックリスト
-- 4カテゴリスコアリング
-- 自動検証例
-- レポート生成パターン
-
-<!-- 
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

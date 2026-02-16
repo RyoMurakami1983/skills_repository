@@ -1,9 +1,10 @@
 ---
 name: skills-validate-skill
 description: Run quality validation on a SKILL.md with scoring and actionable report. Use when reviewing skills.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, validation, quality]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, validation, quality]
+  invocable: false
 ---
 
 # Validate a Skill
@@ -24,7 +25,6 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skills-remediate-validation-findings`** — Fix issues found during validation
 - **`skills-author-skill`** — Write a new skill following best practices
 - **`skills-refactor-skill-to-single-workflow`** — Convert legacy multi-pattern skills
 - **`skills-revise-skill`** — Revise and version existing skills
@@ -51,10 +51,10 @@ Check the physical file structure and section ordering. These are prerequisites 
 | # | Check | Rule | Severity |
 |---|-------|------|----------|
 | S1 | Single file | SKILL.md is primary file (references/ allowed) | Critical |
-| S2 | YAML frontmatter | Contains name, description, author, tags, invocable | Critical |
+| S2 | YAML frontmatter | Contains name, description, metadata(author/tags/invocable) | Critical |
 | S3 | Name consistency | `name:` matches directory name (kebab-case) | Critical |
 | S4 | Naming convention | Follows `<context>-<workflow>` format | Warning |
-| S5 | Description length | ≤ 100 characters, includes "Use when..." | Error |
+| S5 | Description length | ≤ 1024 characters, includes "Use when..." | Error |
 | S6 | When to Use position | First H2 section after title | Error |
 | S7 | Core Principles | Section exists with 3–5 principles | Error |
 | S8 | Single workflow | One `## Workflow:` section (not multiple `## Pattern N:`) | Error |
@@ -163,7 +163,22 @@ Compile results into a structured report:
 
 ### Step 6 — Re-validate After Fixes
 
-After applying fixes (via `skills-remediate-validation-findings`), re-run the full validation to confirm no regressions.
+After applying fixes, re-run the full validation to confirm no regressions.
+
+### Step 7 — Remediate by Severity (Integrated)
+
+Use this integrated loop to fix findings systematically:
+
+1. Fix **Critical** items first (hard gates)
+2. Fix **Error** items next (publish blockers)
+3. Fix **Warning** items to push quality from 80% to 90%+
+4. Re-run full validation after each fix batch
+
+Common remediation actions:
+- Multiple patterns → consolidate to one `## Workflow:` with `### Step N`
+- Missing Values integration → add explicit Value linkage in Core Principles
+- Oversized file → move details to `references/` and keep SKILL.md lean
+- Missing JA parity → mirror section/step/table structure in `references/SKILL.ja.md`
 
 ---
 
@@ -273,8 +288,8 @@ After applying fixes (via `skills-remediate-validation-findings`), re-run the fu
    └─ FAIL → Improve writing
 
 5. Overall ≥ 80% + all categories ≥ 80%?
-   ├─ YES → ✅ PUBLISH
-   └─ NO  → Iterate with skills-remediate-validation-findings
+    ├─ YES → ✅ PUBLISH
+   └─ NO  → Iterate with integrated remediation loop (Step 7)
 ```
 
 ### Severity Levels
@@ -290,23 +305,8 @@ After applying fixes (via `skills-remediate-validation-findings`), re-run the fu
 
 ## Resources
 
-- [skills-remediate-validation-findings](../skills-remediate-validation-findings/SKILL.md) — Fix validation issues
 - [skills-author-skill](../skills-author-skill/SKILL.md) — Authoring best practices
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — Development constitution and Values
 - Validation scripts: `../skill-quality-validation/scripts/` (validate_skill.py/.ps1/.sh)
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- Initial release: single-workflow validation process
-- Migrated from legacy `skill-quality-validation` (6 patterns, 64-item checklist)
-- Streamlined to 37-item checklist aligned with "1 skill = 1 workflow" standard
-- Added severity levels (Critical/Error/Warning/Bonus)
-- Structured report template with actionable fix recommendations
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

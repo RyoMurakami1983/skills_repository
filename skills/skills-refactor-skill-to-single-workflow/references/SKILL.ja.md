@@ -6,9 +6,10 @@
 ---
 name: skills-refactor-skill-to-single-workflow
 description: Convert a legacy multi-pattern skill into a single-workflow skill. Use when migrating existing skills.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, refactoring, migration]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, refactoring, migration]
+  invocable: false
 ---
 
 # スキルを単一ワークフローにリファクタリングする
@@ -140,9 +141,3 @@ invocable: false
 - [ ] 検証: 全結果に`skills-validate-skill`を実行
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- 初版リリース：レガシーマルチパターンスキルの移行ワークフロー
-- 監査→グループ化→作成→ルーター→検証パイプラインを含む

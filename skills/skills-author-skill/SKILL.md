@@ -1,14 +1,19 @@
 ---
 name: skills-author-skill
-description: Write a new SKILL.md from scratch following single-workflow best practices. Use when creating agent skills.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, authoring, documentation]
-invocable: false
+description: >
+  Write a new SKILL.md from scratch following Agent Skills best practices.
+  Use when creating a new skill and deciding the right pattern (workflow,
+  cycle, situational/router, cascade, parallel, or multi-MCP), defining
+  trigger-focused frontmatter, and structuring bilingual documentation.
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, authoring, documentation]
+  invocable: false
 ---
 
 # Author a New Agent Skill
 
-End-to-end workflow for writing a high-quality SKILL.md that follows the "1 skill = 1 workflow" principle, passes quality validation, and integrates with the development constitution (PHILOSOPHY.md).
+End-to-end workflow for writing a high-quality SKILL.md that follows the "1 skill = 1 pattern" principle, passes quality validation, and integrates with the development constitution (PHILOSOPHY.md).
 
 ## When to Use This Skill
 
@@ -24,20 +29,19 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skills-generate-skill-template`** — Generate a skeleton before writing content
 - **`skills-validate-skill`** — Validate the finished skill against quality criteria
 - **`skills-refactor-skill-to-single-workflow`** — Convert legacy multi-pattern skills
-- **`skills-optimize-skill-discoverability`** — Improve name/description/tags after authoring
+- **`skills-revise-skill`** — Revise and optimize discoverability after publishing
 
 ---
 
 ## Core Principles
 
-1. **One Skill = One Workflow** — A skill documents exactly one end-to-end workflow, not a collection of topics (基礎と型)
-2. **Reader-First Design** — Enable readers to determine relevance within 5 seconds (ニュートラル)
-3. **Progressive Disclosure** — Keep SKILL.md ≤ 500 lines; move advanced details to `references/` (基礎と型)
-4. **Explain WHY** — Comments and text explain rationale, transforming tacit knowledge into shared assets (成長の複利)
-5. **Values Integration** — Every skill connects to PHILOSOPHY.md Values; Core Principles cite at least 2 Values (温故知新)
+1. **One Skill = One Pattern** — A skill should teach one executable pattern (workflow/cycle/router/etc.), not a topic dump (基礎と型)
+2. **Concise is Key** — The context window is a public good; keep essential guidance in SKILL.md and move deep details to `references/` (余白の設計)
+3. **Reader-First Design** — Enable readers to determine relevance within 5 seconds (ニュートラル)
+4. **Set Degrees of Freedom** — Choose strictness based on fragility: low for error-prone operations, high for context-dependent tasks (基礎と型)
+5. **Values Integration** — Every skill connects to PHILOSOPHY.md Values; cite at least 2 including `余白の設計` where relevant (成長の複利)
 
 ---
 
@@ -50,10 +54,11 @@ Choose a name following the `<context>-<workflow>` convention (kebab-case, verb-
 ```yaml
 ---
 name: <context>-<verb>-<object>
-description: <what it does>. Use when <activation scenario>. # ≤ 100 chars
-author: RyoMurakami1983
-tags: [tag1, tag2, tag3]   # 3-5 technology-focused tags
-invocable: false
+description: <what it does>. Use when <activation scenario>. # ≤ 1024 chars
+metadata:
+  author: RyoMurakami1983
+  tags: [tag1, tag2, tag3]   # 3-5 technology-focused tags
+  invocable: false
 ---
 ```
 
@@ -68,10 +73,26 @@ invocable: false
 
 **Rules**:
 - `name` must equal directory name
-- `description` includes "Use when..." for agent activation
-- `author: RyoMurakami1983` for skills created under this system
+- `description` includes concrete "Use when..." triggers (this is used for skill activation)
+- Use only standard top-level keys: `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility`
+- Place custom fields (`author`, `tags`, `invocable`) under `metadata`
 
-### Step 2 — Write "When to Use This Skill"
+### Step 2 — Generate Initial Skeleton (Integrated)
+
+Choose one scaffold method and create a minimal structure before writing:
+
+```
+<skill-name>/
+├── SKILL.md
+└── references/
+    └── SKILL.ja.md
+```
+
+Scaffold options:
+- Manual copy from this skill's section order template
+- Script generation (if available in your environment)
+- AI-assisted skeleton generation, then immediate placeholder replacement
+### Step 3 — Write "When to Use This Skill"
 
 This must be the **first H2 section** after the title. Write 5–8 specific, action-oriented scenarios.
 
@@ -79,7 +100,7 @@ This must be the **first H2 section** after the title. Write 5–8 specific, act
 ## When to Use This Skill
 
 Use this skill when:
-- <Verb>-led scenario 1 (50-100 chars)
+- <Verb>-led scenario 1 (specific and concrete)
 - <Verb>-led scenario 2
 - ...
 ```
@@ -90,7 +111,9 @@ Use this skill when:
 - ❌ No abstract phrases ("When you want quality code")
 - ❌ No more than 8 items
 
-### Step 3 — Define Core Principles (3–5)
+**Important**: `description` is the trigger surface for activation; this section is loaded after activation and serves as execution-time guidance.
+
+### Step 4 — Define Core Principles (3–5)
 
 Connect each principle to at least one PHILOSOPHY Value.
 
@@ -102,11 +125,20 @@ Connect each principle to at least one PHILOSOPHY Value.
 3. **Principle Name** — Short explanation (Value名)
 ```
 
-Available Values: 基礎と型 / 成長の複利 / 温故知新 / 継続は力 / ニュートラル
+Available Values: 基礎と型 / 成長の複利 / 温故知新 / 継続は力 / ニュートラル / 余白の設計
 
-### Step 4 — Write the Single Workflow
+### Step 5 — Choose and Write One Pattern
 
-Structure the workflow as sequential steps. Use a single `## Workflow:` section (not numbered `## Pattern N:` sections).
+Select one pattern that matches the task, then write the skill around that single pattern.
+
+| Pattern | Use when | Typical structure |
+|---|---|---|
+| Sequential Workflow | Ordered steps with low branching | `## Workflow:` + `### Step N` |
+| Cycle/Loop | Iterative improve-validate-fix flow | loop stages + exit criteria |
+| Situational/Router | Decision-based branching by context | decision table + routes |
+| Cascade | Progressive refinement through stages | stage-by-stage filters |
+| Parallel | Independent subtasks can run concurrently | split/merge workflow |
+| Multi-MCP | Multiple external systems/agents coordinate | orchestration + contracts |
 
 ```markdown
 ## Workflow: <Workflow Name>
@@ -127,7 +159,7 @@ Explanation + example
 - ✅ Inline examples ≤ 15 lines; longer examples go to `references/`
 - ✅ Comments explain WHY, not WHAT
 
-### Step 5 — Add Good Practices & Pitfalls
+### Step 6 — Add Good Practices & Pitfalls
 
 ```markdown
 ## Good Practices
@@ -144,7 +176,7 @@ Explanation + example
 **Solution**: How to fix it.
 ```
 
-### Step 6 — Add Quick Reference & Resources
+### Step 7 — Add Quick Reference & Resources
 
 ```markdown
 ## Quick Reference
@@ -155,7 +187,7 @@ Explanation + example
 - [Link 2](url) - Description
 ```
 
-### Step 7 — Manage File Size
+### Step 8 — Manage File Size
 
 If SKILL.md exceeds ~450 lines, proactively move content to `references/`:
 
@@ -168,11 +200,11 @@ my-skill/
     └── anti-patterns.md        # Extended anti-patterns
 ```
 
-### Step 8 — Create Japanese Version
+### Step 9 — Create Japanese Version
 
 Create `references/SKILL.ja.md` with identical structure. The Japanese version may include deeper "Why" explanations.
 
-### Step 9 — Validate
+### Step 10 — Validate
 
 Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% overall, ≥ 80% per category.
 
@@ -263,7 +295,7 @@ Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% ov
 
 **Why It's Wrong**: Placeholders confuse agents; generic content provides no value.
 
-**Better Approach**: Use `skills-generate-skill-template` for scaffolding, then fill every section with domain-specific content.
+**Better Approach**: Generate/prepare a skeleton in Step 2, then fill every section with domain-specific content.
 
 ---
 
@@ -271,7 +303,7 @@ Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% ov
 
 ### Skill Authoring Checklist
 
-- [ ] YAML frontmatter: name, description (with "Use when..."), author, tags
+- [ ] YAML frontmatter: name, description (with "Use when..."), metadata(author/tags/invocable)
 - [ ] `name` matches directory name, follows `<context>-<workflow>` convention
 - [ ] "When to Use This Skill" is first H2 (5–8 verb-led scenarios)
 - [ ] Core Principles (3–5) with ≥ 2 Values references
@@ -301,7 +333,7 @@ Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% ov
 10. ## Anti-Patterns
 11. ## Quick Reference
 12. ## Resources
-13. ## Changelog
+13. (No changelog section; use git history)
 ```
 
 ---
@@ -312,20 +344,5 @@ Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% ov
 - [Agent Skills Specification](https://agentskills.io/specification)
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — Development constitution and Values
 - [skills-validate-skill](../skills-validate-skill/SKILL.md) — Quality validation
-- [skills-generate-skill-template](../skills-generate-skill-template/SKILL.md) — Template generation
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- Initial release: single-workflow authoring guide
-- Migrated from legacy `skill-writing-guide` (multi-pattern style)
-- Integrated "1 skill = 1 workflow" principle
-- Added `<context>-<workflow>` naming convention
-- Constitution Values integration throughout
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

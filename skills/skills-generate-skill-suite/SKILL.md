@@ -1,14 +1,17 @@
 ---
 name: skills-generate-skill-suite
 description: Generate multiple related skills as a coordinated suite. Use when splitting a domain into workflow skills.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, generator, suite, migration]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, generator, suite, migration]
+  invocable: false
 ---
 
 # Generate a Skill Suite
 
 End-to-end workflow for generating multiple related single-workflow skills as a coordinated suite, including a router skill, consistent naming, and cross-references. This is the replacement for legacy "multi-pattern skills."
+
+Use Model Context Protocol (MCP) patterns when orchestrating multi-skill execution across tools.
 
 ## When to Use This Skill
 
@@ -23,7 +26,7 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skills-generate-skill-template`** — Generate a single skill (this skill generates multiple)
+- **`skills-author-skill`** — Generate and author a single skill (this skill generates multiple)
 - **`skills-refactor-skill-to-single-workflow`** — Migration methodology for existing skills
 - **`skills-author-skill`** — Fill each generated skeleton with content
 - **`skills-validate-skill`** — Validate each skill in the suite
@@ -49,14 +52,14 @@ Plan the family of skills:
 ## Suite Plan: skills-system
 
 Context prefix: skills-
-Router: skill-writing-guide (existing, convert to router)
+Router: (optional) suite-index router if your domain requires it
 
 Workflow Skills:
 1. skills-author-skill — Write a new skill end-to-end
 2. skills-validate-skill — Run quality validation
-3. skills-remediate-validation-findings — Fix validation issues
-4. skills-generate-skill-template — Generate a skeleton
-5. skills-optimize-skill-discoverability — Improve naming/tags
+3. skills-validate-skill — Validate and remediate issues
+4. skills-author-skill — Generate/author each skeleton
+5. skills-revise-skill — Improve naming/discoverability after publication
 ```
 
 **Suite rules**:
@@ -66,31 +69,31 @@ Workflow Skills:
 
 ### Step 2 — Generate All Skeletons
 
-For each skill in the suite, generate the skeleton using `skills-generate-skill-template`:
+For each skill in the suite, generate the initial skeleton using `skills-author-skill` Step 2:
 
 ```bash
 # Generate each skill
-for skill in skills-author-skill skills-validate-skill skills-remediate-validation-findings; do
+for skill in skills-author-skill skills-validate-skill skills-revise-skill; do
   python scripts/generate_template.py --name "$skill" --tags "copilot,agent-skills"
 done
 ```
 
-Or generate manually by copying the template from `skills-generate-skill-template`.
+Or generate manually by copying the section-order template from `skills-author-skill`.
 
 ### Step 3 — Generate the Router Skill
 
-Create (or convert) a router skill that links all suite members:
+Create (or convert) a router skill that links all suite members. Use imperative routing language so intent selection is explicit.
 
 ```markdown
 ## Related Skills (Suite Members)
 
-| Your Intent | Use This Skill |
-|-------------|---------------|
-| Write a new skill | skills-author-skill |
-| Validate a skill | skills-validate-skill |
-| Fix validation issues | skills-remediate-validation-findings |
-| Generate a template | skills-generate-skill-template |
-| Improve discoverability | skills-optimize-skill-discoverability |
+| Your Intent | Use This Skill | Why |
+|-------------|---------------|-----|
+| Write a new skill | skills-author-skill | Provides skeleton + authoring workflow |
+| Validate a skill | skills-validate-skill | Provides scoring and report generation |
+| Fix validation issues | skills-validate-skill | Includes integrated remediation loop |
+| Generate a template | skills-author-skill | Includes integrated skeleton step |
+| Improve discoverability | skills-revise-skill | Handles metadata and trigger optimization |
 ```
 
 ### Step 4 — Add Cross-References
@@ -101,7 +104,7 @@ Ensure each skill's "Related Skills" section references other suite members:
 ## Related Skills
 
 - **`skills-validate-skill`** — Validate after authoring
-- **`skills-generate-skill-template`** — Generate skeleton before authoring
+- **`skills-author-skill`** — Generate skeleton before authoring
 ```
 
 ### Step 5 — Verify Consistency
@@ -193,21 +196,8 @@ Use `skills-author-skill` to fill each skeleton, then `skills-validate-skill` to
 
 ## Resources
 
-- [skills-generate-skill-template](../skills-generate-skill-template/SKILL.md) — Single skill generation
+- [skills-author-skill](../skills-author-skill/SKILL.md) — Single skill generation and authoring
 - [skills-refactor-skill-to-single-workflow](../skills-refactor-skill-to-single-workflow/SKILL.md) — Migration guide
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — Development constitution and Values
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- Initial release: suite generation workflow
-- Migrated concept from legacy `skill-template-generator` multi-pattern generation
-- Added router skill generation as mandatory suite component
-- Consistency verification checklist
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

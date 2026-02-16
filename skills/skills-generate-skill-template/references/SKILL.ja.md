@@ -6,9 +6,10 @@
 ---
 name: skills-generate-skill-template
 description: Generate a single-workflow skill skeleton with bilingual support. Use when starting a new skill.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, generator, scaffolding]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, generator, scaffolding]
+  invocable: false
 ---
 
 # スキルテンプレートを生成する
@@ -137,10 +138,3 @@ invocable: false
 - テンプレートアセット: `../skill-template-generator/assets/`
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- 初版リリース：単一ワークフローテンプレート生成
-- レガシー`skill-template-generator`（7パターン）から移行
-- 「1スキル＝1ワークフロー」構造にテンプレートを更新

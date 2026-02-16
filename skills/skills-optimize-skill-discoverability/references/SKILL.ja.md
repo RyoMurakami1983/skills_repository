@@ -6,9 +6,10 @@
 ---
 name: skills-optimize-skill-discoverability
 description: Improve skill name, description, and tags for better agent activation. Use when skills are not being found.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, discoverability, naming]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, discoverability, naming]
+  invocable: false
 ---
 
 # スキルの発見性を最適化する
@@ -96,9 +97,3 @@ AIエージェント（Copilot、Claude、Codex）がスキルを確実に見つ
 - [ ] "When to Use"に5〜8個の具体的、動詞先導シナリオ
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- 初版リリース：発見性最適化ワークフロー
-- 命名規約リファレンス（`<context>-<workflow>`）

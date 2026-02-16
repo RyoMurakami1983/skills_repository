@@ -1,9 +1,10 @@
 ---
 name: skill-writing-guide
 description: 高品質なGitHub Copilot agentスキル執筆ガイド。SKILL.md作成時に使用する。
-author: RyoMurakami1983
-tags: [copilot, agent-skills, documentation, writing-guide]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, documentation, writing-guide]
+  invocable: false
 ---
 
 # Skill執筆ガイド
@@ -939,75 +940,3 @@ timeout = 30  # Why: 大量データ処理時に10秒では不足。
 - [SKILL_TEMPLATE.ja.md](../../.copilot/docs/SKILL_TEMPLATE.ja.md) - Japanese template
 
 ---
-
-## 変更履歴
-
-CHANGELOG.mdに詳細を記載。直近の変更：
-
-### Version 2.1.0 (2026-02-13)
-- **グッドプラクティスセクション追加**: 4つの重要なグッドプラクティスとValues統合（詳細版）
-- **アンチパターンセクション強化**: 4つのアンチパターンに拡張（日本語版は詳細解説付き）
-- **日本語版の独立**: references/SKILL.ja.md から SKILL.ja.md に移行（人間向け詳細版として）
-- **段階的開示の実装**: 詳細なアンチパターンは references/anti-patterns.md へ（英語版）
-- **Whyの充実**: 日本語版で各パターンの理由と背景を詳細に説明
-
-### Version 2.0.0 (2026-02-12)
-- **Core Principles拡張**: Values統合（基礎と型、成長の複利、温故知新、継続は力、ニュートラル）
-- **Pattern 8更新**: 500行推奨 + 550行許容（+10%）
-- **開発哲学の統合**: Valuesとパターンを整合
-- **WHY説明の強調**: 成長の複利に沿った説明追加
-- **品質検証同期**: skill-quality-validation 64項目と整合
-
-### Version 1.0.0 (2026-02-12)
-- 初版リリース
-- 8パターンを収録
-- コード例ベストプラクティス定義
-- アンチパターンと落とし穴の区別
-- 段階的開示戦略を導入
-
----
-
-## 日本語版について（About Japanese Version）
-
-このファイル（SKILL.ja.md）は**人間向けの詳細な日本語版**です。
-
-### ファイル構成
-- **SKILL.md**: 英語版・AI向け（約500行、簡潔）
-  - GitHub Copilot AgentがSKILL.mdを読み込むため、簡潔にする
-  - 必須のグッドパターンと基本例を集約
-  
-- **SKILL.ja.md**: 日本語版・人間向け（行数制限なし、詳細）
-  - Whyの説明を充実（なぜそのパターンなのか、価値観との関連）
-  - 具体例を豊富に（実際のコード、シナリオ、チェックリスト）
-  - 学習資産として活用（成長の複利の実現）
-
-- **references/anti-patterns.md**: 詳細なアンチパターン解説（英語）
-  - SKILL.mdの500行制限を守るため、詳細は分離
-  - 症状、具体例、改善策を詳述
-
-### なぜ分離するのか？
-
-**SKILL.md（英語・AI向け）**:
-- GitHub Copilot Agentが読み込むため、500行前後が理想
-- AIエージェントの処理効率を維持
-- 必須のグッドパターンを素早く参照
-
-**SKILL.ja.md（日本語・人間向け）**:
-- 行数制限を気にせず、Whyを詳細に説明
-- 学習資産として活用（成長の複利）
-- チーム内での知識共有に最適
-- 新しいメンバーのオンボーディングに活用
-
-### 推奨される使い方
-
-1. **AIエージェントに任せる時**: SKILL.mdを参照（GitHub Copilotが自動で使用）
-2. **自分で学ぶ時**: SKILL.ja.md を読む（Whyが詳しい）
-3. **チームに教える時**: SKILL.ja.md を共有（日本語で詳細）
-4. **深掘りしたい時**: references/anti-patterns.md も参照（英語だが具体例豊富）
-
----
-
-**Author**: RyoMurakami1983  
-**Last Updated**: 2026-02-13  
-**English Version**: SKILL.md (concise, ~500 lines for AI agents)  
-**Detailed Anti-Patterns**: references/anti-patterns.md (English)

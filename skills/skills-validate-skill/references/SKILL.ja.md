@@ -6,9 +6,10 @@
 ---
 name: skills-validate-skill
 description: Run quality validation on a SKILL.md with scoring and actionable report. Use when reviewing skills.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, validation, quality]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, validation, quality]
+  invocable: false
 ---
 
 # スキルを検証する
@@ -44,7 +45,7 @@ SKILL.mdファイルに対して品質検証を実行し、構造・コンテン
 **Why**: 構造が基礎です。基礎が揺らいでいる上に応用を積んでも、必ず崩れる。これが基礎と型の追求です。
 
 **主要チェック項目**:
-- YAML frontmatter完備（name, description, author, tags, invocable）
+- YAML frontmatter完備（name, description, metadata(author/tags/invocable)）
 - `name:`がディレクトリ名と一致（kebab-case）
 - "When to Use"が最初のH2
 - 単一`## Workflow:`セクション（複数`## Pattern N:`ではない）
@@ -79,6 +80,14 @@ SKILL.mdファイルに対して品質検証を実行し、構造・コンテン
 ### ステップ6 — 修正後の再検証
 
 修正適用後、完全な検証を再実行して退行がないことを確認。
+
+### ステップ7 — 重要度順の修正ループ（統合）
+
+検証結果を以下の順序で修正:
+1. Critical（公開ブロック）
+2. Error（公開前必須）
+3. Warning（90%+達成）
+4. 再検証
 
 ---
 
@@ -141,10 +150,3 @@ SKILL.mdファイルに対して品質検証を実行し、構造・コンテン
 | Bonus | 追加品質ポイント | あれば良い |
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- 初版リリース：単一ワークフロー検証プロセス
-- レガシー`skill-quality-validation`（6パターン、64項目チェックリスト）から移行
-- 「1スキル＝1ワークフロー」標準に合わせた37項目チェックリストに整理

@@ -5,15 +5,20 @@
 
 ---
 name: skills-author-skill
-description: Write a new SKILL.md from scratch following single-workflow best practices. Use when creating agent skills.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, authoring, documentation]
-invocable: false
+description: >
+  Write a new SKILL.md from scratch following Agent Skills best practices.
+  Use when creating a new skill and deciding the right pattern (workflow,
+  cycle, situational/router, cascade, parallel, or multi-MCP), defining
+  trigger-focused frontmatter, and structuring bilingual documentation.
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, authoring, documentation]
+  invocable: false
 ---
 
 # 新しいエージェントスキルを作成する
 
-「1スキル＝1ワークフロー」原則に従い、品質検証に合格し、開発憲法（PHILOSOPHY.md）と統合された高品質なSKILL.mdを一から書くためのワークフロー。
+「1スキル＝1パターン」原則に従い、品質検証に合格し、開発憲法（PHILOSOPHY.md）と統合された高品質なSKILL.mdを一から書くためのワークフロー。
 
 ## When to Use This Skill
 
@@ -29,20 +34,19 @@ invocable: false
 
 ## Related Skills
 
-- **`skills-generate-skill-template`** — コンテンツ記述前にスケルトンを生成
 - **`skills-validate-skill`** — 完成したスキルを品質基準で検証
 - **`skills-refactor-skill-to-single-workflow`** — レガシーのマルチパターンスキルを変換
-- **`skills-optimize-skill-discoverability`** — 作成後にname/description/tagsを改善
+- **`skills-revise-skill`** — 公開後の改訂と発見性最適化
 
 ---
 
 ## Core Principles
 
-1. **1スキル＝1ワークフロー** — スキルはトピック集ではなく、1つのエンドツーエンドワークフローを文書化する（基礎と型）
-2. **読者ファーストの設計** — 読者が5秒以内に関連性を判断できるようにする（ニュートラル）
-3. **段階的開示** — SKILL.md ≤ 500行; 高度な詳細は`references/`へ（基礎と型）
-4. **WHYを説明する** — コメントとテキストで根拠を説明し、暗黙知を共有資産に変換（成長の複利）
-5. **Values統合** — すべてのスキルはPHILOSOPHY.mdのValuesと接続する; Core Principlesは最低2つのValuesを引用（温故知新）
+1. **1スキル＝1パターン** — スキルはトピック集ではなく、1つの実行可能パターン（workflow/cycle/router等）を文書化する（基礎と型）
+2. **簡潔さを最優先** — コンテキストは公共財。SKILL.mdは要点に絞り、詳細は`references/`へ（余白の設計）
+3. **読者ファーストの設計** — 読者が5秒以内に関連性を判断できるようにする（ニュートラル）
+4. **自由度を設計する** — 壊れやすい作業は厳密に、文脈依存作業は柔軟に設計する（基礎と型）
+5. **Values統合** — すべてのスキルはPHILOSOPHY.mdのValuesと接続し、必要に応じて`余白の設計`も明示する（成長の複利）
 
 ---
 
@@ -55,10 +59,11 @@ invocable: false
 ```yaml
 ---
 name: <context>-<verb>-<object>
-description: <何をするか>. Use when <活性化シナリオ>. # ≤ 100文字
-author: RyoMurakami1983
-tags: [tag1, tag2, tag3]   # 3-5個の技術タグ
-invocable: false
+description: <何をするか>. Use when <活性化シナリオ>. # ≤ 1024文字
+metadata:
+  author: RyoMurakami1983
+  tags: [tag1, tag2, tag3]   # 3-5個の技術タグ
+  invocable: false
 ---
 ```
 
@@ -72,45 +77,77 @@ invocable: false
 
 **Why**: 命名規約は「型」です。型があるから迷わず速く動ける。これが基礎と型の追求の実践です。
 
-### ステップ2 — 「When to Use This Skill」を書く
+**補足ルール**:
+- `description` は発動トリガー面なので、具体的な "Use when..." を含める（≤1024文字）
+- トップレベルキーは `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility` に限定
+- `author` / `tags` / `invocable` は `metadata` 配下に置く
+
+### ステップ2 — 初期スケルトンを生成（統合）
+
+執筆前に最小構造を作成します。
+
+```
+<skill-name>/
+├── SKILL.md
+└── references/
+    └── SKILL.ja.md
+```
+
+方法:
+- このスキルのセクション順テンプレートを手動で作成
+- 環境にスクリプトがある場合はスクリプト生成
+- AIで骨子生成後、プレースホルダーを即時置換
+
+### ステップ3 — 「When to Use This Skill」を書く
 
 タイトル後の**最初のH2セクション**でなければなりません。5〜8個の具体的で行動指向のシナリオを書きます。
 
 **Why**: 「誰もが5秒で判断できる」ことがニュートラルな視点の実践。曖昧な表現は個人知のままです。
 
-### ステップ3 — Core Principles定義（3〜5個）
+**重要**: スキル発動に使われるのは主に `description` であり、このセクションは発動後の実行ガイドです。
+
+### ステップ4 — Core Principles定義（3〜5個）
 
 各原則を最低1つのPHILOSOPHY Valueに接続します。
 
 **Why**: Valuesとの接続が、このスキルを「ただのドキュメント」から「開発哲学の実践」に変えます。これが温故知新 — 過去の知恵と新しい技術を繋ぐことです。
 
-### ステップ4 — 単一ワークフローを書く
+### ステップ5 — 1つのパターンを選び、記述する
 
-ワークフローを順序立てたステップとして構成します。番号付き`## Pattern N:`セクションではなく、単一の`## Workflow:`セクションを使用します。
+タスクに合うパターンを1つ選んで、そのパターン中心でスキルを構成します。
 
-**Why**: 「1スキル＝1ワークフロー」の原則は、最小形式で最大可能性を生む設計思想（基礎と型）から来ています。複数のパターンを詰め込むと、AIのコンテキストを無駄に消費し、人間の読み手も迷います。
+| パターン | 使う場面 | 典型構造 |
+|---|---|---|
+| Sequential Workflow | 順序固定の実行手順 | `## Workflow:` + `### Step N` |
+| Cycle/Loop | 改善→検証→修正を反復 | ループ段階 + 終了条件 |
+| Situational/Router | 状況で分岐判断が必要 | Decision Table + 分岐先 |
+| Cascade | 段階的に精度を上げる | ステージ別の精錬 |
+| Parallel | 独立タスクを並列処理できる | 分割/統合フロー |
+| Multi-MCP | 複数システム/エージェント連携 | オーケストレーション + 契約 |
 
-### ステップ5 — Good PracticesとPitfallsを追加
+**Why**: 「1スキル＝1パターン」の原則は、最小形式で最大可能性を生む設計思想（基礎と型）から来ています。複数パターンを詰め込むと、AIのコンテキストを無駄に消費し、人間の読み手も迷います。
+
+### ステップ6 — Good PracticesとPitfallsを追加
 
 各Good PracticeにはValuesリンクを含めます。各PitfallにはProblem/Solutionの構造を使用します。
 
-### ステップ6 — Quick ReferenceとResourcesを追加
+### ステップ7 — Quick ReferenceとResourcesを追加
 
 チェックリスト、デシジョンツリー、またはサマリーテーブルを提供します。
 
-### ステップ7 — ファイルサイズ管理
+### ステップ8 — ファイルサイズ管理
 
 SKILL.mdが〜450行を超えたら、積極的にコンテンツを`references/`に移動します。
 
 **Why**: 500行制限はAIエージェントのコンテキストウィンドウ効率のため。基礎と型 — 最小形式で最大可能性を解放する設計思想です。
 
-### ステップ8 — 日本語版作成
+### ステップ9 — 日本語版作成
 
 `references/SKILL.ja.md`を同一構造で作成。日本語版ではより深い「なぜ」の説明を含められます。
 
 **Why**: 継続は力 — バイリンガル対応を最初から習慣にすることで、後からの対応コストを削減します。
 
-### ステップ9 — 検証
+### ステップ10 — 検証
 
 `skills-validate-skill`を実行して品質基準をチェック。全体≥80%、カテゴリごと≥80%を目標にします。
 
@@ -150,7 +187,7 @@ SKILL.mdが〜450行を超えたら、積極的にコンテンツを`references/
 
 **Problem**: 7〜10個の番号付き`## Pattern N:`セクションが実際には別々のワークフロー。
 
-**Solution**: 1スキル＝1ワークフロー。独立したワークフローは別のスキルに分割。
+**Solution**: 1スキル＝1パターン。独立したパターンは別のスキルに分割。
 
 ### 2. 曖昧な「When to Use」シナリオ
 
@@ -170,7 +207,7 @@ SKILL.mdが〜450行を超えたら、積極的にコンテンツを`references/
 
 ### スキル作成チェックリスト
 
-- [ ] YAMLフロントマター: name, description（"Use when..."含む）, author, tags
+- [ ] YAMLフロントマター: name, description（"Use when..."含む）, metadata(author/tags/invocable)
 - [ ] `name`がディレクトリ名と一致、`<context>-<workflow>`規約に従う
 - [ ] 「When to Use This Skill」が最初のH2（5〜8個の動詞先導シナリオ）
 - [ ] Core Principles（3〜5個）に≥2個のValues参照
@@ -188,15 +225,5 @@ SKILL.mdが〜450行を超えたら、積極的にコンテンツを`references/
 
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — 開発憲法とValues
 - [skills-validate-skill](../skills-validate-skill/SKILL.md) — 品質検証
-- [skills-generate-skill-template](../skills-generate-skill-template/SKILL.md) — テンプレート生成
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- 初版リリース：単一ワークフロー作成ガイド
-- レガシー`skill-writing-guide`（マルチパターン形式）から移行
-- 「1スキル＝1ワークフロー」原則を統合
-- `<context>-<workflow>`命名規約を追加
-- 全体を通じた開発憲法Values統合

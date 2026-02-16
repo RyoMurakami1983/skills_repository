@@ -1,10 +1,11 @@
 ---
 name: git-initial-setup
 description: git init/clone後のmain保護をデフォルト化する設定ガイド。初期セットアップで使う。
-author: RyoMurakami1983
-tags: [git, github, branch-protection, hooks, bootstrap]
-invocable: false
 version: 1.2.0
+metadata:
+  author: RyoMurakami1983
+  tags: [git, github, branch-protection, hooks, bootstrap]
+  invocable: false
 ---
 
 # Git初期セットアップ（main保護）
@@ -257,18 +258,3 @@ git branch --show-current
 - [Git Hooks Documentation](https://git-scm.com/docs/githooks)
 
 ---
-
-## 変更履歴
-
-### Version 1.2.0 (2026-02-12)
-- skill名をgit初期セットアップに変更
-- git init/clone向けのグローバルフック設定を追加
-
-### Version 1.1.0 (2026-02-12)
-- mainへのコミットを止めるpre-commitを追加
-- セットアップでpre-commit + pre-pushを導入
-
-### Version 1.0.0 (2026-02-12)
-- 初版リリース
-- ブランチ保護ルール + pre-pushフックを整理
-- Bash/PowerShellスクリプト同梱

@@ -1,9 +1,10 @@
 ---
 name: skills-remediate-validation-findings
 description: Fix validation failures systematically from a quality report. Use when a skill fails validation.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, remediation, quality]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, remediation, quality]
+  invocable: false
 ---
 
 # Remediate Validation Findings
@@ -230,15 +231,3 @@ Run `skills-validate-skill` one final time to confirm:
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — Values reference for integration fixes
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- Initial release: remediation workflow for validation findings
-- Severity-based triage and fix ordering
-- Common fix patterns for structure, content, and language issues
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->
