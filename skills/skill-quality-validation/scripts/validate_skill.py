@@ -109,6 +109,61 @@ class SkillValidator:
         match = re.match(r'^---\s*\n(.*?)\n---\s*\n', self.content, re.DOTALL)
         return match.group(1) if match else None
 
+    def parse_frontmatter(self) -> Dict:
+        """Parse frontmatter into a simplified dict without external deps."""
+        frontmatter = self.extract_frontmatter()
+        if not frontmatter:
+            return {}
+        lines = frontmatter.split('\n')
+        data: Dict[str, object] = {}
+        i = 0
+
+        while i < len(lines):
+            line = lines[i]
+            if not line.strip() or line.startswith(' ') or line.startswith('\t'):
+                i += 1
+                continue
+
+            m = re.match(r'^([A-Za-z0-9_-]+):\s*(.*)$', line)
+            if not m:
+                i += 1
+                continue
+
+            key = m.group(1)
+            val = m.group(2).strip()
+
+            if key == 'metadata':
+                meta: Dict[str, str] = {}
+                i += 1
+                while i < len(lines):
+                    sub = lines[i]
+                    if sub and not sub.startswith(' ') and not sub.startswith('\t'):
+                        break
+                    sm = re.match(r'^\s+([A-Za-z0-9_-]+):\s*(.*)$', sub)
+                    if sm:
+                        meta[sm.group(1)] = sm.group(2).strip().strip('"\'')
+                    i += 1
+                data[key] = meta
+                continue
+
+            if key == 'description' and val in {'>', '|', '>-', '|-'}:
+                folded: List[str] = []
+                i += 1
+                while i < len(lines):
+                    sub = lines[i]
+                    if sub and not sub.startswith(' ') and not sub.startswith('\t'):
+                        break
+                    if sub.strip():
+                        folded.append(sub.strip())
+                    i += 1
+                data[key] = ' '.join(folded).strip()
+                continue
+
+            data[key] = val.strip('"\'')
+            i += 1
+
+        return data
+
     def get_section_content(self, heading: str) -> Optional[str]:
         """Extract a section body while ignoring headings inside fenced code blocks."""
         lines = self.content.split('\n')
@@ -185,25 +240,28 @@ class StructureValidator(SkillValidator):
 
         # 1.2 YAML frontmatter present with required fields
         frontmatter = self.extract_frontmatter()
+        frontmatter_data = self.parse_frontmatter()
         has_required_fields = False
-        if frontmatter:
-            has_required_fields = all(field in frontmatter.lower() for field in ['name:', 'description:', 'invocable:'])
+        if frontmatter_data:
+            has_required_fields = all(k in frontmatter_data for k in ['name', 'description'])
         checks.append(CheckResult(
             "1.2",
-            "YAML frontmatter with name/description/invocable",
+            "YAML frontmatter with name/description",
             has_required_fields,
             "Found" if has_required_fields else "Missing or incomplete"
         ))
 
-        # 1.2b Author field present in YAML frontmatter
-        has_author = False
-        if frontmatter:
-            has_author = 'author:' in frontmatter.lower()
+        # 1.2b Metadata includes author/tags/invocable (legacy top-level also accepted)
+        metadata = frontmatter_data.get('metadata', {}) if isinstance(frontmatter_data.get('metadata', {}), dict) else {}
+        has_author = (
+            'author' in metadata or
+            ('author' in frontmatter_data and bool(frontmatter_data.get('author')))
+        )
         checks.append(CheckResult(
             "1.2b",
-            "YAML frontmatter includes author field",
+            "YAML frontmatter includes metadata author",
             has_author,
-            "Found" if has_author else "Missing author field"
+            "Found" if has_author else "Missing metadata.author"
         ))
 
         # 1.3 frontmatter name matches folder (kebab-case)
@@ -221,17 +279,21 @@ class StructureValidator(SkillValidator):
             f"Folder: {folder_name}"
         ))
 
-        # 1.4 description <= 100 chars
+        # 1.4 description <= 1024 chars and includes trigger phrase
         desc_match = re.search(r'description:\s*["\']?([^"\'\n]+)["\']?', frontmatter or '', re.IGNORECASE)
         desc_length_ok = False
-        if desc_match:
+        desc = ""
+        if isinstance(frontmatter_data.get('description'), str):
+            desc = frontmatter_data.get('description', '').strip()
+        elif desc_match:
             desc = desc_match.group(1).strip()
-            desc_length_ok = len(desc) <= 100
+        if desc:
+            desc_length_ok = len(desc) <= 1024 and 'use when' in desc.lower()
         checks.append(CheckResult(
             "1.4",
-            "Description ≤100 chars, problem-focused",
+            "Description ≤1024 chars and includes trigger phrase",
             desc_length_ok,
-            f"{len(desc_match.group(1).strip()) if desc_match else 0} chars"
+            f"{len(desc)} chars"
         ))
 
         # 1.5 "When to Use This Skill" is first H2

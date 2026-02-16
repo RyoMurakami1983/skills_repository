@@ -1,9 +1,10 @@
 ---
 name: skills-generate-skill-template
 description: Generate a single-workflow skill skeleton with bilingual support. Use when starting a new skill.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, generator, scaffolding]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, generator, scaffolding]
+  invocable: false
 ---
 
 # Generate a Skill Template
@@ -298,16 +299,3 @@ Run `skills-validate-skill` on the filled skill to confirm it passes.
 - Template assets: `../skill-template-generator/assets/`
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- Initial release: single-workflow template generation
-- Migrated from legacy `skill-template-generator` (7 patterns, ~1028 lines)
-- Updated template to "1 skill = 1 workflow" structure
-- Bilingual generation as default
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

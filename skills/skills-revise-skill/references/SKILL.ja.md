@@ -1,9 +1,10 @@
 ---
 name: skills-revise-skill
 description: Guide for revising GitHub Copilot agent skills and managing changelogs.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, revision, maintenance, changelog]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, revision, maintenance, changelog]
+  invocable: false
 ---
 
 # Skill修正ガイド
@@ -290,23 +291,3 @@ def batch_revise(skill_paths: list[Path], description: str):
 - [CHANGELOG_TEMPLATE.md](assets/CHANGELOG_TEMPLATE.md) - Changelogテンプレート
 
 ---
-
-## Changelog
-
-### Version 2.0.0 (2026-02-15)
-- Changed: マルチパターン形式 → 7ステップの単一ワークフローへ移行
-- Removed: 冗長なコードブロック（本質的なロジックに圧縮）
-- Changed: Best Practices SummaryをBest Practicesに統合
-- Changed: Common Pitfallsを箇条書き形式に圧縮
-
-### Version 1.0.0 (2026-02-12)
-- 初回リリース
-- 著者ベースのシステムスキル検出
-- CHANGELOG.md形式仕様
-- EN/JA同期パターン
-- バージョンアップ戦略
-
-<!-- 
-English version available at ../SKILL.md
-英語版は ../SKILL.md を参照してください
--->

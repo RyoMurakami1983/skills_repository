@@ -1,10 +1,11 @@
 ---
 name: git-initial-setup
 description: Default git setup to protect main after git init/clone. Use when standardizing repo bootstrap.
-author: RyoMurakami1983
-tags: [git, github, branch-protection, hooks, bootstrap]
-invocable: false
 version: 1.2.0
+metadata:
+  author: RyoMurakami1983
+  tags: [git, github, branch-protection, hooks, bootstrap]
+  invocable: false
 ---
 
 # Git Initial Setup for Main Protection
@@ -258,18 +259,3 @@ git branch --show-current
 - [Git Hooks Documentation](https://git-scm.com/docs/githooks)
 
 ---
-
-## Changelog
-
-### Version 1.2.0 (2026-02-12)
-- Renamed skill to git initial setup scope
-- Added global hook defaults for git init/clone
-
-### Version 1.1.0 (2026-02-12)
-- Added pre-commit hook to block commits on main
-- Setup scripts install pre-commit + pre-push
-
-### Version 1.0.0 (2026-02-12)
-- Initial release
-- Branch protection rules + pre-push hook guidance
-- Bash and PowerShell scripts included

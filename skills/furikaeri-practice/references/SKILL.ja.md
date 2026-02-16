@@ -1,10 +1,11 @@
 ---
 name: furikaeri-practice
 description: セッション終了時やPRレビュー後のふりかえり実践。改善サイクルを回したいときに使う。
-author: RyoMurakami1983
-tags: [retrospective, kaizen, kpt, ywt, continuous-improvement, team-growth]
-invocable: false
 version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [retrospective, kaizen, kpt, ywt, continuous-improvement, team-growth]
+  invocable: false
 ---
 
 # ふりかえりプラクティス

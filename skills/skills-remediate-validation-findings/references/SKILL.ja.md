@@ -6,9 +6,10 @@
 ---
 name: skills-remediate-validation-findings
 description: Fix validation failures systematically from a quality report. Use when a skill fails validation.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, remediation, quality]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, remediation, quality]
+  invocable: false
 ---
 
 # 検証結果の修復
@@ -115,9 +116,3 @@ Critical項目はすべてをブロック。YAML frontmatter欠損、name不一�
 | 日本語版なし | `references/SKILL.ja.md`を作成 |
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- 初版リリース：検証指摘事項の修復ワークフロー
-- 重要度ベースのトリアージと修正順序

@@ -1,9 +1,10 @@
 ---
 name: skills-refactor-skill-to-single-workflow
 description: Convert a legacy multi-pattern skill into a single-workflow skill. Use when migrating existing skills.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, refactoring, migration]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, refactoring, migration]
+  invocable: false
 ---
 
 # Refactor a Skill to Single Workflow
@@ -25,7 +26,7 @@ Use this skill when:
 
 - **`skills-author-skill`** — Write a new skill from scratch (use after splitting)
 - **`skills-validate-skill`** — Validate the refactored skill against quality criteria
-- **`skills-optimize-skill-discoverability`** — Improve naming/tags after refactoring
+- **`skills-revise-skill`** — Improve naming/discoverability after refactoring
 
 ---
 
@@ -78,7 +79,7 @@ Workflow 2: "Validate a skill" (if separate validation existed)
   → skills-validate-skill
 
 Workflow 3: "Optimize discoverability" (if separate)
-  → skills-optimize-skill-discoverability
+  → skills-revise-skill
 ```
 
 **Decision criteria for splitting**:
@@ -260,15 +261,3 @@ After consolidation:
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — Development constitution
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- Initial release: migration workflow for legacy multi-pattern skills
-- Includes audit → group → write → router → validate pipeline
-- Added decision tree for split vs. consolidate decisions
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

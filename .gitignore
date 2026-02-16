@@ -127,6 +127,11 @@ site/
 *.diff
 
 # RyoMurakami1983独自
-## AI・LLM・Agentに参照してもらうためのローカル開発資料置き場
-local_docs/
+## 開発時の外部参照資料置き場（ディレクトリのみ管理し、中身は追跡しない）
+local_docs/*
+!local_docs/.gitkeep
+!local_docs/.gitignore
+local_reference_skills/*
+!local_reference_skills/.gitkeep
+!local_reference_skills/.gitignore
 .github/skills/

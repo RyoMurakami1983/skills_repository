@@ -1,9 +1,10 @@
 ---
 name: skill-writing-guide
 description: Router skill. Use when unsure which skill-authoring workflow to use.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, router, writing]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, router, writing]
+  invocable: false
 ---
 
 # Skill Writing Guide (Router)
@@ -95,25 +96,3 @@ For the original reference materials, see `references/`.
 - [Agent Skills Specification](https://agentskills.io/specification)
 
 ---
-
-## Changelog
-
-### Version 3.0.0 (2026-02-13)
-- **Breaking**: Converted to router skill (single workflow)
-- **Migrated**: 9 patterns → `skills-author-skill`, `skills-refactor-skill-to-single-workflow`, `skills-optimize-skill-discoverability`
-- **Preserved**: Backward compatibility via routing table
-
-### Version 2.1.0 (2026-02-13)
-- Added Good Practices section with Values integration
-- Enhanced Anti-Patterns section
-
-### Version 2.0.0 (2026-02-12)
-- Expanded Core Principles with Values integration
-
-### Version 1.0.0 (2026-02-12)
-- Initial release with 8 pattern sections
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

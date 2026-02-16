@@ -6,9 +6,10 @@
 ---
 name: skill-template-generator
 description: Generate structured SKILL.md templates for GitHub Copilot agent skills. Use when starting a new skill from scratch or creating skill boilerplate.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, templates, generator, scaffolding]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, templates, generator, scaffolding]
+  invocable: false
 ---
 
 # Skill Template Generator
@@ -716,16 +717,3 @@ generator = CustomTemplateGenerator(
 - [skill-quality-validation](../skill-quality-validation/SKILL.md) - 生成されたスキルを検証
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-12)
-- 初版リリース
-- 基本およびバイリンガルテンプレート生成
-- カスタマイズサポート
-- `author: RyoMurakami1983`を自動的に含める
-
-<!-- 
-English version available at ../SKILL.md
-英語版は ../SKILL.md を参照してください
--->

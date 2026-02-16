@@ -5,11 +5,11 @@
 ## 📋 概要
 
 このリポジトリは、GitHub Copilot Agentで使用できる高品質なSkillsを集約・管理するためのものです。
-**「1 Skill = 1 Workflow」** 標準に基づき設計されており、各スキルは1つのワークフローに特化しています。
+**「1 Skill = 1 Pattern」** 標準に基づき設計されており、各スキルは1つの実行パターン（workflow/cycle/router等）に特化しています。
 
 ### 🎯 設計思想
 
-- **1 Skill = 1 Workflow**: 各スキルは単一のワークフローに集中し、≤500行で記述
+- **1 Skill = 1 Pattern**: 各スキルは単一の実行パターンに集中し、≤500行で記述
 - **DDD命名規則**: `<context>-<workflow>` 形式（例: `skills-author-skill`, `git-protect-main`）
 - **バイリンガル**: 英語 `SKILL.md` + 日本語 `references/SKILL.ja.md`
 - **憲法連携**: すべてのスキルが [PHILOSOPHY.md](PHILOSOPHY.md) のValuesと接続
@@ -64,6 +64,12 @@ uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\
 
 > 📖 Windows固有の設定（UTF-8、改行コード等）は [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md) を参照
 
+### 🗃️ ローカル参照ディレクトリ運用
+
+- `local_reference_skills/`: 外部skillの一時参照置き場（開発時のみ使用）
+- `local_docs/`: 外部ドキュメントの一時参照置き場（開発時のみ使用）
+- どちらも **ディレクトリのみGit管理**し、配下ファイルは `.gitignore` で追跡しません
+
 ## 🚀 インストール
 
 ### グローバルインストール（全プロジェクト共通）
@@ -109,6 +115,16 @@ rsync -a --delete /tmp/skills-repository/skills/ ~/.copilot/skills/
 
 > 注意: `cp -r` の再実行だけでは削除済みSkillが同期先に残る場合があります。更新時は `rsync --delete` を使用してください。
 
+**Codex（WSL利用）**:
+
+```bash
+# WSL上でCodex用skills配置（例: ~/.codex/skills）
+mkdir -p ~/.codex/skills
+rsync -a --delete /mnt/c/tools/skills_repository/skills/ ~/.codex/skills/
+```
+
+> Windows側のcloneが `C:\tools\skills_repository` の場合、WSLパスは `/mnt/c/tools/skills_repository` になります。
+
 ### プロジェクトインストール（プロジェクト固有）
 
 production/ や言語別Skillsは、プロジェクトの`.github/skills/`にコピーして使用します。
@@ -124,7 +140,7 @@ cp -r /tmp/skills-repository/production/* .github/skills/
 
 #### 1. テンプレート生成
 ```bash
-uv run python ~/.copilot/skills/skill-template-generator/scripts/generate_template.py
+skills-author-skill を使ってスケルトン作成（Step 2）
 ```
 
 #### 2. 品質検証
@@ -137,11 +153,9 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 **スキル作成系 (`skills-*`)**:
 - `skills-author-skill` — 新しいスキルを一から執筆
 - `skills-validate-skill` — スキルの品質検証
-- `skills-remediate-validation-findings` — 検証結果の修正
-- `skills-generate-skill-template` — テンプレート生成
 - `skills-generate-skill-suite` — 関連スキル群を一括生成
 - `skills-refactor-skill-to-single-workflow` — レガシー形式から移行
-- `skills-optimize-skill-discoverability` — 発見性を改善
+- `skills-revise-skill` — スキル改訂 + 発見性最適化
 - `skills-review-skill-enterprise-readiness` — エンタープライズ適性レビュー
 
 **Git/GitHub系**:
@@ -151,10 +165,9 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - `github-issue-intake` — スコープ外作業のIssue化
 - `skills-revise-skill` — スキルの修正・バージョン管理
 
-**ルータースキル**（後方互換）:
-- `skill-writing-guide` → skills-* 系へ振り分け
-- `skill-quality-validation` → skills-validate-skill / skills-remediate-validation-findings へ
-- `skill-template-generator` → skills-generate-skill-template / skills-generate-skill-suite へ
+**後方互換メモ**:
+- 旧ルータースキル/統合元スキルの `SKILL.md` は `archive/phase3-deprecated/` に移動済み
+- `skill-quality-validation/scripts/validate_skill.py` は現行検証スクリプトとして維持
 
 ## 📚 ドキュメント
 
@@ -166,14 +179,13 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 
 ### 新しいSkillを追加する
 
-1. `skills-generate-skill-template` でテンプレート生成
-2. `skills-author-skill` を参考に1ワークフローを記述
-3. `skills-validate-skill` で品質検証（80点以上）
-4. Pull Request作成
+1. `skills-author-skill` でスケルトン作成 + 本文執筆
+2. `skills-validate-skill` で品質検証（80点以上）
+3. Pull Request作成
 
 ### 貢献ガイドライン
 
-- **1 Skill = 1 Workflow** を厳守
+- **1 Skill = 1 Pattern** を厳守
 - 日本語と英語の両方でドキュメント作成
 - 品質検証で80点以上のスコアを維持
 - Conventional Commits形式でコミット

@@ -1,10 +1,11 @@
 ---
 name: github-issue-intake
 description: Capture deferred work as actionable GitHub issues. Use when triaging scope.
-author: RyoMurakami1983
-tags: [github, issues, triage, workflow, documentation]
-invocable: false
 version: 2.1.0
+metadata:
+  author: RyoMurakami1983
+  tags: [github, issues, triage, workflow, documentation]
+  invocable: false
 ---
 
 # Issue Intake
@@ -307,20 +308,3 @@ gh issue edit 123 --title "🟢 ..." --body-file issue.md
 - [GitHub CLI issue edit](https://cli.github.com/manual/gh_issue_edit)
 
 ---
-
-## Changelog
-
-### Version 2.1.0 (2026-02-13)
-- Added "refactor unclear issues" guidance (rewrite title/body with DoD)
-- Documented Windows/PowerShell-safe `--body-file` workflow (UTF-8)
-- Added priority marker scheme (🔴🟡🟢🔵) for titles
-
-### Version 2.0.0 (2026-02-12)
-- Migrated from 7-pattern format to single-workflow with 7 steps
-- Compressed examples: one best example per step
-- Added Japanese value tags to all Core Principles
-
-### Version 1.0.0 (2026-02-12)
-- Initial release
-- Decision, template, labeling, and PR linking patterns
-- CLI and GUI issue creation workflows

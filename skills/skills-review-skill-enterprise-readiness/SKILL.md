@@ -1,9 +1,10 @@
 ---
 name: skills-review-skill-enterprise-readiness
 description: Review a skill for enterprise deployment readiness — governance, security, testing, and operational concerns.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, enterprise, governance, security, review]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, enterprise, governance, security, review]
+  invocable: false
 ---
 
 # Review Skill Enterprise Readiness
@@ -32,7 +33,7 @@ Do **not** use this skill when:
 |-------|-------------|
 | [`skills-validate-skill`](../skills-validate-skill/SKILL.md) | Run quality validation first, then enterprise review |
 | [`skills-author-skill`](../skills-author-skill/SKILL.md) | Author skills that pass enterprise review from the start |
-| [`skills-remediate-validation-findings`](../skills-remediate-validation-findings/SKILL.md) | Fix issues found during review |
+| [`skills-validate-skill`](../skills-validate-skill/SKILL.md) | Validate and remediate issues found during review |
 
 ---
 
@@ -302,16 +303,3 @@ Skill ready for review?
 - [skills-author-skill](../skills-author-skill/SKILL.md) — Author enterprise-ready skills from the start
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- Initial release
-- 34-item enterprise readiness checklist across 4 categories
-- Tiered review approach (Personal/Team/Organization/External)
-- Report template with APPROVED/CONDITIONAL/REJECTED verdicts
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

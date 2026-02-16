@@ -1,10 +1,11 @@
 ---
 name: github-issue-intake
 description: スコープ外作業をIssueとして記録・具体化するためのガイド。トリアージと引き継ぎに使う。
-author: RyoMurakami1983
-tags: [github, issues, triage, workflow, documentation]
-invocable: false
 version: 2.1.0
+metadata:
+  author: RyoMurakami1983
+  tags: [github, issues, triage, workflow, documentation]
+  invocable: false
 ---
 
 # Issueインテーク
@@ -283,20 +284,3 @@ A: コメントで済ませず、title/bodyを具体化（背景・目的・DoD�
 | 7 | PRにリンク | マージで自動クローズ |
 
 ---
-
-## 変更履歴
-
-### Version 2.1.0 (2026-02-13)
-- 曖昧Issueを「具体化」する運用を追加（title/body整備 + DoD）
-- Windows/PowerShellで安全な `--body-file` 手順（UTF-8）を追加
-- タイトル優先度マーカー（🔴🟡🟢🔵）を明示
-
-### Version 2.0.0 (2026-02-12)
-- 7パターン形式からStep 1–7の単一ワークフローに移行
-- 例を圧縮：各ステップにベストな例を1つ
-- コア原則に日本語Valuesタグを追加
-
-### Version 1.0.0 (2026-02-12)
-- 初版リリース
-- 判断、テンプレ、ラベル、PR連携のパターン
-- CLI/GUIのIssue作成手順

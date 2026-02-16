@@ -1,9 +1,10 @@
 ---
 name: skill-quality-validation
 description: Router skill. Use when unsure which skill-validation workflow to use.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, router, validation]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, router, validation]
+  invocable: false
 ---
 
 # Skill Quality Validation (Router)
@@ -105,25 +106,3 @@ For the original reference materials, see `references/`.
 - [references/validation-examples.md](references/validation-examples.md) — Validator implementations
 
 ---
-
-## Changelog
-
-### Version 4.0.0 (2026-02-13)
-- **Breaking**: Converted to router skill (single workflow)
-- **Migrated**: 6 patterns → `skills-validate-skill`, `skills-remediate-validation-findings`
-- **Preserved**: Validation scripts in `scripts/` for backward compatibility
-
-### Version 3.0.0 (2026-02-12)
-- Expanded checklist: 56 → 64 items
-- Added file length optimization and references/ validation
-
-### Version 2.0.0 (2026-02-12)
-- Optimized file length: 780 → 335 lines
-
-### Version 1.0.0 (2026-02-12)
-- Initial release with 56-item checklist
-
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

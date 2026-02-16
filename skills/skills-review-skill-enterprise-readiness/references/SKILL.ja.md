@@ -1,9 +1,10 @@
 ---
 name: skills-review-skill-enterprise-readiness
 description: エンタープライズ展開に向けたスキルのレビュー — ガバナンス、セキュリティ、テスト、運用面の評価。
-author: RyoMurakami1983
-tags: [copilot, agent-skills, enterprise, governance, security, review]
-invocable: false
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, enterprise, governance, security, review]
+  invocable: false
 ---
 
 # エンタープライズ対応レビュー
@@ -166,15 +167,3 @@ invocable: false
 - [skills-author-skill](../skills-author-skill/SKILL.md) — 最初からエンタープライズ対応のスキルを書く
 
 ---
-
-## Changelog
-
-### Version 1.0.0 (2026-02-13)
-- 初版リリース
-- 4カテゴリ34項目のエンタープライズレディネスチェックリスト
-- 段階的レビューアプローチ（個人/チーム/組織/外部）
-- APPROVED/CONDITIONAL/REJECTEDの判定テンプレート
-
-<!--
-English version: ../skills-review-skill-enterprise-readiness/SKILL.md
--->

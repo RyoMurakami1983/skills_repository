@@ -1,20 +1,21 @@
 ---
 name: skills-revise-skill
-description: Guide for revising GitHub Copilot agent skills and managing changelogs.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, revision, maintenance, changelog]
-invocable: false
+description: Revise existing skills, synchronize EN/JA structure, and optimize discoverability metadata. Use when updating published skills.
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, revision, maintenance, changelog]
+  invocable: false
 ---
 
 # Skill Revision Guide
 
-Guide for revising, versioning, and maintaining GitHub Copilot agent skills with changelog management and bilingual synchronization.
+Guide for revising and maintaining GitHub Copilot agent skills with bilingual synchronization and discoverability optimization.
 
 ## When to Use This Skill
 
 Use this skill when:
 - Updating existing SKILL.md files with new content or fixes
-- Recording changes in CHANGELOG.md with concise entries
+- Improving name/description/metadata tags so skills trigger reliably
 - Synchronizing English SKILL.md with Japanese versions
 - Managing skill versions and backward compatibility
 - Identifying system-created skills via author metadata
@@ -25,7 +26,7 @@ Use this skill when:
 
 - **`skills-author-skill`** - Skill writing workflow
 - **`skills-validate-skill`** - Validate revisions before publishing
-- **`skills-generate-skill-template`** - Generate new skills
+- **`skills-refactor-skill-to-single-workflow`** - Refactor legacy skills before revision
 
 ---
 
@@ -42,7 +43,7 @@ Use this skill when:
 
 ### Step 1: Detect System-Created Skills
 
-Check `author: RyoMurakami1983` in YAML frontmatter to determine the skill's origin. System-created skills require enhanced maintenance (bilingual sync + changelog), while third-party skills follow standard revision.
+Check `metadata.author: RyoMurakami1983` in YAML frontmatter to determine the skill's origin. System-created skills require enhanced maintenance (bilingual sync + metadata quality), while third-party skills follow standard revision.
 
 ```python
 import yaml
@@ -53,14 +54,15 @@ def is_system_skill(skill_path: Path) -> bool:
         return False
     end = content.find('---', 3)
     frontmatter = yaml.safe_load(content[3:end])
-    return frontmatter.get('author') == 'RyoMurakami1983'
+    metadata = frontmatter.get('metadata', {}) if isinstance(frontmatter, dict) else {}
+    return metadata.get('author') == 'RyoMurakami1983'
 ```
 
 **When**: Always run first — determines whether EN/JA sync and CHANGELOG checks apply.
 
 | Skill Type | Detection | Revision Support |
 |------------|-----------|------------------|
-| System-created | `author: RyoMurakami1983` | Enhanced: EN/JA sync + CHANGELOG |
+| System-created | `metadata.author: RyoMurakami1983` | Enhanced: EN/JA sync + metadata quality |
 | Third-party | No author or different | Standard: EN only |
 | Unknown | No frontmatter | Minimal: suggest adding frontmatter |
 
@@ -96,32 +98,19 @@ def is_substantial(description: str) -> bool:
 
 ---
 
-### Step 3: Update CHANGELOG.md
+### Step 3: Record Revision in Git/PR Context
 
-Maintain concise, scannable changelogs with 1-line entries per substantial change. Use category prefixes and group by version with ISO dates.
+Record substantial changes in commit message / PR description instead of SKILL.md changelog sections.
 
-```markdown
-# Changelog
-
-## Version 1.2.0 (2026-02-15)
-
-- Changed: Sync method → Async/await pattern for API calls
-- Added: Step 8 - Circuit Breaker implementation
-- Fixed: Memory leak in ViewModelBase.Dispose()
-
-## Version 1.1.0 (2026-01-20)
-
-- Added: Step 7 - Retry policies with Polly
-- Deprecated: Old ConfigureServices method
-
-## Version 1.0.0 (2026-01-01)
-
-- Initial release
+```text
+Changed: <what changed>
+Why: <why it was needed>
+Impact: <trigger/discoverability/behavior impact>
 ```
 
-**Format rules**: Category prefix (Added/Changed/Fixed/Removed/Deprecated/Updated) + 1-line description (max 100 chars) + grouped by version (YYYY-MM-DD).
+**Format rules**: Category prefix + one-line summary + explicit Why/Impact.
 
-**When**: After any substantial change. Use a separate CHANGELOG.md when skill has >5 versions or changelog exceeds 50 lines.
+**When**: After any substantial change.
 
 ---
 
@@ -157,13 +146,13 @@ Apply semantic versioning (MAJOR.MINOR.PATCH) based on change significance. Upda
 | Bug fix | PATCH (1.2.1) | Fixed memory leak |
 | Typo fix | (none) | Don't bump for trivial |
 
-**When**: After all changes are applied and changelog is updated. Each version bump = one atomic commit.
+**When**: After all changes are applied and revision notes are recorded in commit/PR context.
 
 ---
 
 ### Step 6: Detect Outdated Skills
 
-Proactively identify skills needing updates based on age. Parse the latest version date from the changelog and flag stale skills for review.
+Proactively identify skills needing updates based on age. Use Git history (last significant update date) and flag stale skills for review.
 
 ```python
 import re
@@ -171,10 +160,10 @@ from datetime import datetime
 
 def check_freshness(skill_path: Path) -> str:
     content = skill_path.read_text(encoding='utf-8')
-    match = re.search(r'## Version.*?\((\d{4}-\d{2}-\d{2})\)', content)
-    if not match:
-        return "unknown - add changelog"
-    age = (datetime.now() - datetime.strptime(match.group(1), '%Y-%m-%d')).days
+    last_updated = get_last_git_update_date(skill_path)  # implement via `git log -1 --format=%cs`
+    if not last_updated:
+        return "unknown - check git history"
+    age = (datetime.now() - datetime.strptime(last_updated, '%Y-%m-%d')).days
     if age > 180: return f"stale ({age}d) - review needed"
     if age > 90:  return f"aging ({age}d) - consider review"
     return f"fresh ({age}d)"
@@ -192,7 +181,7 @@ def check_freshness(skill_path: Path) -> str:
 
 ### Step 7: Batch Revise Skills
 
-Revise multiple skills in a single session for consistency. Apply the same standards across all skills: detect system skills, apply changes, sync JA versions, update changelogs, and validate.
+Revise multiple skills in a single session for consistency. Apply the same standards across all skills: detect system skills, apply changes, sync JA versions, optimize metadata discoverability, and validate.
 
 ```python
 def batch_revise(skill_paths: list[Path], description: str):
@@ -203,7 +192,7 @@ def batch_revise(skill_paths: list[Path], description: str):
             ja = path.parent / "references" / "SKILL.ja.md"
             if ja.exists():
                 apply_revision(ja, language='ja')
-        update_changelog(path, description)
+        optimize_discoverability_metadata(path)
         score = run_validation(path)
         status = "PASS" if score >= 80 else "FAIL"
         print(f"{path.name}: {score:.0f}% ({status})")
@@ -215,11 +204,11 @@ def batch_revise(skill_paths: list[Path], description: str):
 
 ## Best Practices
 
-1. **Detect System Skills** - Use `author: RyoMurakami1983` field programmatically
-2. **Log Substantial Only** - Skip typos, formatting; log content/functionality changes
-3. **1-Line Changelog** - "Category: Brief description (max 100 chars)"
+1. **Detect System Skills** - Use `metadata.author: RyoMurakami1983` field programmatically
+2. **Log Substantial Only** - Skip typos, formatting; record meaningful changes in commit/PR context
+3. **Optimize Discoverability** - Review `name`, `description`, and `metadata.tags` on each revision
 4. **Sync EN/JA** - Always update both versions for system skills
-5. **CHANGELOG.md** - Move from SKILL.md when > 50 lines
+5. **No In-File Changelog** - Keep history in Git commits/PRs, not SKILL.md sections
 6. **Semantic Versioning** - MAJOR.MINOR.PATCH based on change type
 7. **Validate After Revision** - Run quality check before publishing
 8. **Commit Atomically** - Each version bump = one commit
@@ -230,20 +219,20 @@ def batch_revise(skill_paths: list[Path], description: str):
 ## Common Pitfalls
 
 - **Forgetting Japanese version**: After editing English SKILL.md, always check if `references/SKILL.ja.md` exists and update it. Fix: add JA check to your revision workflow.
-- **Logging trivial changes**: Don't clutter CHANGELOG with typo/formatting fixes. Fix: gate all entries through `is_substantial()` check.
-- **Hard-coding system skill lists**: Don't maintain manual lists of system skills. Fix: detect via `author` frontmatter field programmatically.
+- **Logging trivial changes**: Don't clutter commit/PR summaries with typo-only details. Fix: gate notes through `is_substantial()` check.
+- **Hard-coding system skill lists**: Don't maintain manual lists of system skills. Fix: detect via `metadata.author` field programmatically.
 
 ---
 
 ## Anti-Patterns
 
-### 1. Logging Every Change
+### 1. Logging Every Trivial Change
 
 **Problem**: Trivial entries (typos, indentation) bury meaningful updates.
 
 ```python
-# ❌ changelog.append("Fixed: typo in line 42")
-# ✅ Only log substantial: changelog.append(f"Changed: {before} → {after}")
+# ❌ notes.append("Fixed: typo in line 42")
+# ✅ Only log substantial: notes.append(f"Changed: {before} → {after}")
 ```
 
 ### 2. Neglecting Bilingual Sync
@@ -260,53 +249,32 @@ def batch_revise(skill_paths: list[Path], description: str):
 ## Quick Reference
 
 ```
-1. Open SKILL.md → Check author field
-   ├─ author: RyoMurakami1983 → System skill (enhanced)
+1. Open SKILL.md → Check metadata.author field
+   ├─ metadata.author: RyoMurakami1983 → System skill (enhanced)
    └─ Other/none → Standard revision
 
 2. Make changes to English SKILL.md
 
 3. Substantial change?
-   ├─ Yes → Update CHANGELOG.md + continue
+   ├─ Yes → Record commit/PR revision notes + continue
    └─ No (typo/format) → Skip to step 6
 
 4. If system skill → Update references/SKILL.ja.md
 
-5. Bump version (Breaking→MAJOR, Feature→MINOR, Fix→PATCH)
+5. Optimize discoverability metadata (name/description/tags)
 
 6. Run skills-validate-skill → Commit
 ```
 
-**System Skill** (`author: RyoMurakami1983`): EN/JA sync + CHANGELOG + enhanced validation.
-**Non-System Skill**: English only + standard changelog + basic validation.
+**System Skill** (`metadata.author: RyoMurakami1983`): EN/JA sync + metadata optimization + enhanced validation.
+**Non-System Skill**: English only + basic validation.
 
 ---
 
 ## Resources
 
 - [Semantic Versioning 2.0.0](https://semver.org/)
-- [Keep a Changelog](https://keepachangelog.com/)
 - [skills-validate-skill](../skills-validate-skill/SKILL.md) - Validate revisions
-- [CHANGELOG_TEMPLATE.md](assets/CHANGELOG_TEMPLATE.md) - Changelog template
+- [skills-author-skill](../skills-author-skill/SKILL.md) - Authoring conventions and metadata rules
 
 ---
-
-## Changelog
-
-### Version 2.0.0 (2026-02-15)
-- Changed: Multi-pattern format → single-workflow with 7 steps
-- Removed: Verbose code blocks (compressed to essential logic)
-- Changed: Best Practices Summary merged into Best Practices
-- Changed: Common Pitfalls compressed to bullet format
-
-### Version 1.0.0 (2026-02-12)
-- Initial release
-- Author-based system skill detection
-- CHANGELOG.md format specification
-- EN/JA synchronization patterns
-- Version bump strategies
-
-<!-- 
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->
