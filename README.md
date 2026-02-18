@@ -19,12 +19,12 @@
 | カテゴリ | 説明 | 配置先 | Skills数 | 詳細 |
 |---------|------|--------|---------|------|
 | `skills/` | Skill作成支援 + Git/GitHub ワークフロー | グローバル（~/.copilot/skills/） | 18 | [SKILLS_README.md](skills/SKILLS_README.md) |
+| `dotnet/` | .NET/C# WPF開発ワークフロー | プロジェクト（.github/skills/） | 10 | [下記参照](#-dotnet-skills) |
 | `production/` | MVP/本番向け開発プラクティス | プロジェクト（.github/skills/） | 1 | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
 
 ### 📌 今後追加予定のカテゴリ
 
 - **python/** - Python開発ワークフロー（FastAPI、Pytest等）
-- **dotnet/** - .NET/C#開発ワークフロー（WPF、EF Core等）
 - **typescript/** - TypeScript/Node.js開発ワークフロー
 
 ## 🏁 Developer Quickstart
@@ -169,6 +169,35 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - 旧ルータースキル/統合元スキルの `SKILL.md` は `archive/phase3-deprecated/` に移動済み
 - `skill-quality-validation/scripts/validate_skill.py` は現行検証スクリプトとして維持
 
+## 🔷 dotnet Skills
+
+.NET/C# WPF アプリケーション開発のためのスキル群（10スキル）。
+
+### 基盤スキル
+
+| スキル | 説明 |
+|--------|------|
+| `dotnet-wpf-secure-config` | DPAPI暗号化によるWPFアプリの設定・認証情報管理 |
+| `dotnet-access-to-oracle-migration` | Access SQLからOracleへの移行と.NET C#コード生成 |
+| `dotnet-oracle-wpf-integration` | WPFアプリへのOracle DB接続（Repositoryパターン+CRUD） |
+| `dotnet-wpf-dify-api-integration` | WPFアプリへのDify API統合（DPAPI設定+SSEストリーミング） |
+
+### UIコンポーネントスキル
+
+| スキル | 説明 |
+|--------|------|
+| `dotnet-wpf-employee-input` | 社員番号入力ダイアログ（4桁バリデーション+DPAPI暗号化保存） |
+| `dotnet-wpf-ocr-parameter-input` | OCR実行パラメータ入力UIタブ（非同期進捗表示付き） |
+| `dotnet-wpf-pdf-preview` | PDFアップロード+WebView2インラインプレビュー（MVVM対応） |
+| `dotnet-wpf-comparison-view` | マッチング結果のサイドバイサイド比較ビュー（不一致ハイライト） |
+
+### ドメインロジック・オーケストレーション
+
+| スキル | 説明 |
+|--------|------|
+| `dotnet-generic-matching` | 汎用フィールドマッチング（重み付きスコアリング+Specificationパターン） |
+| `dotnet-ocr-matching-workflow` | OCR→DB照合エンドツーエンドワークフローオーケストレーター（12ステップ） |
+
 ## 📚 ドキュメント
 
 - **[PHILOSOPHY.md](PHILOSOPHY.md)** - 開発憲法（Values / Mission / Vision）
@@ -211,7 +240,8 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - 5つの既存スキルを統合ワークフロー形式に移行
 - validate_skill.py v4.1.0（ルーター/ワークフロー/レガシー3モード対応）
 - DDD命名規則 `<context>-<workflow>` を導入
-- Skills総数: 18 + production 1
+- **dotnetカテゴリ追加**: WPF/Oracle/.NET C#スキル10種を追加
+- Skills総数: 18 + dotnet 10 + production 1
 
 ### v1.1.0 (2026-02-13)
 - Productionカテゴリを追加
