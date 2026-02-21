@@ -1,6 +1,6 @@
 ---
 name: skills-revise-skill
-description: Guide for revising GitHub Copilot agent skills and managing changelogs.
+description: Revise existing skills, synchronize EN/JA structure, and optimize discoverability metadata. Use when updating published skills.
 metadata:
   author: RyoMurakami1983
   tags: [copilot, agent-skills, revision, maintenance, changelog]
@@ -15,7 +15,7 @@ GitHub Copilot agentスキルの修正、バージョン管理、メンテナン
 
 このスキルを使用する場面：
 - 既存のSKILL.mdファイルを新しいコンテンツや修正で更新する場合
-- CHANGELOG.mdに簡潔なエントリーで変更を記録する場合
+- リファレンススキルを本番品質にモダン化する場合（コスモス化）
 - 英語版SKILL.mdと日本語版を同期する場合
 - スキルバージョンと後方互換性を管理する場合
 - authorメタデータでシステム作成スキルを識別する場合
