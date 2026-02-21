@@ -1,21 +1,25 @@
 ---
 name: skills-refactor-skill-to-single-workflow
-description: Convert a legacy multi-pattern skill into a single-workflow skill. Use when migrating existing skills.
+description: >
+  Convert a legacy multi-pattern skill into a single-workflow skill, or
+  modernize a reference skill to production quality. Use when migrating
+  existing skills during the repository-wide cosmos modernization effort.
 metadata:
   author: RyoMurakami1983
-  tags: [copilot, agent-skills, refactoring, migration]
+  tags: [copilot, agent-skills, refactoring, migration, cosmos]
   invocable: false
 ---
 
 # Refactor a Skill to Single Workflow
 
-End-to-end workflow for converting a legacy multi-pattern SKILL.md (7–10 `## Pattern N:` sections) into a single-workflow skill following the "1 skill = 1 workflow" principle.
+End-to-end workflow for converting a legacy SKILL.md into a production-quality skill following the "1 skill = 1 pattern" principle. Handles both multi-pattern splitting and reference-to-production modernization (cosmos migration).
 
 ## When to Use This Skill
 
 Use this skill when:
 - Converting an existing multi-pattern skill to the single-workflow standard
-- Migrating legacy skills during the repository-wide modernization effort
+- Modernizing a reference skill (flat frontmatter, no JA, no references/) to production quality
+- Migrating legacy skills during the repository-wide cosmos modernization effort
 - Deciding which patterns to consolidate vs. split into separate skills
 - Creating router skills that point to newly split workflow skills
 - Reducing SKILL.md from 500+ lines by extracting content to references/
@@ -32,14 +36,47 @@ Use this skill when:
 
 ## Core Principles
 
-1. **Split by Workflow, Not by Section** — Only create a new skill when a pattern is an independently executable workflow (基礎と型)
+1. **One Skill = One Pattern** — A skill implements one executable pattern (workflow/cycle/router/cascade/parallel/multi-MCP), not a topic dump (基礎と型)
 2. **Consolidate First** — Prefer merging related patterns into one workflow over splitting into many small skills (ニュートラル)
 3. **Preserve Context** — Each resulting skill must be self-contained; avoid splitting so much that context is lost (成長の複利)
 4. **Router for Compatibility** — Keep the original directory as a router skill to prevent broken references (継続は力)
+5. **Structural Slack** — Leave room for future evolution; don't over-specify or over-split (余白の設計)
 
 ---
 
 ## Workflow: Refactor to Single Workflow
+
+### Step 0 — Modernize Frontmatter
+
+Convert flat frontmatter to nested `metadata:` format:
+
+```yaml
+# Before (legacy flat format)
+---
+name: my-skill
+description: Does something. Use when doing X.
+invocable: false
+---
+
+# After (production nested format)
+---
+name: my-skill
+description: >
+  Does something specific. Use when doing X
+  and needing to achieve Y.
+metadata:
+  author: RyoMurakami1983
+  tags: [relevant, tags, here]
+  invocable: false
+---
+```
+
+**Checklist**:
+- `description` contains "Use when" trigger phrase
+- `metadata:` nests `author`, `tags`, `invocable`
+- Top-level keys limited to: `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility`
+
+> **Values**: 基礎と型（最小形式で最大可能性を生む設計）
 
 ### Step 1 — Audit the Existing Skill
 
@@ -65,6 +102,8 @@ Count patterns and classify each one:
 - **Independent workflow**: Can be executed start-to-finish alone → **Split** into a new skill
 - **Variant**: Same workflow with different inputs → Keep as options within one skill
 
+> **Values**: 基礎と型（独立実行可能かどうかの判断基準が型）
+
 ### Step 2 — Group into Workflows
 
 Map patterns to end-to-end workflows:
@@ -86,6 +125,8 @@ Workflow 3: "Optimize discoverability" (if separate)
 - ✅ Split when: The workflow has a distinct trigger ("Use when...") AND can run independently
 - ❌ Don't split when: The pattern only makes sense in context of the larger workflow
 
+> **Values**: ニュートラル（誰もが使える普遍性を保つ）
+
 ### Step 3 — Write New Skills
 
 For each identified workflow, create a new skill directory:
@@ -105,6 +146,8 @@ skills/
 
 Follow `skills-author-skill` for each new skill's structure.
 
+> **Values**: 成長の複利（教えることが自律成長を生む）
+
 ### Step 4 — Convert Original to Router
 
 Rewrite the original SKILL.md as a single-workflow router skill:
@@ -112,14 +155,19 @@ Rewrite the original SKILL.md as a single-workflow router skill:
 ```yaml
 ---
 name: skill-writing-guide
-description: Router skill. Use when unsure which skill-authoring workflow to use.
-author: RyoMurakami1983
-tags: [copilot, agent-skills, router]
-invocable: false
+description: >
+  Router skill. Use when unsure which skill-authoring
+  workflow to use.
+metadata:
+  author: RyoMurakami1983
+  tags: [copilot, agent-skills, router]
+  invocable: false
 ---
 ```
 
 The router workflow: guide the user to the correct new skill based on their intent.
+
+> **Values**: 継続は力（既存参照を壊さない段階的移行）
 
 ### Step 5 — Move Overflow Content
 
@@ -133,6 +181,8 @@ skill-writing-guide/references/anti-patterns.md
 skills-author-skill/references/anti-patterns.md
 ```
 
+> **Values**: 余白の設計（コンテンツを適切な場所へ再配置）
+
 ### Step 6 — Update Cross-References
 
 Search for references to the old skill name and update or add notes:
@@ -142,9 +192,13 @@ Search for references to the old skill name and update or add notes:
 grep -r "skill-writing-guide" --include="*.md" .
 ```
 
+> **Values**: 温故知新（過去の参照を新しい構造に繋ぐ）
+
 ### Step 7 — Validate All Results
 
 Run `skills-validate-skill` on each new skill AND the router to ensure compliance.
+
+> **Values**: 基礎と型（品質基準による検証）
 
 ---
 
@@ -229,6 +283,10 @@ Run `skills-validate-skill` on each new skill AND the router to ensure complianc
 ### Refactoring Decision Tree
 
 ```
+Is this a reference skill (local_reference_skills/)?
+├─ YES → Run Step 0 (frontmatter) first, then audit
+└─ NO  → Start at Step 1
+
 For each Pattern in the legacy skill:
 │
 ├─ Is it an independently executable workflow?
@@ -241,6 +299,15 @@ After consolidation:
 ├─ Result ≤ 500 lines? → Done
 └─ Result > 500 lines? → Move details to references/
 ```
+
+### Cosmos Migration Checklist (per skill)
+
+- [ ] Frontmatter: nested `metadata:` format, `author`, "Use when" in description
+- [ ] Structure: H1 → When to Use → Related Skills → Core Principles → Workflow → Good Practices → Common Pitfalls → Anti-Patterns → Quick Reference
+- [ ] Line count: SKILL.md ≤ 500 lines; overflow to `references/`
+- [ ] Values: cite ≥ 2 Values (include 余白の設計 where relevant)
+- [ ] Bilingual: `references/SKILL.ja.md` (English H2 headings + Japanese content)
+- [ ] Validation: `skills-validate-skill` PASS
 
 ### Migration Checklist
 
