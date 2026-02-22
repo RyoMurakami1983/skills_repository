@@ -1,17 +1,22 @@
 ---
 name: dotnet-wpf-employee-input
-description: WPFアプリに社員番号入力ダイアログを追加。DPAPI暗号化保存対応。社員ID設定構築時に使用。
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, mvvm, employee, dpapi, configuration]
-invocable: false
-version: 1.0.0
+description: >
+  Add employee number (社員番号) input dialog to WPF apps with DPAPI-encrypted storage.
+  Use when building employee ID configuration.
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, mvvm, employee, dpapi, configuration]
+  invocable: false
 ---
+
+<!-- このドキュメントは dotnet-wpf-employee-input の日本語版です。英語版: ../SKILL.md -->
 
 # WPFアプリケーションへの社員番号入力ダイアログ追加
 
 WPFアプリケーションに社員番号（社員番号）入力ダイアログを追加するためのエンドツーエンドワークフロー：4桁バリデーション、`SecureConfigService`によるDPAPI暗号化保存、MVVM設定UI、メニューバー統合。
 
-## このスキルを使うタイミング
+## When to Use This Skill
 
 以下の場合にこのスキルを使用してください：
 - WPFアプリケーションに社員番号設定ダイアログを追加するとき
@@ -22,7 +27,7 @@ WPFアプリケーションに社員番号（社員番号）入力ダイアロ�
 
 ---
 
-## 関連スキル
+## Related Skills
 
 - **`dotnet-wpf-secure-config`** — 必須：DPAPI暗号化基盤（先に適用）
 - **`dotnet-wpf-dify-api-integration`** — Dify API呼び出しの`user`フィールドに社員番号を使用
@@ -32,7 +37,7 @@ WPFアプリケーションに社員番号（社員番号）入力ダイアロ�
 
 ---
 
-## コア原則
+## Core Principles
 
 1. **デフォルトでセキュア** — 社員番号はDPAPIで保存。平文設定ファイルには保存しない（ニュートラル）
 2. **MVVM規律** — ViewModelがすべての保存/読み込み/リセットロジックを駆動。code-behindは最小限（基礎と型）
@@ -42,7 +47,7 @@ WPFアプリケーションに社員番号（社員番号）入力ダイアロ�
 
 ---
 
-## ワークフロー: WPFに社員番号ダイアログを追加
+## Workflow: Add Employee Number Dialog to WPF
 
 ### Step 1 — 前提条件のセットアップ
 
@@ -301,7 +306,7 @@ private static bool IsValidEmployeeNumber(string number)
 
 ---
 
-## グッドプラクティス
+## Good Practices
 
 ### 1. 保存前にフォーマットを検証
 
@@ -329,7 +334,7 @@ private static bool IsValidEmployeeNumber(string number)
 
 ---
 
-## よくある落とし穴
+## Common Pitfalls
 
 ### 1. Window_Loadedで設定を読み込まない
 
@@ -383,7 +388,7 @@ await _configService.SaveDifyConfigAsync(config);
 
 ---
 
-## アンチパターン
+## Anti-Patterns
 
 ### 社員番号を平文設定ファイルに保存
 
@@ -403,7 +408,7 @@ await _configService.SaveDifyConfigAsync(config);
 
 ---
 
-## クイックリファレンス
+## Quick Reference
 
 ### 実装チェックリスト
 
@@ -430,7 +435,7 @@ await _configService.SaveDifyConfigAsync(config);
 
 ---
 
-## リソース
+## Resources
 
 - `dotnet-wpf-secure-config` — このスキルが使用するDPAPI暗号化基盤
 - `dotnet-wpf-dify-api-integration` — Dify APIの`user`フィールドに社員番号を使用
@@ -439,7 +444,7 @@ await _configService.SaveDifyConfigAsync(config);
 
 ---
 
-## 変更履歴
+## Changelog
 
 ### バージョン 1.0.0 (2026-02-15)
 - 初回リリース: 社員番号入力ダイアログスキル

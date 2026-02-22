@@ -1,10 +1,10 @@
 ---
 name: tdd-standard-practice
 description: MVP/本番向けにTDDを標準化する。テストリストとRed-Green-Refactorで安全に進める。
-author: RyoMurakami1983
-tags: [tdd, testing, workflow, ci, quality]
-invocable: false
-version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [tdd, testing, workflow, ci, quality]
+  invocable: false
 ---
 
 # TDD標準プラクティス（MVP/本番）

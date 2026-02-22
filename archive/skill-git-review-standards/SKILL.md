@@ -1,10 +1,10 @@
 ---
 name: skill-git-review-standards
 description: Review standards for PR quality, size, and communication.
-author: RyoMurakami1983
-tags: [github, code-review, workflow, quality, collaboration]
-invocable: false
-version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [github, code-review, workflow, quality, collaboration]
+  invocable: false
 ---
 
 # Git Review Standards

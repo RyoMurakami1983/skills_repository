@@ -264,6 +264,19 @@ class StructureValidator(SkillValidator):
             "Found" if has_author else "Missing metadata.author"
         ))
 
+        # 1.2c No forbidden top-level keys (must be under metadata:)
+        forbidden_top_level = {'version', 'author', 'tags', 'invocable'}
+        found_forbidden = []
+        if frontmatter_data:
+            found_forbidden = [k for k in forbidden_top_level if k in frontmatter_data and k not in (frontmatter_data.get('metadata', {}) or {})]
+        no_forbidden = len(found_forbidden) == 0
+        checks.append(CheckResult(
+            "1.2c",
+            "No forbidden top-level keys (version/author/tags/invocable)",
+            no_forbidden,
+            f"Found forbidden: {', '.join(found_forbidden)}" if found_forbidden else "Clean"
+        ))
+
         # 1.3 frontmatter name matches folder (kebab-case)
         name_match = re.search(r'name:\s*["\']?([^"\'\n]+)["\']?', frontmatter or '', re.IGNORECASE)
         folder_name = Path(self.file_path).parent.name

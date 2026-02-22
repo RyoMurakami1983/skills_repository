@@ -1,7 +1,6 @@
 ---
 name: git-commit-practices
 description: Commit practices with Conventional Commits and atomic changes. Use when standardizing team history.
-version: 1.0.0
 metadata:
   author: RyoMurakami1983
   tags: [git, commits, conventional-commits, workflow, quality]

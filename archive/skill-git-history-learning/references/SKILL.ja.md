@@ -1,10 +1,10 @@
 ---
 name: skill-git-history-learning
 description: Git履歴を学習資産として使い、意思決定を共有する。
-author: RyoMurakami1983
-tags: [git, history, learning, documentation, workflow]
-invocable: false
-version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [git, history, learning, documentation, workflow]
+  invocable: false
 ---
 
 # Git履歴学習

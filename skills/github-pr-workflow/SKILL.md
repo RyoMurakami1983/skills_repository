@@ -1,7 +1,6 @@
 ---
 name: github-pr-workflow
 description: "Create a PR and close linked issues. State-driven routing from uncommitted changes to PR creation."
-version: 2.0.0
 metadata:
   author: RyoMurakami1983
   tags: [github, pull-requests, workflow, git, pr-create]

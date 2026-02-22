@@ -1,17 +1,20 @@
+<!-- このドキュメントは dotnet-wpf-ocr-parameter-input の日本語版です。英語版: ../SKILL.md -->
+
 ---
 name: dotnet-wpf-ocr-parameter-input
 description: WPFにOCR実行パラメータ入力UIタブを構築。進捗表示付き。OCR処理タブに設定可能な入力フィールドを追加する際に使用。
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, mvvm, ocr, progress, tab]
-invocable: false
-version: 1.0.0
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, mvvm, ocr, progress, tab]
+  invocable: false
 ---
 
 # OCR実行パラメータ入力タブの構築（進捗表示付き）
 
 .NET WPFアプリケーションにOCR実行パラメータ入力UIタブを追加するエンドツーエンドワークフロー：設定可能な入力フィールド（ComboBox、TextBox、CheckBox）、`IProgress<T>`による非同期OCR実行、リアルタイム進捗バーとログ表示、イベントベースの結果ハンドオフ（親ViewModelへの受け渡し）。
 
-## このスキルを使うタイミング
+## When to Use This Skill
 
 以下の場合にこのスキルを使用してください：
 - ユーザー設定可能な入力パラメータ付きOCR処理タブを追加するとき
@@ -22,7 +25,7 @@ version: 1.0.0
 
 ---
 
-## 関連スキル
+## Related Skills
 
 - **`dotnet-wpf-pdf-preview`** — PDFアップロードとWebView2プレビュー（PDFパス入力を提供）
 - **`dotnet-wpf-dify-api-integration`** — OCR抽出バックエンド用Dify API連携
@@ -32,7 +35,15 @@ version: 1.0.0
 
 ---
 
-## コア原則
+## Dependencies
+
+- .NET + WPF (Windows Presentation Foundation)
+- `CommunityToolkit.Mvvm` (ObservableObject, `[ObservableProperty]`, `[RelayCommand]`)
+- OCR実行ユースケースインターフェース（例：`IOcrUseCase`）とOCRバックエンド（Dify等）
+
+---
+
+## Core Principles
 
 1. **まず聞く、次に作る** — 入力フィールドはユースケースごとに異なるため、コード生成前に必ずユーザーに必要なフィールドを確認する（ニュートラル）
 2. **MVVM規律** — ViewModelがすべての入力状態とOCR実行ロジックを所有し、Viewは純粋な宣言的XAML（基礎と型）
@@ -42,7 +53,7 @@ version: 1.0.0
 
 ---
 
-## ワークフロー: WPFにOCRパラメータ入力タブを追加
+## Workflow: Add OCR Parameter Input Tab to WPF
 
 ### Step 1 — 入力フィールド要件の定義
 
@@ -308,49 +319,11 @@ OCRタブを親ViewModelに接続し、`TabControl`に統合するときに使�
 
 親ViewModelがタブViewModelを作成し、`OcrCompleted`をサブスクライブしてタブ切り替えを管理します。PDFアップロードイベントは`OnPdfUploaded`経由で親からOCRタブに流れます。
 
-**親ViewModelの接続**：
+**親ViewModelの接続** — `OcrCompleted`をサブスクライブし、`OnPdfUploaded`を呼び出す：
 
 ```csharp
-public partial class MainViewModel : ObservableObject
-{
-    public OcrProcessTabViewModel OcrTab { get; }
-
-    [ObservableProperty] private int selectedTabIndex;
-
-    public MainViewModel(IOcrUseCase useCase)
-    {
-        OcrTab = new OcrProcessTabViewModel(useCase);
-        OcrTab.OcrCompleted += OnOcrCompleted;
-    }
-
-    private void OnOcrCompleted(object? sender, IEnumerable<object> results)
-    {
-        // Handle OCR results (e.g., populate comparison view)
-        SelectedTabIndex = 2; // Switch to results tab
-    }
-
-    // Called when PDF is uploaded (e.g., from PDF preview tab)
-    private void NotifyPdfUploaded(string pdfPath)
-    {
-        OcrTab.OnPdfUploaded(pdfPath);
-    }
-}
-```
-
-**MainWindow.xamlでのTabControl統合**：
-
-```xml
-<TabControl SelectedIndex="{Binding SelectedTabIndex}">
-    <TabItem Header="PDF Preview">
-        <!-- PDF preview content -->
-    </TabItem>
-    <TabItem Header="OCR Process">
-        <local:OcrProcessTabView DataContext="{Binding OcrTab}"/>
-    </TabItem>
-    <TabItem Header="Results">
-        <!-- Results content -->
-    </TabItem>
-</TabControl>
+OcrTab = new OcrProcessTabViewModel(useCase);
+OcrTab.OcrCompleted += OnOcrCompleted;
 ```
 
 **イベントフロー**：
@@ -363,15 +336,7 @@ User clicks Start → OcrTab.StartOcrAsync() → IProgress updates UI
 OcrTab.OcrCompleted event → Parent.OnOcrCompleted() → Switch to results tab
 ```
 
-**新しいPDFアップロード時の状態リセット**：
-
-```csharp
-private void NotifyPdfUploaded(string pdfPath)
-{
-    OcrTab.Reset();              // Clear previous progress
-    OcrTab.OnPdfUploaded(pdfPath); // Enable Start button
-}
-```
+完全な接続例（親ViewModel、TabControl、状態リセット）: [`references/detailed-patterns.md`](../references/detailed-patterns.md)
 
 > **Values**: ニュートラル / 継続は力
 
@@ -421,7 +386,7 @@ private async Task StartOcrAsync()
 
 ---
 
-## グッドプラクティス
+## Good Practices
 
 ### 1. 非同期進捗レポートにIProgress\<T\>を使用
 
@@ -472,7 +437,7 @@ await Task.Run(() =>
 
 ---
 
-## よくある落とし穴
+## Common Pitfalls
 
 ### 1. 非同期コールバックからUIスレッドにディスパッチしない
 
@@ -531,7 +496,7 @@ private async Task StartOcrAsync()
 
 ---
 
-## アンチパターン
+## Anti-Patterns
 
 ### 同期処理によるUIスレッドのブロック
 
@@ -567,7 +532,7 @@ private async Task StartOcrAsync()
 
 ---
 
-## クイックリファレンス
+## Quick Reference
 
 ### 実装チェックリスト
 
@@ -605,7 +570,7 @@ private async Task StartOcrAsync()
 
 ---
 
-## リソース
+## Resources
 
 - **`dotnet-wpf-pdf-preview`** — このタブに入力を提供するPDFアップロード
 - **`dotnet-wpf-dify-api-integration`** — OCR実行用Dify APIバックエンド
@@ -615,7 +580,7 @@ private async Task StartOcrAsync()
 
 ---
 
-## 変更履歴
+## Changelog
 
 ### バージョン 1.0.0 (2026-02-18)
 - 初回リリース: 進捗表示付きOCR実行パラメータ入力タブ

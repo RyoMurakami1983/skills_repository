@@ -1,10 +1,11 @@
 ---
 name: dotnet-wpf-dify-api-integration
 description: Add Dify API to WPF apps with DPAPI config and SSE streaming. Use when building Dify integration.
-author: RyoMurakami1983
-tags: [dotnet, wpf, dify, csharp, mvvm]
-invocable: false
-version: 1.0.0
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, dify, csharp, mvvm]
+  invocable: false
 ---
 
 # Add Dify API Integration to WPF Applications
@@ -223,49 +224,7 @@ public async Task<string> RunWorkflowStreamingAsync(
 }
 ```
 
-**SSE stream reader** — Routes events to progress reporter:
-
-```csharp
-private async Task<string> ReadSseStreamAsync(
-    HttpResponseMessage response, IProgress<string>? progress)
-{
-    using var reader = new StreamReader(await response.Content.ReadAsStreamAsync());
-    string? result = null;
-
-    while (!reader.EndOfStream)
-    {
-        var line = await reader.ReadLineAsync();
-        if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("data:")) continue;
-
-        try
-        {
-            using var doc = JsonDocument.Parse(line[5..].Trim());
-            var evt = doc.RootElement.GetProperty("event").GetString();
-            switch (evt)
-            {
-                case "workflow_started":
-                    progress?.Report("▶️ Workflow started"); break;
-                case "node_started":
-                    var title = doc.RootElement.GetProperty("data")
-                        .GetProperty("title").GetString();
-                    progress?.Report($"🔄 {title} running..."); break;
-                case "node_finished":
-                    var d = doc.RootElement.GetProperty("data");
-                    var s = d.GetProperty("status").GetString();
-                    var t = d.GetProperty("title").GetString();
-                    progress?.Report(s == "succeeded" ? $"✅ {t} done" : $"❌ {t} failed");
-                    break;
-                case "workflow_finished":
-                    result = doc.RootElement.GetProperty("data")
-                        .GetProperty("outputs").GetRawText();
-                    progress?.Report("✅ Workflow complete"); break;
-            }
-        }
-        catch (JsonException) { continue; } // Skip malformed SSE lines
-    }
-    return result ?? throw new InvalidOperationException("No workflow output received.");
-}
-```
+**SSE stream reader** — Parses `data:` lines and routes `workflow_started` / `node_started` / `node_finished` / `workflow_finished` events to `IProgress<string>`. See [references/detailed-patterns.md](references/detailed-patterns.md#sse-stream-reader) for full implementation.
 
 > **Values**: 継続は力 / 温故知新
 

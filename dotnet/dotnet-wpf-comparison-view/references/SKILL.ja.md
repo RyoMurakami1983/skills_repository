@@ -1,17 +1,20 @@
 ---
 name: dotnet-wpf-comparison-view
 description: WPFでサイドバイサイド比較ビューを構築。不一致ハイライトとチェックボックス検証付きのマッチング結果表示。
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, mvvm, comparison-view, matching, community-toolkit]
-invocable: false
-version: 1.0.0
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, mvvm, comparison-view, matching, community-toolkit]
+  invocable: false
 ---
+
+<!-- このドキュメントは dotnet-wpf-comparison-view の日本語版です。英語版: ../SKILL.md -->
 
 # WPFでサイドバイサイド比較ビューを構築
 
 マッチング結果をサイドバイサイドで表示する比較ビュー構築のエンドツーエンドワークフロー：スコア追跡付き比較項目ViewModel、3カラムXAMLレイアウト（フィールド名 / ソースA / ソースB）、背景色による不一致ハイライト、ライブスコア再計算付き編集可能フィールド、エクスポート前のチェックボックスベースのユーザー検証。
 
-## このスキルを使うタイミング
+## When to Use This Skill
 
 以下の場合にこのスキルを使用してください：
 - 2つのデータソースからのマッチング結果をサイドバイサイド比較UIで表示するとき
@@ -27,7 +30,7 @@ version: 1.0.0
 
 ---
 
-## 関連スキル
+## Related Skills
 
 - **`dotnet-generic-matching`** — このビューで表示するマッチング結果を提供
 - **`dotnet-wpf-pdf-preview`** — 比較ビューと並べて表示するPDFプレビューパネル
@@ -37,7 +40,15 @@ version: 1.0.0
 
 ---
 
-## コア原則
+## Dependencies
+
+- .NET + WPF（Windows Presentation Foundation）
+- `CommunityToolkit.Mvvm`（ObservableObject、`[ObservableProperty]`、`[RelayCommand]`）
+- ドメイン/アプリケーション層からのマッチング結果（例：`dotnet-generic-matching`）
+
+---
+
+## Core Principles
 
 1. **MVVMバインディングのみ** — すべてのUI更新はデータバインディング経由；`x:Name`でのコントロール操作は禁止（基礎と型）
 2. **視覚フィードバック優先** — 背景色（#F8D7DA ピンク、#BBF7D0 グリーン）で不一致/検証済みステータスを即座に表示（ニュートラル）
@@ -47,7 +58,7 @@ version: 1.0.0
 
 ---
 
-## ワークフロー: 比較ビューの構築
+## Workflow: Build Comparison View
 
 ### Step 1 — 比較項目ViewModelの作成
 
@@ -508,7 +519,7 @@ namespace YourApp.ViewModels
 
 ---
 
-## グッドプラクティス
+## Good Practices
 
 ### 1. マッチングフィードバックに背景色を使用
 
@@ -551,7 +562,7 @@ if (unchecked > 0) { /* Block export */ }
 
 ---
 
-## よくある落とし穴
+## Common Pitfalls
 
 ### 1. ライブプレビュー更新のためのPropertyChangedサブスクライブ漏れ
 
@@ -600,7 +611,7 @@ public void SetResults(IEnumerable<MatchingResultData> results)
 
 ---
 
-## アンチパターン
+## Anti-Patterns
 
 ### ViewModelからの直接UI操作
 
@@ -638,7 +649,7 @@ private static bool IsMismatch(string? a, string? b)
 
 ---
 
-## クイックリファレンス
+## Quick Reference
 
 ### 実装チェックリスト
 
@@ -679,7 +690,7 @@ private static bool IsMismatch(string? a, string? b)
 
 ---
 
-## リソース
+## Resources
 
 - [CommunityToolkit.Mvvm ドキュメント](https://learn.microsoft.com/ja-jp/dotnet/communitytoolkit/mvvm/)
 - [WPF ItemsControlとDataTemplate](https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/controls/itemscontrol)
@@ -689,7 +700,7 @@ private static bool IsMismatch(string? a, string? b)
 
 ---
 
-## 変更履歴
+## Changelog
 
 | バージョン | 日付 | 変更内容 |
 |---------|------|---------|

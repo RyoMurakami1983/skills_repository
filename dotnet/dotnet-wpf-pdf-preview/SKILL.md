@@ -1,10 +1,13 @@
 ---
 name: dotnet-wpf-pdf-preview
-description: Use when adding PDF upload and inline WebView2 preview to a WPF app with MVVM file selection and async initialization.
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, mvvm, webview2, pdf]
-invocable: false
-version: 1.0.0
+description: >
+  Use when adding PDF upload and inline WebView2 preview to a WPF app
+  with MVVM file selection and async initialization.
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, mvvm, webview2, pdf]
+  invocable: false
 ---
 
 # Add PDF Upload and WebView2 Preview to WPF Applications

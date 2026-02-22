@@ -1,17 +1,22 @@
 ---
 name: dotnet-wpf-pdf-preview
-description: WPFアプリにPDFアップロードとWebView2プレビューを追加。MVVMファイル選択と非同期初期化対応。
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, mvvm, webview2, pdf]
-invocable: false
-version: 1.0.0
+description: >
+  Use when adding PDF upload and inline WebView2 preview to a WPF app
+  with MVVM file selection and async initialization.
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, mvvm, webview2, pdf]
+  invocable: false
 ---
+
+<!-- このドキュメントは dotnet-wpf-pdf-preview の日本語版です。英語版: ../SKILL.md -->
 
 # WPFアプリケーションへのPDFアップロードとWebView2プレビュー追加
 
 .NET WPFアプリケーションにPDFファイルアップロードとインラインプレビューを追加するためのエンドツーエンドワークフロー：WebView2ベースのPDFレンダリング、`CommunityToolkit.Mvvm`によるMVVMファイル選択、イベントベースのViewModel→View通信、エラーハンドリング付き非同期WebView2初期化。
 
-## このスキルを使うタイミング
+## When to Use This Skill
 
 以下の場合にこのスキルを使用してください：
 - WPFアプリケーションにPDFアップロードとプレビューパネルを追加するとき
@@ -22,7 +27,7 @@ version: 1.0.0
 
 ---
 
-## 関連スキル
+## Related Skills
 
 - **`dotnet-wpf-secure-config`** — DPAPI暗号化基盤（認証情報の保存用）
 - **`dotnet-wpf-dify-api-integration`** — アップロードしたPDFをDify APIに送信してOCR抽出
@@ -31,7 +36,7 @@ version: 1.0.0
 
 ---
 
-## コア原則
+## Core Principles
 
 1. **MVVM規律** — ViewModelがファイル選択ロジックを所有し、ViewがWebView2レンダリングを所有（基礎と型）
 2. **最小限のcode-behind** — WebView2の初期化とナビゲーションのみをcode-behindに配置（基礎と型）
@@ -41,7 +46,7 @@ version: 1.0.0
 
 ---
 
-## ワークフロー: WPFにPDFプレビューを追加
+## Workflow: Add PDF Preview to WPF
 
 ### Step 1 — WebView2のインストールとレイアウトセットアップ
 
@@ -330,7 +335,7 @@ Select-String -Path "Views/*.xaml","Views/*.cs","ViewModels/*.cs" -Pattern "Your
 
 ---
 
-## グッドプラクティス
+## Good Practices
 
 ### 1. WebView2コードはcode-behindに保持
 
@@ -356,9 +361,17 @@ Select-String -Path "Views/*.xaml","Views/*.cs","ViewModels/*.cs" -Pattern "Your
 
 **Values**: 継続は力（先回りの準備）
 
+### 4. Quick Language Checklist
+
+- 初出時は **Portable Document Format (PDF)** と記載し、以降は「PDF」と略す。
+- 初出時は **Windows Presentation Foundation (WPF)** および **Model-View-ViewModel (MVVM)** と記載する。
+- 最初のナビゲーション前に `EnsureCoreWebView2Async` でWebView2を初期化する。
+- ローカルPDFファイルに `WebView2.Source` を直接バインドしない。命令的にナビゲートする。
+- WebView2 Runtimeが見つからない場合のユーザー向けメッセージとリンクの表示を検討する。
+
 ---
 
-## よくある落とし穴
+## Common Pitfalls
 
 ### 1. デプロイ先のマシンにWebView2 Runtimeをインストールし忘れる
 
@@ -397,7 +410,7 @@ PdfWebView.CoreWebView2.Navigate($"file:///{pdfPath}");
 
 ---
 
-## アンチパターン
+## Anti-Patterns
 
 ### ファイルダイアログロジックをcode-behindに配置
 
@@ -427,7 +440,7 @@ UploadButton.IsEnabled = false;
 
 ---
 
-## クイックリファレンス
+## Quick Reference
 
 ### 実装チェックリスト
 
@@ -460,7 +473,7 @@ UploadButton.IsEnabled = false;
 
 ---
 
-## リソース
+## Resources
 
 - [Microsoft WebView2 SDKドキュメント](https://docs.microsoft.com/microsoft-edge/webview2/)
 - [WebView2 NuGetパッケージ](https://www.nuget.org/packages/Microsoft.Web.WebView2)
@@ -469,7 +482,7 @@ UploadButton.IsEnabled = false;
 
 ---
 
-## 変更履歴
+## Changelog
 
 ### バージョン 1.0.0 (2026-02-15)
 - 初回リリース: 単一ワークフローPDFアップロード + WebView2プレビューガイド

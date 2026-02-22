@@ -7,10 +7,10 @@ Target: ≤500 lines. See skills-author-skill for the full authoring workflow.
 ---
 name: your-skill-name-here
 description: One-line description of what problem this skill solves (100 chars max)
-invocable: false
-tags: [tag1, tag2, tag3]
-author: RyoMurakami1983
-version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [tag1, tag2, tag3]
+  invocable: false
 ---
 
 # Your Skill Title Here

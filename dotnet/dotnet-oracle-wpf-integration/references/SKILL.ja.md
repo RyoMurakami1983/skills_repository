@@ -1,10 +1,16 @@
+<!-- このドキュメントは dotnet-oracle-wpf-integration の日本語版です。英語版: ../SKILL.md -->
+
 ---
 name: dotnet-oracle-wpf-integration
-description: WPFアプリにOracle DB接続をリポジトリパターンで追加。Oracle機能追加時に使用。
-author: RyoMurakami1983
-tags: [dotnet, wpf, oracle, csharp, mvvm, repository-pattern]
-invocable: false
-version: 1.0.0
+description: >
+  Add Oracle DB connection to WPF apps with repository pattern and CRUD operations.
+  Use when integrating Oracle Database into existing WPF applications with MVVM settings
+  dialog, repository pattern, and secure DPAPI-encrypted configuration.
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, oracle, csharp, mvvm, repository-pattern]
+  invocable: false
 ---
 
 # WPFアプリケーションへのOracle Database接続の追加
@@ -46,7 +52,7 @@ version: 1.0.0
 
 ---
 
-## Workflow: WPFへのOracle DB統合
+## Workflow: Integrate Oracle DB into WPF
 
 ### Step 1 — Set Up Project Structure
 
@@ -137,115 +143,12 @@ public async Task SaveOracleConfigAsync(OracleConfigModel config)
 
 MVVMパターンに従ってViewModelとXAMLダイアログを作成する。
 
-**OracleConfigViewModel.cs**：
-
-```csharp
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
-namespace YourApp.Presentation.ViewModels
-{
-    public partial class OracleConfigViewModel : ObservableObject
-    {
-        private readonly ISecureConfigService _configService;
-
-        [ObservableProperty] private string userId = string.Empty;
-        [ObservableProperty] private string password = string.Empty;
-        [ObservableProperty] private string dataSource = string.Empty;
-        [ObservableProperty] private string statusMessage = string.Empty;
-        [ObservableProperty] private bool isSaving;
-
-        public OracleConfigViewModel(ISecureConfigService configService)
-            => _configService = configService;
-
-        public async Task LoadConfigAsync()
-        {
-            try
-            {
-                var config = await _configService.LoadOracleConfigAsync();
-                UserId = config.UserId;
-                DataSource = config.DataSource;
-                Password = config.GetDecryptedPassword();
-            }
-            catch (InvalidOperationException)
-            {
-                // DPAPI復号化失敗：ユーザープロファイルまたはマシン変更時
-                Password = string.Empty;
-                StatusMessage = "保存済みパスワードの復号化に失敗しました。再入力してください。";
-            }
-        }
-
-        private bool ValidateFields()
-        {
-            if (string.IsNullOrWhiteSpace(UserId)
-                || string.IsNullOrWhiteSpace(Password)
-                || string.IsNullOrWhiteSpace(DataSource))
-            { StatusMessage = "すべての項目を入力してください。"; return false; }
-            return true;
-        }
-
-        [RelayCommand]
-        private async Task SaveAsync()
-        {
-            if (!ValidateFields()) return;
-            IsSaving = true;
-            try
-            {
-                var config = new OracleConfigModel
-                    { UserId = UserId, DataSource = DataSource };
-                config.SetPassword(Password);
-                await _configService.SaveOracleConfigAsync(config);
-                StatusMessage = "保存しました。";
-            }
-            catch (Exception ex) { StatusMessage = $"保存エラー: {ex.Message}"; }
-            finally { IsSaving = false; }
-        }
-
-        [RelayCommand]
-        private async Task TestConnectionAsync()
-        {
-            if (!ValidateFields()) return;
-            StatusMessage = "接続テスト中...";
-            try
-            {
-                string connStr = $"User Id={UserId};Password={Password};"
-                    + $"Data Source={DataSource};Connection Timeout=10;";
-                await Task.Run(() =>
-                {
-                    using var conn = new Oracle.ManagedDataAccess.Client
-                        .OracleConnection(connStr);
-                    conn.Open();
-                    using var cmd = conn.CreateCommand();
-                    cmd.CommandText = "SELECT SYSDATE FROM DUAL";
-                    cmd.ExecuteScalar();
-                });
-                StatusMessage = "✅ 接続成功！";
-            }
-            catch (Exception ex)
-            { StatusMessage = $"❌ 接続失敗: {ex.Message}"; }
-        }
-    }
-}
-```
-
-**OracleConfigDialog.xaml.cs** — 最小コードビハインド（PasswordBoxブリッジのみ）：
-
-```csharp
-public partial class OracleConfigDialog : Window
-{
-    public OracleConfigDialog(OracleConfigViewModel viewModel)
-    {
-        InitializeComponent();
-        DataContext = viewModel;
-        Loaded += async (_, _) => await viewModel.LoadConfigAsync();
-        // PasswordBoxはネイティブの双方向バインディングをサポートしない
-        viewModel.PropertyChanged += (_, e) =>
-        { if (e.PropertyName == nameof(viewModel.Password)) PasswordBox.Password = viewModel.Password; };
-        PasswordBox.PasswordChanged += (_, _) => viewModel.Password = PasswordBox.Password;
-    }
-    private void Close_Click(object sender, RoutedEventArgs e) => Close();
-}
-```
+**主要な実装ポイント**（完全なコード → [references/detailed-patterns.md](detailed-patterns.md#step-3--oracleconfigviewmodel)）：
+- `[ObservableProperty]` — UserId, Password, DataSource, StatusMessage, IsSaving
+- `[RelayCommand]` — SaveAsync, TestConnectionAsync
+- DPAPI復号化失敗時のグレースフル対応（パスワード再入力プロンプト）
+- 接続テスト：`SELECT SYSDATE FROM DUAL`（10秒タイムアウト）
+- コードビハインドでPasswordBoxブリッジ（WPFネイティブバインディング非対応）
 
 > **Values**: 基礎と型 / 成長の複利
 
@@ -462,13 +365,13 @@ Debug.Assert(sysdate.Count == 1, "SYSDATEクエリは1行返すべき");
 
 ## Common Pitfalls
 
-### 1. Oracle.ManagedDataAccess.CoreでTNS名を使用
+### 1. Using TNS Names with Oracle.ManagedDataAccess.Core
 
 **問題**：`Data Source=PROD_DSN`がORA-50201で失敗する。NuGetパッケージはODBC DSNやTNS名を解決できない。
 
 **解決策**：`tnsping PROD_DSN`を実行してEZ Connect形式を取得し、`Data Source=192.0.2.10:1521/prod_service`を使用する。
 
-### 2. 接続プールリーク
+### 2. Connection Pool Leaks
 
 **問題**：`OracleConnection`の`using`/`Dispose()`を忘れると接続プールが枯渇する。
 **解決策**：常に`await using var conn = ...`を使用して接続がプールに戻ることを保証する。
@@ -483,7 +386,7 @@ await using var conn = new OracleConnection(connStr);
 await conn.OpenAsync();
 ```
 
-### 3. C#でのOracleダブルクォートエスケープ
+### 3. Oracle Double-Quote Escaping in C#
 
 **問題**：C#逐語的文字列は`"`文字の二重化が必要で、Oracleの引用符付き識別子が読みにくくなる。
 **解決策**：`@""`構文を一貫して使用し、意図するOracle SQLをコメントで記述する。
@@ -493,7 +396,7 @@ await conn.OpenAsync();
 string sql = @"SELECT s.""ship_date"" FROM SCHEMA_A.""production_info"" s";
 ```
 
-### 4. 接続文字列のハードコード
+### 4. Hardcoding Connection Strings
 
 **問題**：`User Id=SCOTT;Password=tiger`をC#コードに直接埋め込む。
 **解決策**：常に`ISecureConfigService`から読み取り、実行時に接続文字列を構築する。
@@ -502,13 +405,13 @@ string sql = @"SELECT s.""ship_date"" FROM SCHEMA_A.""production_info"" s";
 
 ## Anti-Patterns
 
-### ViewModelでのSQL記述
+### SQL in ViewModel
 
 **何が問題か**：ViewModelやコードビハインドにOracleクエリを直接書くこと。
 **なぜ問題か**：プレゼンテーションとデータアクセスの関心事が混在し、データベースなしではテスト不可能。
 **正しいアプローチ**：すべてのSQLはInfrastructure層の`ISofRepository`を経由する。
 
-### パラメータ化クエリの省略
+### Ignoring Parameterized Queries
 
 **何が問題か**：ユーザー入力をSQLクエリに文字列連結すること。
 **なぜ問題か**：SQLインジェクション脆弱性。
@@ -522,7 +425,7 @@ cmd.CommandText = "SELECT * FROM users WHERE name = :name";
 cmd.Parameters.Add(new OracleParameter(":name", userInput));
 ```
 
-### OracleパスワードのDPAPI省略
+### Skipping DPAPI for Oracle Passwords
 
 **何が問題か**：Oracleパスワードを平文の設定ファイルや環境変数に保存すること。
 **なぜ問題か**：ファイルシステムアクセス権を持つ誰でもパスワードを読める。
@@ -532,7 +435,7 @@ cmd.Parameters.Add(new OracleParameter(":name", userInput));
 
 ## Quick Reference
 
-### ORA-*エラーコード早見表
+### ORA-* Error Code Quick Reference
 
 | コード | メッセージ | 修正方法 |
 |--------|----------|---------|
@@ -544,7 +447,7 @@ cmd.Parameters.Add(new OracleParameter(":name", userInput));
 | ORA-00904 | 無効な識別子 | カラム名の大小文字確認 |
 | ORA-12170 | 接続タイムアウト | タイムアウト延長/ネットワーク確認 |
 
-### TNS vs EZ Connect判定
+### TNS vs EZ Connect Decision
 
 | シナリオ | 形式 | 例 |
 |---------|------|-----|

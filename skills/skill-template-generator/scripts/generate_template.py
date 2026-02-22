@@ -160,10 +160,10 @@ class TemplateGenerator:
         content = f"""---
 name: {self.skill_name}
 description: {self.description}
-version: 1.0.0
-invocable: false
-tags: [{tags_str}]
-author: {self.AUTHOR}
+metadata:
+  author: {self.AUTHOR}
+  tags: [{tags_str}]
+  invocable: false
 ---
 
 # {self.skill_name.replace('-', ' ').title()}
@@ -310,10 +310,10 @@ This skill documentation is provided as-is for use with GitHub Copilot.
         content = f"""---
 name: {self.skill_name}
 description: {self.description}
-version: 1.0.0
-invocable: false
-tags: [{tags_str}]
-author: {self.AUTHOR}
+metadata:
+  author: {self.AUTHOR}
+  tags: [{tags_str}]
+  invocable: false
 ---
 
 # {self.skill_name.replace('-', ' ').title()}

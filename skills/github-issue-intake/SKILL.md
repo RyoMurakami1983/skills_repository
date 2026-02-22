@@ -1,7 +1,6 @@
 ---
 name: github-issue-intake
 description: Capture deferred work as actionable GitHub issues. Use when triaging scope.
-version: 2.1.0
 metadata:
   author: RyoMurakami1983
   tags: [github, issues, triage, workflow, documentation]

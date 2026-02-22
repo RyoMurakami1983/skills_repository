@@ -1,10 +1,13 @@
 ---
 name: dotnet-wpf-secure-config
-description: Add DPAPI-encrypted config management to WPF apps with secure credential storage.
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, security, dpapi, configuration]
-invocable: false
-version: 1.0.0
+description: >
+  Add DPAPI-encrypted config management to WPF apps with secure credential storage.
+  Use when setting up encrypted configuration for WPF applications.
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, security, dpapi, configuration]
+  invocable: false
 ---
 
 # Add Secure Configuration to WPF Applications
@@ -78,66 +81,19 @@ Use when adding the Windows DPAPI encryption utility that all config models will
 
 Create the static encryption helper with `Encrypt`, `Decrypt`, and `MaskSensitive` methods.
 
-```csharp
-using System;
-using System.Security.Cryptography;
-using System.Text;
-
-namespace YourApp.Infrastructure.Configuration
+```text
+// Infrastructure/Configuration/DpapiEncryptor.cs — Signature Overview
+public static class DpapiEncryptor
 {
-    /// <summary>
-    /// Windows DPAPI encryption utility.
-    /// CurrentUser scope — encrypted data cannot be decrypted by another user or on another PC.
-    /// </summary>
-    public static class DpapiEncryptor
-    {
-        // ✅ Change this salt per application — see Step 6
-        private static readonly byte[] Entropy
-            = Encoding.UTF8.GetBytes("YourApp_Config_Salt_2026");
+    private static readonly byte[] Entropy = Encoding.UTF8.GetBytes("YourApp_Config_Salt_2026");
 
-        public static string Encrypt(string plainText)
-        {
-            if (string.IsNullOrEmpty(plainText)) return string.Empty;
-            byte[] encrypted = ProtectedData.Protect(
-                Encoding.UTF8.GetBytes(plainText),
-                Entropy, DataProtectionScope.CurrentUser);
-            return Convert.ToBase64String(encrypted);
-        }
-
-        public static string Decrypt(string encryptedText)
-        {
-            if (string.IsNullOrEmpty(encryptedText)) return string.Empty;
-            try
-            {
-                byte[] decrypted = ProtectedData.Unprotect(
-                    Convert.FromBase64String(encryptedText),
-                    Entropy, DataProtectionScope.CurrentUser);
-                return Encoding.UTF8.GetString(decrypted);
-            }
-            catch (CryptographicException ex)
-            {
-                throw new InvalidOperationException(
-                    "Decryption failed. Data may have been encrypted by a different user.", ex);
-            }
-            catch (FormatException ex)
-            {
-                throw new InvalidOperationException(
-                    "Encrypted data format is invalid.", ex);
-            }
-        }
-
-        /// <summary>
-        /// Mask sensitive values for logging (e.g., "abcd****").
-        /// </summary>
-        public static string MaskSensitive(string value)
-        {
-            if (string.IsNullOrEmpty(value) || value.Length <= 4)
-                return "****";
-            return value[..4] + "****";
-        }
-    }
+    public static string Encrypt(string plainText)      // DPAPI Protect → Base64
+    public static string Decrypt(string encryptedText)   // Base64 → DPAPI Unprotect
+    public static string MaskSensitive(string value)     // "abcd****" for logging
 }
 ```
+
+> See [references/detailed-patterns.md](references/detailed-patterns.md#dpapiencryptor--full-implementation) for full implementation with error handling.
 
 **Why full error handling**: `CryptographicException` occurs when data was encrypted by user A but decrypted by user B (e.g., after profile migration). Without catching this, the app crashes on startup instead of prompting re-entry.
 
@@ -240,87 +196,23 @@ namespace YourApp.Infrastructure.Configuration
 
 **SecureConfigService.cs**:
 
-```csharp
-using System;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
-
-namespace YourApp.Infrastructure.Configuration
+```text
+// Infrastructure/Configuration/SecureConfigService.cs — Signature Overview
+public class SecureConfigService : ISecureConfigService
 {
-    public class SecureConfigService : ISecureConfigService
-    {
-        private readonly string _configDirectory;
-        private readonly string _configFilePath;
+    // ✅ Change "YourAppName" — see Step 6
+    // Stores config at %LOCALAPPDATA%/YourAppName/config/config.json
 
-        public SecureConfigService()
-        {
-            // ✅ Change "YourAppName" — see Step 6
-            string localAppData = Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData);
-            _configDirectory = Path.Combine(localAppData, "YourAppName", "config");
-            _configFilePath = Path.Combine(_configDirectory, "config.json");
-        }
+    public bool ConfigExists()
+    public Task ResetConfigAsync()
 
-        public bool ConfigExists() => File.Exists(_configFilePath);
-
-        public async Task ResetConfigAsync()
-        {
-            if (File.Exists(_configFilePath))
-                await Task.Run(() => File.Delete(_configFilePath));
-        }
-
-        // ✅ Add typed methods per integration (example for Oracle):
-        //
-        // public async Task<OracleConfigModel> LoadOracleConfigAsync()
-        // {
-        //     var appConfig = await LoadAppConfigAsync();
-        //     return appConfig.OracleDb;
-        // }
-        //
-        // public async Task SaveOracleConfigAsync(OracleConfigModel config)
-        // {
-        //     var appConfig = await LoadAppConfigAsync();
-        //     appConfig.OracleDb = config;
-        //     await SaveAppConfigAsync(appConfig);
-        // }
-
-        protected async Task<AppConfigModel> LoadAppConfigAsync()
-        {
-            if (!File.Exists(_configFilePath))
-                return new AppConfigModel();
-
-            try
-            {
-                string json = await File.ReadAllTextAsync(_configFilePath);
-                return JsonSerializer.Deserialize<AppConfigModel>(json)
-                       ?? new AppConfigModel();
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(
-                    $"Failed to read config file: {_configFilePath}", ex);
-            }
-        }
-
-        protected async Task SaveAppConfigAsync(AppConfigModel appConfig)
-        {
-            if (!Directory.Exists(_configDirectory))
-                Directory.CreateDirectory(_configDirectory);
-
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder
-                    .UnsafeRelaxedJsonEscaping
-            };
-
-            string json = JsonSerializer.Serialize(appConfig, options);
-            await File.WriteAllTextAsync(_configFilePath, json);
-        }
-    }
+    // ✅ Add typed load/save methods per integration
+    protected Task<AppConfigModel> LoadAppConfigAsync()
+    protected Task SaveAppConfigAsync(AppConfigModel appConfig)
 }
 ```
+
+> See [references/detailed-patterns.md](references/detailed-patterns.md#secureconfigservice--full-implementation) for full implementation.
 
 **Why `protected` for Load/SaveAppConfigAsync**: Integration skills (Oracle, Dify) add typed methods that call these internal helpers. Using `protected` allows subclassing if needed, while keeping the public API clean.
 

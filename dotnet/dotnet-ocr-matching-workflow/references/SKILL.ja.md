@@ -1,17 +1,19 @@
+<!-- このドキュメントは dotnet-ocr-matching-workflow の日本語版です。英語版: ../SKILL.md -->
 ---
 name: dotnet-ocr-matching-workflow
 description: 基盤・インフラ・プレゼンテーションの各スキルをエンドツーエンドで合成し、OCR→DBマッチングの完全なシステムをオーケストレーションします。
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, ddd, ocr, matching, workflow, orchestration]
-invocable: false
-version: 1.0.0
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, ddd, ocr, matching, workflow, orchestration]
+  invocable: false
 ---
 
 # OCRマッチングシステムをエンドツーエンドで構築
 
 個別スキルを組み合わせて、OCRマッチングのフルパイプラインを構築するワークフローオーケストレーターです。DDDプロジェクトのセットアップ、セキュア設定、Oracle DB統合、Dify APIによるOCR抽出、重み付きフィールドマッチング、WPF比較UI、CSVエクスポートまでを、依存性注入（DI）で一貫して配線します。
 
-## このスキルを使うタイミング
+## When to Use This Skill
 
 以下の場合にこのスキルを使用してください：
 - OCR抽出データをデータベースレコードと照合する新しいWPFアプリケーションを構築するとき
@@ -28,7 +30,7 @@ version: 1.0.0
 
 ---
 
-## 関連スキル
+## Related Skills
 
 - **`dotnet-wpf-secure-config`** — DPAPI暗号化の基盤（Step 2）
 - **`dotnet-oracle-wpf-integration`** — Oracle DB接続 + リポジトリ（Step 2）
@@ -43,7 +45,7 @@ version: 1.0.0
 
 ---
 
-## コア原則
+## Core Principles
 
 1. **オーケストレーションし、重複実装しない** — このスキルは他のスキルを参照し、内容を再実装しません（ニュートラル）
 2. **依存順序** — スキルは厳密な依存順序（foundation → infrastructure → presentation）で適用します（基礎と型）
@@ -53,7 +55,21 @@ version: 1.0.0
 
 ---
 
-## ワークフロー：OCRマッチングシステムを構築
+## Quick Execution Checklist
+
+- 4レイヤーのソリューションを作成し、依存方向を確認する。
+- 認証情報を保存するスキルの前に `dotnet-wpf-secure-config` を適用する。
+- OracleとDify統合スキルを適用し、接続テストを実行する。
+- PDFプレビュー + OCR入力タブを追加し、PDF表示を確認する。
+- マッチング + 比較を実装し、ユーザーが行を検証できることを確認する。
+- エンドツーエンドのチェックリストを実行してからエクスポートを追加する。
+- Step 11のチェックリストを使用し、パイプライン全体のデバッグ前に障害を特定する。
+
+理由：この順序はレイヤー単位で障害を切り分け、デバッグコストを低減します。
+
+---
+
+## Workflow: Build OCR Matching System
 
 ### Step 1 — DDDプロジェクト構造をセットアップ
 
@@ -509,7 +525,7 @@ public class ExportService
 
 ---
 
-## グッドプラクティス
+## Good Practices
 
 ### 1. 依存順序どおりにスキルを適用
 
@@ -552,94 +568,19 @@ public ProcessDocumentUseCase()
 
 ---
 
-## よくある落とし穴
+## Common Pitfalls & Anti-Patterns
 
-### 1. 基盤スキルをスキップする
+詳細な説明と例は [detailed-patterns.md](detailed-patterns.md) を参照してください。
 
-**問題**: `dotnet-wpf-secure-config`を先にセットアップせずに、OracleまたはDify統合へ進んでしまうこと。どちらのスキルも暗号化された認証情報の保存に`SecureConfigService`へ依存します。
-
-**解決策**: 常にStep 2から順番に開始してください。認証情報を保存するサービスを使う前に、secure-configスキルを適用する必要があります。
-
-```
-❌ Step 2b (Oracle) → Error: ISecureConfigService not found
-✅ Step 2a (secure-config) → Step 2b (Oracle) → Works
-```
-
-### 2. レイヤー間の密結合
-
-**問題**: ViewModelがApplicationレイヤーのユースケースを介さずに、Oracleの`DbConnection`やDifyの`HttpClient`を直接参照してしまうこと。
-
-**解決策**: ViewModelはApplicationレイヤーのユースケースにのみ依存させます。ユースケースがDomainとInfrastructureのサービスを調整します。
-
-```csharp
-// ❌ WRONG — ViewModel calls Infrastructure directly
-public class OcrViewModel
-{
-    private readonly DifyApiService _dify; // Infrastructure type in Presentation!
-}
-
-// ✅ CORRECT — ViewModel calls Application layer
-public class OcrViewModel
-{
-    private readonly ProcessDocumentUseCase _useCase; // Application type
-}
-```
-
-### 3. 統合前に個別コンポーネントをテストしない
-
-**問題**: 7個以上のスキルを一気に配線して、複数レイヤーをまたぐ不具合をデバッグすること。
-
-**解決策**: Step 11のテストチェックリストに従ってください。エンドツーエンドが失敗する場合は、まずインフラ接続、次にドメインロジック、最後にプレゼンテーションのバインディング、という順に壊れているレイヤーを切り分けます。
+**主要ルール**：
+- スキルは厳密な依存順序で適用する — Oracle/Difyの前に `secure-config`
+- PresentationからApplicationレイヤーを迂回しない
+- Domainレイヤーにインフラ型を混入させない
+- スキル内容を複製せず、参照する
 
 ---
 
-## アンチパターン
-
-### Applicationレイヤーを迂回する
-
-**内容**: ViewがInfrastructureサービスを直接呼び出す（例：ViewModelが`OracleConnection`を生成し、クエリを実行する）。
-
-**問題点**: DDDのレイヤリングに違反します。ビジネスロジックがViewModelに散らばり、テスト不能・再利用不能になります。
-
-**より良いアプローチ**: Applicationレイヤーにユースケースを作成し、DomainとInfrastructureサービスを調整します。ViewModelはユースケースのみを呼び出します。
-
-### DomainレイヤーがInfrastructure型に依存する
-
-**内容**: Domainモデルが`Oracle.ManagedDataAccess`や`System.Net.Http`をimportする。
-
-**問題点**: Domainレイヤーは外部依存ゼロでなければなりません。Domainにインフラ型が混入すると、DBやAPIなしでユニットテストできなくなります。
-
-**より良いアプローチ**: Domainにインターフェース（`IDataRepository`、`IDocumentExtractor`）を定義し、Infrastructureで実装します。DIで登録します。
-
-```csharp
-// ❌ WRONG — Domain depends on Oracle
-namespace YourApp.Domain.Matching
-{
-    using Oracle.ManagedDataAccess.Client; // Infrastructure leak!
-    public class MatchingService { ... }
-}
-
-// ✅ CORRECT — Domain depends only on its own interfaces
-namespace YourApp.Domain.Matching
-{
-    public class MatchingService
-    {
-        private readonly IDataRepository _repository; // Domain interface
-    }
-}
-```
-
-### このオーケストレーターにスキル内容を複製する
-
-**内容**: `dotnet-generic-matching`や`dotnet-wpf-secure-config`の実装コードを、このワークフロースキルに丸ごとコピーする。
-
-**問題点**: メンテナンス負荷が増大します。元スキルが変更されても、このスキルに反映されません。オーケストレーターは複製ではなく参照が目的です。
-
-**より良いアプローチ**: 各ステップで「Apply: **`skill-name`**」と書き、配線／統合ポイントのみを説明します。
-
----
-
-## クイックリファレンス
+## Quick Reference
 
 ### 実装チェックリスト
 
@@ -696,7 +637,7 @@ dotnet-wpf-comparison-view        (needs generic-matching)
 
 ---
 
-## リソース
+## Resources
 
 - `dotnet-wpf-secure-config` — DPAPI暗号化と設定管理
 - `dotnet-oracle-wpf-integration` — Oracleデータベース統合
@@ -708,10 +649,10 @@ dotnet-wpf-comparison-view        (needs generic-matching)
 
 ---
 
-## 変更履歴
+## Changelog
 
 | バージョン | 日付 | 変更 |
 |---------|------|---------|
 | 1.0.0 | 2025-07-13 | 🆕 初回リリース — OCRマッチングシステム用の12ステップ・オーケストレーター |
 
-<!-- 英語版は ../SKILL.md を参照してください -->
+<!-- このドキュメントは dotnet-ocr-matching-workflow の日本語版です。英語版: ../SKILL.md -->

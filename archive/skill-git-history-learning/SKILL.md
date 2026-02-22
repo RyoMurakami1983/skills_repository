@@ -1,10 +1,10 @@
 ---
 name: skill-git-history-learning
 description: Use git history as a learning asset for onboarding and decision tracking.
-author: RyoMurakami1983
-tags: [git, history, learning, documentation, workflow]
-invocable: false
-version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [git, history, learning, documentation, workflow]
+  invocable: false
 ---
 
 # Git History Learning
