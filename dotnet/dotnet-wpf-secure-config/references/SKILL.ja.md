@@ -1,11 +1,16 @@
 ---
 name: dotnet-wpf-secure-config
-description: WPFアプリにDPAPI暗号化設定管理を追加。セキュアな資格情報保存が必要な場合に使用。
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, security, dpapi, configuration]
-invocable: false
-version: 1.0.0
+description: >
+  Add DPAPI-encrypted config management to WPF apps with secure credential storage.
+  Use when setting up encrypted configuration for WPF applications.
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, security, dpapi, configuration]
+  invocable: false
 ---
+
+<!-- このドキュメントは dotnet-wpf-secure-config の日本語版です。英語版: ../SKILL.md -->
 
 # WPFアプリケーションへのセキュア設定管理の追加
 
@@ -79,65 +84,20 @@ Install-Package Microsoft.Extensions.DependencyInjection
 `Encrypt`、`Decrypt`、`MaskSensitive`メソッドを持つ静的暗号化ヘルパーを作成する。
 
 ```csharp
-using System;
-using System.Security.Cryptography;
-using System.Text;
-
-namespace YourApp.Infrastructure.Configuration
+// Infrastructure/Configuration/DpapiEncryptor.cs
+public static class DpapiEncryptor
 {
-    /// <summary>
-    /// Windows DPAPI暗号化ユーティリティ
-    /// CurrentUserスコープ：暗号化データは別ユーザー・別PCでは復号化不可
-    /// </summary>
-    public static class DpapiEncryptor
-    {
-        // ✅ アプリケーションごとに変更すること — Step 6参照
-        private static readonly byte[] Entropy
-            = Encoding.UTF8.GetBytes("YourApp_Config_Salt_2026");
+    // ✅ アプリケーションごとに変更すること — Step 6参照
+    private static readonly byte[] Entropy
+        = Encoding.UTF8.GetBytes("YourApp_Config_Salt_2026");
 
-        public static string Encrypt(string plainText)
-        {
-            if (string.IsNullOrEmpty(plainText)) return string.Empty;
-            byte[] encrypted = ProtectedData.Protect(
-                Encoding.UTF8.GetBytes(plainText),
-                Entropy, DataProtectionScope.CurrentUser);
-            return Convert.ToBase64String(encrypted);
-        }
-
-        public static string Decrypt(string encryptedText)
-        {
-            if (string.IsNullOrEmpty(encryptedText)) return string.Empty;
-            try
-            {
-                byte[] decrypted = ProtectedData.Unprotect(
-                    Convert.FromBase64String(encryptedText),
-                    Entropy, DataProtectionScope.CurrentUser);
-                return Encoding.UTF8.GetString(decrypted);
-            }
-            catch (CryptographicException ex)
-            {
-                throw new InvalidOperationException(
-                    "復号化に失敗しました。別のユーザーで暗号化されている可能性があります。", ex);
-            }
-            catch (FormatException ex)
-            {
-                throw new InvalidOperationException(
-                    "暗号化データのフォーマットが不正です。", ex);
-            }
-        }
-
-        /// <summary>
-        /// センシティブな値をマスク（ログ出力用、例："abcd****"）
-        /// </summary>
-        public static string MaskSensitive(string value)
-        {
-            if (string.IsNullOrEmpty(value) || value.Length <= 4)
-                return "****";
-            return value[..4] + "****";
-        }
-    }
+    public static string Encrypt(string plainText);    // DPAPI Protect → Base64
+    public static string Decrypt(string encryptedText); // Base64 → DPAPI Unprotect
+    public static string MaskSensitive(string value);   // ログ用マスク "abcd****"
 }
 ```
+
+> 完全な実装は [references/detailed-patterns.md](detailed-patterns.md#dpapiencryptor--full-implementation) を参照。
 
 **なぜ完全なエラーハンドリングが必要か**：`CryptographicException`はユーザーAで暗号化したデータをユーザーBが復号化しようとした場合（プロファイル移行後など）に発生する。これをキャッチしないと、再入力を促す代わりにアプリが起動時にクラッシュする。
 
@@ -241,86 +201,22 @@ namespace YourApp.Infrastructure.Configuration
 **SecureConfigService.cs**：
 
 ```csharp
-using System;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
-
-namespace YourApp.Infrastructure.Configuration
+// Infrastructure/Configuration/SecureConfigService.cs
+public class SecureConfigService : ISecureConfigService
 {
-    public class SecureConfigService : ISecureConfigService
-    {
-        private readonly string _configDirectory;
-        private readonly string _configFilePath;
+    // ✅ "YourAppName"を変更 — Step 6参照
+    // 設定を %LOCALAPPDATA%/YourAppName/config/config.json に保存
 
-        public SecureConfigService()
-        {
-            // ✅ "YourAppName"を変更 — Step 6参照
-            string localAppData = Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData);
-            _configDirectory = Path.Combine(localAppData, "YourAppName", "config");
-            _configFilePath = Path.Combine(_configDirectory, "config.json");
-        }
+    public bool ConfigExists() => File.Exists(_configFilePath);
+    public async Task ResetConfigAsync();
 
-        public bool ConfigExists() => File.Exists(_configFilePath);
-
-        public async Task ResetConfigAsync()
-        {
-            if (File.Exists(_configFilePath))
-                await Task.Run(() => File.Delete(_configFilePath));
-        }
-
-        // ✅ 統合ごとに型付きメソッドを追加（Oracleの例）：
-        //
-        // public async Task<OracleConfigModel> LoadOracleConfigAsync()
-        // {
-        //     var appConfig = await LoadAppConfigAsync();
-        //     return appConfig.OracleDb;
-        // }
-        //
-        // public async Task SaveOracleConfigAsync(OracleConfigModel config)
-        // {
-        //     var appConfig = await LoadAppConfigAsync();
-        //     appConfig.OracleDb = config;
-        //     await SaveAppConfigAsync(appConfig);
-        // }
-
-        protected async Task<AppConfigModel> LoadAppConfigAsync()
-        {
-            if (!File.Exists(_configFilePath))
-                return new AppConfigModel();
-
-            try
-            {
-                string json = await File.ReadAllTextAsync(_configFilePath);
-                return JsonSerializer.Deserialize<AppConfigModel>(json)
-                       ?? new AppConfigModel();
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(
-                    $"設定ファイルの読み込みに失敗しました: {_configFilePath}", ex);
-            }
-        }
-
-        protected async Task SaveAppConfigAsync(AppConfigModel appConfig)
-        {
-            if (!Directory.Exists(_configDirectory))
-                Directory.CreateDirectory(_configDirectory);
-
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder
-                    .UnsafeRelaxedJsonEscaping
-            };
-
-            string json = JsonSerializer.Serialize(appConfig, options);
-            await File.WriteAllTextAsync(_configFilePath, json);
-        }
-    }
+    // ✅ 統合ごとに型付きload/saveメソッドを追加
+    protected async Task<AppConfigModel> LoadAppConfigAsync();
+    protected async Task SaveAppConfigAsync(AppConfigModel appConfig);
 }
 ```
+
+> 完全な実装は [references/detailed-patterns.md](detailed-patterns.md#secureconfigservice--full-implementation) を参照。
 
 **なぜLoad/SaveAppConfigAsyncが`protected`か**：統合スキル（Oracle、Dify）が型付きメソッドを追加してこれらの内部ヘルパーを呼び出す。`protected`にすることでサブクラス化を可能にしつつ、公開APIをクリーンに保つ。
 

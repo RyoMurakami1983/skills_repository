@@ -1,17 +1,21 @@
+<!-- このドキュメントは dotnet-generic-matching の日本語版です。英語版: ../SKILL.md -->
+
 ---
 name: dotnet-generic-matching
 description: .NETドメイン層で汎用的な重み付きフィールドマッチングとスコアリングを実装。
-author: RyoMurakami1983
-tags: [dotnet, csharp, ddd, matching, domain-layer, generics, specification-pattern]
-invocable: false
+license: MIT
 version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, csharp, ddd, matching, domain-layer, generics, specification-pattern]
+  invocable: false
 ---
 
-# 汎用的な重み付きフィールドマッチングとスコアリングの実装
+# Implement Generic Weighted Field Matching with Scoring
 
 ドメイン層で汎用的かつ再利用可能なフィールドマッチングシステムを構築するためのエンドツーエンドワークフロー：比較結果とスコアの値オブジェクト、類似度ユーティリティ（レーベンシュタイン距離、数値比較）、汎用 `FieldMatchingService<TSource, TCandidate>`、および品質閾値のためのSpecificationパターン。
 
-## このスキルを使うタイミング
+## When to Use This Skill
 
 以下の場合にこのスキルを使用してください：
 - 複数のフィールドを比較して2つの異なるデータソースからレコードをマッチングするとき
@@ -26,7 +30,7 @@ version: 1.0.0
 
 ---
 
-## 関連スキル
+## Related Skills
 
 - **`dotnet-ocr-matching-workflow`** — このマッチング基盤をOCR-データベースレコードマッチングに使用
 - **`dotnet-oracle-wpf-integration`** — マッチング用の候補データをOracleから提供
@@ -36,7 +40,7 @@ version: 1.0.0
 
 ---
 
-## コア原則
+## Core Principles
 
 1. **ドメインの純粋性** — すべてのマッチングロジックはインフラ依存ゼロでドメイン層に配置（基礎と型）
 2. **汎用的な再利用性** — `FieldMatchingService<TSource, TCandidate>` は任意のエンティティペアで動作（成長の複利）
@@ -46,9 +50,9 @@ version: 1.0.0
 
 ---
 
-## ワークフロー: 汎用フィールドマッチングの構築
+## Workflow: Build Generic Field Matching
 
-### Step 1 — 値オブジェクトの作成（ドメイン層）
+### Step 1 — Create Value Objects (Domain Layer)
 
 フィールド比較、スコアリング、マッチング結果の不変な結果型を定義するときに使用します。
 
@@ -133,7 +137,7 @@ namespace Mercury.Domain.Matching
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 2 — 類似度ユーティリティの実装
+### Step 2 — Implement Similarity Utilities
 
 文字列および数値の比較関数をフィールドマッチング用に構築するときに使用します。
 
@@ -212,7 +216,7 @@ namespace Mercury.Domain.Matching
 
 > **Values**: 基礎と型 / ニュートラル
 
-### Step 3 — マッチングサービスの作成
+### Step 3 — Create Matching Service
 
 ソースを候補と比較する汎用マッチングサービスを構築するときに使用します。
 
@@ -295,7 +299,7 @@ namespace Mercury.Domain.Matching
 
 > **Values**: 成長の複利 / 基礎と型
 
-### Step 4 — Specificationパターンの実装（品質閾値）
+### Step 4 — Implement Specification Pattern (Quality Threshold)
 
 マッチング結果に対する品質制約をファーストクラスのドメイン概念として適用するときに使用します。
 
@@ -347,7 +351,7 @@ bool allHighQuality = spec.IsSatisfiedBy(matchingResults);
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 5 — アプリケーション層との統合
+### Step 5 — Integrate with Application Layer
 
 マッチングサービスをオーケストレーションするユースケースを作成するときに使用します。
 
@@ -383,7 +387,7 @@ namespace Mercury.Application.UseCases.Matching
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 6 — フィールド定義のカスタマイズ
+### Step 6 — Customize Field Definitions
 
 特定のドメイン（例：注文書-SOFマッチング）用にマッチングサービスを設定するときに使用します。
 
@@ -438,9 +442,9 @@ var service = new FieldMatchingService<OrderSheet, SofRecord>(fields, successThr
 
 ---
 
-## グッドプラクティス
+## Good Practices
 
-### 1. 金額比較にはdecimalを使用
+### 1. Use decimal for Money Comparisons
 
 ✅ 金額フィールドの比較（単価、合計金額）には必ず `decimal` を使用してください。浮動小数点型（`float`、`double`）は丸め誤差を引き起こし、厳密値での誤った不一致の原因になります。
 
@@ -450,7 +454,7 @@ public static double NumericSimilarityDecimal(decimal a, decimal b)
     => a == b ? 1.0 : 0.0;
 ```
 
-### 2. 比較前に文字列を正規化
+### 2. Normalize Strings Before Comparison
 
 ✅ 類似度計算前に空白（全角スペースを含む）を除去し、小文字に変換してください。書式の違いによるスコア低下を防ぎます。
 
@@ -459,15 +463,15 @@ private static string Normalize(string? value)
     => (value ?? string.Empty).Trim().Replace(" ", "").Replace("　", "").ToLowerInvariant();
 ```
 
-### 3. 重みはハードコードせず設定可能に
+### 3. Make Weights Configurable, Not Hardcoded
 
 ✅ `FieldDefinition` の設定で重みを渡してください。異なるマッチングシナリオ（注文マッチング vs 在庫マッチング）では異なる重み配分が必要になる場合があります。
 
 ---
 
-## よくある落とし穴
+## Common Pitfalls
 
-### 1. 金額フィールドの比較にfloat/doubleを使用
+### 1. Using float/double for Monetary Field Comparison
 
 **Problem**: `double` の演算は丸め誤差を生じ（例：`0.1 + 0.2 != 0.3`）、厳密一致の金額比較が失敗します。
 
@@ -485,13 +489,13 @@ decimal price2 = 1234.56m;
 bool match = price1 == price2; // 信頼性が高い
 ```
 
-### 2. マッチングサービス内でフィールド名をハードコード
+### 2. Hardcoding Field Names in Matching Service
 
 **Problem**: `"ProductName"` のようなフィールド名をマッチングループに直接埋め込むと、サービスが再利用できなくなります。
 
 **Solution**: 設定可能な抽出関数と名前を持つ `FieldDefinition<TSource, TCandidate>` を使用してください。
 
-### 3. 空の候補リストを処理しない
+### 3. Not Handling Empty Candidate Lists
 
 **Problem**: 候補ゼロで `FindBestMatch` を呼び出すと `NullReferenceException` や誤った「100%一致」結果が発生します。
 
@@ -505,9 +509,9 @@ if (candidateList.Count == 0)
 
 ---
 
-## アンチパターン
+## Anti-Patterns
 
-### ViewModelにマッチングロジックを配置
+### Putting Matching Logic in ViewModel
 
 **What**: WPF ViewModelで類似度スコアの計算やマッチングループを実行すること。
 
@@ -515,7 +519,7 @@ if (candidateList.Count == 0)
 
 **Better Approach**: すべてのマッチングをドメイン層（`FieldMatchingService`）に保持してください。ViewModelはアプリケーション層のユースケースを呼び出し、結果をバインドするだけです。
 
-### 数値フィールドに文字列比較を使用
+### Using String Comparison for Numeric Fields
 
 **What**: 数値をパースせずに `"1234.56"` と `"1234.560"` を文字列として比較すること。
 
@@ -533,9 +537,9 @@ SimilarityCalculator.NumericSimilarityDecimal(1234.56m, 1234.560m); // 1.0
 
 ---
 
-## クイックリファレンス
+## Quick Reference
 
-### 実装チェックリスト
+### Implementation Checklist
 
 - [ ] `FieldComparison` 値オブジェクトを作成（Step 1）
 - [ ] 重み付き計算を持つ `MatchingScore` を作成（Step 1）
@@ -549,7 +553,7 @@ SimilarityCalculator.NumericSimilarityDecimal(1234.56m, 1234.560m); // 1.0
 - [ ] 検証: 空の候補リストがスコアゼロの結果を返すこと
 - [ ] 検証: 金額フィールドが `decimal` 比較を使用していること
 
-### 比較タイプ判定表
+### Comparison Type Decision Table
 
 | データ型 | 比較関数 | 戻り値 | 用途 |
 |---------|---------|--------|------|
@@ -557,7 +561,7 @@ SimilarityCalculator.NumericSimilarityDecimal(1234.56m, 1234.560m); // 1.0
 | 金額（価格、合計） | `NumericSimilarityDecimal` | 0.0 または 1.0（厳密一致） | 単価、合計金額 |
 | 寸法（サイズ、重量） | `NumericSimilarityDouble` | 0.0〜1.0（許容範囲） | 幅、高さ、重量 |
 
-### 重み割り当てガイドライン
+### Weight Assignment Guidelines
 
 | 優先度 | 重み範囲 | フィールド例 |
 |-------|---------|------------|
@@ -568,7 +572,7 @@ SimilarityCalculator.NumericSimilarityDecimal(1234.56m, 1234.560m); // 1.0
 
 ---
 
-## リソース
+## Resources
 
 - `dotnet-ocr-matching-workflow` — このスキルを使用した完全なOCR-データベースマッチングワークフロー
 - `dotnet-wpf-comparison-view` — マッチング結果表示用のWPF UI
@@ -577,7 +581,7 @@ SimilarityCalculator.NumericSimilarityDecimal(1234.56m, 1234.560m); // 1.0
 
 ---
 
-## 変更履歴
+## Changelog
 
 | バージョン | 日付 | 変更内容 |
 |-----------|------|---------|

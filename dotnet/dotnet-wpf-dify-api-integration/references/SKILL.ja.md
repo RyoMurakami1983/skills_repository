@@ -1,17 +1,21 @@
+<!-- このドキュメントは dotnet-wpf-dify-api-integration の日本語版です。英語版: ../SKILL.md -->
+
 ---
 name: dotnet-wpf-dify-api-integration
 description: WPFアプリにDify APIを追加。DPAPI設定とSSEストリーミング対応。Dify連携構築時に使用。
-author: RyoMurakami1983
-tags: [dotnet, wpf, dify, csharp, mvvm]
-invocable: false
 version: 1.0.0
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, dify, csharp, mvvm]
+  invocable: false
 ---
 
 # WPFアプリケーションへのDify API連携追加
 
 WPFアプリケーションにDify API連携を追加するためのエンドツーエンドワークフロー：DPAPIによるセキュア設定、MVVM設定UI、ファイルアップロード、SSEベースのワークフローストリーミング。
 
-## このスキルを使うタイミング
+## When to Use This Skill
 
 以下の場合にこのスキルを使用してください：
 - 既存のWPFアプリケーションにDify API連携を追加するとき
@@ -22,7 +26,7 @@ WPFアプリケーションにDify API連携を追加するためのエンドツ
 
 ---
 
-## 関連スキル
+## Related Skills
 
 - **`dotnet-wpf-secure-config`** — 必須：DPAPI暗号化基盤（先に適用）
 - **`dotnet-oracle-wpf-integration`** — 同じアプリでSecureConfigServiceを共有
@@ -32,7 +36,7 @@ WPFアプリケーションにDify API連携を追加するためのエンドツ
 
 ---
 
-## コア原則
+## Core Principles
 
 1. **階層化アーキテクチャ** — Presentation、Infrastructure、Domainの関心事を分離（基礎と型）
 2. **デフォルトでセキュア** — APIキーはDPAPI暗号化。平文保存は禁止（ニュートラル）
@@ -42,7 +46,7 @@ WPFアプリケーションにDify API連携を追加するためのエンドツ
 
 ---
 
-## ワークフロー: WPFにDify APIを統合
+## Workflow: Integrate Dify API into WPF
 
 ### Step 1 — プロジェクト構造のセットアップ
 
@@ -225,50 +229,7 @@ public async Task<string> RunWorkflowStreamingAsync(
 }
 ```
 
-**SSEストリームリーダー** — イベントを進捗レポーターにルーティング：
-
-```csharp
-private async Task<string> ReadSseStreamAsync(
-    HttpResponseMessage response, IProgress<string>? progress)
-{
-    using var reader = new StreamReader(await response.Content.ReadAsStreamAsync());
-    string? result = null;
-
-    while (!reader.EndOfStream)
-    {
-        var line = await reader.ReadLineAsync();
-        if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("data:")) continue;
-
-        try
-        {
-            using var doc = JsonDocument.Parse(line[5..].Trim());
-            var evt = doc.RootElement.GetProperty("event").GetString();
-            switch (evt)
-            {
-                case "workflow_started":
-                    progress?.Report("▶️ ワークフロー開始"); break;
-                case "node_started":
-                    var title = doc.RootElement.GetProperty("data")
-                        .GetProperty("title").GetString();
-                    progress?.Report($"🔄 {title} 実行中..."); break;
-                case "node_finished":
-                    var d = doc.RootElement.GetProperty("data");
-                    var s = d.GetProperty("status").GetString();
-                    var t = d.GetProperty("title").GetString();
-                    progress?.Report(s == "succeeded" ? $"✅ {t} 完了" : $"❌ {t} 失敗");
-                    break;
-                case "workflow_finished":
-                    result = doc.RootElement.GetProperty("data")
-                        .GetProperty("outputs").GetRawText();
-                    progress?.Report("✅ ワークフロー完了"); break;
-            }
-        }
-        catch (JsonException) { continue; } // 不正なSSE行はスキップ
-    }
-    return result ?? throw new InvalidOperationException(
-        "ワークフロー実行結果が取得できませんでした。");
-}
-```
+**SSEストリームリーダー** — `data:`行を解析し、`workflow_started` / `node_started` / `node_finished` / `workflow_finished`イベントを`IProgress<string>`にルーティングします。完全な実装は[references/detailed-patterns.md](detailed-patterns.md#sse-stream-reader)を参照してください。
 
 > **Values**: 継続は力 / 温故知新
 
@@ -404,7 +365,7 @@ new DifyConfigDialog(vm).ShowDialog();
 
 ---
 
-## グッドプラクティス
+## Good Practices
 
 ### 1. 保存前にBaseUrlスキームを検証
 
@@ -432,7 +393,7 @@ new DifyConfigDialog(vm).ShowDialog();
 
 ---
 
-## よくある落とし穴
+## Common Pitfalls
 
 ### 1. appsettings.jsonにAPIキーを保存
 
@@ -476,7 +437,7 @@ var result = await difyService.RunWorkflowStreamingAsync(..., progress);
 
 ---
 
-## アンチパターン
+## Anti-Patterns
 
 ### code-behindにビジネスロジック
 
@@ -496,7 +457,7 @@ var result = await difyService.RunWorkflowStreamingAsync(..., progress);
 
 ---
 
-## クイックリファレンス
+## Quick Reference
 
 ### 実装チェックリスト
 
@@ -512,7 +473,7 @@ var result = await difyService.RunWorkflowStreamingAsync(..., progress);
 
 ---
 
-## リソース
+## Resources
 
 - `local_docs/DifyAPI実装ガイド.md` — 完全な実装リファレンス（社内限定ドキュメント、本リポジトリ外）
 - `local_docs/共通セキュリティコンポーネント.md` — DPAPI詳細（社内限定ドキュメント、本リポジトリ外）
@@ -521,7 +482,7 @@ var result = await difyService.RunWorkflowStreamingAsync(..., progress);
 
 ---
 
-## 変更履歴
+## Changelog
 
 ### バージョン 1.0.0 (2026-02-15)
 - 初回リリース: 単一ワークフローDify API連携ガイド

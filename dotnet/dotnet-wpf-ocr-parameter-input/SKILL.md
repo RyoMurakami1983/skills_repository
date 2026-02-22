@@ -1,10 +1,12 @@
 ---
 name: dotnet-wpf-ocr-parameter-input
 description: Build an OCR execution parameter input UI tab in WPF with progress display. Use when adding OCR processing tabs with configurable input fields.
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, mvvm, ocr, progress, tab]
-invocable: false
+license: MIT
 version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, mvvm, ocr, progress, tab]
+  invocable: false
 ---
 
 # Build OCR Execution Parameter Input Tab with Progress Display
@@ -201,49 +203,11 @@ Use when connecting the OCR tab to the parent ViewModel and integrating into a `
 
 The parent ViewModel creates the tab ViewModel, subscribes to `OcrCompleted`, and manages tab switching. PDF upload events flow from the parent to the OCR tab via `OnPdfUploaded`.
 
-**Parent ViewModel wiring**:
+**Parent ViewModel wiring** — subscribe to `OcrCompleted` and call `OnPdfUploaded`:
 
 ```csharp
-public partial class MainViewModel : ObservableObject
-{
-    public OcrProcessTabViewModel OcrTab { get; }
-
-    [ObservableProperty] private int selectedTabIndex;
-
-    public MainViewModel(IOcrUseCase useCase)
-    {
-        OcrTab = new OcrProcessTabViewModel(useCase);
-        OcrTab.OcrCompleted += OnOcrCompleted;
-    }
-
-    private void OnOcrCompleted(object? sender, IEnumerable<object> results)
-    {
-        // Handle OCR results (e.g., populate comparison view)
-        SelectedTabIndex = 2; // Switch to results tab
-    }
-
-    // Called when PDF is uploaded (e.g., from PDF preview tab)
-    private void NotifyPdfUploaded(string pdfPath)
-    {
-        OcrTab.OnPdfUploaded(pdfPath);
-    }
-}
-```
-
-**TabControl integration in MainWindow.xaml**:
-
-```xml
-<TabControl SelectedIndex="{Binding SelectedTabIndex}">
-    <TabItem Header="PDF Preview">
-        <!-- PDF preview content -->
-    </TabItem>
-    <TabItem Header="OCR Process">
-        <local:OcrProcessTabView DataContext="{Binding OcrTab}"/>
-    </TabItem>
-    <TabItem Header="Results">
-        <!-- Results content -->
-    </TabItem>
-</TabControl>
+OcrTab = new OcrProcessTabViewModel(useCase);
+OcrTab.OcrCompleted += OnOcrCompleted;
 ```
 
 **Event flow**:
@@ -256,15 +220,7 @@ User clicks Start → OcrTab.StartOcrAsync() → IProgress updates UI
 OcrTab.OcrCompleted event → Parent.OnOcrCompleted() → Switch to results tab
 ```
 
-**State reset on new PDF upload**:
-
-```csharp
-private void NotifyPdfUploaded(string pdfPath)
-{
-    OcrTab.Reset();              // Clear previous progress
-    OcrTab.OnPdfUploaded(pdfPath); // Enable Start button
-}
-```
+Full wiring examples (Parent ViewModel, TabControl, State Reset): [`references/detailed-patterns.md`](references/detailed-patterns.md)
 
 > **Values**: ニュートラル / 継続は力
 
