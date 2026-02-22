@@ -116,6 +116,10 @@ pre-commitとpre-pushフックを導入し、変更がリモートに届く前�
 
 privateリポジトリの保護代替、ローカル安全策、またはリリースウィンドウ中に使います。
 
+> **Note**: `.git/hooks/` にコピーする代わりに、リポジトリレベルのフックディレクトリを `git config core.hooksPath .githooks` で指定できます。フックがバージョン管理され、clone後にセットアップスクリプト不要で自動適用されます。
+
+> **トラブルシューティング（Windows）**: `setup.ps1` がセキュリティエラーで失敗する場合、PowerShellの実行ポリシーが `Restricted` になっている可能性があります。`Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` を実行してローカルスクリプトを許可してから再試行してください。
+
 > **Values**: 継続は力 / 基礎と型
 
 ### Step 6: グローバルフックのデフォルト設定

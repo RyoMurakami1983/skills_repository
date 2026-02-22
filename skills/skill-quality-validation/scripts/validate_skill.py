@@ -1088,7 +1088,7 @@ class LanguageValidator(SkillValidator):
 
 
 class WarningValidator:
-    """Generates warning-level checks (EN/JA parity, Values, safety risks)"""
+    """Generates warning-level checks (EN/JA parity, Values, safety risks, Japanese leak)"""
 
     def __init__(self, content: str, file_path: str):
         self.content = content
@@ -1155,6 +1155,7 @@ class WarningValidator:
         warnings.extend(self._check_step_values())
         warnings.extend(self._check_ja_safety_risks())
         warnings.extend(self._check_glossary_freshness())
+        warnings.extend(self._check_en_japanese_leak())
         return warnings
 
     # --- W1: EN/JA structural parity ---
@@ -1324,6 +1325,57 @@ class WarningValidator:
                 "W4",
                 "Glossary may be outdated — skill file is newer than glossary date",
                 f"Skill modified: {skill_mtime}, Glossary: {glossary_date}"
+            ))
+
+        return warnings
+
+    # --- W5: Japanese leak detection in EN files ---
+
+    def _check_en_japanese_leak(self) -> List[WarningResult]:
+        """W5: Detect Japanese text leaking into EN SKILL.md (outside allowed contexts)."""
+        warnings: List[WarningResult] = []
+
+        # Only check EN files (not JA files)
+        file_name = Path(self.file_path).name
+        if file_name.endswith('.ja.md'):
+            return warnings
+
+        # Strip fenced code blocks (Japanese in code examples is OK)
+        cleaned = self._strip_fenced_code(self.content)
+
+        # Also strip frontmatter (Japanese in frontmatter metadata is OK)
+        cleaned = re.sub(r'^---\s*\n.*?\n---\s*\n', '', cleaned, count=1, flags=re.DOTALL)
+
+        # Also strip Values blockquotes (Japanese Values names like 基礎と型 are OK)
+        cleaned = re.sub(r'^>\s*\*\*Values\*\*.*$', '', cleaned, flags=re.MULTILINE)
+
+        # Strip parenthetical Values references — e.g. (基礎と型), (成長の複利)
+        # Uses regex to catch full and abbreviated Values names
+        cleaned = re.sub(
+            r'[（(](?:温故知新|継続は力|基礎と型の追求|基礎と型|成長の複利|'
+            r'ニュートラルな視点|ニュートラル|余白の設計)[)）]',
+            '', cleaned
+        )
+        # Strip lines containing Values markers with Japanese names
+        cleaned = re.sub(
+            r'^.*\*\*Values\*\*\s*[:：].*$', '', cleaned, flags=re.MULTILINE
+        )
+
+        # Check for Japanese characters (Hiragana, Katakana, CJK Unified Ideographs)
+        japanese_pattern = re.compile(r'[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]')
+
+        found_lines = []
+        for i, line in enumerate(cleaned.split('\n'), 1):
+            if japanese_pattern.search(line):
+                # Get a short excerpt
+                excerpt = line.strip()[:60]
+                found_lines.append(f"L{i}: {excerpt}")
+
+        if found_lines:
+            warnings.append(WarningResult(
+                "W5",
+                "EN SKILL.md contains Japanese text — verify intentional or move to JA version",
+                f"Found in {len(found_lines)} line(s): {'; '.join(found_lines[:5])}"
             ))
 
         return warnings
