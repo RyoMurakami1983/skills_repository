@@ -7,8 +7,6 @@ import sys
 from functools import lru_cache
 from pathlib import Path
 
-import pytest
-
 
 @lru_cache(maxsize=1)
 def _load_validator_module():
@@ -68,7 +66,7 @@ class TestW5TruePositive:
         warnings = v._check_en_japanese_leak()
         assert len(warnings) == 1
         assert warnings[0].id == "W5"
-        assert "日本語" in warnings[0].details or "Japanese" in warnings[0].description
+        assert "このスキルは日本語テストです。" in warnings[0].details
 
     def test_japanese_in_table_detected(self, tmp_path: Path):
         content = FRONTMATTER + "| Type | Example |\n|------|--------|\n| feat | 通知を追加 |\n"
