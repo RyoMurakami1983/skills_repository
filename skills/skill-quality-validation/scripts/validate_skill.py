@@ -1364,12 +1364,21 @@ class WarningValidator:
         # Check for Japanese characters (Hiragana, Katakana, CJK Unified Ideographs)
         japanese_pattern = re.compile(r'[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]')
 
+        # Build original line lookup for accurate line number reporting
+        original_lines = self.content.split('\n')
+
         found_lines = []
-        for i, line in enumerate(cleaned.split('\n'), 1):
+        for _i, line in enumerate(cleaned.split('\n'), 1):
             if japanese_pattern.search(line):
-                # Get a short excerpt
                 excerpt = line.strip()[:60]
-                found_lines.append(f"L{i}: {excerpt}")
+                # Find the actual line number in the original file
+                orig_num = None
+                for oi, ol in enumerate(original_lines, 1):
+                    if ol.strip() == line.strip():
+                        orig_num = oi
+                        break
+                label = f"L{orig_num}" if orig_num else "L?"
+                found_lines.append(f"{label}: {excerpt}")
 
         if found_lines:
             warnings.append(WarningResult(
