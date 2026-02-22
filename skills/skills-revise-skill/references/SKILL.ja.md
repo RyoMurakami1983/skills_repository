@@ -147,7 +147,22 @@ def is_substantial(description: str) -> bool:
 
 ---
 
-### Step 5: バージョン番号の更新
+### Step 5: 用語辞書の整合確認
+
+`copilot-instructions.md`の用語辞書セクション（🗣️ 用語辞書）を確認し、改訂で変更されたスキル名・スコープ・キーワードがあれば辞書を更新。
+
+```text
+# 該当する用語が辞書にあるか確認
+grep -i "SKILL_NAME" copilot/copilot-instructions.md
+```
+
+**実行タイミング**: スキル名・スコープ変更時、または新しいドメイン用語を導入した時。
+
+> **Values**: ニュートラルな視点（用語辞書の鮮度を保ち、形式知を維持）
+
+---
+
+### Step 6: バージョン番号の更新
 
 変更の重要度に基づいてセマンティックバージョニング（MAJOR.MINOR.PATCH）を適用。frontmatterとCHANGELOGのバージョンを更新。
 
@@ -162,7 +177,7 @@ def is_substantial(description: str) -> bool:
 
 ---
 
-### Step 6: 古いスキルの検出
+### Step 7: 古いスキルの検出
 
 経過時間に基づいて更新が必要なスキルを積極的に特定。changelogから最新バージョンの日付を解析し、古いスキルをレビュー対象としてフラグ。
 
@@ -191,7 +206,7 @@ def check_freshness(skill_path: Path) -> str:
 
 ---
 
-### Step 7: スキルの一括改訂
+### Step 8: スキルの一括改訂
 
 1回のセッションで複数のスキルを改訂し、一貫性を確保。すべてのスキルに同じ基準を適用：システムスキル検出、変更適用、JA版同期、changelog更新、検証。
 
