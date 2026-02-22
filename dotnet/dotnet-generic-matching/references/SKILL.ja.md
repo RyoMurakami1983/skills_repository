@@ -4,7 +4,6 @@
 name: dotnet-generic-matching
 description: .NETドメイン層で汎用的な重み付きフィールドマッチングとスコアリングを実装。
 license: MIT
-version: 1.0.0
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, csharp, ddd, matching, domain-layer, generics, specification-pattern]

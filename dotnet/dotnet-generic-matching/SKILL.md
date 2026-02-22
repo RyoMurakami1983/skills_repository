@@ -2,7 +2,6 @@
 name: dotnet-generic-matching
 description: Use when you need generic weighted field matching with scoring in a .NET Domain layer.
 license: MIT
-version: 1.0.0
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, csharp, ddd, matching, domain-layer, generics, specification-pattern]

@@ -3,7 +3,6 @@
 ---
 name: dotnet-wpf-dify-api-integration
 description: WPFアプリにDify APIを追加。DPAPI設定とSSEストリーミング対応。Dify連携構築時に使用。
-version: 1.0.0
 license: MIT
 metadata:
   author: RyoMurakami1983

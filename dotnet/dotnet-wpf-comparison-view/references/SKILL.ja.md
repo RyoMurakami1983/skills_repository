@@ -1,7 +1,6 @@
 ---
 name: dotnet-wpf-comparison-view
 description: WPFでサイドバイサイド比較ビューを構築。不一致ハイライトとチェックボックス検証付きのマッチング結果表示。
-version: 1.0.0
 license: MIT
 metadata:
   author: RyoMurakami1983

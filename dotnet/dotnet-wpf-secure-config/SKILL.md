@@ -81,17 +81,15 @@ Use when adding the Windows DPAPI encryption utility that all config models will
 
 Create the static encryption helper with `Encrypt`, `Decrypt`, and `MaskSensitive` methods.
 
-```csharp
-// Infrastructure/Configuration/DpapiEncryptor.cs
+```text
+// Infrastructure/Configuration/DpapiEncryptor.cs — Signature Overview
 public static class DpapiEncryptor
 {
-    // ✅ Change this salt per application — see Step 6
-    private static readonly byte[] Entropy
-        = Encoding.UTF8.GetBytes("YourApp_Config_Salt_2026");
+    private static readonly byte[] Entropy = Encoding.UTF8.GetBytes("YourApp_Config_Salt_2026");
 
-    public static string Encrypt(string plainText);    // DPAPI Protect → Base64
-    public static string Decrypt(string encryptedText); // Base64 → DPAPI Unprotect
-    public static string MaskSensitive(string value);   // "abcd****" for logging
+    public static string Encrypt(string plainText)      // DPAPI Protect → Base64
+    public static string Decrypt(string encryptedText)   // Base64 → DPAPI Unprotect
+    public static string MaskSensitive(string value)     // "abcd****" for logging
 }
 ```
 
@@ -198,19 +196,19 @@ namespace YourApp.Infrastructure.Configuration
 
 **SecureConfigService.cs**:
 
-```csharp
-// Infrastructure/Configuration/SecureConfigService.cs
+```text
+// Infrastructure/Configuration/SecureConfigService.cs — Signature Overview
 public class SecureConfigService : ISecureConfigService
 {
     // ✅ Change "YourAppName" — see Step 6
     // Stores config at %LOCALAPPDATA%/YourAppName/config/config.json
 
-    public bool ConfigExists() => File.Exists(_configFilePath);
-    public async Task ResetConfigAsync();
+    public bool ConfigExists()
+    public Task ResetConfigAsync()
 
     // ✅ Add typed load/save methods per integration
-    protected async Task<AppConfigModel> LoadAppConfigAsync();
-    protected async Task SaveAppConfigAsync(AppConfigModel appConfig);
+    protected Task<AppConfigModel> LoadAppConfigAsync()
+    protected Task SaveAppConfigAsync(AppConfigModel appConfig)
 }
 ```
 

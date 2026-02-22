@@ -3,7 +3,6 @@
 name: dotnet-ocr-matching-workflow
 description: 基盤・インフラ・プレゼンテーションの各スキルをエンドツーエンドで合成し、OCR→DBマッチングの完全なシステムをオーケストレーションします。
 license: MIT
-version: 1.0.0
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, wpf, csharp, ddd, ocr, matching, workflow, orchestration]

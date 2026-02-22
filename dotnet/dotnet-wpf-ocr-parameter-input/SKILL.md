@@ -2,7 +2,6 @@
 name: dotnet-wpf-ocr-parameter-input
 description: Build an OCR execution parameter input UI tab in WPF with progress display. Use when adding OCR processing tabs with configurable input fields.
 license: MIT
-version: 1.0.0
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, wpf, csharp, mvvm, ocr, progress, tab]

@@ -1,7 +1,6 @@
 ---
 name: dotnet-wpf-comparison-view
 description: Use when building a side-by-side comparison view in WPF for matching results with mismatch highlighting and checkbox verification.
-version: 1.0.0
 license: MIT
 metadata:
   author: RyoMurakami1983

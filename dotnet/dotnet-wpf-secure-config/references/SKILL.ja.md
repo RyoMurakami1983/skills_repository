@@ -83,17 +83,15 @@ Install-Package Microsoft.Extensions.DependencyInjection
 
 `Encrypt`、`Decrypt`、`MaskSensitive`メソッドを持つ静的暗号化ヘルパーを作成する。
 
-```csharp
-// Infrastructure/Configuration/DpapiEncryptor.cs
+```text
+// Infrastructure/Configuration/DpapiEncryptor.cs — シグネチャ概要
 public static class DpapiEncryptor
 {
-    // ✅ アプリケーションごとに変更すること — Step 6参照
-    private static readonly byte[] Entropy
-        = Encoding.UTF8.GetBytes("YourApp_Config_Salt_2026");
+    private static readonly byte[] Entropy = Encoding.UTF8.GetBytes("YourApp_Config_Salt_2026");
 
-    public static string Encrypt(string plainText);    // DPAPI Protect → Base64
-    public static string Decrypt(string encryptedText); // Base64 → DPAPI Unprotect
-    public static string MaskSensitive(string value);   // ログ用マスク "abcd****"
+    public static string Encrypt(string plainText)      // DPAPI Protect → Base64
+    public static string Decrypt(string encryptedText)   // Base64 → DPAPI Unprotect
+    public static string MaskSensitive(string value)     // ログ用マスク "abcd****"
 }
 ```
 
@@ -200,19 +198,19 @@ namespace YourApp.Infrastructure.Configuration
 
 **SecureConfigService.cs**：
 
-```csharp
-// Infrastructure/Configuration/SecureConfigService.cs
+```text
+// Infrastructure/Configuration/SecureConfigService.cs — シグネチャ概要
 public class SecureConfigService : ISecureConfigService
 {
     // ✅ "YourAppName"を変更 — Step 6参照
     // 設定を %LOCALAPPDATA%/YourAppName/config/config.json に保存
 
-    public bool ConfigExists() => File.Exists(_configFilePath);
-    public async Task ResetConfigAsync();
+    public bool ConfigExists()
+    public Task ResetConfigAsync()
 
     // ✅ 統合ごとに型付きload/saveメソッドを追加
-    protected async Task<AppConfigModel> LoadAppConfigAsync();
-    protected async Task SaveAppConfigAsync(AppConfigModel appConfig);
+    protected Task<AppConfigModel> LoadAppConfigAsync()
+    protected Task SaveAppConfigAsync(AppConfigModel appConfig)
 }
 ```
 

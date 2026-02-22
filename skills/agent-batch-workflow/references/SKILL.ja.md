@@ -285,6 +285,6 @@ A: SQLで `blocked` にマーク、descriptionにメモ、バッチからスキ�
 
 ## Resources
 
-- [コスモス化移行ふりかえり](../../docs/furikaeri/2026-02-22-cosmos-migration.md) — このワークフローの起源
+- [コスモス化移行ふりかえり](../../../docs/furikaeri/2026-02-22-cosmos-migration.md) — このワークフローの起源
 - [Git Switch ドキュメント](https://git-scm.com/docs/git-switch) — モダンなブランチコマンド
 - [報連相](https://ja.wikipedia.org/wiki/%E5%A0%B1%E9%80%A3%E7%9B%B8) — 日本のビジネスコミュニケーションプロトコル
