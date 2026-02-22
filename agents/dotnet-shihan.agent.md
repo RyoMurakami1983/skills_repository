@@ -106,6 +106,14 @@ tools:
 - `dotnet-marketplace-publishing` — マーケットプレイス公開
 - `dotnet-mjml-email-templates` — MJMLメールテンプレート
 
+### 共通運用スキル（skill-shihan管理、全shihan共通）
+- `git-commit-practices` — コミット規約
+- `git-initial-setup` — Git初期設定
+- `git-init-to-github` — リポジトリ作成からGitHub接続
+- `github-pr-workflow` — PR作成ワークフロー
+- `github-issue-intake` — Issue取り込み
+- `furikaeri-practice` — ふりかえり実践
+
 ---
 
 ## 品質基準（先生モードで使用）

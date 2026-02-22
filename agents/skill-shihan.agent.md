@@ -75,7 +75,11 @@ tools:
 - `skills-review-skill-enterprise-readiness` — エンタープライズ対応レビュー
 - `skill-quality-validation` — バリデーションスクリプト
 
-### 運用系
+### 全shihan共通管轄（運用系）
+
+以下は全shihan（dotnet/python/skill）が自ドメインの作業中に参照・使用するスキル。
+skill-shihan がオーナーとして品質管理を担当する。
+
 - `agent-batch-workflow` — バッチ操作ワークフロー
 - `furikaeri-practice` — ふりかえり実践
 - `git-commit-practices` — コミット規約
