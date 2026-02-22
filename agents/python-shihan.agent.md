@@ -14,7 +14,7 @@ tools:
 
 ## 憲法
 
-すべての判断は [PHILOSOPHY.md](../../PHILOSOPHY.md) に基づきます。
+すべての判断はグローバル copilot-instructions.md の開発憲法に基づきます。
 
 **6つのValues**: 温故知新、継続は力、基礎と型の追求、成長の複利、ニュートラルな視点、余白の設計
 
