@@ -54,8 +54,11 @@ uv run python skills\skill-quality-validation\scripts\validate_skill.py skills\g
 ### よく使うコマンド
 
 ```powershell
-# スキル検証
+# スキル検証（単体）
 uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\SKILL.md
+
+# スキル検証（一括 — skills/ 配下すべて）
+.\skills\skill-quality-validation\scripts\validate_all_skills.ps1
 
 # テスト実行
 uv run pytest
