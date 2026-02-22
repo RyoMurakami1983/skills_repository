@@ -106,6 +106,9 @@ tools:
 - `dotnet-marketplace-publishing` — マーケットプレイス公開
 - `dotnet-mjml-email-templates` — MJMLメールテンプレート
 
+### デプロイ・運用
+- `dotnet-skill-deploy` — dotnetスキルのプロジェクトデプロイ（カテゴリ/個別選択）
+
 ### 共通運用スキル（skill-shihan管理、全shihan共通）
 - `git-commit-practices` — コミット規約
 - `git-initial-setup` — Git初期設定
