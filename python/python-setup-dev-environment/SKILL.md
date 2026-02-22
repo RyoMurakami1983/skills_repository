@@ -1,10 +1,10 @@
 ---
 name: python-setup-dev-environment
 description: Set up and run a reproducible Python dev environment with uv, ruff, mypy, and VSCode.
-author: RyoMurakami1983
-tags: [python, uv, ruff, mypy, vscode]
-invocable: false
-version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [python, uv, ruff, mypy, vscode]
+  invocable: false
 ---
 
 # Set Up a Python Dev Environment

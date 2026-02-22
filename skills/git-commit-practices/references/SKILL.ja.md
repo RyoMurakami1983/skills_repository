@@ -1,7 +1,6 @@
 ---
 name: git-commit-practices
 description: Conventional Commitsと原子的コミットの実践ガイド。履歴標準化に使う。
-version: 1.0.0
 metadata:
   author: RyoMurakami1983
   tags: [git, commits, conventional-commits, workflow, quality]

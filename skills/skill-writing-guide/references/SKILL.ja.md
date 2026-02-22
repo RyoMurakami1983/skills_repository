@@ -84,20 +84,21 @@ invocable: false
 ---
 name: wpf-mvvm-patterns
 description: Implement MVVM in WPF with domain-driven design, dependency injection, and testability. Use when building enterprise WPF applications with complex business logic.
-author: RyoMurakami1983
-tags: [wpf, mvvm, ddd, csharp, dotnet]
-invocable: false
 license: MIT
-version: 1.2.0
+metadata:
+  author: RyoMurakami1983
+  tags: [wpf, mvvm, ddd, csharp, dotnet]
+  invocable: false
 ---
 ```
 
 **フィールド指針**:
 - **name**: kebab-case、フォルダ名と一致、最大64文字
-- **description**: 100文字以内、"Use when..."で起動条件を明示
-- **author**: システム作成スキルは`RyoMurakami1983`
-- **tags**: 3-5個の技術タグ
-- **invocable**: 通常は`false`
+- **description**: 1024文字以内、"Use when..."で起動条件を明示
+- **author**: `metadata:` 下に配置。システム作成スキルは`RyoMurakami1983`
+- **tags**: `metadata:` 下に配置。3-5個の技術タグ
+- **invocable**: `metadata:` 下に配置。通常は`false`
+- **version**: トップレベル禁止（Changelogで管理）
 
 ---
 

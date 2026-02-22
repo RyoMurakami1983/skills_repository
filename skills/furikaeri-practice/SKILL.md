@@ -1,7 +1,6 @@
 ---
 name: furikaeri-practice
 description: Guided retrospective after sessions or PR reviews. Use when reflecting on work and planning improvements.
-version: 1.0.0
 metadata:
   author: RyoMurakami1983
   tags: [retrospective, kaizen, kpt, ywt, continuous-improvement, team-growth]

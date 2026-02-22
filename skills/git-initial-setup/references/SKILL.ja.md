@@ -1,7 +1,6 @@
 ---
 name: git-initial-setup
 description: git init/clone後のmain保護をデフォルト化する設定ガイド。初期セットアップで使う。
-version: 1.2.0
 metadata:
   author: RyoMurakami1983
   tags: [git, github, branch-protection, hooks, bootstrap]

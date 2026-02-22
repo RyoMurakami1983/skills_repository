@@ -1,7 +1,6 @@
 ---
 name: github-issue-intake
 description: スコープ外作業をIssueとして記録・具体化するためのガイド。トリアージと引き継ぎに使う。
-version: 2.1.0
 metadata:
   author: RyoMurakami1983
   tags: [github, issues, triage, workflow, documentation]

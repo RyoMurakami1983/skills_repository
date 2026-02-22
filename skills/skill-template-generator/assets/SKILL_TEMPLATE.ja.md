@@ -7,10 +7,10 @@
 ---
 name: your-skill-name-here
 description: このスキルが解決する問題の一行説明（100文字以内）
-invocable: false
-tags: [tag1, tag2, tag3]
-author: RyoMurakami1983
-version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [tag1, tag2, tag3]
+  invocable: false
 ---
 
 # スキルタイトル

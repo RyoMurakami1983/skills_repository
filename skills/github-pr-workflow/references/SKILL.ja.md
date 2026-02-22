@@ -1,7 +1,6 @@
 ---
 name: github-pr-workflow
 description: "PRを作成しIssueをクローズする。「プルリクして」「PR作成」で使う。"
-version: 2.0.0
 metadata:
   author: RyoMurakami1983
   tags: [github, pull-requests, workflow, git, pr-create]

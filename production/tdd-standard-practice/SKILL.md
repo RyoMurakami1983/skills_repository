@@ -1,10 +1,10 @@
 ---
 name: tdd-standard-practice
 description: Standardize a production TDD workflow with test lists and Red-Green-Refactor.
-author: RyoMurakami1983
-tags: [tdd, testing, workflow, ci, quality]
-invocable: false
-version: 1.0.0
+metadata:
+  author: RyoMurakami1983
+  tags: [tdd, testing, workflow, ci, quality]
+  invocable: false
 ---
 
 # TDD Standard Practice (Production)
