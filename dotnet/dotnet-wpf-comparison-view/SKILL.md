@@ -1,10 +1,12 @@
 ---
 name: dotnet-wpf-comparison-view
 description: Use when building a side-by-side comparison view in WPF for matching results with mismatch highlighting and checkbox verification.
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, mvvm, comparison-view, matching, community-toolkit]
-invocable: false
 version: 1.0.0
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, mvvm, comparison-view, matching, community-toolkit]
+  invocable: false
 ---
 
 # Build a Side-by-Side Comparison View in WPF
@@ -35,15 +37,11 @@ Use this skill when:
 - **`dotnet-wpf-dify-api-integration`** — Extracts Source B data via AI OCR
 - **`git-commit-practices`** — Commit each step as an atomic change
 
----
-
 ## Dependencies
 
 - .NET + WPF (Windows Presentation Foundation)
 - `CommunityToolkit.Mvvm` (ObservableObject, `[ObservableProperty]`, `[RelayCommand]`)
 - Matching results from your Domain/Application layer (e.g., `dotnet-generic-matching`)
-
----
 
 ## Core Principles
 
@@ -52,8 +50,6 @@ Use this skill when:
 3. **Live Recalculation** — Score updates immediately when editable fields change (継続は力)
 4. **Gated Export** — All checkboxes checked + all scores ≥ threshold before export is allowed (基礎と型)
 5. **Separation of Concerns** — Comparison logic stays in ViewModel; View only renders bindings (成長の複利)
-
----
 
 ## Workflow: Build Comparison View
 
@@ -350,42 +346,23 @@ namespace YourApp.ViewModels
 
 ### 1. Use Background Colors for Visual Matching Feedback
 
-✅ Apply `#F8D7DA` (pink) for mismatched fields, `#BBF7D0` (green) for verified fields, and `Transparent` for matching fields. Bind background to a string property in the ViewModel.
-
-```csharp
-// ✅ CORRECT — ViewModel drives background color via binding
-SourceBField1Background = IsField1Checked ? "#BBF7D0"
-    : IsMismatch(SourceAField1, SourceBField1) ? "#F8D7DA"
-    : "Transparent";
-```
+✅ Apply `#F8D7DA` (pink) for mismatched fields, `#BBF7D0` (green) for verified fields, and `Transparent` for matching fields. Bind background to a ViewModel string property — see Step 5 for implementation.
 
 **Values**: ニュートラル（即座の視覚フィードバック）
 
 ### 2. Recalculate Score on Editable Field Change
 
-✅ Use `partial void OnXxxChanged()` hooks to trigger `RecalculateMatchingScore()` immediately when the user edits a field. This gives instant feedback on whether their edit improved the match.
-
-```csharp
-partial void OnEditableUnitPriceChanged(decimal value)
-{
-    IsModified = true;
-    UpdateMismatchBackgrounds();
-    RecalculateMatchingScore();
-}
-```
+✅ Use `partial void OnXxxChanged()` hooks to trigger `RecalculateMatchingScore()` immediately when the user edits a field — see Step 4 for implementation.
 
 **Values**: 継続は力（リアルタイム再計算）
 
 ### 3. Validate All Checkboxes Before Export
 
-✅ Use `GetUncheckedVisibleCount()` to ensure every visible field has been reviewed. Only count fields where `HasDisplayValue` returns true — skip empty or placeholder values.
-
-```csharp
-var unchecked = ComparisonItems.Sum(i => i.GetUncheckedVisibleCount());
-if (unchecked > 0) { /* Block export */ }
-```
+✅ Use `GetUncheckedVisibleCount()` to ensure every visible field has been reviewed. Only count fields where `HasDisplayValue` returns true — see Step 6 for implementation.
 
 **Values**: 基礎と型（品質ゲート）
+
+> Code examples: `references/detailed-patterns.md`
 
 ---
 
@@ -444,35 +421,19 @@ public void SetResults(IEnumerable<MatchingResultData> results)
 
 **What**: Using `x:Name` to directly set TextBlock colors or backgrounds from code-behind instead of data binding.
 
-**Why It's Wrong**: Violates MVVM. The ViewModel cannot be unit tested if it depends on UI controls. Background color logic becomes invisible to tests.
+**Why It's Wrong**: Violates MVVM. The ViewModel cannot be unit tested if it depends on UI controls.
 
-**Better Approach**: Expose color as a string property in the ViewModel. Bind `Background="{Binding FieldBackground}"` in XAML. Test the ViewModel property directly.
-
-```csharp
-// ❌ WRONG — Direct UI manipulation
-Field1TextBlock.Background = new SolidColorBrush(Colors.Pink);
-
-// ✅ CORRECT — ViewModel property with binding
-[ObservableProperty] private string sourceBField1Background = "Transparent";
-```
+**Better Approach**: Expose color as a string `[ObservableProperty]` in the ViewModel. Bind `Background="{Binding FieldBackground}"` in XAML.
 
 ### Putting Comparison Logic in View Layer
 
 **What**: Computing mismatch status or score in XAML triggers, code-behind, or value converters.
 
-**Why It's Wrong**: Comparison logic is application/domain logic. Placing it in the View layer makes it untestable and couples business rules to UI framework.
+**Why It's Wrong**: Comparison logic is domain logic. Placing it in the View makes it untestable.
 
-**Better Approach**: Keep `IsMismatch()`, `UpdateMismatchBackgrounds()`, and `RecalculateMatchingScore()` in the ViewModel. The View only binds to the resulting properties.
+**Better Approach**: Keep `IsMismatch()`, `UpdateMismatchBackgrounds()`, and `RecalculateMatchingScore()` in the ViewModel.
 
-```csharp
-// ❌ WRONG — Mismatch check in IValueConverter
-public object Convert(object[] values, ...) =>
-    values[0]?.ToString() != values[1]?.ToString() ? Brushes.Pink : Brushes.Transparent;
-
-// ✅ CORRECT — Mismatch check in ViewModel
-private static bool IsMismatch(string? a, string? b)
-    => (a ?? string.Empty) != (b ?? string.Empty);
-```
+> Code examples: `references/detailed-patterns.md`
 
 ---
 
