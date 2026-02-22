@@ -1,10 +1,13 @@
 ---
 name: dotnet-wpf-employee-input
-description: Add employee number (社員番号) input dialog to WPF apps with DPAPI-encrypted storage. Use when building employee ID configuration.
-author: RyoMurakami1983
-tags: [dotnet, wpf, csharp, mvvm, employee, dpapi, configuration]
-invocable: false
-version: 1.0.0
+description: >
+  Add employee number (社員番号) input dialog to WPF apps with DPAPI-encrypted storage.
+  Use when building employee ID configuration.
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, wpf, csharp, mvvm, employee, dpapi, configuration]
+  invocable: false
 ---
 
 # Add Employee Number Input Dialog to WPF Applications

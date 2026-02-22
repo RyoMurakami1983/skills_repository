@@ -1,9 +1,13 @@
 ---
 name: dotnet-access-to-oracle-migration
-description: Migrate Access SQL to Oracle, generate .NET C# code. Use when converting Access queries to Oracle.
-author: RyoMurakami1983
-tags: [dotnet, oracle, access, csharp, database-migration]
-invocable: false
+description: >
+  Migrate Access SQL to Oracle, generate .NET C# code.
+  Use when converting Access queries to Oracle.
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, oracle, access, csharp, database-migration]
+  invocable: false
 ---
 
 # Migrate Access SQL to Oracle

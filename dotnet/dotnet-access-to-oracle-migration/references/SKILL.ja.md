@@ -1,10 +1,16 @@
 ---
 name: dotnet-access-to-oracle-migration
-description: Access SQLをOracleに移行し.NET C#コードを生成。VIEW/SYNONYM検出、tnsping検証を行う。
-author: RyoMurakami1983
-tags: [dotnet, oracle, access, csharp, database-migration]
-invocable: false
+description: >
+  Migrate Access SQL to Oracle, generate .NET C# code.
+  Use when converting Access queries to Oracle.
+license: MIT
+metadata:
+  author: RyoMurakami1983
+  tags: [dotnet, oracle, access, csharp, database-migration]
+  invocable: false
 ---
+
+<!-- このドキュメントは dotnet-access-to-oracle-migration の日本語版です。英語版: ../SKILL.md -->
 
 # Access SQLからOracle移行
 
