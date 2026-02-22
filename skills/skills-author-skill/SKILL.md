@@ -223,7 +223,18 @@ Create `references/SKILL.ja.md` with identical structure. The Japanese version m
 
 > **Values**: 継続は力（バイリンガル対応でアクセシビリティを維持）
 
-### Step 10 — Validate
+### Step 10 — Update Glossary
+
+Check `copilot-instructions.md` glossary section (🗣️ 用語辞書) and add/update entries for the new skill's key terms. This keeps the Ubiquitous Language dictionary in sync with new skills.
+
+```text
+# Verify glossary has an entry for the new skill
+grep -i "SKILL_NAME" copilot/copilot-instructions.md
+```
+
+> **Values**: ニュートラルな視点（用語を形式知化し、誰もが同じ言葉で議論できる）
+
+### Step 11 — Validate
 
 Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% overall, ≥ 80% per category.
 

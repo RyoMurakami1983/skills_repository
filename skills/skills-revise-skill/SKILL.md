@@ -144,7 +144,22 @@ For system skills, keep SKILL.md and references/SKILL.ja.md in sync. Update both
 
 ---
 
-### Step 5: Bump Version Number
+### Step 5: Verify Glossary Alignment
+
+Check `copilot-instructions.md` glossary section (🗣️ 用語辞書) for any terms affected by the revision. Update or add entries when a skill's name, scope, or key terminology changes.
+
+```text
+# Check glossary for affected terms
+grep -i "SKILL_NAME" copilot/copilot-instructions.md
+```
+
+**When**: After any revision that changes a skill's name, scope, or introduces new domain terms.
+
+> **Values**: ニュートラルな視点（用語辞書の鮮度を保ち、形式知を維持）
+
+---
+
+### Step 6: Bump Version Number
 
 Apply semantic versioning (MAJOR.MINOR.PATCH) based on change significance. Update the version in frontmatter and CHANGELOG.
 
@@ -161,7 +176,7 @@ Apply semantic versioning (MAJOR.MINOR.PATCH) based on change significance. Upda
 
 ---
 
-### Step 6: Detect Outdated Skills
+### Step 7: Detect Outdated Skills
 
 Proactively identify skills needing updates based on age. Use Git history (last significant update date) and flag stale skills for review.
 
@@ -192,7 +207,7 @@ def check_freshness(skill_path: Path) -> str:
 
 ---
 
-### Step 7: Batch Revise Skills
+### Step 8: Batch Revise Skills
 
 Revise multiple skills in a single session for consistency. Apply the same standards across all skills: detect system skills, apply changes, sync JA versions, optimize metadata discoverability, and validate.
 
