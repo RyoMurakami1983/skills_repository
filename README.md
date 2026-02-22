@@ -145,6 +145,26 @@ rsync -a --delete /mnt/c/tools/skills_repository/skills/ ~/.codex/skills/
 
 production/ や言語別Skillsは、プロジェクトの`.github/skills/`にコピーして使用します。
 
+**dotnetスキルのデプロイ（推奨: `dotnet-skill-deploy` スキル使用）**:
+
+`@dotnet-shihan` に「dotnetスキルをプロジェクトにデプロイして」と依頼すると、対話型でプロジェクト種別に応じたスキルを選択・コピーできます。
+
+手動実行する場合:
+
+```powershell
+# カテゴリ一覧を表示
+& C:\tools\skills_repository\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1 `
+    -SourceRoot C:\tools\skills_repository\dotnet -List
+
+# WPFアプリ開発一式をデプロイ
+& C:\tools\skills_repository\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1 `
+    -SourceRoot C:\tools\skills_repository\dotnet `
+    -Target C:\path\to\my-project `
+    -Category wpf-app
+```
+
+**productionスキルの手動コピー**:
+
 ```bash
 mkdir -p .github/skills
 cp -r /tmp/skills-repository/production/* .github/skills/
