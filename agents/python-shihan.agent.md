@@ -67,6 +67,14 @@ Pythonエコシステムの進化を追い、新しいパターンを作る。
 ### 現在
 - `python-setup-dev-environment` — Python開発環境セットアップ
 
+### 共通運用スキル（skill-shihan管理、全shihan共通）
+- `git-commit-practices` — コミット規約
+- `git-initial-setup` — Git初期設定
+- `git-init-to-github` — リポジトリ作成からGitHub接続
+- `github-pr-workflow` — PR作成ワークフロー
+- `github-issue-intake` — Issue取り込み
+- `furikaeri-practice` — ふりかえり実践
+
 ### 将来の成長領域（スキル化候補）
 - Python型注釈とmypyの実践
 - pytest パターン（fixture, parametrize, conftest設計）
