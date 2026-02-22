@@ -15,6 +15,7 @@ Guide for revising and maintaining GitHub Copilot agent skills with bilingual sy
 
 Use this skill when:
 - Updating existing SKILL.md files with new content or fixes
+- Modernizing reference skills to production quality (cosmos migration)
 - Improving name/description/metadata tags so skills trigger reliably
 - Synchronizing English SKILL.md with Japanese versions
 - Managing skill versions and backward compatibility
@@ -60,6 +61,8 @@ def is_system_skill(skill_path: Path) -> bool:
 
 **When**: Always run first — determines whether EN/JA sync and CHANGELOG checks apply.
 
+> **Values**: ニュートラル（出自に関わらず適切な基準を適用）
+
 | Skill Type | Detection | Revision Support |
 |------------|-----------|------------------|
 | System-created | `metadata.author: RyoMurakami1983` | Enhanced: EN/JA sync + metadata quality |
@@ -88,6 +91,8 @@ def is_substantial(description: str) -> bool:
 
 **When**: Before writing any CHANGELOG entry — gate all logging through this check.
 
+> **Values**: 基礎と型（実質的な変更のみを記録する型）
+
 | Change Type | Log? | Example |
 |-------------|------|---------|
 | Content added/removed | ✅ Yes | "Added: Circuit Breaker step" |
@@ -112,6 +117,8 @@ Impact: <trigger/discoverability/behavior impact>
 
 **When**: After any substantial change.
 
+> **Values**: 成長の複利（変更理由の蓄積が学習資産に）
+
 ---
 
 ### Step 4: Synchronize English and Japanese
@@ -133,6 +140,8 @@ For system skills, keep SKILL.md and references/SKILL.ja.md in sync. Update both
 
 **When**: Every time a system skill (`author: RyoMurakami1983`) has substantial English changes.
 
+> **Values**: 継続は力（バイリンガル同期を習慣化）
+
 ---
 
 ### Step 5: Bump Version Number
@@ -147,6 +156,8 @@ Apply semantic versioning (MAJOR.MINOR.PATCH) based on change significance. Upda
 | Typo fix | (none) | Don't bump for trivial |
 
 **When**: After all changes are applied and revision notes are recorded in commit/PR context.
+
+> **Values**: 温故知新（バージョン履歴で過去と未来を繋ぐ）
 
 ---
 
@@ -170,6 +181,8 @@ def check_freshness(skill_path: Path) -> str:
 ```
 
 **When**: During quarterly maintenance or before batch revisions.
+
+> **Values**: 余白の設計（鮮度管理で知識の腐敗を防ぐ）
 
 | Age | Status | Action |
 |-----|--------|--------|
@@ -199,6 +212,8 @@ def batch_revise(skill_paths: list[Path], description: str):
 ```
 
 **When**: Framework/library updates across skills, standardizing style, fixing recurring issues, or quarterly maintenance.
+
+> **Values**: 基礎と型（一貫した基準をバッチ適用）
 
 ---
 

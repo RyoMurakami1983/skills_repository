@@ -77,6 +77,8 @@ metadata:
 - Use only standard top-level keys: `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility`
 - Place custom fields (`author`, `tags`, `invocable`) under `metadata`
 
+> **Values**: 基礎と型（フロントマターが発動のトリガー）
+
 ### Step 2 — Generate Initial Skeleton (Integrated)
 
 Choose one scaffold method and create a minimal structure before writing:
@@ -92,6 +94,9 @@ Scaffold options:
 - Manual copy from this skill's section order template
 - Script generation (if available in your environment)
 - AI-assisted skeleton generation, then immediate placeholder replacement
+
+> **Values**: 余白の設計（骨格を先に作り、中身を後から充填）
+
 ### Step 3 — Write "When to Use This Skill"
 
 This must be the **first H2 section** after the title. Write 5–8 specific, action-oriented scenarios.
@@ -113,6 +118,8 @@ Use this skill when:
 
 **Important**: `description` is the trigger surface for activation; this section is loaded after activation and serves as execution-time guidance.
 
+> **Values**: ニュートラル（5秒で判断可能な形式知化）
+
 ### Step 4 — Define Core Principles (3–5)
 
 Connect each principle to at least one PHILOSOPHY Value.
@@ -126,6 +133,8 @@ Connect each principle to at least one PHILOSOPHY Value.
 ```
 
 Available Values: 基礎と型 / 成長の複利 / 温故知新 / 継続は力 / ニュートラル / 余白の設計
+
+> **Values**: 成長の複利（Valuesとの接続が複利的成長を生む）
 
 ### Step 5 — Choose and Write One Pattern
 
@@ -159,6 +168,8 @@ Explanation + example
 - ✅ Inline examples ≤ 15 lines; longer examples go to `references/`
 - ✅ Comments explain WHY, not WHAT
 
+> **Values**: 基礎と型（1パターンの型を徹底）
+
 ### Step 6 — Add Good Practices & Pitfalls
 
 ```markdown
@@ -176,6 +187,8 @@ Explanation + example
 **Solution**: How to fix it.
 ```
 
+> **Values**: 温故知新（過去の失敗知を形式知化）
+
 ### Step 7 — Add Quick Reference & Resources
 
 ```markdown
@@ -186,6 +199,8 @@ Explanation + example
 - [Link 1](url) - Description
 - [Link 2](url) - Description
 ```
+
+> **Values**: ニュートラル（即座に参照可能な普遍的リファレンス）
 
 ### Step 8 — Manage File Size
 
@@ -200,13 +215,19 @@ my-skill/
     └── anti-patterns.md        # Extended anti-patterns
 ```
 
+> **Values**: 余白の設計（コンテキストウィンドウの余白を守る）
+
 ### Step 9 — Create Japanese Version
 
 Create `references/SKILL.ja.md` with identical structure. The Japanese version may include deeper "Why" explanations.
 
+> **Values**: 継続は力（バイリンガル対応でアクセシビリティを維持）
+
 ### Step 10 — Validate
 
 Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% overall, ≥ 80% per category.
+
+> **Values**: 基礎と型（品質基準で型を検証）
 
 ---
 
