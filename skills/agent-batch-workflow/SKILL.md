@@ -109,6 +109,8 @@ INSERT INTO todo_deps (todo_id, depends_on) VALUES
 - Group independent items into batches of 2–3
 - Items with dependencies go into later batches
 - Similar items (same type of change) batch together
+- **Always grep from repository root** to discover full scope: `grep -r "pattern" --include="*.md"` — never assume changes are limited to one directory
+- **Persist the file list** in SQL or plan.md before starting — if context compaction occurs, you can instantly restore state
 
 ### Step 3: Parallel Execution
 
