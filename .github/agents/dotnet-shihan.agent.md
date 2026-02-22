@@ -86,6 +86,7 @@ tools:
 - `dotnet-playwright-ci-caching` — Playwright CIキャッシュ
 
 ### WPF・デスクトップ
+- `dotnet-wpf-mvvm-patterns` — MVVM基盤パターン（CommunityToolkit.Mvvm）
 - `dotnet-wpf-secure-config` — DPAPI暗号化設定
 - `dotnet-oracle-wpf-integration` — Oracle統合
 - `dotnet-wpf-dify-api-integration` — Dify API統合
