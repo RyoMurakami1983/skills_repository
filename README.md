@@ -16,11 +16,13 @@
 
 ## 🗂️ カテゴリ
 
-| カテゴリ | 説明 | 配置先 | Skills数 | 詳細 |
-|---------|------|--------|---------|------|
-| `skills/` | Skill作成支援 + Git/GitHub ワークフロー | グローバル（~/.copilot/skills/） | 18 | [SKILLS_README.md](skills/SKILLS_README.md) |
-| `dotnet/` | .NET/C# WPF開発ワークフロー | プロジェクト（.github/skills/） | 10 | [下記参照](#-dotnet-skills) |
-| `production/` | MVP/本番向け開発プラクティス | プロジェクト（.github/skills/） | 1 | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
+| カテゴリ | 説明 | 配置先 | 詳細 |
+|---------|------|--------|------|
+| `copilot/` | グローバル開発憲法（copilot-instructions.md） | グローバル（~/.copilot/） | [copilot-instructions.md](copilot/copilot-instructions.md) |
+| `agents/` | 師範エージェント（dotnet/python/skill） | グローバル（~/.copilot/agents/） | [下記参照](#-agents) |
+| `skills/` | Skill作成支援 + Git/GitHub ワークフロー（18） | グローバル（~/.copilot/skills/） | [SKILLS_README.md](skills/SKILLS_README.md) |
+| `dotnet/` | .NET/C# WPF開発ワークフロー（10） | プロジェクト（.github/skills/） | [下記参照](#-dotnet-skills) |
+| `production/` | MVP/本番向け開発プラクティス（1） | プロジェクト（.github/skills/） | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
 
 ### 📌 今後追加予定のカテゴリ
 
@@ -74,7 +76,7 @@ uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\
 
 ### グローバルインストール（全プロジェクト共通）
 
-**Meta-Skills（Skill作成支援）をグローバルに配置（Windows推奨: 安全同期）**:
+**Skills + Agents + 開発憲法 をグローバルに配置（Windows推奨: 安全同期）**:
 
 ```powershell
 # 1) 専用のローカルcloneを作成（初回のみ）
@@ -82,9 +84,12 @@ git clone https://github.com/RyoMurakami1983/skills_repository.git C:\tools\skil
 
 # 2) 同期先フォルダを作成（初回のみ）
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\skills | Out-Null
+New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\agents | Out-Null
 
-# 3) 初回同期（不要ファイル削除も含めて完全同期）
+# 3) 初回同期（Skills + Agents + copilot-instructions.md を完全同期）
 robocopy C:\tools\skills_repository\skills $env:USERPROFILE\.copilot\skills /MIR
+robocopy C:\tools\skills_repository\agents $env:USERPROFILE\.copilot\agents /MIR
+Copy-Item C:\tools\skills_repository\copilot\copilot-instructions.md $env:USERPROFILE\.copilot\copilot-instructions.md
 ```
 
 **更新時（常に最新へ安全同期）**:
@@ -92,17 +97,23 @@ robocopy C:\tools\skills_repository\skills $env:USERPROFILE\.copilot\skills /MIR
 ```powershell
 Set-Location C:\tools\skills_repository
 git pull --ff-only
-robocopy C:\tools\skills_repository\skills $env:USERPROFILE\.copilot\skills /MIR
+robocopy skills $env:USERPROFILE\.copilot\skills /MIR
+robocopy agents $env:USERPROFILE\.copilot\agents /MIR
+Copy-Item copilot\copilot-instructions.md $env:USERPROFILE\.copilot\copilot-instructions.md
 ```
 
-> 注意: `/MIR` は同期先の不要ファイルを削除します。`$env:USERPROFILE\.copilot\skills` を専用同期先として使用してください。
+> 注意: `/MIR` は同期先の不要ファイルを削除します。`$env:USERPROFILE\.copilot\skills` と `$env:USERPROFILE\.copilot\agents` を専用同期先として使用してください。
+
+> **エージェント優先順位**: ユーザーレベル（`~/.copilot/agents/`）> リポレベル（`.github/agents/`）> Organization。グローバルに配置した師範エージェントは、どのプロジェクトでも `@dotnet-shihan`, `@python-shihan`, `@skill-shihan` として呼び出し可能です。
 
 **Linux/macOS（初回）**:
 
 ```bash
 git clone https://github.com/RyoMurakami1983/skills_repository.git /tmp/skills-repository
-mkdir -p ~/.copilot/skills
+mkdir -p ~/.copilot/skills ~/.copilot/agents
 cp -r /tmp/skills-repository/skills/* ~/.copilot/skills/
+cp -r /tmp/skills-repository/agents/* ~/.copilot/agents/
+cp /tmp/skills-repository/copilot/copilot-instructions.md ~/.copilot/copilot-instructions.md
 ```
 
 **Linux/macOS（更新時）**:
@@ -111,9 +122,11 @@ cp -r /tmp/skills-repository/skills/* ~/.copilot/skills/
 cd /tmp/skills-repository
 git pull --ff-only
 rsync -a --delete /tmp/skills-repository/skills/ ~/.copilot/skills/
+rsync -a --delete /tmp/skills-repository/agents/ ~/.copilot/agents/
+cp /tmp/skills-repository/copilot/copilot-instructions.md ~/.copilot/copilot-instructions.md
 ```
 
-> 注意: `cp -r` の再実行だけでは削除済みSkillが同期先に残る場合があります。更新時は `rsync --delete` を使用してください。
+> 注意: `cp -r` の再実行だけでは削除済みSkill/Agentが同期先に残る場合があります。更新時は `rsync --delete` を使用してください。
 
 **Codex（WSL利用）**:
 
@@ -169,6 +182,16 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - 旧ルータースキル/統合元スキルの `SKILL.md` は `archive/phase3-deprecated/` に移動済み
 - `skill-quality-validation/scripts/validate_skill.py` は現行検証スクリプトとして維持
 
+## 🤖 Agents
+
+師範エージェント（`agents/` → `~/.copilot/agents/` にグローバル配置）。どのプロジェクトでも `@エージェント名` で呼び出し可能。
+
+| エージェント | 説明 | モード |
+|-------------|------|--------|
+| `@dotnet-shihan` | C#/.NET/WPFの設計・実装・レビュー | 先生（既定）/ 求道者 |
+| `@python-shihan` | Pythonの設計・実装・レビュー | 先生（既定）/ 求道者 |
+| `@skill-shihan` | スキルの作成・レビュー・バリデーション | 先生（既定）/ 求道者 |
+
 ## 🔷 dotnet Skills
 
 .NET/C# WPF アプリケーション開発のためのスキル群（10スキル）。
@@ -201,6 +224,7 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 ## 📚 ドキュメント
 
 - **[PHILOSOPHY.md](PHILOSOPHY.md)** - 開発憲法（Values / Mission / Vision）
+- **[copilot/copilot-instructions.md](copilot/copilot-instructions.md)** - グローバル開発規律（全プロジェクト適用）
 - **[skills/SKILLS_README.md](skills/SKILLS_README.md)** - Skills詳細情報・一覧
 - **[production/PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md)** - Production Skills詳細情報
 
