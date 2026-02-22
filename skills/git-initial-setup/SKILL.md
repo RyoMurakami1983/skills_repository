@@ -116,6 +116,10 @@ Install local pre-commit and pre-push hooks to block commits and pushes to main 
 
 Use for private repos without branch protection rules, as a local safety net, or during release windows.
 
+> **Note**: As an alternative to copying hooks into `.git/hooks/`, you can use a repository-level hooks directory with `git config core.hooksPath .githooks`. This keeps hooks version-controlled and automatically applied after clone — no setup script required.
+
+> **Troubleshooting (Windows)**: If `setup.ps1` fails with a security error, your PowerShell execution policy may be set to `Restricted`. Run `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` to allow local scripts, then retry.
+
 > **Values**: 継続は力 / 基礎と型
 
 ### Step 6: Set Global Hook Defaults

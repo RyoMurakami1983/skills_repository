@@ -231,6 +231,14 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - **[skills/SKILLS_README.md](skills/SKILLS_README.md)** - Skills詳細情報・一覧
 - **[production/PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md)** - Production Skills詳細情報
 
+## 📋 Architecture Decision Records (ADR)
+
+設計判断の記録は `docs/adr/` に保存しています。
+
+| ID | タイトル | ステータス |
+|----|---------|-----------|
+| [ADR-001](docs/adr/ADR-001-dotnet-security-foundation-extraction.md) | .NET WPF セキュリティ基盤の独立スキル抽出 | Accepted |
+
 ## 🤝 貢献
 
 ### 新しいSkillを追加する
@@ -245,6 +253,12 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - 日本語と英語の両方でドキュメント作成
 - 品質検証で80点以上のスコアを維持
 - Conventional Commits形式でコミット
+
+## 📝 表記規約
+
+- プレースホルダーは **UPPER_CASE** で記述: `PATH`, `FILE`, `WORKFLOW_NAME`
+- またはバッククォート内で山括弧を使用: `` `<path>` ``, `` `<file>` ``
+- Markdown中に裸の `<...>` を書くとHTMLタグとして解釈され表示が消えるため避けること
 
 ## 📄 ライセンス
 

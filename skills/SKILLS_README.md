@@ -86,7 +86,7 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 
 ```bash
 # スクリプトで自動検証（スクリプトはskill-quality-validationに配置）
-python skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
+uv run python skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
 ```
 
 詳細: [skills-validate-skill/SKILL.md](skills-validate-skill/SKILL.md) | [日本語版](skills-validate-skill/references/SKILL.ja.md)
@@ -97,7 +97,7 @@ python skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
 
 ```bash
 # スクリプトで生成（スクリプトはskill-template-generatorに配置）
-python skill-template-generator/scripts/generate_template.py --name "git-protect-main"
+uv run python skill-template-generator/scripts/generate_template.py --name "git-protect-main"
 ```
 
 詳細: [skills-generate-skill-template/SKILL.md](skills-generate-skill-template/SKILL.md) | [日本語版](skills-generate-skill-template/references/SKILL.ja.md)

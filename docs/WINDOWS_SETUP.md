@@ -112,6 +112,48 @@ $OutputEncoding
 [Console]::OutputEncoding
 ```
 
+## 🪝 Gitフックのセットアップ
+
+### clone後にフックを有効化する
+
+リポジトリのフック（pre-commit, pre-push）はclone後に自動適用されません。以下のいずれかの方法で有効化してください。
+
+**方法1: `core.hooksPath`（推奨）**
+
+リポジトリに `.githooks/` ディレクトリがある場合、以下で有効化できます：
+
+```powershell
+# リポジトリレベルでフックディレクトリを指定
+git config core.hooksPath .githooks
+```
+
+この方法ではフックがバージョン管理され、セットアップスクリプトの実行が不要です。
+
+**方法2: セットアップスクリプト**
+
+```powershell
+.\scripts\setup.ps1
+```
+
+### トラブルシューティング
+
+**`setup.ps1` がセキュリティエラーで失敗する場合**:
+
+PowerShellの実行ポリシーが `Restricted`（デフォルト）だとスクリプトが実行できません：
+
+```powershell
+# 現在のポリシーを確認
+Get-ExecutionPolicy -Scope CurrentUser
+
+# CurrentUserスコープでRemoteSignedに変更
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+
+# 変更後、再実行
+.\scripts\setup.ps1
+```
+
+---
+
 ## 🐍 Python実行の規約
 
 ### 基本ルール

@@ -274,7 +274,7 @@ if __name__ == "__main__":
 # Check if SKILL.md changed
 if git diff --cached --name-only | grep -q "SKILL.md"; then
     echo "SKILL.md changed - checking JA sync..."
-    python scripts/check_sync.py
+    uv run python scripts/check_sync.py
     
     if [ $? -ne 0 ]; then
         echo "❌ EN/JA sync check failed"
@@ -291,6 +291,6 @@ Add to GitHub Actions workflow:
 ```yaml
 - name: Check EN/JA Synchronization
   run: |
-    python scripts/check_sync.py --en SKILL.md --ja references/SKILL.ja.md
+    uv run python scripts/check_sync.py --en SKILL.md --ja references/SKILL.ja.md
   if: contains(github.event.head_commit.modified, 'SKILL.md')
 ```
