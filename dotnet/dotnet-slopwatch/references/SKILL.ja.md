@@ -13,7 +13,7 @@ description: >
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, quality, llm, anti-cheat, slopwatch]
-  invocable: true
+  invocable: false
 ---
 
 # Slopwatch: .NET向けLLMアンチチート
@@ -64,7 +64,7 @@ metadata:
   "isRoot": true,
   "tools": {
     "slopwatch.cmd": {
-      "version": "0.2.0",
+      "version": "0.3.4",  // check latest: dotnet tool search slopwatch
       "commands": ["slopwatch"],
       "rollForward": false
     }
@@ -114,9 +114,11 @@ Slopwatchが問題をフラグした場合、**無視しない**：
 
 > **Values**: 基礎と型（根本原因の修正が型）
 
-### Step 4 — Claude Code フックの設定
+### Step 4 — AIコーディングアシスタントとの統合
 
-`.claude/settings.json`にポストエディットフックとしてSlopwatchを追加する：
+#### 4a: 自動フック（Claude Code）
+
+`.claude/settings.json`にポストエディットフックとしてSlopwatchを追加する。`--hook` フラグはgit dirty filesのみを解析し、stderrにエラーを出力し、デフォルトで警告時に失敗する：
 
 ```json
 {
@@ -137,7 +139,18 @@ Slopwatchが問題をフラグした場合、**無視しない**：
 }
 ```
 
-**Why**: 自動ガードレールにより、LLMが編集するたびにスロップが即座にブロックされる。人間がレビューする前に品質が担保される。
+#### 4b: オンデマンド（Copilot CLI）
+
+`@dotnet-shihan` にslopwatch実行を依頼する。agentが `slopwatch analyze` をshell経由で実行し、結果を解釈する：
+
+```
+@dotnet-shihan slopwatch を実行して
+@dotnet-shihan 近道してないかチェックして
+```
+
+agentはコードレビュー時にこのスキルとSLOP-xxxカタログを自動的に参照する。
+
+**Why**: 自動ガードレール（Claude Code）またはオンデマンド検査（Copilot CLI）により、LLMのスロップが人間のレビュー前に検出される。
 
 > **Values**: 成長の複利（自動ガードレールで品質を仕組み化）
 
@@ -175,7 +188,7 @@ Slopwatch CLIツールが自動で適用するルール。
 | SW003 | Error | 空catchブロック | `catch (Exception) { }` |
 | SW004 | Warning | 恣意的な遅延 | テスト内の`await Task.Delay(1000);` |
 | SW005 | Warning | プロジェクトファイルスロップ | `<NoWarn>CS1591</NoWarn>` |
-| SW006 | Warning | CPMバイパス | インライン`Version="1.0.0"` |
+| SW006 | Error | パッケージバージョンオーバーライド | CPMバイパスのインライン`Version="1.0.0"` |
 
 ---
 
@@ -320,6 +333,7 @@ slopwatch analyze --update-baseline
 
 ## Resources
 
+- [Slopwatch GitHub](https://github.com/Aaronontheweb/dotnet-slopwatch) — ソースコードとドキュメント
 - [Slopwatch NuGet Package](https://www.nuget.org/packages/Slopwatch.Cmd)
 - [dotnet-local-tools](../dotnet-local-tools/SKILL.md) — .NETローカルツールの管理
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — 開発憲法

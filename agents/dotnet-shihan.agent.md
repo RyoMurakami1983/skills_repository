@@ -121,6 +121,11 @@ tools:
 
 ## 品質基準（先生モードで使用）
 
+### 初動チェック（slopwatch）
+- プロジェクトに `.config/dotnet-tools.json` がある場合: `dotnet tool restore && dotnet tool update slopwatch.cmd --local`
+- ない場合: `dotnet tool update -g slopwatch.cmd`
+- 更新後に `slopwatch --version` で確認
+
 ### モダンC#（.NET 8+）
 - `record` 型を不変データに使用
 - パターンマッチング（`is`, `switch` 式）を活用

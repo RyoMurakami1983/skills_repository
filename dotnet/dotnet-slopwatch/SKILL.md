@@ -8,7 +8,7 @@ description: >
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, quality, llm, anti-cheat, slopwatch]
-  invocable: true
+  invocable: false
 ---
 
 # Slopwatch: LLM Anti-Cheat for .NET
@@ -59,7 +59,7 @@ Add to `.config/dotnet-tools.json` as a local tool:
   "isRoot": true,
   "tools": {
     "slopwatch.cmd": {
-      "version": "0.2.0",
+      "version": "0.3.4",  // check latest: dotnet tool search slopwatch
       "commands": ["slopwatch"],
       "rollForward": false
     }
@@ -113,9 +113,11 @@ When Slopwatch flags an issue, **do not ignore it**:
 
 > **Values**: 基礎と型（根本原因の修正が型）
 
-### Step 4 — Configure Claude Code Hook
+### Step 4 — Integrate with AI Coding Assistant
 
-Add Slopwatch as a post-edit hook in `.claude/settings.json`:
+#### 4a: Automatic Hook (Claude Code)
+
+Add Slopwatch as a post-edit hook in `.claude/settings.json`. The `--hook` flag analyzes only git-dirty files, outputs errors to stderr, and fails on warnings by default:
 
 ```json
 {
@@ -136,7 +138,16 @@ Add Slopwatch as a post-edit hook in `.claude/settings.json`:
 }
 ```
 
-The `--hook` flag analyzes only git-dirty files, outputs errors to stderr, and blocks the edit on failures.
+#### 4b: On-Demand (Copilot CLI)
+
+Ask `@dotnet-shihan` to run slopwatch. The agent executes `slopwatch analyze` via shell and interprets results:
+
+```
+@dotnet-shihan slopwatch を実行して
+@dotnet-shihan 近道してないかチェックして
+```
+
+The agent references this skill and the SLOP-xxx catalog during code reviews automatically.
 
 > **Values**: 成長の複利（自動ガードレールで品質を仕組み化）
 
@@ -172,7 +183,7 @@ Automated rules enforced by the Slopwatch CLI tool.
 | SW003 | Error | Empty catch blocks | `catch (Exception) { }` |
 | SW004 | Warning | Arbitrary delays | `await Task.Delay(1000);` in tests |
 | SW005 | Warning | Project file slop | `<NoWarn>CS1591</NoWarn>` |
-| SW006 | Warning | CPM bypass | Inline `Version="1.0.0"` |
+| SW006 | Error | Package version override | Inline `Version="1.0.0"` bypassing CPM |
 
 ---
 
@@ -318,6 +329,7 @@ slopwatch analyze --output json
 
 ## Resources
 
+- [Slopwatch GitHub](https://github.com/Aaronontheweb/dotnet-slopwatch) — Source code and documentation
 - [Slopwatch NuGet Package](https://www.nuget.org/packages/Slopwatch.Cmd)
 - [dotnet-local-tools](../dotnet-local-tools/SKILL.md) — Managing local .NET tools
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — Development constitution
