@@ -121,6 +121,11 @@ tools:
 
 ## 品質基準（先生モードで使用）
 
+### 初動チェック（slopwatch）
+- プロジェクトに `.config/dotnet-tools.json` がある場合: `dotnet tool restore && dotnet tool update slopwatch.cmd --local`
+- ない場合: `dotnet tool update -g slopwatch.cmd`
+- 更新後に `slopwatch --version` で確認
+
 ### モダンC#（.NET 8+）
 - `record` 型を不変データに使用
 - パターンマッチング（`is`, `switch` 式）を活用
@@ -138,6 +143,12 @@ tools:
 - `CryptographicException` 等のインフラ例外は明示的にキャッチ
 - 外部API呼び出しは必ずタイムアウト＋リトライ
 - ユーザー向けエラーメッセージは日本語
+
+### 層の責務（SLOP検出）
+- Presentation層でドメイン文字列を `Split`/`Substring`/`Regex` で再解釈していないか（SLOP-001）
+- Application層レスポンスに新機能で必要なフィールドが構造化されているか
+- 「データが足りないから手元で作る」パターンを発見したら、下位層のレスポンス拡張を指示
+- 判断基準：「その Split はドメインの構造を知らないと書けないか？」→ Yes = SLOP-001
 
 ### テスト
 - xUnit + FluentAssertions
@@ -160,4 +171,6 @@ tools:
 - [ ] エラーハンドリング: 具体的な例外型、明確なメッセージ
 - [ ] テスト: 振る舞いベース、独立実行可能
 - [ ] Slop検出: LLM生成コードの「その場しのぎ」排除
+- [ ] SLOP-001: Presentation層でドメインデータの文字列パース無し
+- [ ] SLOP-001: Application層レスポンスに必要フィールドが構造化済み
 ```

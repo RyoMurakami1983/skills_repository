@@ -6,28 +6,32 @@
 ---
 name: dotnet-slopwatch
 description: >
-  Detect LLM reward hacking in .NET code changes with Slopwatch.
-  Use when validating LLM-generated C# code, running post-edit
-  hooks, or integrating anti-slop quality gates into CI/CD.
+  Two-layer slop prevention for .NET: code-level detection via Slopwatch CLI (SW-xxx)
+  and architectural anti-pattern catalog (SLOP-xxx).
+  Use when validating LLM-generated C# code, checking for layer boundary violations,
+  or integrating anti-slop quality gates into CI/CD.
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, quality, llm, anti-cheat, slopwatch]
-  invocable: true
+  invocable: false
 ---
 
 # Slopwatch: .NET向けLLMアンチチート
 
-Slopwatchをインストール・設定・使用して「スロップ」を検出するワークフロー。スロップとは、LLMがテストを通すためやビルドを成功させるために取る近道のことで、根本的な問題を解決していないパターンを指す。
+.NETプロジェクト向けの2層スロップ予防システム：
+
+- **コードレベル (SW-xxx)** — Slopwatch CLIツールによる自動検出（テスト無効化、空catch、警告抑制）
+- **アーキテクチャレベル (SLOP-xxx)** — 人間/LLMの判断が必要なアンチパターンカタログ（層境界違反、責務漏洩）
 
 ## When to Use This Skill
 
 このスキルを使用する場面：
 - LLMが生成したC#コード変更をリワードハッキングパターンから検証する時
+- Presentation層のコードにApplication/Domain層に属するドメインロジックが含まれていないかチェックする時
 - Slopwatchを Claude Code のポストエディットフックとして設定する時
 - GitHub ActionsやAzure Pipelinesにアンチスロップ品質ゲートを統合する時
 - 既存の.NETプロジェクトにベースラインを確立する時
-- 検出ルールやseverityレベルをチーム向けに設定する時
-- Slopwatchが特定の変更をフラグした理由を調査する時
+- DDD/クリーンアーキテクチャにおけるアーキテクチャ判断をレビューする時
 
 ---
 
@@ -60,7 +64,7 @@ Slopwatchをインストール・設定・使用して「スロップ」を検�
   "isRoot": true,
   "tools": {
     "slopwatch.cmd": {
-      "version": "0.2.0",
+      "version": "0.3.4",  // check latest: dotnet tool search slopwatch
       "commands": ["slopwatch"],
       "rollForward": false
     }
@@ -110,9 +114,11 @@ Slopwatchが問題をフラグした場合、**無視しない**：
 
 > **Values**: 基礎と型（根本原因の修正が型）
 
-### Step 4 — Claude Code フックの設定
+### Step 4 — AIコーディングアシスタントとの統合
 
-`.claude/settings.json`にポストエディットフックとしてSlopwatchを追加する：
+#### 4a: 自動フック（Claude Code）
+
+`.claude/settings.json`にポストエディットフックとしてSlopwatchを追加する。`--hook` フラグはgit dirty filesのみを解析し、stderrにエラーを出力し、デフォルトで警告時に失敗する：
 
 ```json
 {
@@ -133,7 +139,18 @@ Slopwatchが問題をフラグした場合、**無視しない**：
 }
 ```
 
-**Why**: 自動ガードレールにより、LLMが編集するたびにスロップが即座にブロックされる。人間がレビューする前に品質が担保される。
+#### 4b: オンデマンド（Copilot CLI）
+
+`@dotnet-shihan` にslopwatch実行を依頼する。agentが `slopwatch analyze` をshell経由で実行し、結果を解釈する：
+
+```
+@dotnet-shihan slopwatch を実行して
+@dotnet-shihan 近道してないかチェックして
+```
+
+agentはコードレビュー時にこのスキルとSLOP-xxxカタログを自動的に参照する。
+
+**Why**: 自動ガードレール（Claude Code）またはオンデマンド検査（Copilot CLI）により、LLMのスロップが人間のレビュー前に検出される。
 
 > **Values**: 成長の複利（自動ガードレールで品質を仕組み化）
 
@@ -160,7 +177,9 @@ jobs:
 
 ---
 
-## Detection Rules
+## コードレベル検出ルール (SW-xxx)
+
+Slopwatch CLIツールが自動で適用するルール。
 
 | ルール | 重大度 | パターン | 例 |
 |--------|--------|---------|-----|
@@ -169,7 +188,58 @@ jobs:
 | SW003 | Error | 空catchブロック | `catch (Exception) { }` |
 | SW004 | Warning | 恣意的な遅延 | テスト内の`await Task.Delay(1000);` |
 | SW005 | Warning | プロジェクトファイルスロップ | `<NoWarn>CS1591</NoWarn>` |
-| SW006 | Warning | CPMバイパス | インライン`Version="1.0.0"` |
+| SW006 | Error | パッケージバージョンオーバーライド | CPMバイパスのインライン`Version="1.0.0"` |
+
+---
+
+## アーキテクチャレベルスロップパターン (SLOP-xxx)
+
+設計レベルのアンチパターン。人間またはLLMの判断が必要で、静的解析だけでは検出できない — アーキテクチャの意図を理解する必要がある。
+
+### SLOP-001: Layer Boundary Violation（層境界違反）
+
+**重大度**: Error
+
+**症状**: 上位層（Presentation/ViewModel）が、下位層から受け取った結合文字列を `string.Split`、`Substring`、`Regex` 等で再解釈し、ドメイン値を再構築している。
+
+**なぜ危険か**:
+- 文字列フォーマットの暗黙的な前提に依存する（区切り文字、順序、エスケープ）
+- ドメイン知識がPresentation層に漏洩する（「鋼種名にハイフンが含まれうる」）
+- 変更に脆い：フォーマット変更時にPresentation層も壊れる
+
+**Why（深掘り）**: この違反が起きる根本的な理由は「データが足りないから手元で作る」というLLMのSlop傾向にある。Application層のレスポンスに必要なフィールドが無い → 上位層でパースして補う — これは「最短距離の誘惑」であり、層構造という「型」を破壊する。型を破ると一見動くが、ドメインの構造を知らないとバグが見えない（鋼種名のハイフン問題）。
+
+**実例** (MillScanSplitter PR#20):
+
+```csharp
+// ❌ SLOP-001: Presentation層でドメイン値をパース
+// OcrValue = "25_10_29-394R072-9#SUH3-AIS-X578D"
+var parts = ocrValue.Split('-');
+var steelType = parts[2]; // "9#SUH3" を返す — 誤り（正解: "9#SUH3-AIS"）
+```
+
+鋼種名 `9#SUH3-AIS` にハイフンが含まれるため、単純な分割では値が破壊される。
+
+```csharp
+// ✅ 修正: Application層のレスポンスに構造化フィールドを追加
+record ProcessDocumentComparisonRow(
+    // ... 既存フィールド ...
+    string ManufacturingNumber,  // Domain層の ExtractedItem から直接セット
+    string SteelType,
+    string HeatNo
+);
+```
+
+**処方**: 上位層に必要なデータがレスポンスに無いなら、**下位層のレスポンスを拡張**せよ — 文字列パースでドメイン値を再構築するな。
+
+**チェックポイント**:
+- [ ] 新機能で必要なデータがApplication層レスポンスに構造化されているか？
+- [ ] 構造化フィールドはDomain層のEntity/ValueObjectから直接マッピングされているか？
+- [ ] Presentation層にドメイン文字列の `Split`/`Substring`/`Regex` が無いか？
+
+**判断基準**: 「その `Split` は、ドメインの構造を知らないと書けないか？」 → Yes なら SLOP-001 違反。No なら正当な UI フォーマット処理。
+
+> **Values**: 基礎と型（DDD層構造は「型」。型を破ると一見動くが、ドメイン知識の漏洩で脆くなる）
 
 ---
 
@@ -263,6 +333,7 @@ slopwatch analyze --update-baseline
 
 ## Resources
 
+- [Slopwatch GitHub](https://github.com/Aaronontheweb/dotnet-slopwatch) — ソースコードとドキュメント
 - [Slopwatch NuGet Package](https://www.nuget.org/packages/Slopwatch.Cmd)
 - [dotnet-local-tools](../dotnet-local-tools/SKILL.md) — .NETローカルツールの管理
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — 開発憲法
