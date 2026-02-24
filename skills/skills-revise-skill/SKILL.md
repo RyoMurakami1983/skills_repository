@@ -28,6 +28,7 @@ Use this skill when:
 - **`skills-author-skill`** - Skill writing workflow
 - **`skills-validate-skill`** - Validate revisions before publishing
 - **`skills-refactor-skill-to-single-workflow`** - Refactor legacy skills before revision
+- **`knowledge-capture`** — Anonymization gate for examples derived from real projects
 
 ---
 
@@ -105,7 +106,7 @@ def is_substantial(description: str) -> bool:
 
 ### Step 3: Record Revision in Git/PR Context
 
-Record substantial changes in commit message / PR description instead of SKILL.md changelog sections.
+Record substantial changes in commit message / PR description instead of SKILL.md changelog sections. If adding or updating examples derived from real projects, apply `knowledge-capture` **Anonymization Checklist** (AC-1 through AC-4).
 
 ```text
 Changed: <what changed>
