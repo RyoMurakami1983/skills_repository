@@ -122,7 +122,7 @@ This section is designed to be referenced directly by other skills. Apply each c
 **Action**: Remove or replace with generic names.
 
 ```
-❌ "MillScanSplitter PR#20"
+❌ "InvoiceParser PR#15"
 ✅ (remove project reference entirely, or use "Example:")
 
 ❌ "Contoso Steel Division"
@@ -136,7 +136,7 @@ This section is designed to be referenced directly by other skills. Apply each c
 **Action**: Replace with dummy values that preserve the same structural characteristics.
 
 ```
-❌ "25_10_29-394R072-9#SUH3-AIS-X578D"
+❌ "2024_03_15-WO7890-TYP-A-B-SN45678"
 ✅ "20240101-MFG001-AL-6XN-H12345"
     (preserves: date prefix, hyphen-delimited, embedded hyphens in values)
 ```
@@ -150,10 +150,10 @@ This section is designed to be referenced directly by other skills. Apply each c
 **Action**: Generalize to industry-neutral terms.
 
 ```
-❌ "鋼種名" (steel type name), "溶解番号" (heat number)
+❌ "基板型番" (board model number), "ロット管理番号" (lot control number)
 ✅ "製品型番" (product type code), "ロット番号" (lot number)
 
-❌ "SteelType", "HeatNo"
+❌ "BoardModel", "BatchId"
 ✅ "ProductType", "LotNumber"
 ```
 
@@ -164,7 +164,7 @@ This section is designed to be referenced directly by other skills. Apply each c
 **Action**: Replace with representative dummy values.
 
 ```
-❌ "Tolerance: ±0.003mm for SUH3 grade"
+❌ "Tolerance: ±0.003mm for X-200 grade"
 ✅ "Tolerance: ±0.01mm for this product grade"
 ```
 
