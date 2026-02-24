@@ -199,27 +199,27 @@ Design-level anti-patterns requiring human or LLM judgment. These cannot be dete
 
 **Why It's Dangerous**:
 - Relies on implicit assumptions about string format (delimiters, order, escaping)
-- Domain knowledge leaks into Presentation layer ("steel type names can contain hyphens")
+- Domain knowledge leaks into Presentation layer ("product type codes can contain hyphens")
 - Fragile under change: format changes break Presentation code silently
 
-**Real-World Example** (MillScanSplitter PR#20):
+**Example**:
 
 ```csharp
 // ❌ SLOP-001: Presentation layer parsing domain values
-// OcrValue = "25_10_29-394R072-9#SUH3-AIS-X578D"
-var parts = ocrValue.Split('-');
-var steelType = parts[2]; // Returns "9#SUH3" — WRONG (actual: "9#SUH3-AIS")
+// compositeCode = "20240101-MFG001-AL-6XN-H12345"
+var parts = compositeCode.Split('-');
+var productType = parts[2]; // Returns "AL" — WRONG (actual: "AL-6XN")
 ```
 
-Steel type `9#SUH3-AIS` contains a hyphen, so naive splitting destroys the value.
+Product type `AL-6XN` contains a hyphen, so naive splitting destroys the value.
 
 ```csharp
 // ✅ Fix: Extend Application layer response with structured fields
-record ProcessDocumentComparisonRow(
+record ComparisonRow(
     // ... existing fields ...
-    string ManufacturingNumber,  // Set from ExtractedItem (Domain)
-    string SteelType,
-    string HeatNo
+    string CategoryCode,   // Set from domain entity
+    string ProductType,
+    string LotNumber
 );
 ```
 
