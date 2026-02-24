@@ -32,6 +32,7 @@ Use this skill when:
 - **`skills-validate-skill`** — Validate the finished skill against quality criteria
 - **`skills-refactor-skill-to-single-workflow`** — Convert legacy multi-pattern skills
 - **`skills-revise-skill`** — Revise and optimize discoverability after publishing
+- **`knowledge-capture`** — Anonymization gate for examples derived from real projects
 
 ---
 
@@ -167,6 +168,7 @@ Explanation + example
 - ✅ Include import/using statements
 - ✅ Inline examples ≤ 15 lines; longer examples go to `references/`
 - ✅ Comments explain WHY, not WHAT
+- ✅ If examples come from real projects, apply `knowledge-capture` **Anonymization Checklist** (AC-1 through AC-4)
 
 > **Values**: 基礎と型（1パターンの型を徹底）
 

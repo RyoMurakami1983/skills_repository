@@ -322,10 +322,11 @@ SKILL.md は英語で記述するため、日本語トリガーはこの辞書�
 | バリデーションして / 検証して | `skill-quality-validation` | SKILL.md の品質検証 |
 | テンプレ作って | `skills-generate-skill-template` | スキルの雛形生成 |
 | ふりかえりして / ふりかえり | `furikaeri-practice` | セッション後のKPT/YWT改善サイクル |
+| 匿名化して / 固有名詞チェック | `knowledge-capture` | 文書・スキル例の匿名化ゲート（AC-1〜AC-4） |
 
 > **運用ルール**: スキルの新規作成・改訂時は、この辞書も合わせて更新すること。
 
-**Glossary Last Updated**: 2026-02-14
+**Glossary Last Updated**: 2026-02-24
 
 ---
 

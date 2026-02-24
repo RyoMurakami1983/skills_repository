@@ -87,6 +87,7 @@ skill-shihan がオーナーとして品質管理を担当する。
 - `git-init-to-github` — リポジトリ作成からGitHub接続
 - `github-pr-workflow` — PR作成ワークフロー
 - `github-issue-intake` — Issue取り込み
+- `knowledge-capture` — 知識捕捉と匿名化ゲート
 
 ---
 

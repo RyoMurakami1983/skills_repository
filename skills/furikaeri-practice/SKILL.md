@@ -28,6 +28,7 @@ Use this skill when:
 - **`git-commit-practices`** — Commit history as learning asset
 - **`github-pr-workflow`** — PR creation and issue close
 - **`github-issue-intake`** — Capture improvement items as issues
+- **`knowledge-capture`** — Anonymization gate for documents that may become public skills
 
 ---
 
@@ -216,6 +217,12 @@ Next time: Try YWT format — KPT felt repetitive for this type of session.
 Use when finishing any furikaeri. Even 1 sentence improves the next one.
 
 > **Values**: 継続は力 / 成長の複利
+
+### Step 6: Anonymization Gate (Before Output)
+
+If the furikaeri content may flow into a public skill or reference, apply the `knowledge-capture` **Anonymization Checklist** (AC-1 through AC-4) before committing. Replace project names, data formats, domain terms, and numeric values with generic equivalents.
+
+> **Values**: ニュートラルな視点（固有データの漏洩を入口で防ぐ）
 
 ---
 
