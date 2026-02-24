@@ -77,8 +77,8 @@ Use structured formats that separate facts from proprietary details. Apply table
 
 ## Bad: Narrative (hard to anonymize)
 
-When we processed the MillScanSplitter output for order 394R072,
-the steel type 9#SUH3-AIS was incorrectly parsed because...
+When we processed the OrderProcessor output for order ORD-394072,
+the product type X-200-B was incorrectly parsed because...
 ```
 
 Structured formats make proprietary data visible and replaceable. Narrative buries it in context.
