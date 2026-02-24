@@ -204,29 +204,29 @@ Slopwatch CLIツールが自動で適用するルール。
 
 **なぜ危険か**:
 - 文字列フォーマットの暗黙的な前提に依存する（区切り文字、順序、エスケープ）
-- ドメイン知識がPresentation層に漏洩する（「鋼種名にハイフンが含まれうる」）
+- ドメイン知識がPresentation層に漏洩する（「製品型番にハイフンが含まれうる」）
 - 変更に脆い：フォーマット変更時にPresentation層も壊れる
 
-**Why（深掘り）**: この違反が起きる根本的な理由は「データが足りないから手元で作る」というLLMのSlop傾向にある。Application層のレスポンスに必要なフィールドが無い → 上位層でパースして補う — これは「最短距離の誘惑」であり、層構造という「型」を破壊する。型を破ると一見動くが、ドメインの構造を知らないとバグが見えない（鋼種名のハイフン問題）。
+**Why（深掘り）**: この違反が起きる根本的な理由は「データが足りないから手元で作る」というLLMのSlop傾向にある。Application層のレスポンスに必要なフィールドが無い → 上位層でパースして補う — これは「最短距離の誘惑」であり、層構造という「型」を破壊する。型を破ると一見動くが、ドメインの構造を知らないとバグが見えない（製品型番のハイフン問題）。
 
-**実例** (MillScanSplitter PR#20):
+**実例**:
 
 ```csharp
 // ❌ SLOP-001: Presentation層でドメイン値をパース
-// OcrValue = "25_10_29-394R072-9#SUH3-AIS-X578D"
-var parts = ocrValue.Split('-');
-var steelType = parts[2]; // "9#SUH3" を返す — 誤り（正解: "9#SUH3-AIS"）
+// compositeCode = "20240101-MFG001-AL-6XN-H12345"
+var parts = compositeCode.Split('-');
+var productType = parts[2]; // "AL" を返す — 誤り（正解: "AL-6XN"）
 ```
 
-鋼種名 `9#SUH3-AIS` にハイフンが含まれるため、単純な分割では値が破壊される。
+製品型番 `AL-6XN` にハイフンが含まれるため、単純な分割では値が破壊される。
 
 ```csharp
 // ✅ 修正: Application層のレスポンスに構造化フィールドを追加
-record ProcessDocumentComparisonRow(
+record ComparisonRow(
     // ... 既存フィールド ...
-    string ManufacturingNumber,  // Domain層の ExtractedItem から直接セット
-    string SteelType,
-    string HeatNo
+    string CategoryCode,   // Domain層のエンティティから直接セット
+    string ProductType,
+    string LotNumber
 );
 ```
 
