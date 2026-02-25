@@ -1,6 +1,6 @@
 ---
 name: git-initial-setup
-description: git init/clone後のmain保護をデフォルト化する設定ガイド。初期セットアップで使う。
+description: git init/clone後のmain保護をデフォルト化し、環境差異を吸収する設定ガイド。初期セットアップで使う。
 metadata:
   author: RyoMurakami1983
   tags: [git, github, branch-protection, hooks, bootstrap]
@@ -9,7 +9,7 @@ metadata:
 
 # Git初期セットアップ（main保護）
 
-git init/clone後のmain保護をデフォルト化するため、GitHubブランチ保護（Option A）とグローバルなフック設定、ローカルpre-commit/pre-push（Option B）を組み合わせます。
+git init/clone後のmain保護をデフォルト化するため、GitHubブランチ保護（Option A）とグローバルなフック設定、ローカルpre-commit/pre-push（Option B）を組み合わせます。さらに `.gitattributes` と `.editorconfig` でクロスプラットフォームの環境差異を吸収します。
 
 ## このスキルを使うとき
 
@@ -18,6 +18,7 @@ git init/clone後のmain保護をデフォルト化するため、GitHubブラ�
 - グローバルフック設定をチームに展開したい
 - mainへのPull Request (PR)マージだけを強制したい
 - リリース前の誤コミット/誤プッシュを防止したい
+- チームのOS・エディタ・AIエージェントの違いによる環境差異を吸収したい
 - privateリポジトリでローカル保護を補完したい
 - 大型リリース前に保護状況を監査したい
 
@@ -62,7 +63,53 @@ Enable: Require a pull request before merging
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 2: レビュー要件の設定
+### Step 2: リポジトリ環境ファイルの生成
+
+`.gitattributes` と `.editorconfig` を追加し、クロスプラットフォームの差異を吸収します。これらがないと、異なるOSやAIエージェントのサンドボックスからcloneしたメンバーが全ファイルmodifiedになる問題が発生します。
+
+**.gitattributes**（改行コード正規化）:
+
+```
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.sln text eol=crlf
+*.png binary
+*.jpg binary
+*.ico binary
+```
+
+**.editorconfig**（エディタ設定正規化）:
+
+```ini
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+```
+
+既存リポジトリに導入する場合は、`.gitattributes` 追加後に `git add --renormalize .` で追跡ファイルを再正規化してください。
+
+新規リポジトリ作成時、または異なるOS・エディタ・AIエージェントを使うメンバーのオンボーディング時に使います。
+
+> **Values**: 基礎と型 / 余白の設計
+
+### Step 3: レビュー要件の設定
 
 mainへのマージを意図的かつ追跡可能にするため、レビュー要件を定義します。Code Ownersを有効化し、新コミット時に既存の承認を無効化して責任を明確にします。
 
@@ -77,7 +124,7 @@ mainマージの責任を明確化し、レビュー品質を統一したいと�
 
 > **Values**: 成長の複利 / ニュートラル
 
-### Step 3: 必須ステータスチェックの設定
+### Step 4: 必須ステータスチェックの設定
 
 CIチェックでマージをゲートし、壊れたビルドをmainに入れません。必須チェックでmainをグリーンに保ち、ロールバックリスクを低減します。
 
@@ -91,7 +138,7 @@ CIパイプラインがあり、リグレッションを防ぎたいときに使
 
 > **Values**: 継続は力 / 基礎と型
 
-### Step 4: プッシュ権限の制限
+### Step 5: プッシュ権限の制限
 
 直接プッシュ権限を制限し、管理者にも保護を適用します。"Include administrators"を有効化し、プッシュ可能なユーザーを制限します。
 
@@ -105,7 +152,7 @@ CIパイプラインがあり、リグレッションを防ぎたいときに使
 
 > **Values**: ニュートラル / 基礎と型
 
-### Step 5: ローカルフックの導入
+### Step 6: ローカルフックの導入
 
 pre-commitとpre-pushフックを導入し、変更がリモートに届く前にmainへのコミット・プッシュをブロックします。
 
@@ -122,7 +169,7 @@ privateリポジトリの保護代替、ローカル安全策、またはリリ�
 
 > **Values**: 継続は力 / 基礎と型
 
-### Step 6: グローバルフックのデフォルト設定
+### Step 7: グローバルフックのデフォルト設定
 
 `core.hooksPath`でグローバルフックを設定し、新規リポジトリに保護を自動継承させます。
 
@@ -134,7 +181,7 @@ git config --global core.hooksPath "~/.githooks"
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 7: チームへの展開
+### Step 8: チームへの展開
 
 明確なコミュニケーションで保護を展開します：PR運用ポリシーの告知、セットアップスクリプトの共有、オンボーディング資料の更新を行います。
 
@@ -149,7 +196,7 @@ git config --global core.hooksPath "~/.githooks"
 
 > **Values**: 成長の複利 / 継続は力
 
-### Step 8: 緊急対応
+### Step 9: 緊急対応
 
 保護を恒久的に無効化せずに問題を解消します。緊急ホットフィックスでは、管理者バイパスと事後レビューを組み合わせます。
 
@@ -167,6 +214,7 @@ git push --no-verify origin hotfix/critical-fix
 
 ## ベストプラクティス
 
+- リポジトリ作成時に `.gitattributes` と `.editorconfig` を追加する
 - 先にグローバルフックを設定してから新規リポジトリを作成
 - リモート作成後にGitHub保護を有効化
 - mainマージに最低1承認を必須化
@@ -194,6 +242,7 @@ Fix: GitHubの保護ルールでチーム全体を強制する。
 
 ## アンチパターン
 
+- チーム全員が同じOS・エディタ設定であると暗黙に仮定する（暗黙の環境前提）
 - 早く直したいから保護を一時解除する
 - `--no-verify`を常用フローにする
 - mainへの直接プッシュを自由化する
@@ -223,15 +272,17 @@ A: ルールで"Include administrators"を有効化した場合のみ対象に�
 | ステップ | 目的 | 使うとき |
 |----------|------|----------|
 | 1 | ブランチ保護ルール | PR運用を徹底したい |
-| 3 | 必須ステータスチェック | ビルド/テストを必須化 |
-| 5 | ローカルフック | ローカル安全策が必要 |
-| 6 | グローバルデフォルト | git init/cloneを標準化 |
+| 2 | 環境ファイル | クロスプラットフォーム統一 |
+| 4 | 必須ステータスチェック | ビルド/テストを必須化 |
+| 6 | ローカルフック | ローカル安全策が必要 |
+| 7 | グローバルデフォルト | git init/cloneを標準化 |
 
 ### 判断テーブル
 
 | 状況 | 推奨 | 理由 |
 |------|------|------|
-| 新規リポジトリ | core.hooksPath設定 | 全体デフォルト化 |
+| 新規リポジトリ | .gitattributes + .editorconfig追加 | 初日から環境差異を吸収 |
+| マルチOSチーム | core.hooksPath設定 | 全体デフォルト化 |
 | 新規のみ適用 | init.templateDir設定 | 既存に影響なし |
 | private/無料プラン | ローカルフック | サーバー保護不可 |
 | チーム運用 | PR必須化 | 変更の追跡性向上 |

@@ -1,6 +1,6 @@
 ---
 name: git-initial-setup
-description: Default git setup to protect main after git init/clone. Use when standardizing repo bootstrap.
+description: Default git setup to protect main after git init/clone. Use when standardizing repo bootstrap and absorbing environment differences.
 metadata:
   author: RyoMurakami1983
   tags: [git, github, branch-protection, hooks, bootstrap]
@@ -9,7 +9,7 @@ metadata:
 
 # Git Initial Setup for Main Protection
 
-Standardize main-branch protection for repositories created by git init/clone. Combine GitHub branch protection (Option A) with global hook defaults and local pre-commit/pre-push hooks (Option B) for defense in depth.
+Standardize main-branch protection for repositories created by git init/clone. Combine GitHub branch protection (Option A) with global hook defaults and local pre-commit/pre-push hooks (Option B) for defense in depth. Absorb cross-platform environment differences with `.gitattributes` and `.editorconfig`.
 
 ## When to Use This Skill
 
@@ -18,6 +18,7 @@ Use this skill when:
 - Rolling out global hook defaults across developer machines
 - Enforcing Pull Request (PR)-only merges for main in team repositories
 - Preventing accidental commits/pushes during release preparation
+- Absorbing cross-platform line-ending and encoding differences in team repositories
 - Adding local safeguards for private repos without protection rules
 - Auditing protection coverage before a major release
 
@@ -62,7 +63,53 @@ Use when setting up any new repository or adding protection to an existing one.
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 2: Configure Review Requirements
+### Step 2: Generate Repository Environment Files
+
+Add `.gitattributes` and `.editorconfig` to absorb cross-platform differences. Without these files, team members on different OSes or AI agent sandboxes may see all files as modified after clone.
+
+**.gitattributes** (line-ending normalization):
+
+```
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.sln text eol=crlf
+*.png binary
+*.jpg binary
+*.ico binary
+```
+
+**.editorconfig** (editor settings normalization):
+
+```ini
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
+```
+
+For existing repositories, run `git add --renormalize .` after adding `.gitattributes` to re-normalize tracked files.
+
+Use when creating a new repository or onboarding team members with different OSes, editors, or AI agents.
+
+> **Values**: 基礎と型 / 余白の設計
+
+### Step 3: Configure Review Requirements
 
 Define review requirements so main merges are intentional and traceable. Enable Code Owners and dismiss stale approvals on new commits to maintain accountability.
 
@@ -77,7 +124,7 @@ Use when you need accountability for every main merge and consistent review qual
 
 > **Values**: 成長の複利 / ニュートラル
 
-### Step 3: Require Status Checks
+### Step 4: Require Status Checks
 
 Gate merges on CI checks so broken builds never land in main. Required checks keep main green and reduce rollback risk.
 
@@ -91,7 +138,7 @@ Use when your repository has CI pipelines and you want to prevent regressions.
 
 > **Values**: 継続は力 / 基礎と型
 
-### Step 4: Restrict Push Access
+### Step 5: Restrict Push Access
 
 Limit direct push access and ensure protections apply to administrators. Enable "Include administrators" and restrict who can push to matching branches.
 
@@ -105,7 +152,7 @@ Use in regulated or audited environments where strong guarantees are needed.
 
 > **Values**: ニュートラル / 基礎と型
 
-### Step 5: Install Local Hooks
+### Step 6: Install Local Hooks
 
 Install local pre-commit and pre-push hooks to block commits and pushes to main before changes reach the remote.
 
@@ -122,7 +169,7 @@ Use for private repos without branch protection rules, as a local safety net, or
 
 > **Values**: 継続は力 / 基礎と型
 
-### Step 6: Set Global Hook Defaults
+### Step 7: Set Global Hook Defaults
 
 Configure global hook defaults so new repositories inherit protections automatically via `core.hooksPath`.
 
@@ -134,7 +181,7 @@ Use when you manage multiple repositories on the same workstation and want autom
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 7: Roll Out to Team
+### Step 8: Roll Out to Team
 
 Roll out protections with clear communication: announce the PR-only policy, share setup scripts, and update onboarding docs.
 
@@ -149,7 +196,7 @@ Use when you manage multiple repositories or need consistent protections across 
 
 > **Values**: 成長の複利 / 継続は力
 
-### Step 8: Handle Emergencies
+### Step 9: Handle Emergencies
 
 Handle common failures without disabling protections permanently. For emergency hotfixes, use a documented admin bypass with post-incident review.
 
@@ -167,6 +214,7 @@ Use when protections block an urgent fix or hook behavior differs across environ
 
 ## Best Practices
 
+- Add `.gitattributes` and `.editorconfig` at repository creation time
 - Set global hook defaults before creating new repos
 - Use Pull Request (PR) reviews for all main merges
 - Set branch protection after the remote exists
@@ -195,6 +243,7 @@ Fix: Add GitHub branch protection to enforce team-wide rules.
 
 ## Anti-Patterns
 
+- Assuming all team members use the same OS and editor settings (Implicit Environment Assumption)
 - Disabling branch protection to make a quick change
 - Using `--no-verify` as a default workflow
 - Allowing unrestricted direct pushes to main
@@ -224,15 +273,17 @@ A: Only if "Include administrators" is enabled in the branch protection rule.
 | Step | Focus | Use When |
 |------|-------|----------|
 | 1 | Branch protection rule | You need PR-only merges |
-| 3 | Required status checks | You need build/test gates |
-| 5 | Local hooks | You need local safety nets |
-| 6 | Global defaults | You want git init/clone defaults |
+| 2 | Environment files | You need cross-platform consistency |
+| 4 | Required status checks | You need build/test gates |
+| 6 | Local hooks | You need local safety nets |
+| 7 | Global defaults | You want git init/clone defaults |
 
 ### Decision Table
 
 | Situation | Recommendation | Why |
 |-----------|----------------|-----|
-| New repo setup | Set core.hooksPath | Default protection everywhere |
+| New repo setup | Add .gitattributes + .editorconfig | Absorb environment differences from day one |
+| Multi-OS team | Set core.hooksPath | Default protection everywhere |
 | Only new repos | Set init.templateDir | Avoid touching existing repos |
 | Private repo on free plan | Use local hooks | Server rules unavailable |
 | Team workflow | Enable PR-only merges | Traceable changes |
