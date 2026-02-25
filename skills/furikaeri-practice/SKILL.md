@@ -128,6 +128,8 @@ Prompt the user:
 
 Use when analyzing any session. This is the core analysis step.
 
+> **Note**: Always render KPT/YWT lists as plain markdown text in the conversation so they remain visible when scrolling back. Reserve interactive selection UIs (e.g., `ask_user`) for moments that require a user decision, such as priority voting in Step 3.
+
 > **Values**: 基礎と型 / 成長の複利
 
 ### Step 3: Pick the Most Important Items
