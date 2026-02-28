@@ -1,6 +1,6 @@
 # GitHub Copilot Skills Collection
 
-高品質なGitHub Copilot Agent Skillsのコレクション
+GitHub Copilot Agent Skillsのコレクション
 
 ## 📋 概要
 
