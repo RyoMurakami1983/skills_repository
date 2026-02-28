@@ -4,7 +4,7 @@
 
 ## 📋 概要
 
-このリポジトリは、GitHub Copilot Agentで使用できる高品質なSkillsを集約・管理するためのものです。
+このリポジトリは、GitHub Copilot Agentで使用できるSkillsを集約・管理するためのものです。
 **「1 Skill = 1 Pattern」** 標準に基づき設計されており、各スキルは1つの実行パターン（workflow/cycle/router等）に特化しています。
 
 ### 🎯 設計思想
