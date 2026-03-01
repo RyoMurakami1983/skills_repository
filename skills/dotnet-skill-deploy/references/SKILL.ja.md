@@ -199,7 +199,7 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 - ✅ **少なく、多くなく** — 余分なスキルはエージェントのコンテキストノイズ
 - ✅ **定期的に更新** — skills_repository更新時に `-Force` で再実行
 - ✅ **プロジェクト種別に合わせる** — WPFアプリにBlazor/Playwrightスキルは不要
-- ✅ **カテゴリ定義を同期する** — dotnetスキルの追加・削除時は `scripts/Deploy-DotnetSkills.ps1` の `CategoryMap`、複合カテゴリ `wpf-app`、`agents/dotnet-shihan.agent.md` を必ず同期
+- ✅ **カテゴリ定義を同期する** — dotnetスキルの追加・削除時は repoルート相対パス `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` の `CategoryMap`、複合カテゴリ `wpf-app`、`agents/dotnet-shihan.agent.md` を必ず同期
 
 ### カテゴリ保守ルール（dotnetスキル追加・削除時）
 

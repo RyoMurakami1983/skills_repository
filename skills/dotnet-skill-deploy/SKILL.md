@@ -200,7 +200,7 @@ If you want to track them in your project repository, run:
 - ✅ **Deploy fewer, not more** — Extra skills add context noise for the agent. Why: Copilot's context window is finite; irrelevant skills dilute relevant guidance.
 - ✅ **Update periodically** — Re-run with `-Force` when skills_repository is updated. Why: skills evolve with new patterns and best practices.
 - ✅ **Match project type** — A WPF app doesn't need Blazor/Playwright skills. Why: precision > coverage for agent-assisted development.
-- ✅ **Keep category definitions in sync** — When dotnet skills are added/removed, update `scripts/Deploy-DotnetSkills.ps1` `CategoryMap`, verify composite `wpf-app`, and align `agents/dotnet-shihan.agent.md`. Why: drift causes missing or invalid deployments.
+- ✅ **Keep category definitions in sync** — When dotnet skills are added/removed, update repo-root-relative `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` `CategoryMap`, verify composite `wpf-app`, and align `agents/dotnet-shihan.agent.md`. Why: drift causes missing or invalid deployments.
 
 ### Category Maintenance Rule (when dotnet skills change)
 
