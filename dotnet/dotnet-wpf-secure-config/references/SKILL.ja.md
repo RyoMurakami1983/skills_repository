@@ -408,4 +408,4 @@ logger.LogInformation($"Password: {DpapiEncryptor.MaskSensitive(password)}");
 ## Resources
 
 - 共通セキュリティコンポーネント — 完全な実装リファレンス（内部ドキュメント、このリポジトリ外で管理）
-- [Microsoft: Data Protection API (DPAPI)](https://docs.microsoft.com/windows/win32/seccng/data-protection-api)
+- [Microsoft: Data Protection API (DPAPI)](https://learn.microsoft.com/en-us/windows/win32/seccng/cng-dpapi)
