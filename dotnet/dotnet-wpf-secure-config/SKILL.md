@@ -406,4 +406,4 @@ logger.LogInformation($"Password: {DpapiEncryptor.MaskSensitive(password)}");
 ## Resources
 
 - Shared Security Components — Full implementation reference (internal documentation maintained outside this repository)
-- [Microsoft: Data Protection API (DPAPI)](https://docs.microsoft.com/windows/win32/seccng/data-protection-api)
+- [Microsoft: Data Protection API (DPAPI)](https://learn.microsoft.com/en-us/windows/win32/seccng/cng-dpapi)

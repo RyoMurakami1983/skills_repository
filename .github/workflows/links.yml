@@ -32,7 +32,6 @@ jobs:
             --no-progress
             --config ./lychee.toml
             --format markdown
-            --output ./lychee/out.md
             --include ^https?://
             dotnet/dotnet-wpf-secure-config/**/*.md
 
