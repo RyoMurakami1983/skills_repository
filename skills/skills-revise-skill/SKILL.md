@@ -28,6 +28,7 @@ Use this skill when:
 - **`skills-author-skill`** - Skill writing workflow
 - **`skills-validate-skill`** - Validate revisions before publishing
 - **`skills-refactor-skill-to-single-workflow`** - Refactor legacy skills before revision
+- **`skills-maintain-bilingual-skill`** — Maintain EN/JA structural parity for bilingual skills
 - **`knowledge-capture`** — Anonymization gate for examples derived from real projects
 
 ---
