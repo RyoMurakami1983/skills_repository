@@ -220,7 +220,28 @@ Use when finishing any furikaeri. Even 1 sentence improves the next one.
 
 > **Values**: 継続は力 / 成長の複利
 
-### Step 6: Anonymization Gate (Before Output)
+### Step 6: Register Actions as GitHub Issues
+
+Convert prioritized actions from Steps 3–4 into trackable execution items.
+
+1. Confirm whether each prioritized action should be turned into an issue.
+2. If yes, create an issue (or a draft) with SMART context (goal, done condition, due time).
+3. Add the issue number to furikaeri notes and keep bidirectional links.
+
+```markdown
+## Action ↔ Issue Mapping
+
+| Action | Issue |
+|--------|-------|
+| Require API doc updates on API changes | #128 |
+| Standardize test timeout configuration | #129 |
+```
+
+Use when turning furikaeri outcomes into trackable execution items.
+
+> **Values**: 継続は力 / 成長の複利 / 基礎と型
+
+### Step 7: Anonymization Gate (Before Output)
 
 If the furikaeri content may flow into a public skill or reference, apply the `knowledge-capture` **Anonymization Checklist** (AC-1 through AC-4) before committing. Replace project names, data formats, domain terms, and numeric values with generic equivalents.
 

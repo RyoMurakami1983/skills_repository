@@ -219,6 +219,31 @@ Problem項目の根本原因が不明な場合、またはTry項目に具体的�
 
 > **Values**: 継続は力 / 成長の複利
 
+### Step 6: Register Actions as GitHub Issues
+
+優先したアクション項目を、追跡可能なIssueに変換する。
+
+1. 各優先アクションについて「Issue化しますか？」を確認する。  
+2. Yesの場合は、SMART文脈（目的・完了条件・期限）を含めてIssueを作成（またはIssue下書きを提示）する。  
+3. 発行したIssue番号を、ふりかえりノート側に必ず相互参照として記録する。
+
+```markdown
+## Action → Issue 対応
+
+| Action (SMART) | Issue |
+|---|---|
+| PRチェックリストに「APIドキュメント更新」を追加（次スプリントまで） | #128 |
+| テストセットアップへタイムアウト設定を追加（今週中） | Draft: "Add timeout config to integration tests" |
+```
+
+> **Values**: 継続は力 / 成長の複利
+
+### Step 7: Anonymization Gate (Before Output)
+
+ふりかえり内容が公開スキルや共有ドキュメントに流れる可能性がある場合は、`knowledge-capture` の **Anonymization Checklist**（AC-1〜AC-4）を適用してから出力する。プロジェクト固有名、データ形式、業務ドメイン語、具体的な数値は一般化する。
+
+> **Values**: ニュートラルな視点（固有データの漏洩を入口で防ぐ）
+
 ---
 
 ## ベストプラクティス
