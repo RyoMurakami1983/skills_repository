@@ -199,6 +199,14 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 - ✅ **少なく、多くなく** — 余分なスキルはエージェントのコンテキストノイズ
 - ✅ **定期的に更新** — skills_repository更新時に `-Force` で再実行
 - ✅ **プロジェクト種別に合わせる** — WPFアプリにBlazor/Playwrightスキルは不要
+- ✅ **カテゴリ定義を同期する** — dotnetスキルの追加・削除時は repoルート相対パス `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` の `CategoryMap`、複合カテゴリ `wpf-app`、`agents/dotnet-shihan.agent.md` を必ず同期
+
+### カテゴリ保守ルール（dotnetスキル追加・削除時）
+
+1. `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` の `CategoryMap` を更新する。
+2. 該当カテゴリへの追加・削除と、`wpf-app` 複合カテゴリの内訳を確認する。
+3. `agents/dotnet-shihan.agent.md` の管轄スキル一覧を同期する。
+4. `Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -List` を実行し、表示結果を確認する。
 
 ## Anti-Patterns
 
@@ -211,7 +219,7 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 
 ## スクリプトリファレンス
 
-デプロイスクリプトは `scripts/Deploy-DotnetSkills.ps1` に配置。
+デプロイスクリプトは repoルート相対パス `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` に配置。
 
 | パラメータ | 型 | 必須 | 説明 |
 |-----------|---|------|------|
