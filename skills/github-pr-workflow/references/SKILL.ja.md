@@ -5,6 +5,10 @@ metadata:
   author: RyoMurakami1983
   tags: [github, pull-requests, workflow, git, pr-create]
   invocable: false
+  tool_versions:
+    git: ">=2.30"
+    gh: ">=2.0"
+  last_reviewed: "2026-03-01"
 ---
 
 # GitHub PR Workflow

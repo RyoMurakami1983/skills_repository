@@ -5,6 +5,11 @@ metadata:
   author: RyoMurakami1983
   tags: [git, github, branch-protection, hooks, bootstrap]
   invocable: false
+  tool_versions:
+    git: ">=2.30"
+    gh: ">=2.0"
+    powershell: ">=5.1"
+  last_reviewed: "2026-03-01"
 ---
 
 # Git初期セットアップ（main保護）

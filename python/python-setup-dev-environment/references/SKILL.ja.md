@@ -5,6 +5,12 @@ metadata:
   author: RyoMurakami1983
   tags: [python, uv, ruff, mypy, vscode]
   invocable: false
+  tool_versions:
+    python: ">=3.11"
+    uv: ">=0.5"
+    ruff: ">=0.9"
+    mypy: ">=1.0"
+  last_reviewed: "2026-03-01"
 ---
 
 # Python開発環境をセットアップする

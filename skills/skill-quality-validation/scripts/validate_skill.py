@@ -1088,7 +1088,13 @@ class LanguageValidator(SkillValidator):
 
 
 class WarningValidator:
-    """Generates warning-level checks (EN/JA parity, Values, safety risks, Japanese leak)"""
+    """Generates warning-level checks (EN/JA parity, Values, safety risks, Japanese leak, tool freshness)"""
+
+    TOOL_KEYWORDS = [
+        'git', 'dotnet', 'python', 'uv', 'ruff', 'mypy', 'powershell',
+        'cli', 'npm', 'node', 'typescript', 'gh', 'docker', 'kubectl',
+        'pip', 'cargo', 'rust', 'java', 'maven', 'gradle',
+    ]
 
     def __init__(self, content: str, file_path: str):
         self.content = content
@@ -1156,6 +1162,7 @@ class WarningValidator:
         warnings.extend(self._check_ja_safety_risks())
         warnings.extend(self._check_glossary_freshness())
         warnings.extend(self._check_en_japanese_leak())
+        warnings.extend(self._check_tool_freshness())
         return warnings
 
     # --- W1: EN/JA structural parity ---
@@ -1385,6 +1392,51 @@ class WarningValidator:
                 "W5",
                 "EN SKILL.md contains Japanese text — verify intentional or move to JA version",
                 f"Found in {len(found_lines)} line(s): {'; '.join(found_lines[:5])}"
+            ))
+
+        return warnings
+
+    # --- W6: Tool freshness check ---
+
+    def _check_tool_freshness(self) -> List[WarningResult]:
+        """W6: Warn when a tool-dependent skill lacks tool_versions or last_reviewed in frontmatter."""
+        warnings: List[WarningResult] = []
+
+        # Only check EN files
+        if Path(self.file_path).name.endswith('.ja.md'):
+            return warnings
+
+        fm_match = re.match(r'^---\s*\n(.*?)\n---\s*\n', self.content, re.DOTALL)
+        if not fm_match:
+            return warnings
+
+        fm_text = fm_match.group(1).lower()
+
+        # Detect tool-dependency via tags
+        tags_match = re.search(r'tags:\s*\[([^\]]+)\]', fm_text)
+        if not tags_match:
+            return warnings
+
+        tags_str = tags_match.group(1)
+        matched_tools = [kw for kw in self.TOOL_KEYWORDS if kw in tags_str]
+        if not matched_tools:
+            return warnings
+
+        # W6.1: tool_versions missing
+        if 'tool_versions' not in fm_text:
+            warnings.append(WarningResult(
+                "W6.1",
+                "Tool-dependent skill lacks tool_versions in frontmatter",
+                f"Detected tools: {', '.join(matched_tools[:5])}"
+                + " — add metadata: tool_versions: {tool: version}"
+            ))
+
+        # W6.2: last_reviewed missing
+        if 'last_reviewed' not in fm_text:
+            warnings.append(WarningResult(
+                "W6.2",
+                "Tool-dependent skill lacks last_reviewed in frontmatter",
+                "Add metadata: last_reviewed: YYYY-MM-DD to track freshness"
             ))
 
         return warnings
