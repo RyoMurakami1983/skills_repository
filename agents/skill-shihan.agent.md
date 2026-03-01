@@ -103,6 +103,7 @@ skill-shihan がオーナーとして品質管理を担当する。
 - 500行以内（超過分は `references/` へ分離）
 - 標準H2構造: When to Use → Core Principles → Workflow/Patterns → Pitfalls → Anti-Patterns → Quick Reference
 - `references/SKILL.ja.md` 必須（EN/JA構造パリティ）
+- 運用リスクがあるスキルは Preflight / Self-Review / Troubleshooting を含める
 
 ### Values
 - 全Workflow StepにValues blockquote
@@ -123,6 +124,7 @@ skill-shihan がオーナーとして品質管理を担当する。
 - [ ] 500行以内（超過は references/ に分離済み）
 - [ ] references/SKILL.ja.md 存在、EN/JA構造パリティ
 - [ ] 全StepにValues blockquote
+- [ ] 運用リスクがある場合、Preflight / Self-Review / Troubleshooting がある
 - [ ] コードブロック: コンパイル可能 or 明示的に擬似コード
 - [ ] validate_skill.py ≥85% PASS
 ```

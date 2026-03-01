@@ -191,6 +191,30 @@ Explanation + example
 
 > **Values**: 温故知新（過去の失敗知を形式知化）
 
+### Step 6.5 — Add Operational Guardrails
+
+Add lightweight operational guardrails so the skill is usable under real repository constraints:
+
+```markdown
+### Preflight Checklist
+- [ ] Preconditions and permissions are verified before execution
+
+### Self-Review Checklist
+- [ ] High-risk failure points were explicitly checked before completion
+
+## Troubleshooting
+- Symptom: <observed failure>
+  - Cause: <root cause>
+  - Fix: <minimal recovery action>
+```
+
+Placement rules:
+- Keep only the minimum executable checks in `SKILL.md`
+- Move long diagnostics and examples to `references/`
+- Add `scripts/` or `assets/` only when reuse is clear and recurring
+
+> **Values**: 基礎と型 / 余白の設計
+
 ### Step 7 — Add Quick Reference & Resources
 
 ```markdown
@@ -311,6 +335,12 @@ Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% ov
 
 **Solution**: Move detailed examples, anti-patterns, and Japanese content to `references/`.
 
+### 5. Missing Operational Guardrails
+
+**Problem**: The skill has workflow steps but lacks Preflight/Self-Review/Troubleshooting.
+
+**Solution**: Add concise guardrails in `SKILL.md` and move detailed cases to `references/`.
+
 ---
 
 ## Anti-Patterns
@@ -345,6 +375,7 @@ Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% ov
 - [ ] Code examples use ✅/❌ markers, explain WHY
 - [ ] Good Practices section with Values links
 - [ ] Common Pitfalls (3–5 items)
+- [ ] Preflight / Self-Review / Troubleshooting are present when operational risk exists
 - [ ] Anti-Patterns (2–3 items)
 - [ ] Quick Reference (checklist or decision tree)
 - [ ] Resources section
