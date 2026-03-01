@@ -220,7 +220,28 @@ Use when finishing any furikaeri. Even 1 sentence improves the next one.
 
 > **Values**: 継続は力 / 成長の複利
 
-### Step 6: Anonymization Gate (Before Output)
+### Step 6: Register Actions as GitHub Issues
+
+Convert prioritized actions from Steps 3–4 into trackable execution items.
+
+1. Confirm whether each prioritized action should be turned into an issue.
+2. If yes, create an issue (or a draft) with SMART context (goal, definition of done, due date).
+3. Add the issue number to furikaeri notes, and in the created issue include a link (URL/path) back to the furikaeri note so links stay bidirectional.
+
+```markdown
+## Action ↔ Issue Mapping
+
+| Action | Issue |
+|--------|-------|
+| Require API doc updates on API changes | #128 |
+| Standardize test timeout configuration | #129 |
+```
+
+Use when turning furikaeri outcomes into trackable execution items.
+
+> **Values**: 継続は力 / 成長の複利 / 基礎と型
+
+### Step 7: Anonymization Gate (Before Output)
 
 If the furikaeri content may flow into a public skill or reference, apply the `knowledge-capture` **Anonymization Checklist** (AC-1 through AC-4) before committing. Replace project names, data formats, domain terms, and numeric values with generic equivalents.
 
@@ -332,8 +353,8 @@ A: 5–10 minutes for a solo AI session. 15–30 minutes for a team session.
 **Q: KPT or YWT — which is better?**
 A: KPT for problem-solving sessions, YWT for learning-focused ones. Try both and see what fits.
 
-**Q: Do I need to do all 5 steps every time?**
-A: Steps 1–3 and 5 are always recommended. Step 4 (5 Whys + SMART) is only for complex or recurring problems.
+**Q: Do I need to do all 7 steps every time?**
+A: Steps 1–3, 5, and 6 are recommended for most sessions. Step 4 (5 Whys + SMART) is for complex or recurring problems, and Step 7 (Anonymization Gate) is required only when content may be published/shared.
 
 **Q: What if nothing went wrong?**
 A: Great sessions still have Keep items and Try items. "What could be even better?" always yields insights.
