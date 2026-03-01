@@ -1418,25 +1418,32 @@ class WarningValidator:
             return warnings
 
         tags_str = tags_match.group(1)
-        matched_tools = [kw for kw in self.TOOL_KEYWORDS if kw in tags_str]
+        # Normalize tags into discrete tokens to avoid substring matches (e.g. 'gh' matching 'github')
+        raw_tokens = re.split(r'[,\s]+', tags_str)
+        normalized_tags = {
+            token.strip(" '\"").lower()
+            for token in raw_tokens
+            if token.strip(" '\"")
+        }
+        matched_tools = [kw for kw in self.TOOL_KEYWORDS if kw in normalized_tags]
         if not matched_tools:
             return warnings
 
-        # W6.1: tool_versions missing
-        if 'tool_versions' not in fm_text:
+        # W6.1: tool_versions missing under metadata: block (indented key)
+        if not re.search(r'^\s+tool_versions\s*:', fm_match.group(1), re.MULTILINE):
             warnings.append(WarningResult(
                 "W6.1",
                 "Tool-dependent skill lacks tool_versions in frontmatter",
                 f"Detected tools: {', '.join(matched_tools[:5])}"
-                + " — add metadata: tool_versions: {tool: version}"
+                + " — add metadata.tool_versions: {tool: version}"
             ))
 
-        # W6.2: last_reviewed missing
-        if 'last_reviewed' not in fm_text:
+        # W6.2: last_reviewed missing under metadata: block (indented key)
+        if not re.search(r'^\s+last_reviewed\s*:', fm_match.group(1), re.MULTILINE):
             warnings.append(WarningResult(
                 "W6.2",
                 "Tool-dependent skill lacks last_reviewed in frontmatter",
-                "Add metadata: last_reviewed: YYYY-MM-DD to track freshness"
+                "Add metadata.last_reviewed: YYYY-MM-DD to track freshness"
             ))
 
         return warnings
