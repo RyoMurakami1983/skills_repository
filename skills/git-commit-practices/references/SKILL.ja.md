@@ -5,6 +5,9 @@ metadata:
   author: RyoMurakami1983
   tags: [git, commits, conventional-commits, workflow, quality]
   invocable: false
+  tool_versions:
+    git: ">=2.30"
+  last_reviewed: "2026-03-01"
 ---
 
 # Gitコミット実践

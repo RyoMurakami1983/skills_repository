@@ -326,6 +326,52 @@ def test_warning_ja_safety_keywords(tmp_path: Path):
     assert "W3.2" in w_ids
 
 
+def test_warning_w6_tool_dependent_missing_fields(tmp_path: Path):
+    """W6.1/W6.2: Tool-dependent skill without tool_versions/last_reviewed triggers warnings"""
+    mod = _load_validator_module()
+    en = (
+        "---\nname: test\ndescription: test\n"
+        "metadata:\n  author: T\n  tags: [git, workflow]\n  invocable: false\n---\n"
+        "## When to Use This Skill\n- Use with git.\n"
+    )
+    file_path = _write_skill_file(tmp_path, "tool-dep-missing", en)
+    report = mod.validate_skill_file(str(file_path))
+    w_ids = [w.id for w in report.warnings]
+    assert "W6.1" in w_ids
+    assert "W6.2" in w_ids
+
+
+def test_warning_w6_tool_dependent_with_fields(tmp_path: Path):
+    """W6.1/W6.2: Tool-dependent skill with tool_versions and last_reviewed suppresses warnings"""
+    mod = _load_validator_module()
+    en = (
+        "---\nname: test\ndescription: test\n"
+        "metadata:\n  author: T\n  tags: [git, workflow]\n  invocable: false\n"
+        "  tool_versions:\n    git: '>=2.30'\n  last_reviewed: '2026-03-01'\n---\n"
+        "## When to Use This Skill\n- Use with git.\n"
+    )
+    file_path = _write_skill_file(tmp_path, "tool-dep-complete", en)
+    report = mod.validate_skill_file(str(file_path))
+    w_ids = [w.id for w in report.warnings]
+    assert "W6.1" not in w_ids
+    assert "W6.2" not in w_ids
+
+
+def test_warning_w6_non_tool_skill_no_warning(tmp_path: Path):
+    """W6: Non-tool skill (no tool keywords in tags) does not trigger W6"""
+    mod = _load_validator_module()
+    en = (
+        "---\nname: test\ndescription: test\n"
+        "metadata:\n  author: T\n  tags: [workflow, documentation]\n  invocable: false\n---\n"
+        "## When to Use This Skill\n- Use for docs.\n"
+    )
+    file_path = _write_skill_file(tmp_path, "non-tool-skill", en)
+    report = mod.validate_skill_file(str(file_path))
+    w_ids = [w.id for w in report.warnings]
+    assert "W6.1" not in w_ids
+    assert "W6.2" not in w_ids
+
+
 def test_no_warnings_when_aligned(tmp_path: Path):
     """No warnings when EN/JA are structurally aligned and no safety keywords"""
     mod = _load_validator_module()
