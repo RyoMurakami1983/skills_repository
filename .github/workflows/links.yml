@@ -17,6 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare lychee report path
+        run: |
+          mkdir -p ./lychee
+          : > ./lychee/out.md
+
       - name: Check external links
         id: lychee
         uses: lycheeverse/lychee-action@v2
@@ -37,7 +42,7 @@ jobs:
         with:
           script: |
             const labels = [
-              { name: "t/chore", color: "1D76DB", description: "Maintenance task" },
+              { name: "t/chore", color: "006B75", description: "Maintenance task" },
               { name: "a/skills", color: "22863A", description: "Skills domain" }
             ];
             for (const label of labels) {
@@ -49,13 +54,19 @@ jobs:
                 });
               } catch (error) {
                 if (error.status === 404) {
-                  await github.rest.issues.createLabel({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    name: label.name,
-                    color: label.color,
-                    description: label.description
-                  });
+                  try {
+                    await github.rest.issues.createLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      name: label.name,
+                      color: label.color,
+                      description: label.description
+                    });
+                  } catch (createError) {
+                    if (createError.status !== 422) {
+                      throw createError;
+                    }
+                  }
                 } else {
                   throw error;
                 }
