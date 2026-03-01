@@ -173,6 +173,14 @@ Use when the branch is pushed and no PR exists yet.
 - Use `--body-file` on Windows for reliable UTF-8 handling
 - Verify authentication with `gh auth status` before creating PRs
 
+### Preflight Checklist (Before `gh pr create`)
+
+- [ ] You are on a feature branch (not `main`)
+- [ ] `gh auth status` succeeds for the intended account
+- [ ] Branch can be pushed to remote (no protection conflict)
+- [ ] If changes include `.github/workflows/*`, token includes `workflow` scope
+- [ ] Existing open PR for the branch is checked (`gh pr list --head BRANCH --state open`)
+
 ---
 
 ## Common Pitfalls
@@ -185,6 +193,16 @@ Use when the branch is pushed and no PR exists yet.
 
 3. **Creating PR from main branch**
    Fix: Step 1 state detection routes to feature branch creation first.
+
+## Troubleshooting
+
+- **`workflow ... not found on the default branch` when dispatching Actions**
+  - Cause: `workflow_dispatch` targets workflows present on the default branch.
+  - Fix: Merge the workflow file into default branch first, then dispatch.
+
+- **Push rejected for `.github/workflows/*` due to scope**
+  - Cause: Token lacks `workflow` scope.
+  - Fix: Re-authenticate with `gh auth refresh -h github.com -s workflow`.
 
 ---
 
@@ -205,6 +223,13 @@ Use when the branch is pushed and no PR exists yet.
 - [ ] Commit via `git-commit-practices` if needed
 - [ ] Push branch to origin
 - [ ] Create PR with `gh pr create` (Japanese body + `Closes #N`)
+
+### Self-Review Checklist (Before finishing)
+
+- [ ] PR body includes intent, reason, test, and issue links
+- [ ] New automation/workflow changes include required path preparation steps
+- [ ] GitHub API create operations are idempotent (e.g., tolerate 422 race)
+- [ ] Label names/colors follow repository conventions
 
 ### PR Body Template
 

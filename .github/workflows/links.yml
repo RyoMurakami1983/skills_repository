@@ -1,0 +1,93 @@
+name: Link Check
+
+on:
+  schedule:
+    # Monday 09:00 JST
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare lychee report path
+        run: |
+          mkdir -p ./lychee
+          : > ./lychee/out.md
+
+      - name: Check external links
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        continue-on-error: true
+        with:
+          args: >-
+            --verbose
+            --no-progress
+            --config ./lychee.toml
+            --format markdown
+            --output ./lychee/out.md
+            --include ^https?://
+            dotnet/dotnet-wpf-secure-config/**/*.md
+
+      - name: Ensure issue labels exist
+        if: steps.lychee.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = [
+              { name: "t/chore", color: "006B75", description: "Maintenance task" },
+              { name: "a/skills", color: "22863A", description: "Skills domain" }
+            ];
+            for (const label of labels) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name
+                });
+              } catch (error) {
+                if (error.status === 404) {
+                  try {
+                    await github.rest.issues.createLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      name: label.name,
+                      color: label.color,
+                      description: label.description
+                    });
+                  } catch (createError) {
+                    if (createError.status !== 422) {
+                      throw createError;
+                    }
+                  }
+                } else {
+                  throw error;
+                }
+              }
+            }
+
+      - name: Append reproduction command
+        if: steps.lychee.outcome == 'failure'
+        run: |
+          {
+            echo ""
+            echo "## Reproduction"
+            echo '```bash'
+            echo "lychee --config ./lychee.toml --verbose --no-progress --include '^https?://' dotnet/dotnet-wpf-secure-config/**/*.md"
+            echo '```'
+          } >> ./lychee/out.md
+
+      - name: Create issue from report
+        if: steps.lychee.outcome == 'failure'
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: Link Checker Report
+          content-filepath: ./lychee/out.md
+          labels: t/chore,a/skills
