@@ -225,8 +225,8 @@ Use when finishing any furikaeri. Even 1 sentence improves the next one.
 Convert prioritized actions from Steps 3–4 into trackable execution items.
 
 1. Confirm whether each prioritized action should be turned into an issue.
-2. If yes, create an issue (or a draft) with SMART context (goal, done condition, due time).
-3. Add the issue number to furikaeri notes and keep bidirectional links.
+2. If yes, create an issue (or a draft) with SMART context (goal, definition of done, due date).
+3. Add the issue number to furikaeri notes, and in the created issue include a link (URL/path) back to the furikaeri note so links stay bidirectional.
 
 ```markdown
 ## Action ↔ Issue Mapping
@@ -353,8 +353,8 @@ A: 5–10 minutes for a solo AI session. 15–30 minutes for a team session.
 **Q: KPT or YWT — which is better?**
 A: KPT for problem-solving sessions, YWT for learning-focused ones. Try both and see what fits.
 
-**Q: Do I need to do all 5 steps every time?**
-A: Steps 1–3 and 5 are always recommended. Step 4 (5 Whys + SMART) is only for complex or recurring problems.
+**Q: Do I need to do all 7 steps every time?**
+A: Steps 1–3, 5, and 6 are recommended for most sessions. Step 4 (5 Whys + SMART) is for complex or recurring problems, and Step 7 (Anonymization Gate) is required only when content may be published/shared.
 
 **Q: What if nothing went wrong?**
 A: Great sessions still have Keep items and Try items. "What could be even better?" always yields insights.
