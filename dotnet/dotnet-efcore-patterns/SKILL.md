@@ -96,6 +96,8 @@ await db.SaveChangesAsync();
 
 Use `dotnet ef` CLI commands exclusively. Never edit, delete, or rename migration files manually. Why: the snapshot file tracks cumulative state and manual changes corrupt it.
 
+> **Prerequisite**: If `dotnet ef` is not found, install the EF Core CLI tool first (`dotnet tool install --global dotnet-ef`) or use a local tool manifest and run `dotnet tool restore`.
+
 ```bash
 # Create a new migration
 dotnet ef migrations add AddCustomerTable \
