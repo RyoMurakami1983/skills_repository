@@ -191,6 +191,32 @@ Explanation + example
 
 > **Values**: 温故知新（過去の失敗知を形式知化）
 
+### Step 6.5 — Add Operational Guardrails
+
+Add lightweight operational guardrails so the skill is usable under real repository constraints:
+
+```markdown
+## Troubleshooting
+- Symptom: <observed failure>
+  - Cause: <root cause>
+  - Fix: <minimal recovery action>
+
+## Quick Reference
+### Preflight Checklist
+- [ ] Preconditions and permissions are verified before execution
+
+### Self-Review Checklist
+- [ ] High-risk failure points were explicitly checked before completion
+```
+
+Placement rules:
+- Keep only the minimum executable checks in `SKILL.md`
+- Move long diagnostics and examples to `references/`
+- Add `scripts/` or `assets/` only when reuse is clear and recurring
+- Place `## Troubleshooting` before `## Quick Reference`, and place both checklists under Quick Reference as H3 sections
+
+> **Values**: 基礎と型 / 余白の設計
+
 ### Step 7 — Add Quick Reference & Resources
 
 ```markdown
@@ -311,6 +337,12 @@ Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% ov
 
 **Solution**: Move detailed examples, anti-patterns, and Japanese content to `references/`.
 
+### 5. Missing Operational Guardrails
+
+**Problem**: The skill has workflow steps but lacks Preflight/Self-Review/Troubleshooting.
+
+**Solution**: Add concise guardrails in `SKILL.md` and move detailed cases to `references/`.
+
 ---
 
 ## Anti-Patterns
@@ -345,6 +377,7 @@ Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% ov
 - [ ] Code examples use ✅/❌ markers, explain WHY
 - [ ] Good Practices section with Values links
 - [ ] Common Pitfalls (3–5 items)
+- [ ] Preflight / Self-Review / Troubleshooting are present when operational risk exists
 - [ ] Anti-Patterns (2–3 items)
 - [ ] Quick Reference (checklist or decision tree)
 - [ ] Resources section
@@ -365,9 +398,10 @@ Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% ov
 8. ## Good Practices
 9. ## Common Pitfalls
 10. ## Anti-Patterns
-11. ## Quick Reference
-12. ## Resources
-13. (No changelog section; use git history)
+11. ## Troubleshooting (if operational risk exists)
+12. ## Quick Reference
+13. ## Resources
+14. (No changelog section; use git history)
 ```
 
 ---

@@ -143,6 +143,32 @@ metadata:
 
 > **Values**: 温故知新（過去の失敗知を形式知化）
 
+### ステップ6.5 — 運用ガードレールを追加
+
+実運用で迷わないよう、軽量なガードレールを追加します。
+
+```markdown
+## トラブルシューティング（Troubleshooting）
+- 症状: <発生した事象>
+  - 原因: <根本原因>
+  - 対処: <最小復旧手順>
+
+## Quick Reference
+### 事前チェックリスト（Preflight）
+- [ ] 実行前提と権限を事前確認した
+
+### セルフレビューチェックリスト（Self-Review）
+- [ ] 失敗しやすい箇所を完了前に確認した
+```
+
+配置ルール:
+- `SKILL.md` には最小限の実行チェックのみ置く
+- 長い診断手順や事例は `references/` に分離
+- `scripts/` / `assets/` は再利用性が明確な場合のみ追加
+- `## トラブルシューティング` は `## Quick Reference` の前に置き、2つのチェックリストはQuick Reference配下のH3に置く
+
+> **Values**: 基礎と型 / 余白の設計
+
 ### ステップ7 — Quick ReferenceとResourcesを追加
 
 チェックリスト、デシジョンツリー、またはサマリーテーブルを提供します。
@@ -232,6 +258,12 @@ grep -i "SKILL_NAME" copilot/copilot-instructions.md
 
 **Solution**: 各原則が括弧内で最低1つのValueを引用。
 
+### 4. 運用ガードレールの欠落
+
+**Problem**: ワークフロー手順はあるが、Preflight/Self-Review/Troubleshooting がない。
+
+**Solution**: `SKILL.md` に簡潔に追加し、詳細ケースは `references/` に分離する。
+
 ---
 
 ## Quick Reference
@@ -246,6 +278,7 @@ grep -i "SKILL_NAME" copilot/copilot-instructions.md
 - [ ] コード例に✅/❌マーカー、WHYを説明
 - [ ] Good PracticesセクションにValuesリンク
 - [ ] Common Pitfalls（3〜5項目）
+- [ ] 運用リスクがある場合、Preflight / Self-Review / Troubleshooting を記載
 - [ ] SKILL.md ≤ 500行
 - [ ] `references/SKILL.ja.md`が存在（日本語版）
 - [ ] `skills-validate-skill`で検証済み

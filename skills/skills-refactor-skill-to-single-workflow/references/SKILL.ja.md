@@ -133,6 +133,18 @@ metadata:
 
 > **Values**: 温故知新（過去の参照を新しい構造に繋ぐ）
 
+### ステップ6.5 — 膨張させずにガードレールを注入
+
+モダナイズ時は、次の3点を最小構成で追加します。
+- `Preflight`（前提条件・権限確認）
+- `Self-Review`（完了前の高リスク確認）
+- `Troubleshooting`（既知障害と最小復旧手順）
+
+`SKILL.md` は簡潔に保ち、詳細な障害カタログは `references/` に分離します。  
+`scripts/` / `assets/` は複数スキルで再利用される場合のみ追加します。
+
+> **Values**: 基礎と型 / 余白の設計
+
 ### ステップ7 — 全結果を検証
 
 各新スキルとルーターに対して`skills-validate-skill`を実行。
@@ -187,6 +199,12 @@ metadata:
 
 **Solution**: 常に元をルータースキルに変換; 移行中は削除しない。
 
+### 4. トラブルシューティング詳細の本編詰め込み
+
+**Problem**: 移行時に長い障害一覧を SKILL.md へ直接貼り付けてしまう。
+
+**Solution**: 本編は実行に必要な最小情報だけ残し、詳細診断は `references/` へ移す。
+
 ---
 
 ## Anti-Patterns
@@ -219,6 +237,7 @@ metadata:
 - [ ] Values: 2つ以上のValues引用（関連する場合は余白の設計を含む）
 - [ ] バイリンガル: `references/SKILL.ja.md`（英語H2見出し + 日本語コンテンツ）
 - [ ] バリデーション: `skills-validate-skill` PASS
+- [ ] 運用リスクがある場合、Preflight / Self-Review / Troubleshooting を追加
 
 ### リファクタリング判断ツリー
 
@@ -249,6 +268,7 @@ metadata:
 - [ ] 移動: references/assetsを新スキルディレクトリに再配置
 - [ ] 更新: リポジトリ全体のクロスリファレンスを修正
 - [ ] 検証: 全結果に`skills-validate-skill`を実行
+- [ ] ガードレール追加後、詳細トラブルシューティングは `references/` に整理
 
 ---
 

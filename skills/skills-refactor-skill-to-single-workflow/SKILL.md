@@ -194,6 +194,18 @@ grep -r "skill-writing-guide" --include="*.md" .
 
 > **Values**: 温故知新（過去の参照を新しい構造に繋ぐ）
 
+### Step 6.5 — Inject Guardrails Without Bloat
+
+When modernizing a skill, add guardrails with a minimal footprint:
+- `Preflight` for prerequisites and permissions
+- `Self-Review` for high-risk checks before completion
+- `Troubleshooting` for known failure patterns and minimal recovery
+
+Keep examples concise in `SKILL.md`; move long failure catalogs to `references/`.
+Create `scripts/` or `assets/` only when they are reused across multiple skills.
+
+> **Values**: 基礎と型 / 余白の設計
+
 ### Step 7 — Validate All Results
 
 Run `skills-validate-skill` on each new skill AND the router to ensure compliance.
@@ -256,6 +268,12 @@ Run `skills-validate-skill` on each new skill AND the router to ensure complianc
 
 **Solution**: Search the entire repo for old skill name references and update them.
 
+### 5. Inflating SKILL.md with Troubleshooting Dumps
+
+**Problem**: Large failure catalogs are copied into SKILL.md during migration.
+
+**Solution**: Keep SKILL.md operationally minimal; move deep diagnostics to `references/`.
+
 ---
 
 ## Anti-Patterns
@@ -308,6 +326,7 @@ After consolidation:
 - [ ] Values: cite ≥ 2 Values (include 余白の設計 where relevant)
 - [ ] Bilingual: `references/SKILL.ja.md` (English H2 headings + Japanese content)
 - [ ] Validation: `skills-validate-skill` PASS
+- [ ] Preflight / Self-Review / Troubleshooting are added where operational risk exists
 
 ### Migration Checklist
 
@@ -318,6 +337,7 @@ After consolidation:
 - [ ] Move: relocate references/assets to new skill directories
 - [ ] Update: fix cross-references across repo
 - [ ] Validate: run `skills-validate-skill` on all results
+- [ ] Add guardrails and keep detailed troubleshooting in `references/`
 
 ---
 
