@@ -173,6 +173,14 @@ gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file
 - Windows では `--body-file` で UTF-8 を確実に扱う
 - `gh auth status` で認証を事前確認する
 
+### 事前チェックリスト（`gh pr create` 前）
+
+- [ ] feature branch 上で作業している（`main` ではない）
+- [ ] `gh auth status` が対象アカウントで成功する
+- [ ] ブランチをリモートへ push できる（保護ルールに抵触しない）
+- [ ] `.github/workflows/*` を変更する場合、トークンに `workflow` scope がある
+- [ ] 対象ブランチに既存のOpen PRがないことを確認済み（`gh pr list --head BRANCH --state open`）
+
 ---
 
 ## よくある落とし穴
@@ -185,6 +193,16 @@ gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file
 
 3. **mainブランチから直接PRを作る**
    修正: Step 1 の状態検知で feature branch 作成に誘導。
+
+## トラブルシューティング
+
+- **Actions実行時に `workflow ... not found on the default branch` が出る**
+  - 原因: `workflow_dispatch` は default branch 上に存在する workflow を対象にする。
+  - 対処: 先に workflow ファイルを default branch にマージしてから手動実行する。
+
+- **`.github/workflows/*` を含む push が権限エラーで拒否される**
+  - 原因: トークンに `workflow` scope が不足している。
+  - 対処: `gh auth refresh -h github.com -s workflow` で再認証する。
 
 ---
 
@@ -205,6 +223,13 @@ gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file
 - [ ] 必要なら `git-commit-practices` でコミット
 - [ ] ブランチを origin に push
 - [ ] `gh pr create` で PR 作成（日本語本文 + `Closes #N`）
+
+### セルフレビューチェックリスト（完了前）
+
+- [ ] PR本文に「意図・理由・テスト・Issueリンク」が揃っている
+- [ ] 自動化/workflow変更では必要な出力先ディレクトリ準備がある
+- [ ] GitHub API の create 処理が冪等（422競合など）になっている
+- [ ] ラベル名・色がリポジトリ規約に一致している
 
 ### PR本文テンプレート
 
