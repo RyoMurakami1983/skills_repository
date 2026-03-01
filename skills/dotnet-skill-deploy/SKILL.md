@@ -248,7 +248,7 @@ Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Category wp
 
 ## Script Reference
 
-The deployment script is located at `scripts/Deploy-DotnetSkills.ps1`.
+The deployment script is located at repo-root-relative `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1`.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|

@@ -219,7 +219,7 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 
 ## スクリプトリファレンス
 
-デプロイスクリプトは `scripts/Deploy-DotnetSkills.ps1` に配置。
+デプロイスクリプトは repoルート相対パス `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` に配置。
 
 | パラメータ | 型 | 必須 | 説明 |
 |-----------|---|------|------|
