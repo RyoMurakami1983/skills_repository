@@ -96,6 +96,8 @@ await db.SaveChangesAsync();
 
 `dotnet ef` CLI コマンドのみを使用する。マイグレーションファイルの手動編集・削除・名前変更は絶対にしない。スナップショットファイルは累積状態を追跡しており、手動変更は破損を引き起こすため。
 
+> **前提条件**: `dotnet ef` が見つからない場合は、まず EF Core CLI ツールをインストールする。グローバルツールとして使う場合は `dotnet tool install --global dotnet-ef` を実行する。リポジトリごとのローカルツールとして使う場合は、まだマニフェストがない場合にプロジェクトルートで `dotnet new tool-manifest` を実行し、その後 `dotnet tool install dotnet-ef` でマニフェストに登録する。以降はリポジトリのクローン後や CI では `dotnet tool restore` を実行すれば `dotnet ef` が利用できる。
+
 ```bash
 # 新しいマイグレーションを作成
 dotnet ef migrations add AddCustomerTable \
