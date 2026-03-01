@@ -196,22 +196,24 @@ Explanation + example
 Add lightweight operational guardrails so the skill is usable under real repository constraints:
 
 ```markdown
+## Troubleshooting
+- Symptom: <observed failure>
+  - Cause: <root cause>
+  - Fix: <minimal recovery action>
+
+## Quick Reference
 ### Preflight Checklist
 - [ ] Preconditions and permissions are verified before execution
 
 ### Self-Review Checklist
 - [ ] High-risk failure points were explicitly checked before completion
-
-## Troubleshooting
-- Symptom: <observed failure>
-  - Cause: <root cause>
-  - Fix: <minimal recovery action>
 ```
 
 Placement rules:
 - Keep only the minimum executable checks in `SKILL.md`
 - Move long diagnostics and examples to `references/`
 - Add `scripts/` or `assets/` only when reuse is clear and recurring
+- Place `## Troubleshooting` before `## Quick Reference`, and place both checklists under Quick Reference as H3 sections
 
 > **Values**: 基礎と型 / 余白の設計
 
@@ -396,9 +398,10 @@ Run `skills-validate-skill` to check against quality criteria. Target ≥ 80% ov
 8. ## Good Practices
 9. ## Common Pitfalls
 10. ## Anti-Patterns
-11. ## Quick Reference
-12. ## Resources
-13. (No changelog section; use git history)
+11. ## Troubleshooting (if operational risk exists)
+12. ## Quick Reference
+13. ## Resources
+14. (No changelog section; use git history)
 ```
 
 ---
