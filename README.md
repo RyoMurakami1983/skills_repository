@@ -19,7 +19,7 @@ GitHub Copilot Agent Skillsのコレクション
 | カテゴリ | 説明 | 配置先 | 詳細 |
 |---------|------|--------|------|
 | `copilot/` | グローバル開発憲法（copilot-instructions.md） | グローバル（~/.copilot/） | [copilot-instructions.md](copilot/copilot-instructions.md) |
-| `agents/` | 師範エージェント（dotnet/python/skill） | グローバル（~/.copilot/agents/） | [下記参照](#-agents) |
+| `agents/` | 師範エージェント（dotnet/python/typescript/skill） | グローバル（~/.copilot/agents/） | [下記参照](#-agents) |
 | `skills/` | Skill作成支援 + Git/GitHub ワークフロー（18） | グローバル（~/.copilot/skills/） | [SKILLS_README.md](skills/SKILLS_README.md) |
 | `dotnet/` | .NET/C# WPF開発ワークフロー（10） | プロジェクト（.github/skills/） | [下記参照](#-dotnet-skills) |
 | `production/` | MVP/本番向け開発プラクティス（1） | プロジェクト（.github/skills/） | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
@@ -107,7 +107,7 @@ Copy-Item copilot\copilot-instructions.md $env:USERPROFILE\.copilot\copilot-inst
 
 > 注意: `/MIR` は同期先の不要ファイルを削除します。`$env:USERPROFILE\.copilot\skills` と `$env:USERPROFILE\.copilot\agents` を専用同期先として使用してください。
 
-> **エージェント優先順位**: ユーザーレベル（`~/.copilot/agents/`）> リポレベル（`.github/agents/`）> Organization。グローバルに配置した師範エージェントは、どのプロジェクトでも `@dotnet-shihan`, `@python-shihan`, `@skill-shihan` として呼び出し可能です。
+> **エージェント優先順位**: ユーザーレベル（`~/.copilot/agents/`）> リポレベル（`.github/agents/`）> Organization。グローバルに配置した師範エージェントは、どのプロジェクトでも `@dotnet-shihan`, `@python-shihan`, `@typescript-shihan`, `@skill-shihan` として呼び出し可能です。
 
 **Linux/macOS（初回）**:
 
@@ -213,6 +213,7 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 |-------------|------|--------|
 | `@dotnet-shihan` | C#/.NET/WPFの設計・実装・レビュー | 先生（既定）/ 求道者 |
 | `@python-shihan` | Pythonの設計・実装・レビュー | 先生（既定）/ 求道者 |
+| `@typescript-shihan` | TypeScript/Node.jsの設計・実装・レビュー | 先生（既定）/ 求道者 |
 | `@skill-shihan` | スキルの作成・レビュー・バリデーション | 先生（既定）/ 求道者 |
 
 ## 🔷 dotnet Skills
