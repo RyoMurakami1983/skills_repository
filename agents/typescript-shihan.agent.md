@@ -133,7 +133,12 @@ function processData(data: any): any {
 
 // ✅ 良い例：型ガード + unknown
 function isUserData(data: unknown): data is { value: string } {
-  return typeof data === 'object' && data !== null && 'value' in data;
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'value' in data &&
+    typeof (data as { value: unknown }).value === 'string'
+  );
 }
 
 function processData(data: unknown): string {
