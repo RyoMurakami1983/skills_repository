@@ -64,6 +64,7 @@ metadata:
 | アーキテクチャ決定 | ADRワークフロー | `docs/adr/` | 要（公開リポジトリ） |
 | インシデントレポート | インシデントワークフロー | `docs/incidents/` | 要 |
 | 学習ノート | 単独 | プロジェクトdocs | 状況依存 |
+| GitHub Issue | `github-issue-intake` | 公開リポジトリのIssue | 要 |
 
 **判断基準**: 「この文書の内容が公開リポジトリに届く可能性があるか？」 → Yes = 匿名化必須。
 
@@ -108,7 +109,7 @@ OrderProcessorの出力で注文ORD-394072を処理した際、
 | `docs/furikaeri/` | コミット、PR、改善issueにリンク |
 | スキルの実例 | `skills-author-skill` または `skills-revise-skill` に連携 |
 | ADR | `docs/adr/` にコミット、ADRインデックスを更新 |
-| GitHub Issue | `github-issue-intake` で作成 |
+| GitHub Issue | 書く前に AC-1〜AC-4 を適用；`github-issue-intake` で作成 |
 
 > **Values**: 継続は力（知識を正しい場所に届け、次のアクションに繋げる）
 
