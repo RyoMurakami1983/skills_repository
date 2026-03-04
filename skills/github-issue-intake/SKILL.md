@@ -29,6 +29,7 @@ Use this skill when:
 - **`git-initial-setup`** - Default repo protections for new repos
 - **`skills-revise-skill`** - Revision and change log practices
 - **`skills-validate-skill`** - Validate documentation quality
+- **`knowledge-capture`** - Anonymization gate for public-repo content
 
 ---
 
@@ -67,6 +68,36 @@ Action: Create issue and continue
 ```
 
 **When**: You discover scope creep during a PR or a fix risks delaying the current release.
+
+### Step 1.5: Apply Anonymization Gate (Public Repo)
+
+Before writing any content, check whether the destination repository is **public**. If yes, apply the [Anonymization Checklist from `knowledge-capture`](../knowledge-capture/SKILL.md#anonymization-checklist) (AC-1 through AC-4):
+
+| Check | What to scan in the issue |
+|-------|--------------------------|
+| AC-1 | Project names, org names, private repo names (e.g., `MyOrg/my-private-repo`) |
+| AC-2 | Internal IDs, data formats, function/class names specific to a private codebase |
+| AC-3 | Domain-specific terminology that identifies the internal system or client |
+| AC-4 | Real numeric thresholds, config values, or business-specific numbers |
+
+Replace private details with generic equivalents before writing the issue body.
+
+```markdown
+# ❌ WRONG — private repo details exposed
+## Background
+Practiced during `internal_project` bug fix. See: MyOrg/my-private-repo PR #3
+
+# ✅ CORRECT — anonymized
+## Background
+Practiced during a numerical optimization library bug fix session.
+See: (private repo / internal PR)
+```
+
+**Decision Rule**: Is the destination repository public? → Yes = Apply AC-1 through AC-4 before writing.
+
+> **Values**: ニュートラルな視点（固有知識を普遍化して公開する）
+
+**When**: Every time you create an issue in a public repository that references internal project work.
 
 ### Step 2: Write (or Refactor) Title and Body
 
@@ -282,6 +313,7 @@ A: Yes — treat it as backlog maintenance. Update title/body (and add DoD) so t
 | Step | Action | Output |
 |------|--------|--------|
 | 1 | Decide fix vs issue | Decision logged |
+| 1.5 | Apply anonymization gate (public repo) | No private data in issue |
 | 2 | Write/refactor title + body (use 🔴🟡🟢🔵) | Searchable, actionable issue |
 | 3 | Apply labels and priority | Sortable backlog |
 | 4 | Add repro steps and evidence | Reproducible report |

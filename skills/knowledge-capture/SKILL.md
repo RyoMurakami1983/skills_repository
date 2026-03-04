@@ -59,6 +59,7 @@ Determine the document type and its downstream destination. Use this table to de
 | Architecture Decision | (ADR workflow) | `docs/adr/` | Yes (if public repo) |
 | Incident Report | (incident workflow) | `docs/incidents/` | Yes |
 | Learning Note | (standalone) | project docs | Context-dependent |
+| GitHub Issue | `github-issue-intake` | Public repo issues | Yes |
 
 **Decision Rule**: "Could this document's content end up in a public repository?" → Yes = anonymization required.
 
@@ -105,7 +106,7 @@ Deliver the document to its destination and link to next actions. Check the rout
 | `docs/furikaeri/` | Commit, PR, link to improvement issues |
 | Skill example | Feed into `skills-author-skill` or `skills-revise-skill` |
 | ADR | Commit to `docs/adr/`, update ADR index |
-| GitHub Issue | Create via `github-issue-intake` |
+| GitHub Issue | Apply AC-1 through AC-4 before writing; create via `github-issue-intake` |
 
 > **Values**: 継続は力（知識を正しい場所に届け、次のアクションに繋げる）
 
