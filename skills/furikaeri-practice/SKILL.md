@@ -244,8 +244,9 @@ Convert prioritized actions from Steps 3–4 into trackable execution items.
 > **Applies to**: sessions where `metadata.author == "RyoMurakami1983"` (i.e., this skills_repository).
 > Skip this step in other contexts.
 
-Save the furikaeri record to the Notion database:
-**`copilot-cliのふりかえりログ`** (`collection://319b5a4c-d694-80a5-a35e-000bf54edcce`)
+Save the furikaeri record to your designated private Notion database for furikaeri logs.
+
+> **How to get the `data_source_id`**: Run `notion-notion-fetch` on your furikaeri log database URL to retrieve the `collection://...` ID from the `<data-source>` tag. Store this ID in your local agent configuration — do **not** commit the actual UUID to the repository.
 
 Map KPT/YWT outputs to database fields:
 
@@ -260,9 +261,9 @@ Map KPT/YWT outputs to database fields:
 | `次回アクション` | SMART goals + Issue numbers (from Steps 3–4 + 6a) |
 | `関連タグ` | JSON array — choose from: `["開発", "デバッグ", "設計", "テスト", "レビュー", "リファクタリング", "ドキュメント", "会議", "学習"]` |
 
-Use `notion-notion-create-pages` with `data_source_id: "319b5a4c-d694-80a5-a35e-000bf54edcce"`.
+Use `notion-notion-create-pages` with `data_source_id: "<NOTION_DATA_SOURCE_ID>"` (your local value).
 
-Use when finishing any furikaeri in the RyoMurakami1983 context. Enables long-term trend tracking.
+Use when finishing any furikaeri in this workspace or team context. Enables long-term trend tracking.
 
 > **Values**: 継続は力 / 成長の複利 / 基礎と型
 
@@ -385,7 +386,7 @@ A: Steps 1–3, 5, and 6 are recommended for most sessions. Step 4 (5 Whys + SMA
 A: Great sessions still have Keep items and Try items. "What could be even better?" always yields insights.
 
 **Q: Should I store furikaeri notes somewhere?**
-A: Yes. For `RyoMurakami1983` sessions, save to the Notion database `copilot-cliのふりかえりログ` via Step 6b. For other contexts, create a GitHub Issue with the `furikaeri` label, or keep a `FURIKAERI.md` in your project.
+A: Yes. For `RyoMurakami1983` sessions, save to your designated private Notion database for furikaeri logs via Step 6b. For other contexts, create a GitHub Issue with the `furikaeri` label, or keep a `FURIKAERI.md` in your project.
 
 ---
 

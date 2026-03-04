@@ -243,8 +243,9 @@ Problem項目の根本原因が不明な場合、またはTry項目に具体的�
 > **適用条件**: `metadata.author == "RyoMurakami1983"` のセッション（このskills_repository）のみ。
 > その他のコンテキストではこのステップをスキップする。
 
-ふりかえり内容を Notion データベース  
-**`copilot-cliのふりかえりログ`** (`collection://319b5a4c-d694-80a5-a35e-000bf54edcce`) に保存する。
+ふりかえり内容を、自分専用のプライベート Notion ふりかえりログ DB に保存する。
+
+> **`data_source_id` の取得方法**: ふりかえりログ DB の URL に対して `notion-notion-fetch` を実行し、`<data-source>` タグの `collection://...` ID を取得する。この値はローカルのエージェント設定に保存し、**リポジトリにはコミットしない**こと。
 
 KPT/YWT のアウトプットをフィールドにマッピングする:
 
@@ -259,7 +260,7 @@ KPT/YWT のアウトプットをフィールドにマッピングする:
 | `次回アクション` | SMART 目標 + Issue 番号（Steps 3–4 + 6a から） |
 | `関連タグ` | JSON 配列 — 選択肢: `["開発", "デバッグ", "設計", "テスト", "レビュー", "リファクタリング", "ドキュメント", "会議", "学習"]` |
 
-`notion-notion-create-pages` を `data_source_id: "319b5a4c-d694-80a5-a35e-000bf54edcce"` で呼び出す。
+`notion-notion-create-pages` を `data_source_id: "<NOTION_DATA_SOURCE_ID>"` で呼び出す（ローカル設定から取得した値を使用）。
 
 > **なぜ？** — GitHub Issue は「次にやること」の追跡に強く、Notion は「時系列のふりかえりログ」として長期トレンドの把握に強い。両方を使うことで、実行管理と成長記録を分離できる。
 
@@ -384,7 +385,7 @@ A: 基本は Step 1〜3・Step 5・Step 6 を実施。Step 4（5つのなぜ + S
 A: 良いセッションにもKeep項目やTry項目がある。「もっと良くするには？」は必ず何かを生む。
 
 **Q: ふりかえりノートはどこに保存する？**
-A: `RyoMurakami1983` のセッションでは Step 6b で Notion データベース `copilot-cliのふりかえりログ` に保存する。その他のコンテキストでは GitHub Issue に `furikaeri` ラベルをつけるか、プロジェクトに `FURIKAERI.md` を置く。
+A: `RyoMurakami1983` のセッションでは Step 6b で自分専用のプライベート Notion ふりかえりログ DB に保存する。その他のコンテキストでは GitHub Issue に `furikaeri` ラベルをつけるか、プロジェクトに `FURIKAERI.md` を置く。
 
 ---
 
