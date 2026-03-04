@@ -10,7 +10,8 @@ permissions:
 
 jobs:
   # Uncomment this job if your repository has significant Markdown content.
-  # Also add .textlintrc.json and package.json (see github-quality-gate-setup skill).
+  # Also add .textlintrc.json, package.json, and package-lock.json (run npm install locally first).
+  # See the github-quality-gate-setup skill for templates.
   #
   # textlint:
   #   name: textlint

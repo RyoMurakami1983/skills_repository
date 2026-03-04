@@ -198,7 +198,7 @@ After the CI workflow is merged to main, manually configure branch protection to
 ## Common Pitfalls
 
 1. **Push rejected for `.github/workflows/*`**
-   ❌ Token lacks `workflow` scope — push fails silently.
+   ❌ Token lacks `workflow` scope — push is rejected with a remote error.
    ✅ Fix: `gh auth refresh -h github.com -s workflow`
 
 2. **textlint "No rules found"**
