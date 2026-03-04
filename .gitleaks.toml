@@ -1,0 +1,29 @@
+# gitleaks configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "skills-repository gitleaks config"
+
+[extend]
+# Use default ruleset from gitleaks
+useDefault = true
+
+# Allowlist for documentation examples and skill content
+# These patterns are intentionally example/placeholder values
+[[allowlists]]
+description = "Documentation example placeholders"
+regexes = [
+  # Generic API key placeholders used in skill examples
+  '''YOUR[_-]?API[_-]?KEY''',
+  '''EXAMPLE[_-]?TOKEN''',
+  '''YOUR[_-]?TOKEN[_-]?HERE''',
+  '''REPLACE[_-]?WITH[_-]?YOUR''',
+  # Azure dummy connection strings in dotnet skill examples
+  '''Endpoint=sb://[a-z-]+\.servicebus\.windows\.net/;SharedAccessKeyName=''',
+]
+
+[[allowlists]]
+description = "Test and skill example files"
+paths = [
+  # Validator test fixtures may contain example secrets for testing
+  '''skills/skill-quality-validation/scripts/tests/''',
+]

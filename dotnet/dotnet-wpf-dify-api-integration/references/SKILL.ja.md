@@ -47,8 +47,6 @@ WPFアプリケーションにDify API連携を追加するためのエンドツ
 
 ## Workflow: Integrate Dify API into WPF
 
-### Step 1 — プロジェクト構造のセットアップ
-
 ### Step 1 — 前提条件確認とDify固有ファイル追加
 
 `dotnet-wpf-secure-config` 適用済みプロジェクトにDify固有ファイルを追加するときに使用します。

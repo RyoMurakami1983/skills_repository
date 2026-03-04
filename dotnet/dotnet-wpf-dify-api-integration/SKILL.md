@@ -45,8 +45,6 @@ Use this skill when:
 
 ## Workflow: Integrate Dify API into WPF
 
-### Step 1 — Set Up Project Structure
-
 ### Step 1 — Verify Prerequisites and Add Dify Files
 
 Use when adding Dify-specific files to a project that already has `dotnet-wpf-secure-config` applied.
