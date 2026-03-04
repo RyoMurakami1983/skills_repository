@@ -2,8 +2,5 @@
   "rules": {
     "@textlint-rule/no-invalid-control-character": true,
     "no-empty-section": true
-  },
-  "filters": {
-    "comments": true
   }
 }
