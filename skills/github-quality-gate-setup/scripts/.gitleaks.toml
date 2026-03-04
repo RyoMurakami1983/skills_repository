@@ -1,0 +1,25 @@
+# gitleaks configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "repo-quality-gate"
+
+[extend]
+# Use gitleaks default ruleset
+useDefault = true
+
+# Add allowlists below for patterns that appear in your docs/examples
+# but are NOT real secrets.
+#
+# [[allowlists]]
+# description = "Documentation example placeholders"
+# regexes = [
+#   '''YOUR[_-]?API[_-]?KEY''',
+#   '''EXAMPLE[_-]?TOKEN''',
+#   '''YOUR[_-]?TOKEN[_-]?HERE''',
+# ]
+#
+# [[allowlists]]
+# description = "Test fixture directories"
+# paths = [
+#   '''tests/fixtures/''',
+# ]
