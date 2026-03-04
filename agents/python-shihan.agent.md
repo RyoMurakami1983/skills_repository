@@ -78,6 +78,7 @@ Pythonエコシステムの進化を追い、新しいパターンを作る。
 ### 将来の成長領域（スキル化候補）
 - Python型注釈とmypyの実践
 - pytest パターン（fixture, parametrize, conftest設計）
+- `python-debug-tdd` — TDD型バグ修正ワークフロー（再現テスト→根本原因特定→最小修正→副作用確認）([Issue #96](https://github.com/RyoMurakami1983/skills_repository/issues/96))
 - uv / ruff / pyproject.toml エコシステム
 - FastAPI / Pydantic パターン
 - データ処理（pandas, polars）
