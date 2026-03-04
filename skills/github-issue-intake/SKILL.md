@@ -85,7 +85,7 @@ Replace private details with generic equivalents before writing the issue body.
 ```markdown
 # ❌ WRONG — private repo details exposed
 ## Background
-Practiced during `slit_optimizer` bug fix. See: TohokuSteelKiki/slit_optimizer PR #3
+Practiced during `internal_project` bug fix. See: MyOrg/my-private-repo PR #3
 
 # ✅ CORRECT — anonymized
 ## Background

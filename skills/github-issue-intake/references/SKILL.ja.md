@@ -85,8 +85,8 @@ Issue本文を書く前に、固有の詳細を汎用表現に置き換える。
 ```markdown
 # ❌ NG — private repoの固有名詞がそのまま
 ## 背景
-slit_optimizer の fine_proposal_vars バグ修正時に実践。
-参考: TohokuSteelKiki/slit_optimizer PR #3
+optimizer_project の internal_function_name バグ修正時に実践。
+参考: MyOrg/my-private-repo PR #3
 
 # ✅ OK — 匿名化済み
 ## 背景
