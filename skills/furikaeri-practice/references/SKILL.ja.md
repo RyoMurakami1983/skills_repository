@@ -240,6 +240,10 @@ Problem項目の根本原因が不明な場合、またはTry項目に具体的�
 | テストセットアップへタイムアウト設定を追加（今週中） | Draft: "Add timeout config to integration tests" |
 ```
 
+> **アクション種別による分岐**
+> - **コーディング・プロセスの改善** → GitHub Issue を作成（本ステップ）
+> - **skill・型・ワークフローの改善** → `skills-revise-skill` を起動して該当スキルを更新
+
 #### 6b: Notion へ保存（RyoMurakami1983 のみ）
 
 > **適用条件**: `metadata.author == "RyoMurakami1983"` のセッション（このskills_repository）のみ。

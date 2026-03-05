@@ -241,6 +241,10 @@ Convert prioritized actions from Steps 3–4 into trackable execution items.
 | Standardize test timeout configuration | #129 |
 ```
 
+> **Action type routing**
+> - **Coding/process improvements** → Create a GitHub Issue (this step)
+> - **Skill/pattern/workflow improvements** → Invoke `skills-revise-skill` to update the relevant skill
+
 #### 6b: Save to Notion (RyoMurakami1983 only)
 
 > **Applies to**: sessions where `metadata.author == "RyoMurakami1983"` (i.e., this skills_repository).
