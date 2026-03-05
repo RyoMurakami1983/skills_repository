@@ -159,6 +159,8 @@ Use when prioritizing action items. Forces focus on what matters most.
 
 > **Values**: ニュートラル / 継続は力
 
+> **Next**: The prioritized items selected here will be converted into GitHub Issues in **Step 6a**. Do not end the session before completing Step 6 — unregistered actions are lost.
+
 ### Step 4: Dig Deeper (When Needed)
 
 For items with unclear root causes, apply **5 Whys** to find the real problem. Then set a **SMART goal** for the action item.
@@ -238,6 +240,10 @@ Convert prioritized actions from Steps 3–4 into trackable execution items.
 | Require API doc updates on API changes | #128 |
 | Standardize test timeout configuration | #129 |
 ```
+
+> **Action type routing**
+> - **Coding/process improvements** → Create a GitHub Issue (this step)
+> - **Skill/pattern/workflow improvements** → Invoke `skills-revise-skill` to update the relevant skill
 
 #### 6b: Save to Notion (RyoMurakami1983 only)
 
