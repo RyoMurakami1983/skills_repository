@@ -323,10 +323,11 @@ SKILL.md は英語で記述するため、日本語トリガーはこの辞書�
 | テンプレ作って | `skills-generate-skill-template` | スキルの雛形生成 |
 | ふりかえりして / ふりかえり | `furikaeri-practice` | セッション後のKPT/YWT改善サイクル |
 | 匿名化して / 固有名詞チェック | `knowledge-capture` | 文書・スキル例の匿名化ゲート（AC-1〜AC-4） |
+| 「おはよう。Issueを解決しましょう」 / 「挨拶してIssue対応開始」 | `session-issue-autopilot` | 挨拶トリガーからIssue選定・実装・PR・協働ふりかえりまでを単一フローで実行 |
 
 > **運用ルール**: スキルの新規作成・改訂時は、この辞書も合わせて更新すること。
 
-**Glossary Last Updated**: 2026-02-24
+**Glossary Last Updated**: 2026-03-05
 
 ---
 
