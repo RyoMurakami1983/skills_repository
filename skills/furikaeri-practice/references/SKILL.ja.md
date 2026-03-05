@@ -249,9 +249,11 @@ Problem項目の根本原因が不明な場合、またはTry項目に具体的�
 > **適用条件**: `metadata.author == "RyoMurakami1983"` のセッション（このskills_repository）のみ。
 > その他のコンテキストではこのステップをスキップする。
 
-ふりかえり内容を、自分専用のプライベート Notion ふりかえりログ DB に保存する。
+ふりかえり内容は **`notion-safe-operations`** を使って保存する。
 
-> **`data_source_id` の取得方法**: ふりかえりログ DB の URL に対して `notion-notion-fetch` を実行し、`<data-source>` タグの `collection://...` ID を取得する。この値はローカルのエージェント設定に保存し、**リポジトリにはコミットしない**こと。
+> **なぜこの分岐？** Notionツールの可用性はセッション/エージェント/モデルで変動する。基盤スキルに集約することで、Preflight確認・DS ID安全管理・失敗時フォールバックを一貫運用できる。
+
+> **DS ID 運用方針**: `NOTION_FURIKAERI_DS_ID` などのローカル環境変数、またはローカル設定を使う。実UUIDをリポジトリへコミットしない。
 
 KPT/YWT のアウトプットをフィールドにマッピングする:
 
@@ -266,7 +268,7 @@ KPT/YWT のアウトプットをフィールドにマッピングする:
 | `次回アクション` | SMART 目標 + Issue 番号（Steps 3–4 + 6a から） |
 | `関連タグ` | JSON 配列 — 選択肢: `["開発", "デバッグ", "設計", "テスト", "レビュー", "リファクタリング", "ドキュメント", "会議", "学習"]` |
 
-`notion-notion-create-pages` を `data_source_id: "<NOTION_DATA_SOURCE_ID>"` で呼び出す（ローカル設定から取得した値を使用）。
+`notion-safe-operations` を呼び出し、上記マッピング済みコンテンツを create-page payload に渡す。
 
 > **なぜ？** — GitHub Issue は「次にやること」の追跡に強く、Notion は「時系列のふりかえりログ」として長期トレンドの把握に強い。両方を使うことで、実行管理と成長記録を分離できる。
 

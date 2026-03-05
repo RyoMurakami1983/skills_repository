@@ -250,9 +250,11 @@ Convert prioritized actions from Steps 3–4 into trackable execution items.
 > **Applies to**: sessions where `metadata.author == "RyoMurakami1983"` (i.e., this skills_repository).
 > Skip this step in other contexts.
 
-Save the furikaeri record to your designated private Notion database for furikaeri logs.
+Save the furikaeri record using **`notion-safe-operations`**.
 
-> **How to get the `data_source_id`**: Run `notion-notion-fetch` on your furikaeri log database URL to retrieve the `collection://...` ID from the `<data-source>` tag. Store this ID in your local agent configuration — do **not** commit the actual UUID to the repository.
+> **Why this routing?** Notion tool availability may differ by session/agent/model. The base skill enforces preflight checks, secure DS ID handling, and deterministic fallback payloads.
+
+> **DS ID policy**: Use local environment variables (for example, `NOTION_FURIKAERI_DS_ID`) or local agent config. Do **not** commit real UUIDs.
 
 Map KPT/YWT outputs to database fields:
 
@@ -267,7 +269,7 @@ Map KPT/YWT outputs to database fields:
 | `次回アクション` | SMART goals + Issue numbers (from Steps 3–4 + 6a) |
 | `関連タグ` | JSON array — choose from: `["開発", "デバッグ", "設計", "テスト", "レビュー", "リファクタリング", "ドキュメント", "会議", "学習"]` |
 
-Use `notion-notion-create-pages` with `data_source_id: "<NOTION_DATA_SOURCE_ID>"` (your local value).
+Invoke `notion-safe-operations` and pass this mapped content into the create-page payload.
 
 Use when finishing any furikaeri in this workspace or team context. Enables long-term trend tracking.
 
