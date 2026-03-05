@@ -135,21 +135,22 @@ Copy-Item copilot\copilot-instructions.md $env:USERPROFILE\.copilot\copilot-inst
 **Linux/macOS（初回）**:
 
 ```bash
-git clone https://github.com/RyoMurakami1983/skills_repository.git /tmp/skills-repository
+export SKILLS_REPO="/tmp/skills-repository"  # 任意のパスに変更可
+git clone https://github.com/RyoMurakami1983/skills_repository.git "$SKILLS_REPO"
 mkdir -p ~/.copilot/skills ~/.copilot/agents
-cp -r /tmp/skills-repository/skills/* ~/.copilot/skills/
-cp -r /tmp/skills-repository/agents/* ~/.copilot/agents/
-cp /tmp/skills-repository/copilot/copilot-instructions.md ~/.copilot/copilot-instructions.md
+cp -r "$SKILLS_REPO/skills/"* ~/.copilot/skills/
+cp -r "$SKILLS_REPO/agents/"* ~/.copilot/agents/
+cp "$SKILLS_REPO/copilot/copilot-instructions.md" ~/.copilot/copilot-instructions.md
 ```
 
 **Linux/macOS（更新時）**:
 
 ```bash
-cd /tmp/skills-repository
+cd "$SKILLS_REPO"
 git pull --ff-only
-rsync -a --delete /tmp/skills-repository/skills/ ~/.copilot/skills/
-rsync -a --delete /tmp/skills-repository/agents/ ~/.copilot/agents/
-cp /tmp/skills-repository/copilot/copilot-instructions.md ~/.copilot/copilot-instructions.md
+rsync -a --delete "$SKILLS_REPO/skills/" ~/.copilot/skills/
+rsync -a --delete "$SKILLS_REPO/agents/" ~/.copilot/agents/
+cp "$SKILLS_REPO/copilot/copilot-instructions.md" ~/.copilot/copilot-instructions.md
 ```
 
 > 注意: `cp -r` の再実行だけでは削除済みSkill/Agentが同期先に残る場合があります。更新時は `rsync --delete` を使用してください。
