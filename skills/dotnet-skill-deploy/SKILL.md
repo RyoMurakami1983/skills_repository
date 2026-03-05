@@ -37,7 +37,7 @@ Use this skill when:
 ## Dependencies
 
 - PowerShell 5.1+ (Windows)
-- `skills_repository` cloned locally (typically at `C:\tools\skills_repository`)
+- `skills_repository` cloned locally — set `$env:SKILLS_REPO` (PowerShell) or `$SKILLS_REPO` (bash/WSL) to its path (e.g., `C:\tools\skills_repository` on Windows, `/mnt/c/tools/skills_repository` on WSL)
 
 ## Core Principles
 
@@ -267,7 +267,7 @@ The deployment script is located at repo-root-relative `skills/dotnet-skill-depl
 ## FAQ
 
 **Q: Where should skills_repository be cloned?**
-A: The recommended location is `C:\tools\skills_repository`. The `-SourceRoot` parameter points to its `dotnet/` subdirectory.
+A: Anywhere you prefer. Set `$env:SKILLS_REPO` (PowerShell) or `$SKILLS_REPO` (bash/WSL) to the clone path and use it as `-SourceRoot "$env:SKILLS_REPO\dotnet"`. The recommended Windows location is `C:\tools\skills_repository`; the equivalent WSL path is `/mnt/c/tools/skills_repository`.
 
 **Q: Can I combine `-Category` and `-Skills`?**
 A: Yes. The script merges both selections (deduplicates automatically).

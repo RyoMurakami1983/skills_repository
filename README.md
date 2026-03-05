@@ -77,28 +77,51 @@ uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\
 
 ## 🚀 インストール
 
+### 🌐 クロス環境パス設定（Windows / WSL 共通）
+
+このリポジトリのパスは環境によって異なります。以下の環境変数を設定しておくと、後述のコマンドをそのまま使用できます。
+
+| 環境 | 推奨クローン先 | 環境変数設定 |
+|------|--------------|-------------|
+| Windows (PowerShell) | `C:\tools\skills_repository` | `$env:SKILLS_REPO = "C:\tools\skills_repository"` |
+| WSL (bash) | `/mnt/c/tools/skills_repository` | `export SKILLS_REPO="/mnt/c/tools/skills_repository"` |
+| Linux/macOS (bash) | `/tmp/skills-repository` | `export SKILLS_REPO="/tmp/skills-repository"` |
+
+```powershell
+# PowerShell: セッション永続化（$PROFILE に追記）
+$env:SKILLS_REPO = "C:\tools\skills_repository"
+```
+
+```bash
+# bash/WSL: セッション永続化（~/.bashrc または ~/.zshrc に追記）
+export SKILLS_REPO="/mnt/c/tools/skills_repository"
+```
+
 ### グローバルインストール（全プロジェクト共通）
 
 **Skills + Agents + 開発憲法 をグローバルに配置（Windows推奨: 安全同期）**:
 
 ```powershell
+# 0) 環境変数を設定（未設定の場合）
+$env:SKILLS_REPO = "C:\tools\skills_repository"
+
 # 1) 専用のローカルcloneを作成（初回のみ）
-git clone https://github.com/RyoMurakami1983/skills_repository.git C:\tools\skills_repository
+git clone https://github.com/RyoMurakami1983/skills_repository.git $env:SKILLS_REPO
 
 # 2) 同期先フォルダを作成（初回のみ）
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\skills | Out-Null
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\agents | Out-Null
 
 # 3) 初回同期（Skills + Agents + copilot-instructions.md を完全同期）
-robocopy C:\tools\skills_repository\skills $env:USERPROFILE\.copilot\skills /MIR
-robocopy C:\tools\skills_repository\agents $env:USERPROFILE\.copilot\agents /MIR
-Copy-Item C:\tools\skills_repository\copilot\copilot-instructions.md $env:USERPROFILE\.copilot\copilot-instructions.md
+robocopy $env:SKILLS_REPO\skills $env:USERPROFILE\.copilot\skills /MIR
+robocopy $env:SKILLS_REPO\agents $env:USERPROFILE\.copilot\agents /MIR
+Copy-Item $env:SKILLS_REPO\copilot\copilot-instructions.md $env:USERPROFILE\.copilot\copilot-instructions.md
 ```
 
 **更新時（常に最新へ安全同期）**:
 
 ```powershell
-Set-Location C:\tools\skills_repository
+Set-Location $env:SKILLS_REPO
 git pull --ff-only
 robocopy skills $env:USERPROFILE\.copilot\skills /MIR
 robocopy agents $env:USERPROFILE\.copilot\agents /MIR
@@ -112,21 +135,22 @@ Copy-Item copilot\copilot-instructions.md $env:USERPROFILE\.copilot\copilot-inst
 **Linux/macOS（初回）**:
 
 ```bash
-git clone https://github.com/RyoMurakami1983/skills_repository.git /tmp/skills-repository
+export SKILLS_REPO="/tmp/skills-repository"  # 任意のパスに変更可
+git clone https://github.com/RyoMurakami1983/skills_repository.git "$SKILLS_REPO"
 mkdir -p ~/.copilot/skills ~/.copilot/agents
-cp -r /tmp/skills-repository/skills/* ~/.copilot/skills/
-cp -r /tmp/skills-repository/agents/* ~/.copilot/agents/
-cp /tmp/skills-repository/copilot/copilot-instructions.md ~/.copilot/copilot-instructions.md
+cp -r "$SKILLS_REPO/skills/"* ~/.copilot/skills/
+cp -r "$SKILLS_REPO/agents/"* ~/.copilot/agents/
+cp "$SKILLS_REPO/copilot/copilot-instructions.md" ~/.copilot/copilot-instructions.md
 ```
 
 **Linux/macOS（更新時）**:
 
 ```bash
-cd /tmp/skills-repository
+cd "$SKILLS_REPO"
 git pull --ff-only
-rsync -a --delete /tmp/skills-repository/skills/ ~/.copilot/skills/
-rsync -a --delete /tmp/skills-repository/agents/ ~/.copilot/agents/
-cp /tmp/skills-repository/copilot/copilot-instructions.md ~/.copilot/copilot-instructions.md
+rsync -a --delete "$SKILLS_REPO/skills/" ~/.copilot/skills/
+rsync -a --delete "$SKILLS_REPO/agents/" ~/.copilot/agents/
+cp "$SKILLS_REPO/copilot/copilot-instructions.md" ~/.copilot/copilot-instructions.md
 ```
 
 > 注意: `cp -r` の再実行だけでは削除済みSkill/Agentが同期先に残る場合があります。更新時は `rsync --delete` を使用してください。
@@ -135,11 +159,12 @@ cp /tmp/skills-repository/copilot/copilot-instructions.md ~/.copilot/copilot-ins
 
 ```bash
 # WSL上でCodex用skills配置（例: ~/.codex/skills）
+export SKILLS_REPO="/mnt/c/tools/skills_repository"  # 環境変数を設定
 mkdir -p ~/.codex/skills
-rsync -a --delete /mnt/c/tools/skills_repository/skills/ ~/.codex/skills/
+rsync -a --delete "$SKILLS_REPO/skills/" ~/.codex/skills/
 ```
 
-> Windows側のcloneが `C:\tools\skills_repository` の場合、WSLパスは `/mnt/c/tools/skills_repository` になります。
+> Windows側のcloneが `C:\tools\skills_repository` の場合、WSLパスは `/mnt/c/tools/skills_repository` になります。`$SKILLS_REPO` 環境変数を使えばパスを1箇所で管理できます。
 
 ### プロジェクトインストール（プロジェクト固有）
 
@@ -153,12 +178,12 @@ production/ や言語別Skillsは、プロジェクトの`.github/skills/`にコ
 
 ```powershell
 # カテゴリ一覧を表示
-& C:\tools\skills_repository\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1 `
-    -SourceRoot C:\tools\skills_repository\dotnet -List
+& "$env:SKILLS_REPO\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1" `
+    -SourceRoot "$env:SKILLS_REPO\dotnet" -List
 
 # WPFアプリ開発一式をデプロイ
-& C:\tools\skills_repository\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1 `
-    -SourceRoot C:\tools\skills_repository\dotnet `
+& "$env:SKILLS_REPO\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1" `
+    -SourceRoot "$env:SKILLS_REPO\dotnet" `
     -Target C:\path\to\my-project `
     -Category wpf-app
 ```

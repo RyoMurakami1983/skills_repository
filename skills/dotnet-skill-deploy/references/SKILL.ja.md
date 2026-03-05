@@ -37,7 +37,7 @@ metadata:
 ## Dependencies
 
 - PowerShell 5.1+（Windows）
-- `skills_repository` がローカルにクローン済み（通常 `C:\tools\skills_repository`）
+- `skills_repository` がローカルにクローン済み — パスを `$env:SKILLS_REPO`（PowerShell）または `$SKILLS_REPO`（bash/WSL）に設定（例: Windows は `C:\tools\skills_repository`、WSL は `/mnt/c/tools/skills_repository`）
 
 ## Core Principles
 
@@ -238,7 +238,7 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 ## FAQ
 
 **Q: skills_repositoryはどこにクローンすべき？**
-A: 推奨場所は `C:\tools\skills_repository`。`-SourceRoot` パラメータでその `dotnet/` サブディレクトリを指定。
+A: どこでも可。クローン先のパスを `$env:SKILLS_REPO`（PowerShell）または `$SKILLS_REPO`（bash/WSL）に設定し、`-SourceRoot "$env:SKILLS_REPO\dotnet"` として使用。Windows推奨パスは `C:\tools\skills_repository`、WSL相当パスは `/mnt/c/tools/skills_repository`。
 
 **Q: `-Category` と `-Skills` を組み合わせられる？**
 A: はい。スクリプトは両方の選択をマージ（重複自動排除）。
