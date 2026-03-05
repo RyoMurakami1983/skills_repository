@@ -307,6 +307,14 @@ Fix: Ensure `npm run build` works independently before running `npx tauri build`
 
 Fix: Verify `frontendDist` path in `tauri.conf.json` points to the directory containing your `index.html`.
 
+**Issue 6: Works with `tauri:dev` but fails with `tauri:build`**
+
+- `tauri:dev` uses the Vite dev server URL (`devUrl`) — the `dist/` directory is **not** used
+- `tauri:build` compiles the frontend first (`beforeBuildCommand`), then reads `frontendDist`
+- "Works in dev, blank in build" almost always means `frontendDist` points to the wrong directory
+
+Fix: Run `npm run build` independently and confirm output lands in the path set as `frontendDist`.
+
 Use when diagnosing build or runtime failures.
 
 > **Values**: 温故知新 / 基礎と型
@@ -337,6 +345,17 @@ Fix: The path is relative to `src-tauri/`. If your built files are in `dist/` at
 
 4. **Expecting MSI to work without WiX**
 Fix: Use NSIS target or install WiX Toolset separately. The app binary works regardless.
+
+5. **`outDir` relative path when using a custom Vite `root`**
+Fix: When `root` is set (e.g., `src/editor`), `outDir: 'dist'` outputs to `src/editor/dist`, not the project root. This causes a mismatch with `frontendDist: "../dist"` in `tauri.conf.json`.
+   ```typescript
+   // ❌ Outputs to src/editor/dist when root is 'src/editor'
+   outDir: 'dist',
+
+   // ✅ Always outputs to project root/dist regardless of root setting
+   import { resolve } from 'path';
+   outDir: resolve(__dirname, 'dist'),
+   ```
 
 ---
 
@@ -381,6 +400,7 @@ npx tauri build --debug
 | Daily development | `npx tauri build --debug` | Faster than release build |
 | Preparing release | `npx tauri build` | Optimized binary + installer |
 | Build fails | Check Step 7 troubleshooting | Systematic diagnosis |
+| Cross-compile for x64 on ARM Windows | `rustup target add x86_64-pc-windows-msvc` then `npx tauri build -- --target x86_64-pc-windows-msvc` | Surface/ARM devices default to ARM64 |
 
 ### Tauri vs Electron comparison
 
@@ -401,7 +421,7 @@ npx tauri build --debug
 A: For most projects, no. Tauri plugins provide TypeScript APIs for file I/O, dialogs, clipboard, and more. You only need Rust for custom native operations.
 
 **Q: Why is the first build so slow?**
-A: The first build compiles the entire Rust dependency tree (~90s). Subsequent builds use cached artifacts and are much faster.
+A: The first build compiles the entire Rust dependency tree (~90s). `cargo check` also takes 3–5 minutes on first run as it downloads and compiles all Rust crates — no progress output is normal, do not cancel. Subsequent builds use cached artifacts and are much faster.
 
 **Q: Can I use Tauri with React/Vue/Svelte?**
 A: Yes. Tauri is frontend-agnostic. Set your framework's dev server URL as `devUrl` and build output path as `frontendDist`.

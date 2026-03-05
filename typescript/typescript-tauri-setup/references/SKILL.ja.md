@@ -302,6 +302,14 @@ error: failed to download WiX
 
 修正: `tauri.conf.json`の`frontendDist`パスが`index.html`を含むディレクトリを正しく指しているか確認。
 
+**問題6: `tauri:dev` は動くのに `tauri:build` が失敗する**
+
+- `tauri:dev` は Vite の dev server URL（`devUrl`）を使用 — `dist/` ディレクトリは**参照されない**
+- `tauri:build` は `beforeBuildCommand` でフロントエンドをビルドしてから `frontendDist` を参照する
+- 「開発では表示されるがビルド後は真っ白」はほぼ常に `frontendDist` のパスズレが原因
+
+修正: `npm run build` を単独で実行して、出力先が `frontendDist` のパスと一致するか確認。
+
 ビルドまたはランタイムの問題を診断するときに使います。
 
 > **Values**: 温故知新 / 基礎と型
@@ -332,6 +340,17 @@ error: failed to download WiX
 
 4. **WiXなしでMSIが動くと期待する**
 修正: NSISターゲットを使うか、WiX Toolsetを別途インストール。アプリバイナリ自体は問題なく動作。
+
+5. **カスタム Vite `root` 設定時の `outDir` 相対パス**
+修正: `root: 'src/editor'` などを設定すると `outDir: 'dist'` は `src/editor/dist` に出力され、`tauri.conf.json` の `frontendDist: "../dist"` と一致しなくなる。
+   ```typescript
+   // ❌ root が 'src/editor' のとき src/editor/dist に出力
+   outDir: 'dist',
+
+   // ✅ root 設定に関わらず常にプロジェクトルート/dist に出力
+   import { resolve } from 'path';
+   outDir: resolve(__dirname, 'dist'),
+   ```
 
 ---
 
@@ -376,6 +395,7 @@ npx tauri build --debug
 | 日常開発 | `npx tauri build --debug` | リリースビルドより高速 |
 | リリース準備 | `npx tauri build` | 最適化バイナリ + インストーラー |
 | ビルド失敗 | Step 7のトラブルシューティング参照 | 体系的な診断 |
+| ARM Windows で x64 向けクロスコンパイル | `rustup target add x86_64-pc-windows-msvc` → `npx tauri build -- --target x86_64-pc-windows-msvc` | Surface/ARM デバイスはデフォルト ARM64 |
 
 ### Tauri vs Electron比較
 
@@ -396,7 +416,7 @@ npx tauri build --debug
 A: ほとんどのプロジェクトでは不要です。TauriプラグインがファイルI/O、ダイアログ、クリップボードなどのTypeScript APIを提供します。Rustが必要なのはカスタムネイティブ操作だけです。
 
 **Q: 初回ビルドがなぜ遅い?**
-A: 初回はRustの依存関係ツリー全体をコンパイルします（約90秒）。2回目以降はキャッシュを使用して大幅に高速化されます。
+A: 初回はRustの依存関係ツリー全体をコンパイルします（約90秒）。`cargo check` も初回実行時はすべてのRustクレートをダウンロード・コンパイルするため3〜5分かかります。進捗が表示されなくても正常です。キャンセルしないでください。2回目以降はキャッシュを使用して大幅に高速化されます。
 
 **Q: React/Vue/SvelteでもTauriは使える?**
 A: はい。Tauriはフロントエンドに依存しません。フレームワークの開発サーバーURLを`devUrl`に、ビルド出力パスを`frontendDist`に設定してください。
