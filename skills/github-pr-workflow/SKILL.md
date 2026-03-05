@@ -103,6 +103,8 @@ Use when any PR-related request is received.
 Branch from the latest main. Use descriptive prefixes (`feature/`, `fix/`, `docs/`) with the issue number.
 
 ```bash
+# Verify authentication before branching (catches push failures early)
+gh auth status
 git switch main
 git pull --ff-only
 git switch -c feature/issue-123

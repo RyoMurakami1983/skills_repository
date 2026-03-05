@@ -103,6 +103,8 @@ gh pr list --head $Branch --state open
 最新のmainからブランチを作成します。追跡性のためにIssue番号付きの説明的プレフィックス（`feature/`、`fix/`、`docs/`）を使用します。
 
 ```bash
+# ブランチ作成前に認証確認（push失敗を防ぐ）
+gh auth status
 git switch main
 git pull --ff-only
 git switch -c feature/issue-123
