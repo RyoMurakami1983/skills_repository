@@ -343,14 +343,14 @@ error: failed to download WiX
 
 5. **カスタム Vite `root` 設定時の `outDir` 相対パス**
 修正: `root: 'src/editor'` などを設定すると `outDir: 'dist'` は `src/editor/dist` に出力され、`tauri.conf.json` の `frontendDist: "../dist"` と一致しなくなる。
-```typescript
-// ❌ root が 'src/editor' のとき src/editor/dist に出力
-outDir: 'dist',
+   ```typescript
+   // ❌ root が 'src/editor' のとき src/editor/dist に出力
+   outDir: 'dist',
 
-// ✅ root 設定に関わらず常にプロジェクトルート/dist に出力
-import { resolve } from 'path';
-outDir: resolve(__dirname, 'dist'),
-```
+   // ✅ root 設定に関わらず常にプロジェクトルート/dist に出力
+   import { resolve } from 'path';
+   outDir: resolve(__dirname, 'dist'),
+   ```
 
 ---
 

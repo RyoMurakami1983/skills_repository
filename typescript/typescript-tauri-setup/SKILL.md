@@ -348,14 +348,14 @@ Fix: Use NSIS target or install WiX Toolset separately. The app binary works reg
 
 5. **`outDir` relative path when using a custom Vite `root`**
 Fix: When `root` is set (e.g., `src/editor`), `outDir: 'dist'` outputs to `src/editor/dist`, not the project root. This causes a mismatch with `frontendDist: "../dist"` in `tauri.conf.json`.
-```typescript
-// ❌ Outputs to src/editor/dist when root is 'src/editor'
-outDir: 'dist',
+   ```typescript
+   // ❌ Outputs to src/editor/dist when root is 'src/editor'
+   outDir: 'dist',
 
-// ✅ Always outputs to project root/dist regardless of root setting
-import { resolve } from 'path';
-outDir: resolve(__dirname, 'dist'),
-```
+   // ✅ Always outputs to project root/dist regardless of root setting
+   import { resolve } from 'path';
+   outDir: resolve(__dirname, 'dist'),
+   ```
 
 ---
 
