@@ -342,4 +342,4 @@ SKILL.md は英語で記述するため、日本語トリガーはこの辞書�
 ---
 
 **Author**: RyoMurakami1983  
-**Last Updated**: 2026-02-14
+**Last Updated**: 2026-03-05
