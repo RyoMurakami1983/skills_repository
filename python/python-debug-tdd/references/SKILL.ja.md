@@ -1,6 +1,6 @@
 ---
 name: python-debug-tdd
-description: Pythonの不具合をTDD型（Red→原因調査→Green→副作用確認）で最小修正し、回帰テストを恒久化する。Use when バグ報告を安全に再現・修正・再発防止したいとき。
+description: Pythonの不具合をTDD型（Red→原因調査→Green→副作用確認）で最小修正し、回帰テストを恒久化する。バグ報告を安全に再現・修正・再発防止したいときに使用。
 metadata:
   author: RyoMurakami1983
   tags: [python, tdd, debug, pytest, regression]
@@ -102,7 +102,9 @@ def calculate_score(base: int, penalty: float | str) -> int:
     penalty_value = float(penalty)
     if not 0 <= penalty_value <= 1:
         raise ValueError("penalty must be in [0, 1]")
-    return int(base * (1 - penalty_value))
+    raw_score = base * (1 - penalty_value)
+    # スコアは四捨五入で整数化し、境界挙動を明示する
+    return round(raw_score)
 ```
 
 Use when 根本原因が1文で説明でき、必要な不変条件を明確化できたとき。

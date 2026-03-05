@@ -105,7 +105,9 @@ def calculate_score(base: int, penalty: float | str) -> int:
     penalty_value = float(penalty)
     if not 0 <= penalty_value <= 1:
         raise ValueError("penalty must be in [0, 1]")
-    return int(base * (1 - penalty_value))
+    raw_score = base * (1 - penalty_value)
+    # Use explicit rounding to avoid silent truncation drift.
+    return round(raw_score)
 ```
 
 Use when root cause is identified and you can state the intended invariant in one sentence.
