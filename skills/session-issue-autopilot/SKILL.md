@@ -26,6 +26,7 @@ Use this skill when:
 3. **Human-in-the-Loop Checkpoints** — Mandatory user confirmation for agent choice and retrospective participation (ニュートラル)
 4. **Traceable Conversation to Artifact** — Move decisions into issues, PRs, and records so progress survives sessions (継続は力)
 5. **Safe Automation Boundaries** — Automate mechanics, never bypass collaborative reflection and consent checkpoints (余白の設計)
+6. **Human Merge Decision** — Merge on GitHub stays with a human; automation resumes only for confirmed post-merge sync (基礎と型)
 
 ## Workflow: Run Session Issue Autopilot
 
@@ -171,7 +172,29 @@ Use when review starts. Why: fast, structured response shortens cycle time and p
 
 > **Values**: 継続は力 / ニュートラル
 
-### Step 8: Mandatory Collaborative Retrospective Checkpoint
+### Step 8: Human Merge Gate and Safe Post-Merge Sync
+
+After review response is complete, stop at the merge gate. A human decides whether to merge on GitHub.
+
+Only after the merge is confirmed should you help with local sync, and only if the worktree is clean.
+
+```bash
+# Verify the merge already happened and local tree is safe to sync
+git status --short
+git switch main
+git pull --ff-only
+```
+
+Safety rules:
+- Do not perform the GitHub merge yourself
+- If `git status --short` is not clean, stop and ask the user
+- If `git pull --ff-only` fails, stop and surface the divergence
+
+Use when review response is complete and the next step is merge or post-merge cleanup.
+
+> **Values**: 基礎と型 / 余白の設計
+
+### Step 9: Mandatory Collaborative Retrospective Checkpoint
 
 After merge (or after review cycle pause), ask user to join retrospective.
 
@@ -187,9 +210,9 @@ Use when execution loop is complete. Why: reflection without participant alignme
 
 > **Values**: 余白の設計 / 成長の複利
 
-### Step 9: Run KPT/YWT and Record Actions (Issue/Notion)
+### Step 10: Run KPT/YWT and Record Actions (Issue/Notion)
 
-If user joined Step 8, run KPT or YWT and persist next actions.
+If user joined Step 9, run KPT or YWT and persist next actions.
 
 ```markdown
 Choose format: KPT or YWT
@@ -214,6 +237,7 @@ Use when collaborative retrospective is approved. Why: recorded actions turn ref
 - Enforce one-day scope hard; split oversized issues into follow-ups.
 - Keep agent checkpoint mandatory and blocking.
 - Prefer `--body-file` for all non-trivial `gh` issue/PR/comment content.
+- Keep merge on GitHub human-only, then run post-merge sync only after merge confirmation
 - Keep retrospective outputs linked to concrete tracking artifacts.
 
 ## Common Pitfalls
@@ -226,12 +250,15 @@ Use when collaborative retrospective is approved. Why: recorded actions turn ref
    - Fix: require explicit user answer before Step 5.
 4. Posting multiline `gh` content inline and breaking markdown/backticks.
    - Fix: use temporary markdown files with `--body-file`.
-5. Running retrospective automatically without user collaboration.
-   - Fix: block on Step 8 yes/no response.
+5. Auto-merging or syncing before human confirmation.
+   - Fix: stop at the merge gate, then verify merge confirmation and a clean tree before syncing.
+6. Running retrospective automatically without user collaboration.
+   - Fix: block on Step 9 yes/no response.
 
 ## Anti-Patterns
 
 - ❌ Full automation with no human checkpoints for role selection or retrospective join.
+- ❌ Automating the GitHub merge decision instead of handing it to a human.
 - Issue roulette: switching targets mid-session without an explicit reprioritization decision.
 - PR-first behavior with weak or missing validation evidence.
 - Treating retrospective as optional decoration instead of a compounding design loop.
@@ -247,6 +274,7 @@ Use when collaborative retrospective is approved. Why: recorded actions turn ref
 | Build & Validate | Branch + passing evidence | "Are validations green?" |
 | PR | PR created via `--body-file` | "Does PR body include link + evidence?" |
 | Review Loop | Responses and fix commits | "Did we address all review threads?" |
+| Merge Gate | Human merge decision + safe local sync | "Has a human merged this PR already?" |
 | Retro Checkpoint | Explicit user yes/no | "Shall we run collaborative retrospective now?" |
 | KPT/YWT Record | Action items in Issue/Notion | "Were actions recorded with links?" |
 

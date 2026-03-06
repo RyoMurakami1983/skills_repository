@@ -1,6 +1,6 @@
 ---
 name: github-pr-workflow
-description: "Create a PR and close linked issues. State-driven routing from uncommitted changes to PR creation."
+description: "Use when you need to create a PR from repo state, link issues, and hand off a review-ready branch."
 metadata:
   author: RyoMurakami1983
   tags: [github, pull-requests, workflow, git, pr-create]
@@ -17,15 +17,18 @@ A state-driven workflow that routes from uncommitted changes through PR creation
 
 **Pull Request (PR)**: A reviewed change proposal in GitHub.
 
+Detect state first. Create the PR only from a feature branch. Use `--body-file` for any non-trivial body.
+
 ## When to Use This Skill
 
 Use this skill when:
-- The user requests PR creation (see Glossary in `copilot-instructions.md` for trigger phrases)
-- Work on a feature branch is ready to be proposed for merge
-- You need to push a branch and open a PR with issue links
-- Uncommitted or unpushed changes need routing before PR creation
+- Creating a PR after feature-branch work is ready for review
+- Routing uncommitted or unpushed changes before opening a PR
+- Linking issues with `Closes #N` or `Refs #N` during PR creation
+- Verifying branch and authentication state before running `gh pr create`
+- Handing off a review-ready PR without automating the merge decision
 
-> **Scope**: This skill covers state detection through PR creation and Issue close. Review handling, CI gates, merge strategy, and post-merge sync are out of scope (future skill).
+> **Scope**: This skill covers state detection through PR creation and issue linkage. The final merge decision stays with a human, and post-merge sync is a separate follow-up step after merge confirmation.
 
 ## Related Skills
 
@@ -52,6 +55,35 @@ Use this skill when:
 5. **State-Driven** (温故知新) - Detect current state and route to the right action
 
 ---
+
+## Decision Table
+
+Use this table to choose the next action at a glance.
+
+| Current state | Next move | Why |
+|---|---|---|
+| On `main` | Create a feature branch first | Keeps reviewable work off default branch |
+| Uncommitted changes exist | Commit before PR creation | Preserves traceable state |
+| Commits are local only | Push branch first | `gh pr create` needs the remote branch |
+| PR does not exist yet | Create the PR | Opens review flow and issue links |
+| PR already exists | Report status and stop | Avoids duplicate PRs |
+
+---
+
+## Responsibility Boundaries
+
+Keep the merge boundary explicit so automation does not overreach.
+
+| Phase | Agent responsibility | Human responsibility |
+|---|---|---|
+| Before PR | Detect state, create branch, prepare validated changes | Confirm the work is ready to propose |
+| PR creation | Open the PR, link issues, summarize evidence | Decide who reviews and when |
+| Merge decision | Summarize readiness only | Decide whether and when to merge on GitHub |
+| After merge | Help with local sync only after merge is confirmed | Confirm the merge actually happened |
+
+Use when the user asks what this skill will and will not automate.
+
+> **Values**: ニュートラル / 余白の設計
 
 ## Workflow: Ship via Pull Request
 
@@ -94,7 +126,7 @@ gh pr list --head $Branch --state open
 
 > **Important**: If uncommitted changes exist, delegate to `git-commit-practices` first. If on main, create a feature branch before any commits.
 
-Use when any PR-related request is received.
+Use when any PR-related request is received. Why: state detection prevents wrong branching, pushing, or duplicate PR creation.
 
 > **Values**: 基礎と型 / 継続は力
 
@@ -111,7 +143,7 @@ git switch -c feature/issue-123
 git push -u origin feature/issue-123
 ```
 
-Use when starting new work or when Step 1 detected you are on main.
+Use when starting new work or when Step 1 detected you are on main. Why: creating the branch first keeps later commits clean and reviewable.
 
 > **Values**: 基礎と型
 
@@ -168,6 +200,10 @@ gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file
 Use when the branch is pushed and no PR exists yet.
 
 > **Values**: 成長の複利 / ニュートラル
+
+✅ **Good**: Open the PR, summarize readiness, then stop before the human merge decision.
+❌ **Bad**: Treat PR creation as implicit permission to merge or sync `main`.
+Why: explicit handoff preserves the human decision boundary and keeps automation safe.
 
 ---
 
@@ -261,7 +297,7 @@ Closes #N
 A: No. Team policy requires Japanese PR descriptions.
 
 **Q: Does this skill handle reviews and merges?**
-A: No. This skill covers PR creation only. Review and merge will be a separate skill.
+A: It handles PR creation only. Review response is handled by `github-pr-review-response`, merge remains a human decision, and post-merge sync is a separate follow-up step.
 
 **Q: What if `gh` is not installed?**
 A: `gh auth status` will fail. Install [GitHub CLI](https://cli.github.com/) first.

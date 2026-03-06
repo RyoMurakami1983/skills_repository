@@ -26,7 +26,7 @@ Use this skill when:
 - Replying to reviewer questions with clear explanations of why a design was chosen
 - Requesting re-review after all review comments have been addressed with commits
 
-> **Scope**: This skill covers review comment triage through re-review request. Merge strategy, CI gates, and post-merge sync are out of scope.
+> **Scope**: This skill covers review comment triage through re-review request. The merge decision stays with a human; CI gates and post-merge sync remain separate follow-up concerns.
 
 ## Related Skills
 
@@ -281,6 +281,23 @@ Use when every review comment has a fix commit or a reply, and all tests pass.
 
 > **Values**: 成長の複利 / ニュートラル
 
+### Step 8: Stop at the Human Merge Gate
+
+After requesting re-review, stop. Summarize readiness if helpful, but do not merge the PR yourself.
+
+```markdown
+Ready for human merge decision:
+- Review comments addressed
+- Validation rerun and green
+- Re-review requested
+```
+
+If the PR is later merged and the user explicitly asks for local cleanup, move to a separate post-merge sync workflow and first verify the worktree is clean.
+
+Use when review response work is complete and the next action is a merge decision.
+
+> **Values**: ニュートラル / 余白の設計
+
 ---
 
 ## Best Practices
@@ -291,6 +308,7 @@ Use when every review comment has a fix commit or a reply, and all tests pass.
 - Avoid force-pushing after review — it hides review conversation history
 - Create follow-up issues for suggestions that are out of scope for the current PR
 - Use `gh pr review --comment` to reply directly in the review thread
+- Stop at readiness; do not merge on behalf of the user
 
 ---
 
@@ -357,6 +375,9 @@ A: Acknowledge the comment, create a follow-up issue via `github-issue-intake`, 
 
 **Q: Does this skill handle the initial PR creation?**
 A: No. Use `github-pr-workflow` to create the PR. This skill starts after review comments arrive.
+
+**Q: Does this skill merge the PR after re-review?**
+A: No. Merge remains a human decision. This skill ends after replies, validation, and re-review request are complete.
 
 ---
 
