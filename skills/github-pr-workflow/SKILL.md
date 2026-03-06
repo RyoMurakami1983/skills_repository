@@ -13,7 +13,7 @@ metadata:
 
 # GitHub PR Workflow
 
-A state-driven workflow that routes from uncommitted changes through PR creation and Issue close.
+A state-driven workflow that routes from uncommitted changes through PR creation, issue linkage, and review-wait handoff.
 
 **Pull Request (PR)**: A reviewed change proposal in GitHub.
 
@@ -28,7 +28,7 @@ Use this skill when:
 - Verifying branch and authentication state before running `gh pr create`
 - Handing off a review-ready PR without automating the merge decision
 
-> **Scope**: This skill covers state detection through PR creation and Issue close. Review handling, CI gates, merge strategy, and post-merge sync are out of scope (future skill).
+> **Scope**: This skill covers state detection through PR creation, issue linkage, and low-cost handoff into review waiting. Detailed review handling, merge strategy, and post-merge sync are out of scope.
 
 ## Related Skills
 
@@ -53,6 +53,21 @@ Use this skill when:
 3. **Japanese PR Body** (ニュートラル) - Write PR descriptions in Japanese for the team
 4. **Clean Main** (継続は力) - Only verified changes reach main
 5. **State-Driven** (温故知新) - Detect current state and route to the right action
+6. **Event-Driven Waiting** (余白の設計) - Wait for review signals instead of repeatedly re-checking the same PR
+
+---
+
+## Decision Table
+
+Use this table to choose the next action at a glance.
+
+| Current state | Next move | Why |
+|---|---|---|
+| On `main` | Create a feature branch first | Keeps reviewable work off default branch |
+| Uncommitted changes exist | Commit before PR creation | Preserves traceable state |
+| Commits are local only | Push branch first | `gh pr create` needs the remote branch |
+| PR does not exist yet | Create the PR | Opens review flow and issue links |
+| PR already exists | Report status and stop | Avoids duplicate PRs |
 
 ---
 
@@ -201,6 +216,38 @@ Use when the branch is pushed and no PR exists yet.
 
 > **Values**: 成長の複利 / ニュートラル
 
+✅ **Good**: Create the PR once, record the URL, and hand it off to waiting mode.
+❌ **Bad**: Re-run PR creation commands or re-check the same branch with no state change.
+Why: one clean handoff preserves traceability and avoids duplicate effort.
+
+### Step 4: Enter Review Waiting Mode Efficiently
+
+After the PR is open, stop active polling. Wait for a concrete trigger, then hand off to `github-pr-review-response`.
+
+```bash
+# Capture the PR URL once, then stop looping on checks
+gh pr view --json url,updatedAt --jq '{url: .url, updatedAt: .updatedAt}'
+
+# Optional low-frequency batch check during a natural pause
+gh pr status
+```
+
+| Trigger | Action | Avoid |
+|---------|--------|-------|
+| New review notification or user says review arrived | Open `github-pr-review-response` and inspect comments once | Re-checking before any signal |
+| Planned batch check after finishing another task | Run one consolidated `gh pr status` | Per-PR polling loops |
+| No new activity signal | Stay idle | "Just checking again" behavior |
+| PR closed or merged | Exit waiting mode | Continuing review checks |
+
+Exit waiting mode when one of these happens:
+- A new review or review request needs action
+- The PR is closed or merged
+- The user explicitly reprioritizes the session
+
+Use when the PR exists and work has shifted from creation to waiting.
+
+> **Values**: 余白の設計 / 継続は力
+
 ---
 
 ## Best Practices
@@ -211,6 +258,8 @@ Use when the branch is pushed and no PR exists yet.
 - Prefer `--body-file` for any multiline or shell-sensitive body; on Windows, make it the default
 - Use `mktemp` + `trap` with a single-quoted heredoc (`<<'EOF'`) when generating body files in Bash
 - Verify authentication with `gh auth status` before creating PRs
+- Prefer event-driven review waiting; do not burn cycles on repeated checks with no signal
+- Batch PR status checks at natural context switches instead of polling one PR at a time
 
 ### Preflight Checklist (Before `gh pr create`)
 
@@ -233,7 +282,10 @@ Use when the branch is pushed and no PR exists yet.
 3. **Creating PR from main branch**
    Fix: Step 1 state detection routes to feature branch creation first.
 
-4. **Backticks or `$()` break the PR body**
+4. **Polling for review every few minutes**
+   Fix: Switch to event-driven waiting and batch status checks only at planned pauses.
+
+5. **Backticks or `$()` break the PR body**
    Fix: Generate the body with a single-quoted heredoc and pass it via `--body-file`.
 
 ## Troubleshooting
@@ -265,6 +317,7 @@ Use when the branch is pushed and no PR exists yet.
 - [ ] Commit via `git-commit-practices` if needed
 - [ ] Push branch to origin
 - [ ] Create PR with `gh pr create` (Japanese body + `Closes #N`)
+- [ ] Record the PR URL once, then wait for review signals instead of polling
 
 ### Self-Review Checklist (Before finishing)
 

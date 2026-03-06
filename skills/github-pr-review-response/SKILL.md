@@ -28,6 +28,25 @@ Use this skill when:
 
 > **Scope**: This skill covers review comment triage through re-review request. Merge strategy, CI gates, and post-merge sync are out of scope.
 
+## Review Waiting Strategy
+
+Do not enter this workflow just because the PR is still open. Enter only when a real review signal says action is needed.
+
+| Signal | Enter this skill? | Action |
+|---|---|---|
+| New review submitted | Yes | Start Step 1 once |
+| Review requested from you | Yes | Start Step 1 once |
+| User reports new review activity | Yes | Verify and start Step 1 |
+| PR is still open but unchanged | No | Stay idle |
+| Only a CI status changed | Maybe | Check whether review work is actually blocked |
+
+Low-consumption waiting rules:
+- Prefer notifications, explicit user messages, or other event signals over manual polling
+- If you must check manually, batch all PR checks into one pass at a natural pause
+- Stop checking once there is no new signal to act on
+
+Exit waiting mode when the PR is closed, merged, or no review action remains.
+
 ## Related Skills
 
 - **`github-pr-workflow`** — PR creation and issue linking (upstream workflow)
@@ -320,6 +339,7 @@ Use when every review comment has a fix commit or a reply, and all tests pass.
 - Avoid force-pushing after review — it hides review conversation history
 - Create follow-up issues for suggestions that are out of scope for the current PR
 - Use `gh pr review --comment` to reply directly in the review thread
+- Start this workflow only on a real review trigger, not on repeated idle checks
 - Prefer `--body-file` for multi-line review summaries and replies
 
 ---
@@ -338,7 +358,10 @@ Use when every review comment has a fix commit or a reply, and all tests pass.
 4. **Replying "Fixed" without context**
    Fix: Reference the commit hash and explain the fix approach in your reply.
 
-5. **Inline reply bodies break because of backticks or shell characters**
+5. **Opening the review workflow with no new signal**
+   Fix: Stay in waiting mode until a new review, review request, or explicit user signal arrives.
+
+6. **Inline reply bodies break because of backticks or shell characters**
    Fix: Write the reply with a quoted heredoc and send it via `--body-file`.
 
 ---
@@ -365,6 +388,12 @@ Use when every review comment has a fix commit or a reply, and all tests pass.
 | 5 | Commit with Conventional format | Review context in body |
 | 6 | Push and reply to each comment | Every comment answered |
 | 7 | Request re-review | Reviewer notified |
+
+### Waiting Mode Rules
+
+- React to new reviews or review requests, not to an unchanged open PR
+- Batch manual checks instead of polling repeatedly
+- Exit waiting mode when there is nothing new to address
 
 ### Reply Template
 
