@@ -1,6 +1,6 @@
 ---
 name: github-pr-workflow
-description: "Use when リポジトリ状態からPRを作成し、Issue連携まで安全に進めたいとき。"
+description: "リポジトリ状態からPRを作成し、Issue連携まで安全に進めたいときに使用します。"
 metadata:
   author: RyoMurakami1983
   tags: [github, pull-requests, workflow, git, pr-create]
@@ -158,9 +158,16 @@ Refs #130"
 **ファイル経由の本文**（複数行Markdown・コードフェンス・バッククォートを含む本文の既定推奨）:
 
 ```bash
-# クォート付きHEREDOCで一時ファイルへ書き出す
-# なぜ: `<<'EOF'` ならバッククォート、$変数、$(command) をシェル展開しない
-BODY_FILE="${TMPDIR:-/tmp}/pr_body.md"
+# 一意な一時ファイルを作り、クォート付きHEREDOCで書き出す
+# なぜ: mktemp で衝突を避け、trap で失敗時も確実に削除できる
+BODY_FILE="$(mktemp "${TMPDIR:-/tmp}/pr_body.XXXXXX")" || {
+  echo "PR本文用の一時ファイル作成に失敗しました" >&2
+  exit 1
+}
+cleanup() {
+  [ -n "$BODY_FILE" ] && rm -f "$BODY_FILE"
+}
+trap cleanup EXIT
 cat > "$BODY_FILE" <<'EOF'
 ## 概要
 注文履歴画面に検索フィルタを追加し、本文内の `int(order_id)` 例もそのまま残す。
@@ -177,7 +184,6 @@ Refs #130
 EOF
 
 gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file "$BODY_FILE"
-rm -f "$BODY_FILE"
 ```
 
 複数段落の本文、シェル例、バッククォートを含むMarkdownでは、このパターンを既定にしてください。
@@ -203,7 +209,7 @@ Why: ファイル経由の方が再現性・レビュー性・シェル安全性
 - タイトルは Conventional Commits 形式（`feat:`, `fix:` 等）
 - `Closes #N` で Issue を自動クローズする
 - 複数行やシェルに敏感な本文では `--body-file` を既定にする（Windows では必須寄り）
-- Bashで本文ファイルを作るときはクォート付きHEREDOC（`<<'EOF'`）を使う
+- Bashで本文ファイルを作るときは `mktemp` + `trap` とクォート付きHEREDOC（`<<'EOF'`）を使う
 - `gh auth status` で認証を事前確認する
 
 ### 事前チェックリスト（`gh pr create` 前）

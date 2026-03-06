@@ -229,8 +229,15 @@ Push all fix commits, then reply to each review comment explaining what was done
 git push origin HEAD
 
 # Add a general review comment summarizing changes via body-file.
-# Why: review replies often include backticks, bullets, and commit hashes.
-REVIEW_BODY="${TMPDIR:-/tmp}/review_response.md"
+# Why: mktemp avoids collisions, and trap cleans up even on failures.
+REVIEW_BODY="$(mktemp "${TMPDIR:-/tmp}/review_response.XXXXXX")" || {
+  echo "Failed to create temporary file for review response" >&2
+  exit 1
+}
+cleanup_review_body() {
+  [ -n "$REVIEW_BODY" ] && rm -f "$REVIEW_BODY"
+}
+trap cleanup_review_body EXIT
 cat > "$REVIEW_BODY" <<'EOF'
 All review comments addressed. See individual commits for details.
 
@@ -239,7 +246,6 @@ All review comments addressed. See individual commits for details.
 EOF
 
 gh pr review --comment --body-file "$REVIEW_BODY"
-rm -f "$REVIEW_BODY"
 
 # For threaded replies to specific review comments, use GitHub web UI
 # or the API: gh api repos/OWNER/REPO/pulls/comments/COMMENT_ID/replies -f body="Fixed in abc1234"
@@ -273,7 +279,14 @@ After all comments are addressed and pushed, request a re-review from the origin
 gh pr edit --add-reviewer reviewer-username
 
 # Optionally leave a summary comment via body-file
-REREVIEW_BODY="${TMPDIR:-/tmp}/rereview_summary.md"
+REREVIEW_BODY="$(mktemp "${TMPDIR:-/tmp}/rereview_summary.XXXXXX")" || {
+  echo "Failed to create temporary file for re-review summary" >&2
+  exit 1
+}
+cleanup_rereview_body() {
+  [ -n "$REREVIEW_BODY" ] && rm -f "$REREVIEW_BODY"
+}
+trap cleanup_rereview_body EXIT
 cat > "$REREVIEW_BODY" <<'EOF'
 All review comments addressed:
 - Fixed SQL injection (commit abc1234)
@@ -284,7 +297,6 @@ Ready for re-review. Thank you for the feedback!
 EOF
 
 gh pr comment --body-file "$REREVIEW_BODY"
-rm -f "$REREVIEW_BODY"
 ```
 
 ```powershell

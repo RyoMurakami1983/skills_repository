@@ -229,8 +229,15 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
 git push origin HEAD
 
 # body-fileで全体コメントを追加
-# なぜ: レビュー返信はバッククォート、箇条書き、コミットハッシュを含みやすい
-REVIEW_BODY="${TMPDIR:-/tmp}/review_response.md"
+# なぜ: mktemp で衝突を避け、trap で失敗時も確実に削除できる
+REVIEW_BODY="$(mktemp "${TMPDIR:-/tmp}/review_response.XXXXXX")" || {
+  echo "レビュー返信用の一時ファイル作成に失敗しました" >&2
+  exit 1
+}
+cleanup_review_body() {
+  [ -n "$REVIEW_BODY" ] && rm -f "$REVIEW_BODY"
+}
+trap cleanup_review_body EXIT
 cat > "$REVIEW_BODY" <<'EOF'
 全レビューコメントに対応済みです。各コミットの詳細を参照してください。
 
@@ -239,7 +246,6 @@ cat > "$REVIEW_BODY" <<'EOF'
 EOF
 
 gh pr review --comment --body-file "$REVIEW_BODY"
-rm -f "$REVIEW_BODY"
 
 # 特定のレビューコメントスレッドへの返信はGitHub Web UIを使用
 # またはAPI: gh api repos/OWNER/REPO/pulls/comments/COMMENT_ID/replies -f body="abc1234で修正済み"
@@ -273,7 +279,14 @@ gh pr review --comment --body "全レビューコメントに対応済み。各�
 gh pr edit --add-reviewer reviewer-username
 
 # サマリーコメントを body-file で残す（任意）
-REREVIEW_BODY="${TMPDIR:-/tmp}/rereview_summary.md"
+REREVIEW_BODY="$(mktemp "${TMPDIR:-/tmp}/rereview_summary.XXXXXX")" || {
+  echo "再レビュー要約用の一時ファイル作成に失敗しました" >&2
+  exit 1
+}
+cleanup_rereview_body() {
+  [ -n "$REREVIEW_BODY" ] && rm -f "$REREVIEW_BODY"
+}
+trap cleanup_rereview_body EXIT
 cat > "$REREVIEW_BODY" <<'EOF'
 すべてのレビューコメントに対応しました：
 - SQLインジェクション修正（コミットabc1234）
@@ -284,7 +297,6 @@ cat > "$REREVIEW_BODY" <<'EOF'
 EOF
 
 gh pr comment --body-file "$REREVIEW_BODY"
-rm -f "$REREVIEW_BODY"
 ```
 
 ```powershell

@@ -158,9 +158,16 @@ Refs #130"
 **File-based body** (recommended default for multiline Markdown, code fences, or backticks):
 
 ```bash
-# Write body to a temp file with a quoted heredoc.
-# Why: single-quoted EOF prevents shell expansion of backticks, $vars, and $(command).
-BODY_FILE="${TMPDIR:-/tmp}/pr_body.md"
+# Write body to a unique temp file with a quoted heredoc.
+# Why: mktemp avoids filename collisions, and trap cleans up on failure paths too.
+BODY_FILE="$(mktemp "${TMPDIR:-/tmp}/pr_body.XXXXXX")" || {
+  echo "Failed to create temporary file for PR body" >&2
+  exit 1
+}
+cleanup() {
+  [ -n "$BODY_FILE" ] && rm -f "$BODY_FILE"
+}
+trap cleanup EXIT
 cat > "$BODY_FILE" <<'EOF'
 ## 概要
 注文履歴画面に検索フィルタを追加し、本文内の `int(order_id)` 例もそのまま残す。
@@ -177,7 +184,6 @@ Refs #130
 EOF
 
 gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file "$BODY_FILE"
-rm -f "$BODY_FILE"
 ```
 
 Prefer this pattern for any non-trivial body, especially when Markdown contains backticks, shell examples, or multiple paragraphs.
@@ -203,7 +209,7 @@ Use when the branch is pushed and no PR exists yet.
 - Use Conventional Commits format for titles (`feat:`, `fix:`, etc.)
 - Always include `Closes #N` to auto-close linked issues
 - Prefer `--body-file` for any multiline or shell-sensitive body; on Windows, make it the default
-- Use a single-quoted heredoc (`<<'EOF'`) when generating body files in Bash
+- Use `mktemp` + `trap` with a single-quoted heredoc (`<<'EOF'`) when generating body files in Bash
 - Verify authentication with `gh auth status` before creating PRs
 
 ### Preflight Checklist (Before `gh pr create`)
