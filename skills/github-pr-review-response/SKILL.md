@@ -228,8 +228,18 @@ Push all fix commits, then reply to each review comment explaining what was done
 # Push fix commits to the PR branch
 git push origin HEAD
 
-# Add a general review comment summarizing changes
-gh pr review --comment --body "All review comments addressed. See individual commits for details."
+# Add a general review comment summarizing changes via body-file.
+# Why: review replies often include backticks, bullets, and commit hashes.
+REVIEW_BODY="${TMPDIR:-/tmp}/review_response.md"
+cat > "$REVIEW_BODY" <<'EOF'
+All review comments addressed. See individual commits for details.
+
+- Fixed null-handling in `build_payload()`
+- Added a regression test for the failure path
+EOF
+
+gh pr review --comment --body-file "$REVIEW_BODY"
+rm -f "$REVIEW_BODY"
 
 # For threaded replies to specific review comments, use GitHub web UI
 # or the API: gh api repos/OWNER/REPO/pulls/comments/COMMENT_ID/replies -f body="Fixed in abc1234"
@@ -246,6 +256,7 @@ Reply guidelines:
 
 - ✅ **Do**: Reference the specific commit that addresses the comment
 - ✅ **Do**: Explain why you chose a particular fix approach
+- ✅ **Do**: Use `--body-file` when a reply includes multiple lines, backticks, or shell snippets
 - ❌ **Don't**: Reply with just "Fixed" — explain what changed and why
 - ❌ **Don't**: Ignore comments you disagree with — reply with your reasoning instead
 
@@ -261,13 +272,19 @@ After all comments are addressed and pushed, request a re-review from the origin
 # Request re-review from the reviewer
 gh pr edit --add-reviewer reviewer-username
 
-# Optionally leave a summary comment
-gh pr comment --body "All review comments addressed:
+# Optionally leave a summary comment via body-file
+REREVIEW_BODY="${TMPDIR:-/tmp}/rereview_summary.md"
+cat > "$REREVIEW_BODY" <<'EOF'
+All review comments addressed:
 - Fixed SQL injection (commit abc1234)
 - Added error handling (commit def5678)
 - Refactored to guard clause (commit ghi9012)
 
-Ready for re-review. Thank you for the feedback!"
+Ready for re-review. Thank you for the feedback!
+EOF
+
+gh pr comment --body-file "$REREVIEW_BODY"
+rm -f "$REREVIEW_BODY"
 ```
 
 ```powershell
@@ -291,6 +308,7 @@ Use when every review comment has a fix commit or a reply, and all tests pass.
 - Avoid force-pushing after review — it hides review conversation history
 - Create follow-up issues for suggestions that are out of scope for the current PR
 - Use `gh pr review --comment` to reply directly in the review thread
+- Prefer `--body-file` for multi-line review summaries and replies
 
 ---
 
@@ -307,6 +325,9 @@ Use when every review comment has a fix commit or a reply, and all tests pass.
 
 4. **Replying "Fixed" without context**
    Fix: Reference the commit hash and explain the fix approach in your reply.
+
+5. **Inline reply bodies break because of backticks or shell characters**
+   Fix: Write the reply with a quoted heredoc and send it via `--body-file`.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: github-pr-workflow
-description: "Create a PR and close linked issues. State-driven routing from uncommitted changes to PR creation."
+description: "Use when you need to create a PR from repo state, link issues, and hand off a review-ready branch."
 metadata:
   author: RyoMurakami1983
   tags: [github, pull-requests, workflow, git, pr-create]
@@ -17,13 +17,16 @@ A state-driven workflow that routes from uncommitted changes through PR creation
 
 **Pull Request (PR)**: A reviewed change proposal in GitHub.
 
+Detect state first. Create the PR only from a feature branch. Use `--body-file` for any non-trivial body.
+
 ## When to Use This Skill
 
 Use this skill when:
-- The user requests PR creation (see Glossary in `copilot-instructions.md` for trigger phrases)
-- Work on a feature branch is ready to be proposed for merge
-- You need to push a branch and open a PR with issue links
-- Uncommitted or unpushed changes need routing before PR creation
+- Creating a PR after feature-branch work is ready for review
+- Routing uncommitted or unpushed changes before opening a PR
+- Linking issues with `Closes #N` or `Refs #N` during PR creation
+- Verifying branch and authentication state before running `gh pr create`
+- Handing off a review-ready PR without automating the merge decision
 
 > **Scope**: This skill covers state detection through PR creation and Issue close. Review handling, CI gates, merge strategy, and post-merge sync are out of scope (future skill).
 
@@ -50,6 +53,20 @@ Use this skill when:
 3. **Japanese PR Body** (ニュートラル) - Write PR descriptions in Japanese for the team
 4. **Clean Main** (継続は力) - Only verified changes reach main
 5. **State-Driven** (温故知新) - Detect current state and route to the right action
+
+---
+
+## Decision Table
+
+Use this table to choose the next action at a glance.
+
+| Current state | Next move | Why |
+|---|---|---|
+| On `main` | Create a feature branch first | Keeps reviewable work off default branch |
+| Uncommitted changes exist | Commit before PR creation | Preserves traceable state |
+| Commits are local only | Push branch first | `gh pr create` needs the remote branch |
+| PR does not exist yet | Create the PR | Opens review flow and issue links |
+| PR already exists | Report status and stop | Avoids duplicate PRs |
 
 ---
 
@@ -94,7 +111,7 @@ gh pr list --head $Branch --state open
 
 > **Important**: If uncommitted changes exist, delegate to `git-commit-practices` first. If on main, create a feature branch before any commits.
 
-Use when any PR-related request is received.
+Use when any PR-related request is received. Why: state detection prevents wrong branching, pushing, or duplicate PR creation.
 
 > **Values**: 基礎と型 / 継続は力
 
@@ -111,7 +128,7 @@ git switch -c feature/issue-123
 git push -u origin feature/issue-123
 ```
 
-Use when starting new work or when Step 1 detected you are on main.
+Use when starting new work or when Step 1 detected you are on main. Why: creating the branch first keeps later commits clean and reviewable.
 
 > **Values**: 基礎と型
 
@@ -138,13 +155,15 @@ Closes #123
 Refs #130"
 ```
 
-**File-based body** (recommended for UTF-8 safety on Windows):
+**File-based body** (recommended default for multiline Markdown, code fences, or backticks):
 
 ```bash
-# Write body to a temp file
-cat > pr_body.md << 'EOF'
+# Write body to a temp file with a quoted heredoc.
+# Why: single-quoted EOF prevents shell expansion of backticks, $vars, and $(command).
+BODY_FILE="${TMPDIR:-/tmp}/pr_body.md"
+cat > "$BODY_FILE" <<'EOF'
 ## 概要
-注文履歴画面に検索フィルタを追加。
+注文履歴画面に検索フィルタを追加し、本文内の `int(order_id)` 例もそのまま残す。
 
 ## 理由
 サポートから検索要求が多く、対応工数を削減するため。
@@ -157,8 +176,15 @@ Closes #123
 Refs #130
 EOF
 
-gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file pr_body.md
+gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file "$BODY_FILE"
+rm -f "$BODY_FILE"
 ```
+
+Prefer this pattern for any non-trivial body, especially when Markdown contains backticks, shell examples, or multiple paragraphs.
+
+✅ **Good**: Generate the body file, inspect it, then call `gh pr create --body-file`.
+❌ **Bad**: Paste multiline Markdown with backticks directly into `--body` and hope shell quoting survives.
+Why: the file-based path is reproducible, reviewable, and safe across shells.
 
 | Keyword | Effect |
 |---------|--------|
@@ -176,7 +202,8 @@ Use when the branch is pushed and no PR exists yet.
 - Write PR body in Japanese (team policy)
 - Use Conventional Commits format for titles (`feat:`, `fix:`, etc.)
 - Always include `Closes #N` to auto-close linked issues
-- Use `--body-file` on Windows for reliable UTF-8 handling
+- Prefer `--body-file` for any multiline or shell-sensitive body; on Windows, make it the default
+- Use a single-quoted heredoc (`<<'EOF'`) when generating body files in Bash
 - Verify authentication with `gh auth status` before creating PRs
 
 ### Preflight Checklist (Before `gh pr create`)
@@ -199,6 +226,9 @@ Use when the branch is pushed and no PR exists yet.
 
 3. **Creating PR from main branch**
    Fix: Step 1 state detection routes to feature branch creation first.
+
+4. **Backticks or `$()` break the PR body**
+   Fix: Generate the body with a single-quoted heredoc and pass it via `--body-file`.
 
 ## Troubleshooting
 
@@ -233,6 +263,7 @@ Use when the branch is pushed and no PR exists yet.
 ### Self-Review Checklist (Before finishing)
 
 - [ ] PR body includes intent, reason, test, and issue links
+- [ ] Body generation uses quoted heredoc + `--body-file` when Markdown contains backticks or shell examples
 - [ ] New automation/workflow changes include required path preparation steps
 - [ ] GitHub API create operations are idempotent (e.g., tolerate 422 race)
 - [ ] Label names/colors follow repository conventions
