@@ -13,7 +13,7 @@ metadata:
 
 # GitHub PR Workflow
 
-A state-driven workflow that routes from uncommitted changes through PR creation and Issue close.
+A state-driven workflow that routes from uncommitted changes through PR creation, issue linkage, and review-wait handoff.
 
 **Pull Request (PR)**: A reviewed change proposal in GitHub.
 

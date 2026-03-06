@@ -1,6 +1,6 @@
 ---
 name: github-pr-workflow
-description: "Use when リポジトリ状態からPRを作成し、Issue連携まで安全に進めたいとき。"
+description: "リポジトリ状態からPRを作成し、Issue連携まで安全に進めたいときに使用します。"
 metadata:
   author: RyoMurakami1983
   tags: [github, pull-requests, workflow, git, pr-create]
@@ -13,7 +13,7 @@ metadata:
 
 # GitHub PR Workflow
 
-状態検知からPR作成・Issueクローズまでを自動化するワークフロー。
+状態検知からPR作成・Issue連携・レビュー待機への受け渡しまでを扱うワークフロー。
 
 **Pull Request (PR)**: GitHub上でレビューする変更提案。
 
