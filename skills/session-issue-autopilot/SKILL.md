@@ -179,7 +179,8 @@ After review response is complete, stop at the merge gate. A human decides wheth
 Only after the merge is confirmed should you help with local sync, and only if the worktree is clean.
 
 ```bash
-# Verify the merge already happened and local tree is safe to sync
+# Confirm the PR is merged, then verify local sync is safe
+gh pr view <pr-number> --json state,mergedAt --jq '{state: .state, mergedAt: .mergedAt}'
 git status --short
 git switch main
 git pull --ff-only

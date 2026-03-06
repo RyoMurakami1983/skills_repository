@@ -180,7 +180,8 @@ gh pr comment <pr-number> --body-file /tmp/review_reply.md
 マージ確認後に限り、かつ worktree が clean な場合だけローカル同期を補助します。
 
 ```bash
-# 先にマージ済みであることとローカル同期の安全性を確認
+# PRがマージ済みか確認し、その後ローカル同期の安全性を確認
+gh pr view <pr-number> --json state,mergedAt --jq '{state: .state, mergedAt: .mergedAt}'
 git status --short
 git switch main
 git pull --ff-only

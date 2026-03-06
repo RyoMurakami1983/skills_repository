@@ -292,7 +292,7 @@ Ready for human merge decision:
 - Re-review requested
 ```
 
-If the PR is later merged and the user explicitly asks for local cleanup, move to a separate post-merge sync workflow and first verify the worktree is clean.
+If the PR is later merged and the user explicitly asks for local cleanup, follow your repository's post-merge sync or cleanup procedure and first verify the worktree is clean.
 
 Use when review response work is complete and the next action is a merge decision.
 
