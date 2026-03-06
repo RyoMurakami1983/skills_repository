@@ -85,6 +85,20 @@ Use this table to choose the next action at a glance.
 
 ---
 
+## Responsibility Boundaries
+
+Keep the merge boundary explicit so automation does not overreach.
+
+| Phase | Agent responsibility | Human responsibility |
+|---|---|---|
+| Before PR | Detect state, create branch, prepare validated changes | Confirm the work is ready to propose |
+| PR creation | Open the PR, link issues, summarize evidence | Decide who reviews and when |
+| Merge decision | Summarize readiness only | Decide whether and when to merge on GitHub |
+| After merge | Help with local sync only after merge is confirmed | Confirm the merge actually happened |
+
+Use when the user asks what this skill will and will not automate.
+
+> **Values**: ニュートラル / 余白の設計
 ## Workflow: Ship via Pull Request
 
 ### Step 1: Detect State and Route
@@ -351,7 +365,7 @@ Closes #N
 A: No. Team policy requires Japanese PR descriptions.
 
 **Q: Does this skill handle reviews and merges?**
-A: No. This skill covers PR creation only. Review and merge will be a separate skill.
+A: It handles PR creation only. Review response is handled by `github-pr-review-response`, merge remains a human decision, and post-merge sync is a separate follow-up step.
 
 **Q: What if `gh` is not installed?**
 A: `gh auth status` will fail. Install [GitHub CLI](https://cli.github.com/) first.
