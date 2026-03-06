@@ -1,6 +1,6 @@
 ---
 name: github-pr-workflow
-description: "PRを作成しIssueをクローズする。「プルリクして」「PR作成」で使う。"
+description: "リポジトリ状態からPRを作成し、Issue連携まで安全に進めたいときに使用します。"
 metadata:
   author: RyoMurakami1983
   tags: [github, pull-requests, workflow, git, pr-create]
@@ -17,13 +17,16 @@ metadata:
 
 **Pull Request (PR)**: GitHub上でレビューする変更提案。
 
+先に状態を検知してください。PRは必ず feature branch から作成してください。複数行本文は `--body-file` を使ってください。
+
 ## このスキルを使うとき
 
 以下の状況で活用してください：
-- 「プルリクして」「PR作成して」「PRを作って」と指示されたとき
-- feature branchでの作業が完了し、マージ提案の準備ができたとき
-- ブランチをpushしてIssue連携付きのPRを作成したいとき
-- 未コミット・未pushの変更があり、PR作成前にルーティングが必要なとき
+- feature branch の作業がレビュー準備完了になり、PRを作成するとき
+- 未コミット・未push の変更をPR作成前にルーティングするとき
+- `Closes #N` や `Refs #N` で Issue 連携しながらPRを作成するとき
+- `gh pr create` 前にブランチ状態と認証状態を確認するとき
+- マージ判断を自動化せず、レビュー待ちへ安全に引き渡すとき
 
 > **スコープ**: このスキルは状態検知からPR作成・Issueクローズまでを扱います。レビュー対応・CIゲート・マージ戦略・マージ後同期はスコープ外です（将来の別スキルで対応）。
 
@@ -50,6 +53,20 @@ metadata:
 3. **日本語PR本文** (ニュートラル) - チーム標準としてPR本文を日本語で記述
 4. **mainを清潔に** (継続は力) - 検証済みの変更のみmainに到達させる
 5. **状態駆動** (温故知新) - 現在の状態を検知し、適切なアクションにルーティング
+
+---
+
+## 判断テーブル
+
+次の一手をひと目で決めるためのテーブルです。
+
+| 現在の状態 | 次のアクション | 理由 |
+|---|---|---|
+| `main` にいる | 先に feature branch を作る | default branch にレビュー前の作業を置かないため |
+| 未コミット変更あり | PR前にコミットする | 追跡可能な状態を保つため |
+| ローカルコミットのみ | 先に push する | `gh pr create` にはリモートブランチが必要なため |
+| PR未作成 | PRを作成する | レビューフローとIssue連携を開くため |
+| PR既存 | 状態を報告して止まる | 重複PRを防ぐため |
 
 ---
 
@@ -94,7 +111,7 @@ gh pr list --head $Branch --state open
 
 > **重要**: 未コミットの変更がある場合は `git-commit-practices` ワークフローに委譲してください（先にコミット、その後戻る）。mainにいる場合は、コミット前に必ず feature branch を作成してください。
 
-「プルリクして」「PR作成して」等のPR関連リクエスト時に使用します。
+「プルリクして」「PR作成して」等のPR関連リクエスト時に使用します。Why: 状態検知を先に行うと、誤った分岐や重複PR作成を防げます。
 
 > **Values**: 基礎と型 / 継続は力
 
@@ -111,7 +128,7 @@ git switch -c feature/issue-123
 git push -u origin feature/issue-123
 ```
 
-新しい作業を開始するとき、または Step 1 で main にいることが検知された場合に使用します。
+新しい作業を開始するとき、または Step 1 で main にいることが検知された場合に使用します。Why: 先にブランチを切ると、その後のコミット履歴がきれいに保てます。
 
 > **Values**: 基礎と型
 
@@ -138,13 +155,22 @@ Closes #123
 Refs #130"
 ```
 
-**ファイル経由の本文**（Windowsでの UTF-8 安全推奨）:
+**ファイル経由の本文**（複数行Markdown・コードフェンス・バッククォートを含む本文の既定推奨）:
 
 ```bash
-# 本文を一時ファイルに書き出す
-cat > pr_body.md << 'EOF'
+# 一意な一時ファイルを作り、クォート付きHEREDOCで書き出す
+# なぜ: mktemp で衝突を避け、trap で失敗時も確実に削除できる
+BODY_FILE="$(mktemp "${TMPDIR:-/tmp}/pr_body.XXXXXX")" || {
+  echo "PR本文用の一時ファイル作成に失敗しました" >&2
+  exit 1
+}
+cleanup() {
+  [ -n "$BODY_FILE" ] && rm -f "$BODY_FILE"
+}
+trap cleanup EXIT
+cat > "$BODY_FILE" <<'EOF'
 ## 概要
-注文履歴画面に検索フィルタを追加。
+注文履歴画面に検索フィルタを追加し、本文内の `int(order_id)` 例もそのまま残す。
 
 ## 理由
 サポートから検索要求が多く、対応工数を削減するため。
@@ -157,8 +183,14 @@ Closes #123
 Refs #130
 EOF
 
-gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file pr_body.md
+gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file "$BODY_FILE"
 ```
+
+複数段落の本文、シェル例、バッククォートを含むMarkdownでは、このパターンを既定にしてください。
+
+✅ **良い例**: 本文ファイルを生成して確認してから `gh pr create --body-file` を実行する。
+❌ **悪い例**: バッククォート入りの複数行Markdownを `--body` に直接貼り付けてクォート崩れに賭ける。
+Why: ファイル経由の方が再現性・レビュー性・シェル安全性が高いからです。
 
 | キーワード | 効果 |
 |-----------|------|
@@ -176,7 +208,8 @@ gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file
 - PR本文は日本語で記述する（チーム標準）
 - タイトルは Conventional Commits 形式（`feat:`, `fix:` 等）
 - `Closes #N` で Issue を自動クローズする
-- Windows では `--body-file` で UTF-8 を確実に扱う
+- 複数行やシェルに敏感な本文では `--body-file` を既定にする（Windows では必須寄り）
+- Bashで本文ファイルを作るときは `mktemp` + `trap` とクォート付きHEREDOC（`<<'EOF'`）を使う
 - `gh auth status` で認証を事前確認する
 
 ### 事前チェックリスト（`gh pr create` 前）
@@ -199,6 +232,9 @@ gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file
 
 3. **mainブランチから直接PRを作る**
    修正: Step 1 の状態検知で feature branch 作成に誘導。
+
+4. **バッククォートや `$()` を含む本文が壊れる**
+   修正: クォート付きHEREDOCで本文ファイルを生成し、`--body-file` で渡す。
 
 ## トラブルシューティング
 
@@ -233,6 +269,7 @@ gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file
 ### セルフレビューチェックリスト（完了前）
 
 - [ ] PR本文に「意図・理由・テスト・Issueリンク」が揃っている
+- [ ] バッククォートやシェル例を含む本文では、クォート付きHEREDOC + `--body-file` を使っている
 - [ ] 自動化/workflow変更では必要な出力先ディレクトリ準備がある
 - [ ] GitHub API の create 処理が冪等（422競合など）になっている
 - [ ] ラベル名・色がリポジトリ規約に一致している

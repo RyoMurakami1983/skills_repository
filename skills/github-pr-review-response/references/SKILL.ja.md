@@ -228,8 +228,24 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
 # 修正コミットをPRブランチにプッシュ
 git push origin HEAD
 
-# 全体のレビューコメントを追加
-gh pr review --comment --body "全レビューコメントに対応済み。各コミットの詳細を参照してください。"
+# body-fileで全体コメントを追加
+# なぜ: mktemp で衝突を避け、trap で失敗時も確実に削除できる
+REVIEW_BODY="$(mktemp "${TMPDIR:-/tmp}/review_response.XXXXXX")" || {
+  echo "レビュー返信用の一時ファイル作成に失敗しました" >&2
+  exit 1
+}
+cleanup_review_body() {
+  [ -n "$REVIEW_BODY" ] && rm -f "$REVIEW_BODY"
+}
+trap cleanup_review_body EXIT
+cat > "$REVIEW_BODY" <<'EOF'
+全レビューコメントに対応済みです。各コミットの詳細を参照してください。
+
+- `build_payload()` の nullハンドリングを修正
+- 失敗経路の回帰テストを追加
+EOF
+
+gh pr review --comment --body-file "$REVIEW_BODY"
 
 # 特定のレビューコメントスレッドへの返信はGitHub Web UIを使用
 # またはAPI: gh api repos/OWNER/REPO/pulls/comments/COMMENT_ID/replies -f body="abc1234で修正済み"
@@ -246,6 +262,7 @@ gh pr review --comment --body "全レビューコメントに対応済み。各�
 
 - ✅ **推奨**: コメントに対応した具体的なコミットを参照する
 - ✅ **推奨**: 特定の修正アプローチを選んだ理由を説明する
+- ✅ **推奨**: 複数行・バッククォート・シェル断片を含む返信は `--body-file` を使う
 - ❌ **非推奨**: 「修正済み」だけの返信 — 何をなぜ変更したか説明する
 - ❌ **非推奨**: 反対意見のコメントを無視する — 理由を添えて返信する
 
@@ -261,13 +278,25 @@ gh pr review --comment --body "全レビューコメントに対応済み。各�
 # レビュアーに再レビューを依頼
 gh pr edit --add-reviewer reviewer-username
 
-# サマリーコメントを残す（任意）
-gh pr comment --body "すべてのレビューコメントに対応しました：
+# サマリーコメントを body-file で残す（任意）
+REREVIEW_BODY="$(mktemp "${TMPDIR:-/tmp}/rereview_summary.XXXXXX")" || {
+  echo "再レビュー要約用の一時ファイル作成に失敗しました" >&2
+  exit 1
+}
+cleanup_rereview_body() {
+  [ -n "$REREVIEW_BODY" ] && rm -f "$REREVIEW_BODY"
+}
+trap cleanup_rereview_body EXIT
+cat > "$REREVIEW_BODY" <<'EOF'
+すべてのレビューコメントに対応しました：
 - SQLインジェクション修正（コミットabc1234）
 - エラーハンドリング追加（コミットdef5678）
 - ガード句にリファクタ（コミットghi9012）
 
-再レビューをお願いします。フィードバックありがとうございました！"
+再レビューをお願いします。フィードバックありがとうございました！
+EOF
+
+gh pr comment --body-file "$REREVIEW_BODY"
 ```
 
 ```powershell
@@ -291,6 +320,7 @@ gh pr comment --body "すべてのレビューコメントに対応しました�
 - レビュー後のforce-pushを避ける — レビュー会話の履歴が消える
 - 現在のPRのスコープ外の提案にはフォローアップIssueを作成する
 - レビュースレッドに直接返信するため `gh pr review --comment` を使用する
+- 複数行のレビュー要約や返信では `--body-file` を優先する
 
 ---
 
@@ -307,6 +337,9 @@ gh pr comment --body "すべてのレビューコメントに対応しました�
 
 4. **コンテキストなしで「修正済み」と返信する**
    修正方法: コミットハッシュを参照し、返信で修正アプローチを説明する。
+
+5. **バッククォートやシェル文字を含む返信本文が壊れる**
+   修正方法: クォート付きHEREDOCで返信本文を作り、`--body-file` で送る。
 
 ---
 
