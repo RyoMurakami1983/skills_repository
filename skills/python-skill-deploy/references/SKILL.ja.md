@@ -6,18 +6,20 @@ description: >
   またはskills_repositoryからの更新を行うとき。
 allowed-tools:
   - powershell
+  - bash
 metadata:
   author: RyoMurakami1983
   tags: [python, deployment, skills, project-setup, automation]
   invocable: false
   tool_versions:
+    bash: ">=4.0"
     powershell: ">=5.1"
   last_reviewed: "2026-03-07"
 ---
 
 # Pythonスキルをプロジェクトへデプロイする
 
-`skills_repository/python/` から選択したPythonスキルを、対象プロジェクトの `.github/skills/` へ配置する対話型ワークフローです。
+`skills_repository/python/` から選択したPythonスキルを、対象プロジェクトの `.github/skills/` へ配置する対話型ワークフローです。PowerShell と Bash の両方から実行できます。
 
 ## When to Use This Skill
 
@@ -39,7 +41,7 @@ Use this skill when:
 
 ## Dependencies
 
-- PowerShell 5.1+（クロス環境では `pwsh` 推奨）
+- PowerShell 5.1+ または Bash 4.0+
 - `skills_repository` がローカルにクローン済みであること
 - `$env:SKILLS_REPO`（PowerShell）または `$SKILLS_REPO`（bash/WSL）がリポジトリルートを指していること
 
@@ -91,6 +93,12 @@ Use this skill when:
     -List
 ```
 
+```bash
+"<skills_repository>/skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh" \
+  --source-root "<skills_repository>/python" \
+  --list
+```
+
 現在のカテゴリ:
 
 | カテゴリ | 数 | 内容 |
@@ -126,6 +134,21 @@ Use this skill when:
     -Target "<project_path>" `
     -Category dev-env `
     -Skills python-debug-tdd
+```
+
+```bash
+# カテゴリデプロイをプレビュー
+"<skills_repository>/skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh" \
+  --source-root "<skills_repository>/python" \
+  --target "<project_path>" \
+  --category dev-env \
+  --what-if
+
+# カテゴリを実デプロイ
+"<skills_repository>/skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh" \
+  --source-root "<skills_repository>/python" \
+  --target "<project_path>" \
+  --category dev-env
 ```
 
 更新時は `-Force` を付けて、上書き意図を明示します。
@@ -164,6 +187,8 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 - `all` は動的に保ち、新しいPythonソーススキルが増えても再利用できるようにする
 - Pythonプロジェクトスキルが増減したら `agents/python-shihan.agent.md` とカテゴリ定義を同期する
 - 更新時だけ `-Force` を使い、上書き意図をあいまいにしない
+- WSL や bash 主体の作業では `Deploy-PythonSkills.sh` を優先し、PowerShell 変換の手間を減らす
+- Windows PowerShell / WSL / ログ出力で崩れないよう、スクリプトのコンソール出力は ASCII 安全に保つ
 
 ---
 
@@ -180,6 +205,9 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 
 4. **コピー後の確認を省略する**
    Fix: 直後に `.github/skills/` を一覧表示し、期待したディレクトリがあるか確認する。
+
+5. **Windows/WSL で文字化けした出力をそのまま使う**
+   Fix: スクリプト出力は ASCII 安全に保ち、ローカライズ説明は SKILL 文書側へ寄せる。
 
 ---
 
@@ -203,6 +231,10 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
   - 原因: `-WhatIf` のままだったか、`-Force` なしで既存スキルがスキップされた。
   - 対処: サマリー出力を確認し、必要なら `-WhatIf` を外すか `-Force` を付けて再実行する。
 
+- **WSL で PowerShell を呼びたくない**
+  - 原因: bash 主体の環境で PowerShell スクリプトを経由したくない。
+  - 対処: `skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh` を使い、`--source-root` / `--target` / `--category` で同じ操作を行う。
+
 ---
 
 ## Quick Reference
@@ -216,7 +248,7 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 
 ### Self-Review Checklist
 
-- [ ] `skills/python-skill-deploy/scripts/Deploy-PythonSkills.ps1` を使っている
+- [ ] `Deploy-PythonSkills.ps1` または `Deploy-PythonSkills.sh` を使っている
 - [ ] `-SourceRoot` が `python/` を指している
 - [ ] サマリー出力が期待した配布対象と一致している
 - [ ] 配布後にターゲット `.github/skills/` を一覧表示して確認した
@@ -249,11 +281,23 @@ Deploy-PythonSkills.ps1 -SourceRoot <python_path> -Target <project> -Category de
 Deploy-PythonSkills.ps1 -SourceRoot <python_path> -Target <project> -Category all -Force
 ```
 
+```bash
+# カテゴリとスキル一覧
+Deploy-PythonSkills.sh --source-root <python_path> --list
+
+# プレビュー
+Deploy-PythonSkills.sh --source-root <python_path> --target <project> --category dev-env --what-if
+
+# カテゴリ配布
+Deploy-PythonSkills.sh --source-root <python_path> --target <project> --category dev-env
+```
+
 ---
 
 ## Resources
 
 - [PowerShell documentation](https://learn.microsoft.com/powershell/)
+- [Bash manual](https://www.gnu.org/software/bash/manual/bash.html)
 - [uv documentation](https://docs.astral.sh/uv/)
 - [Python Setup Dev Environment](../../../python/python-setup-dev-environment/SKILL.md)
 - [Deploy Dotnet Skills to Project](../../dotnet-skill-deploy/SKILL.md)

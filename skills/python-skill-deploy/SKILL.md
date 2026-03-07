@@ -6,18 +6,20 @@ description: >
   or updating project-level skills from the skills_repository.
 allowed-tools:
   - powershell
+  - bash
 metadata:
   author: RyoMurakami1983
   tags: [python, deployment, skills, project-setup, automation]
   invocable: false
   tool_versions:
+    bash: ">=4.0"
     powershell: ">=5.1"
   last_reviewed: "2026-03-07"
 ---
 
 # Deploy Python Skills to Project
 
-Interactive workflow for deploying selected Python skills from `skills_repository/python/` to a target project's `.github/skills/` directory.
+Interactive workflow for deploying selected Python skills from `skills_repository/python/` to a target project's `.github/skills/` directory, with both PowerShell and Bash entrypoints.
 
 ## When to Use This Skill
 
@@ -39,7 +41,7 @@ Use this skill when:
 
 ## Dependencies
 
-- PowerShell 5.1+ (`pwsh` recommended for cross-platform use)
+- PowerShell 5.1+ or Bash 4.0+
 - `skills_repository` cloned locally
 - `$env:SKILLS_REPO` (PowerShell) or `$SKILLS_REPO` (bash/WSL) set to the repository root
 
@@ -91,6 +93,12 @@ Recommend the smallest useful skill set, then show the available choices.
     -List
 ```
 
+```bash
+"<skills_repository>/skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh" \
+  --source-root "<skills_repository>/python" \
+  --list
+```
+
 Current categories:
 
 | Category | Count | Contents |
@@ -126,6 +134,21 @@ Run the deploy script with the confirmed selection. Offer `-WhatIf` first when t
     -Target "<project_path>" `
     -Category dev-env `
     -Skills python-debug-tdd
+```
+
+```bash
+# Preview category deployment
+"<skills_repository>/skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh" \
+  --source-root "<skills_repository>/python" \
+  --target "<project_path>" \
+  --category dev-env \
+  --what-if
+
+# Execute category deployment
+"<skills_repository>/skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh" \
+  --source-root "<skills_repository>/python" \
+  --target "<project_path>" \
+  --category dev-env
 ```
 
 For updates, add `-Force` so overwrite intent is explicit.
@@ -164,6 +187,8 @@ Use when the copy step is complete and the user needs confirmation plus next act
 - Keep `all` dynamic so newly added Python source skills become deployable without manual duplication.
 - Sync category definitions with `agents/python-shihan.agent.md` when Python project skills change.
 - Re-run with `-Force` only when the user explicitly wants to replace copied skills.
+- Prefer `Deploy-PythonSkills.sh` in WSL/bash-first workflows to avoid path and encoding friction.
+- Keep script console output ASCII-safe so Windows PowerShell, WSL, and logs render consistently.
 
 ---
 
@@ -180,6 +205,9 @@ Use when the copy step is complete and the user needs confirmation plus next act
 
 4. **Skipping verification after copy**
    Fix: List `.github/skills/` immediately after deployment and confirm the expected directories exist.
+
+5. **Windows/WSL console output becomes mojibake**
+   Fix: Keep deploy-script console output ASCII-safe and move localized guidance into SKILL docs instead of script output.
 
 ---
 
@@ -203,6 +231,10 @@ Use when the copy step is complete and the user needs confirmation plus next act
   - Cause: The run used `-WhatIf`, or existing skills were skipped without `-Force`.
   - Fix: Check the summary output, then rerun without `-WhatIf` or with `-Force` as needed.
 
+- **WSL user does not want to invoke PowerShell**
+  - Cause: The workflow is being run from a bash-first environment.
+  - Fix: Use `skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh` with `--source-root`, `--target`, and the same category/skill choices.
+
 ---
 
 ## Quick Reference
@@ -216,7 +248,7 @@ Use when the copy step is complete and the user needs confirmation plus next act
 
 ### Self-Review Checklist
 
-- [ ] The command uses `skills/python-skill-deploy/scripts/Deploy-PythonSkills.ps1`
+- [ ] The command uses either `Deploy-PythonSkills.ps1` or `Deploy-PythonSkills.sh`
 - [ ] `-SourceRoot` points to `python/`, not another category directory
 - [ ] The copy summary matches expected deployed skills
 - [ ] The target `.github/skills/` directories were listed after deployment
@@ -249,11 +281,23 @@ Deploy-PythonSkills.ps1 -SourceRoot <python_path> -Target <project> -Category de
 Deploy-PythonSkills.ps1 -SourceRoot <python_path> -Target <project> -Category all -Force
 ```
 
+```bash
+# List categories and skills
+Deploy-PythonSkills.sh --source-root <python_path> --list
+
+# Preview deploy
+Deploy-PythonSkills.sh --source-root <python_path> --target <project> --category dev-env --what-if
+
+# Deploy category
+Deploy-PythonSkills.sh --source-root <python_path> --target <project> --category dev-env
+```
+
 ---
 
 ## Resources
 
 - [PowerShell documentation](https://learn.microsoft.com/powershell/)
+- [Bash manual](https://www.gnu.org/software/bash/manual/bash.html)
 - [uv documentation](https://docs.astral.sh/uv/)
 - [Python Setup Dev Environment](../../python/python-setup-dev-environment/SKILL.md)
 - [Deploy Dotnet Skills to Project](../dotnet-skill-deploy/SKILL.md)

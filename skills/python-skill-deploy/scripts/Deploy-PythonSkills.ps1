@@ -99,12 +99,12 @@ if ($List) {
     foreach ($cat in $listCategories) {
         $skillsInCategory = @(Resolve-CategorySkills -CategoryName $cat -AvailableSkills $AvailableSkills)
         $label = switch ($cat) {
-            'dev-env' { '開発環境基盤 (Development Environment Foundation)' }
-            'all'     { '全Pythonスキル (All Available Python Skills)' }
+            'dev-env' { 'Development Environment Foundation' }
+            'all'     { 'All Available Python Skills' }
             default   { $cat }
         }
 
-        Write-Host "  $cat ($($skillsInCategory.Count) skills) — $label" -ForegroundColor Yellow
+        Write-Host "  $cat ($($skillsInCategory.Count) skills) - $label" -ForegroundColor Yellow
         foreach ($skillName in $skillsInCategory) {
             $marker = if ($AvailableSkills -contains $skillName) { '  [ok]' } else { '  [missing]' }
             $color = if ($AvailableSkills -contains $skillName) { 'Green' } else { 'Red' }
@@ -218,7 +218,7 @@ $totalActions = $copied.Count + $overwritten.Count
 Write-Host "`n  Total deployed: $totalActions skill(s)" -ForegroundColor Cyan
 
 if ($WhatIfPreference) {
-    Write-Host "  (Dry run — no files were copied)" -ForegroundColor Magenta
+    Write-Host "  (Dry run - no files were copied)" -ForegroundColor Magenta
 }
 
 Write-Host ""
