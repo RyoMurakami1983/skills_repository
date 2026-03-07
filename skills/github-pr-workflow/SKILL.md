@@ -8,7 +8,7 @@ metadata:
   tool_versions:
     git: ">=2.30"
     gh: ">=2.0"
-  last_reviewed: "2026-03-01"
+  last_reviewed: "2026-03-07"
 ---
 
 # GitHub PR Workflow
@@ -28,7 +28,7 @@ Use this skill when:
 - Verifying branch and authentication state before running `gh pr create`
 - Handing off a review-ready PR without automating the merge decision
 
-> **Scope**: This skill covers state detection through PR creation, issue linkage, and low-cost handoff into review waiting. Detailed review handling, merge strategy, and post-merge sync are out of scope.
+> **Scope**: This skill covers state detection through PR creation, issue linkage, low-cost handoff into review waiting, and confirmed post-merge sync for remaining PR branches. Detailed review handling and the merge decision itself stay out of scope.
 
 ## Related Skills
 
@@ -95,6 +95,7 @@ Keep the merge boundary explicit so automation does not overreach.
 | PR creation | Open the PR, link issues, summarize evidence | Decide who reviews and when |
 | Merge decision | Summarize readiness only | Decide whether and when to merge on GitHub |
 | After merge | Help with local sync only after merge is confirmed | Confirm the merge actually happened |
+| Parallel PR cleanup | Sync remaining PR branches from `origin/main`, rerun checks, summarize re-review needs | Decide merge order and resolve any product-level reprioritization |
 
 Use when the user asks what this skill will and will not automate.
 
@@ -262,6 +263,43 @@ Use when the PR exists and work has shifted from creation to waiting.
 
 > **Values**: 余白の設計 / 継続は力
 
+### Step 5: Sync Remaining PR Branches After One PR Merges
+
+If multiple PRs are in flight and one of them gets merged, sync each remaining PR branch with the latest `origin/main` before asking reviewers to continue.
+
+```bash
+# Start from a clean worktree and the remaining PR branch
+git status --short
+git fetch origin
+git switch feature/issue-124-followup
+
+# Bring in the newly merged main history
+git merge origin/main
+
+# If conflicts occur, resolve them first, then rerun validation
+npm test          # or repo-equivalent checks
+npm run lint      # or repo-equivalent checks
+
+# Push the sync or conflict-resolution commit
+git push origin HEAD
+```
+
+Parallel-PR checklist after one branch merges:
+
+1. Confirm the first PR is actually merged on GitHub.
+2. Switch to each remaining PR branch and merge `origin/main`.
+3. Resolve conflicts immediately if they appear.
+4. Rerun validator / lint / relevant tests after the merge.
+5. Push the updated branch and request re-review if new commits were added.
+
+✅ **Good**: Treat post-merge sync as a required follow-up whenever sibling PRs touch nearby files or the same workflow.
+❌ **Bad**: Leave remaining PRs stale after a related merge, then discover conflicts only at the next merge attempt.
+Why: immediate sync keeps review state honest and prevents hidden drift across parallel PRs.
+
+Use when one PR from a parallel set has merged and other review branches still remain open.
+
+> **Values**: 基礎と型 / 継続は力
+
 ---
 
 ## Best Practices
@@ -274,6 +312,7 @@ Use when the PR exists and work has shifted from creation to waiting.
 - Verify authentication with `gh auth status` before creating PRs
 - Prefer event-driven review waiting; do not burn cycles on repeated checks with no signal
 - Batch PR status checks at natural context switches instead of polling one PR at a time
+- After one PR merges from a parallel set, sync every remaining branch with `origin/main` before continuing review
 
 ### Preflight Checklist (Before `gh pr create`)
 
@@ -288,7 +327,7 @@ Use when the PR exists and work has shifted from creation to waiting.
 ## Common Pitfalls
 
 1. **PR body written in English**
-   Fix: Use the Japanese template headings (概要/理由/テスト/関連).
+   Fix: Use the team's Japanese PR template headings in the standard Summary/Reason/Test/Related order.
 
 2. **Missing issue link**
    Fix: Always include `Closes #N` in the Related section.
@@ -302,6 +341,9 @@ Use when the PR exists and work has shifted from creation to waiting.
 5. **Backticks or `$()` break the PR body**
    Fix: Generate the body with a single-quoted heredoc and pass it via `--body-file`.
 
+6. **Remaining PR branches are left unsynced after a sibling PR merges**
+   Fix: Merge `origin/main` into each open sibling branch, rerun checks, and request re-review if the branch changed.
+
 ## Troubleshooting
 
 - **`workflow ... not found on the default branch` when dispatching Actions**
@@ -311,6 +353,10 @@ Use when the PR exists and work has shifted from creation to waiting.
 - **Push rejected for `.github/workflows/*` due to scope**
   - Cause: Token lacks `workflow` scope.
   - Fix: Re-authenticate with `gh auth refresh -h github.com -s workflow`.
+
+- **A remaining PR turns conflicted after another PR merged**
+  - Cause: The branch still points to pre-merge main history.
+  - Fix: `git fetch origin`, switch to the remaining branch, merge `origin/main`, resolve conflicts, rerun checks, and push before asking for more review.
 
 ---
 
@@ -332,6 +378,7 @@ Use when the PR exists and work has shifted from creation to waiting.
 - [ ] Push branch to origin
 - [ ] Create PR with `gh pr create` (Japanese body + `Closes #N`)
 - [ ] Record the PR URL once, then wait for review signals instead of polling
+- [ ] If a sibling PR merges first, sync this branch with `origin/main`, rerun checks, and re-request review as needed
 
 ### Self-Review Checklist (Before finishing)
 
@@ -365,7 +412,7 @@ Closes #N
 A: No. Team policy requires Japanese PR descriptions.
 
 **Q: Does this skill handle reviews and merges?**
-A: It handles PR creation only. Review response is handled by `github-pr-review-response`, merge remains a human decision, and post-merge sync is a separate follow-up step.
+A: It handles PR creation plus confirmed post-merge sync for remaining PR branches. Review response is handled by `github-pr-review-response`, and the merge decision remains human-only.
 
 **Q: What if `gh` is not installed?**
 A: `gh auth status` will fail. Install [GitHub CLI](https://cli.github.com/) first.
