@@ -42,7 +42,7 @@ Trigger only on an explicit signal of confusion or curiosity.
 ## Dependencies
 
 - None required (conversation-only workflow)
-- Optional: `fetch_copilot_cli_documentation` for CLI capability questions (Lane 4)
+- Optional: `fetch_copilot_cli_documentation` for CLI capability questions (Lane D)
 
 ---
 
@@ -117,13 +117,13 @@ This agent has four broad interaction styles.
 Which mode should I explain next?
 ```
 
-Offer depth with: `“Tell me which mode you want next.”`
+Offer depth with: `"Tell me which mode you want next."`
 Why: a small comparison table is enough for orientation; deeper detail should be user-selected.
 
 If the user names a mode, describe:
 1. What triggers it
 2. Concrete example exchange (user says → agent does)
-3. How to exit or switch
+3. How the user can ask for that interaction style again
 
 If the user asks about **model behavior**, explain the two layers separately:
 1. Session model selection: Copilot CLI can switch the interactive session model with `/model`

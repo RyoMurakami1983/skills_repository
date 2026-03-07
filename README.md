@@ -20,9 +20,9 @@ GitHub Copilot Agent Skillsのコレクション
 |---------|------|--------|------|
 | `copilot/` | グローバル開発憲法（copilot-instructions.md） | グローバル（~/.copilot/） | [copilot-instructions.md](copilot/copilot-instructions.md) |
 | `agents/` | 師範エージェント（dotnet/python/typescript/skill） | グローバル（~/.copilot/agents/） | [下記参照](#-agents) |
-| `skills/` | Skill作成支援 + Git/GitHub ワークフロー（19） | グローバル（~/.copilot/skills/） | [SKILLS_README.md](skills/SKILLS_README.md) |
-| `dotnet/` | .NET/C# WPF開発ワークフロー（10） | プロジェクト（.github/skills/） | [下記参照](#-dotnet-skills) |
-| `production/` | MVP/本番向け開発プラクティス（1） | プロジェクト（.github/skills/） | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
+| `skills/` | Skill作成支援 + Git/GitHub ワークフロー | グローバル（~/.copilot/skills/） | [SKILLS_README.md](skills/SKILLS_README.md) |
+| `dotnet/` | .NET/C# WPF開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#-dotnet-skills) |
+| `production/` | MVP/本番向け開発プラクティス | プロジェクト（.github/skills/） | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
 
 ### 📌 今後追加予定のカテゴリ
 
@@ -373,7 +373,7 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - validate_skill.py v4.1.0（ルーター/ワークフロー/レガシー3モード対応）
 - DDD命名規則 `<context>-<workflow>` を導入
 - **dotnetカテゴリ追加**: WPF/Oracle/.NET C#スキル10種を追加
-- Skills総数: 19 + dotnet 10 + production 1
+- Skills総数: skills / dotnet / production の各カテゴリ配下を参照
 
 ### v1.1.0 (2026-02-13)
 - Productionカテゴリを追加
