@@ -65,7 +65,8 @@ notion-notion-fetch(id="collection://<your-data-source-id>")
 | Signal | Decision |
 |---|---|
 | Fetch succeeds | Continue to Step 2 |
-| Tool missing / fetch fails | Stop writes and use Step 5 fallback |
+| Error contains "unauthorized" / "401" / "authentication" | Auth expired → ask user to run `/mcp r` then retry |
+| Tool missing / fetch fails (other) | Stop writes and use Step 5 fallback |
 
 Why: `/mcp show` can list integrations while current runtime still cannot invoke the tool.
 
@@ -141,6 +142,13 @@ If write execution fails, return a copy-paste payload and retry guidance.
 ## Notion write failed
 - Error: <exact error>
 - Retry:
+
+  **If error contains "unauthorized" / "401" / "authentication" (auth expired):**
+  1. Run `/mcp r` in the terminal to re-authenticate Notion
+  2. Re-run Step 1 preflight
+  3. Re-submit the same payload
+
+  **Other failures:**
   1. Reset agent/model context
   2. Re-run Step 1 preflight
   3. Re-submit the same payload
@@ -192,6 +200,7 @@ Why: a structured fallback preserves momentum even when tools are unstable.
 | Need to write Notion data | Run Step 1 preflight first |
 | DS ID unknown | Run Step 2 resolution flow |
 | Property error occurs | Re-run Step 3 schema check |
+| Auth expired (401 / unauthorized) | Run `/mcp r` to re-authenticate, then retry Step 1 |
 | Tool call fails in runtime | Use Step 5 fallback payload |
 
 ### Minimal Checklist
@@ -205,6 +214,9 @@ Why: a structured fallback preserves momentum even when tools are unstable.
 ---
 
 ## FAQ
+
+**Q: What if Notion auth expires mid-session?**
+A: The preflight fetch will return an "unauthorized" or 401 error. Run `/mcp r` in the terminal to re-authenticate, then retry from Step 1.
 
 **Q: Why not save DS IDs in repository docs?**
 A: DS IDs are workspace-specific identifiers; local-only storage is safer and cleaner.

@@ -65,7 +65,8 @@ notion-notion-fetch(id="collection://<your-data-source-id>")
 | シグナル | 判断 |
 |---|---|
 | fetch成功 | Step 2へ進む |
-| ツール未検出/失敗 | Step 5フォールバックへ |
+| "unauthorized" / "401" / "authentication" を含むエラー | 認証切れ → ユーザーに `/mcp r` を実行するよう案内 |
+| ツール未検出/その他失敗 | Step 5フォールバックへ |
 
 **なぜ？** `/mcp show` で見えても、実行コンテキストで呼べない場合があるため。
 
@@ -139,6 +140,13 @@ notion-notion-fetch(id="collection://...")
 ## Notion write failed
 - Error: <exact error>
 - Retry:
+
+  **"unauthorized" / "401" / "authentication" を含む場合（認証切れ）:**
+  1. ターミナルで `/mcp r` を実行して Notion を再認証する
+  2. Step 1 preflight を再実行
+  3. 同じ payload を再送
+
+  **その他の失敗:**
   1. agent/model を再初期化
   2. Step 1 preflight を再実行
   3. 同じ payload を再送
@@ -190,7 +198,8 @@ Payload:
 | Notionへ書き込みたい | Step 1 preflight を先に実行 |
 | DS ID が不明 | Step 2 解決フローを実行 |
 | Property error が出た | Step 3 スキーマ確認を再実行 |
-| 実行時にツール失敗 | Step 5 フォールバックを返す |
+| 認証切れ（401 / unauthorized） | `/mcp r` を実行して再認証し、Step 1 からやり直す |
+| 実行時にツール失敗（その他） | Step 5 フォールバックを返す |
 
 ### 最小チェックリスト
 
@@ -203,6 +212,9 @@ Payload:
 ---
 
 ## FAQ
+
+**Q: セッション中に Notion の認証が切れたらどうする？**
+A: preflight fetch が "unauthorized" や 401 エラーを返します。ターミナルで `/mcp r` を実行して再認証し、Step 1 からやり直してください。
 
 **Q: なぜ DS ID をリポジトリに書かない？**
 A: ワークスペース固有識別子の漏洩を防ぎ、環境依存を減らすため。
