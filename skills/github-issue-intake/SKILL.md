@@ -59,7 +59,7 @@ Determine whether to fix inline or defer. Use a simple decision matrix based on 
 
 ```text
 # ✅ CORRECT - File issue when out of scope
-Issue: "Bug: CSV import fails on UTF-8 BOM"
+Issue: "🟡 CSV import: UTF-8 BOM を受け付けない"
 Scope: Not required for current PR
 Action: Create issue and continue
 
@@ -157,7 +157,7 @@ Assign labels for type, priority, and area so the backlog is sortable. At minimu
 
 ```yaml
 # ✅ CORRECT
-labels: [bug, priority/P1, area/import]
+labels: [t/bug, p/high, a/import]
 
 # ❌ WRONG
 labels: []
@@ -196,7 +196,7 @@ Use `gh issue create` for fast, repeatable creation, and `gh issue edit` to refa
 gh issue create \
   --title "🟢 github-issue-intake: Issueは日本語で起票する方針を明記する" \
   --body-file issue.md \
-  --label enhancement,a/skills,t/chore \
+  --label t/chore,p/medium,a/skills \
   --assignee @me
 
 # Edit
@@ -302,7 +302,7 @@ Fix: Prefer `--body-file` with UTF-8 for CLI edits.
 A: File an issue when the fix is out of scope or exceeds your timebox.
 
 **Q: What labels are mandatory?**
-A: At minimum, include type and priority labels.
+A: At minimum, include one type label (`t/*`) and one priority label (`p/*`).
 
 **Q: Should issues in this repository be written in Japanese or English?**
 A: Default to Japanese for titles and bodies. Keep proper nouns, CLI commands, code identifiers, and external service names in English when that improves recognition.
@@ -327,7 +327,7 @@ A: Yes — treat it as backlog maintenance. Update title/body (and add DoD) so t
 
 ```bash
 # CLI quick create
-gh issue create --title "🟢 改善: ..." --body-file issue.md --label enhancement,a/skills
+gh issue create --title "🟢 改善: ..." --body-file issue.md --label t/feature,p/medium,a/skills
 
 # CLI quick edit
 gh issue edit 123 --title "🟢 〜を明記する" --body-file issue.md

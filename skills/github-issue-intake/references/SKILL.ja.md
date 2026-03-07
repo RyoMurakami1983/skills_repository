@@ -59,7 +59,7 @@ metadata:
 
 ```text
 # ✅ CORRECT - スコープ外はIssue化
-Issue: "Bug: CSV import fails on UTF-8 BOM"
+Issue: "🟡 CSV import: UTF-8 BOM を受け付けない"
 Scope: 現PRでは不要
 Action: Issueを作成して続行
 
@@ -156,7 +156,7 @@ Issue の言語方針が明文化されておらず、起票者ごとに英語 /
 
 ```yaml
 # ✅ CORRECT
-labels: [bug, priority/P1, area/import]
+labels: [t/bug, p/high, a/import]
 
 # ❌ WRONG
 labels: []
@@ -195,7 +195,7 @@ Log: 2026-02-12T12:03:11Z ERROR import failed (BOM detected)
 gh issue create \
   --title "🟢 github-issue-intake: Issueは日本語で起票する方針を明記する" \
   --body-file issue.md \
-  --label enhancement,a/skills,t/chore \
+  --label t/chore,p/medium,a/skills \
   --assignee @me
 
 # 更新（具体化）
@@ -305,6 +305,9 @@ A: コメントで済ませず、title/bodyを具体化（背景・目的・DoD�
 **Q: このリポジトリのIssueは日本語と英語のどちらで書くべき？**
 A: 既定は日本語。固有名詞・CLI コマンド・コード識別子・外部サービス名は、認知しやすさを優先して英語のまま使ってよい。
 
+**Q: 最低限必要なラベルは？**
+A: 少なくとも種別ラベル（`t/*`）を1つと、優先度ラベル（`p/*`）を1つ付ける。
+
 ---
 
 ## クイックリファレンス
@@ -323,7 +326,7 @@ A: 既定は日本語。固有名詞・CLI コマンド・コード識別子・�
 ---
 ```bash
 # CLI で新規作成
-gh issue create --title "🟢 改善: ..." --body-file issue.md --label enhancement,a/skills
+gh issue create --title "🟢 改善: ..." --body-file issue.md --label t/feature,p/medium,a/skills
 
 # CLI で更新
 gh issue edit 123 --title "🟢 〜を明記する" --body-file issue.md
