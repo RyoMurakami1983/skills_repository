@@ -188,6 +188,22 @@ production/ や言語別Skillsは、プロジェクトの`.github/skills/`にコ
     -Category wpf-app
 ```
 
+**pythonスキルのデプロイ（推奨: `python-skill-deploy` スキル使用）**:
+
+`@python-shihan` に「pythonスキルをプロジェクトにデプロイして」と依頼すると、対話型でカテゴリまたは個別スキルを選択してコピーできます。
+
+```powershell
+# カテゴリ一覧を表示
+& "$env:SKILLS_REPO\skills\python-skill-deploy\scripts\Deploy-PythonSkills.ps1" `
+    -SourceRoot "$env:SKILLS_REPO\python" -List
+
+# Python開発環境スキルをデプロイ
+& "$env:SKILLS_REPO\skills\python-skill-deploy\scripts\Deploy-PythonSkills.ps1" `
+    -SourceRoot "$env:SKILLS_REPO\python" `
+    -Target C:\path\to\my-project `
+    -Category dev-env
+```
+
 **productionスキルの手動コピー**:
 
 ```bash

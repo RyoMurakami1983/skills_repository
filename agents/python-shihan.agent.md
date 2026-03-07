@@ -65,6 +65,7 @@ Pythonエコシステムの進化を追い、新しいパターンを作る。
 ## 管轄スキル
 
 ### 現在
+- `python-skill-deploy` — Pythonスキルのプロジェクトデプロイ（カテゴリ/個別選択）
 - `python-setup-dev-environment` — Python開発環境セットアップ
 - `python-debug-tdd` — TDD型バグ修正ワークフロー（再現テスト→根本原因特定→最小修正→副作用確認）
 
