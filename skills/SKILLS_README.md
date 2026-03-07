@@ -42,6 +42,12 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 |---------|-------------|------|
 | [skills-review-skill-enterprise-readiness](skills-review-skill-enterprise-readiness/) | エンタープライズ適合評価 | 34項目チェックリストによる企業導入準備評価 |
 
+### エージェント UX スキル
+
+| Skill名 | ワークフロー | 説明 |
+|---------|-------------|------|
+| [agent-explain-on-demand](agent-explain-on-demand/) | Explain on Demand | 動作・モード・変更点・能力をオンデマンドで説明（短答先出し） |
+
 ### Git/GitHub/Issue ワークフロースキル（移行済み・リネーム済み）
 
 | Skill名 | ワークフロー | 行数 | 状態 |

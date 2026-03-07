@@ -20,9 +20,9 @@ GitHub Copilot Agent Skillsのコレクション
 |---------|------|--------|------|
 | `copilot/` | グローバル開発憲法（copilot-instructions.md） | グローバル（~/.copilot/） | [copilot-instructions.md](copilot/copilot-instructions.md) |
 | `agents/` | 師範エージェント（dotnet/python/typescript/skill） | グローバル（~/.copilot/agents/） | [下記参照](#-agents) |
-| `skills/` | Skill作成支援 + Git/GitHub ワークフロー（18） | グローバル（~/.copilot/skills/） | [SKILLS_README.md](skills/SKILLS_README.md) |
-| `dotnet/` | .NET/C# WPF開発ワークフロー（10） | プロジェクト（.github/skills/） | [下記参照](#-dotnet-skills) |
-| `production/` | MVP/本番向け開発プラクティス（1） | プロジェクト（.github/skills/） | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
+| `skills/` | Skill作成支援 + Git/GitHub ワークフロー | グローバル（~/.copilot/skills/） | [SKILLS_README.md](skills/SKILLS_README.md) |
+| `dotnet/` | .NET/C# WPF開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#-dotnet-skills) |
+| `production/` | MVP/本番向け開発プラクティス | プロジェクト（.github/skills/） | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
 
 ### 📌 今後追加予定のカテゴリ
 
@@ -306,6 +306,22 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - **[skills/SKILLS_README.md](skills/SKILLS_README.md)** - Skills詳細情報・一覧
 - **[production/PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md)** - Production Skills詳細情報
 
+### 💬 エージェントの動作を知りたいとき
+
+モードを宣言しなくても大丈夫です。気になったときに、そのまま聞いてください。
+
+| こんなとき | 話しかけ方の例 |
+|-----------|-------------|
+| 何をしているか分からない | `今何してる？` / `動作がよく分からない` |
+| 使えるモードを知りたい | `モードの説明をして` / `どんな動き方ができる？` |
+| モデルの切り替わり方を知りたい | `モデルは固定？` / `さっきSonnet 4.6だったのはなぜ？` |
+| アップデートで変わった点を知りたい | `最近何が変わった？` / `updateで何が変わった？` |
+| エージェント自体について知りたい | `あなたについて教えて` / `何ができる？` |
+
+エージェントは **短い答えを先に返し、詳しく聞かれたら掘り下げます**。  
+たとえばモデルについて聞かれたら、`/model` で切り替える通常の仕組みと、sub-agent 呼び出し時にその回だけ `model` 指定で上書きできるケースを分けて説明します。  
+詳細は [`skills/agent-explain-on-demand/`](skills/agent-explain-on-demand/) を参照してください。
+
 ## 📋 Architecture Decision Records (ADR)
 
 設計判断の記録は `docs/adr/` に保存しています。
@@ -357,7 +373,7 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - validate_skill.py v4.1.0（ルーター/ワークフロー/レガシー3モード対応）
 - DDD命名規則 `<context>-<workflow>` を導入
 - **dotnetカテゴリ追加**: WPF/Oracle/.NET C#スキル10種を追加
-- Skills総数: 18 + dotnet 10 + production 1
+- Skills総数: skills / dotnet / production の各カテゴリ配下を参照
 
 ### v1.1.0 (2026-02-13)
 - Productionカテゴリを追加
