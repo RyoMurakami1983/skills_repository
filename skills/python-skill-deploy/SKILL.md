@@ -249,7 +249,7 @@ Use when the copy step is complete and the user needs confirmation plus next act
 ### Self-Review Checklist
 
 - [ ] The command uses either `Deploy-PythonSkills.ps1` or `Deploy-PythonSkills.sh`
-- [ ] `-SourceRoot` points to `python/`, not another category directory
+- [ ] Source root flag (`-SourceRoot` or `--source-root`) points to `python/`, not another category directory
 - [ ] The copy summary matches expected deployed skills
 - [ ] The target `.github/skills/` directories were listed after deployment
 

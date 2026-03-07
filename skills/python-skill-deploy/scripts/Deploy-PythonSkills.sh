@@ -51,20 +51,47 @@ parse_args() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --source-root)
+                if [[ $# -lt 2 || "$2" == --* ]]; then
+                    echo "--source-root requires a value." >&2
+                    usage >&2
+                    exit 1
+                fi
                 SOURCE_ROOT="$2"
                 shift 2
                 ;;
             --target)
+                if [[ $# -lt 2 || "$2" == --* ]]; then
+                    echo "--target requires a value." >&2
+                    usage >&2
+                    exit 1
+                fi
                 TARGET="$2"
                 shift 2
                 ;;
             --category)
+                if [[ $# -lt 2 || "$2" == --* ]]; then
+                    echo "--category requires a value." >&2
+                    usage >&2
+                    exit 1
+                fi
                 CATEGORY="$2"
                 shift 2
                 ;;
             --skills)
-                IFS=',' read -r -a parsed <<< "$2"
-                REQUESTED_SKILLS+=("${parsed[@]}")
+                if [[ $# -lt 2 || "$2" == --* ]]; then
+                    echo "--skills requires a value." >&2
+                    usage >&2
+                    exit 1
+                fi
+                local IFS=','
+                read -r -a parsed <<< "$2"
+                local trimmed_parsed=()
+                for skill in "${parsed[@]}"; do
+                    skill="${skill#"${skill%%[![:space:]]*}"}"
+                    skill="${skill%"${skill##*[![:space:]]}"}"
+                    trimmed_parsed+=("$skill")
+                done
+                REQUESTED_SKILLS+=("${trimmed_parsed[@]}")
                 shift 2
                 ;;
             --list)
@@ -241,7 +268,7 @@ if [[ -z "$SOURCE_ROOT" ]]; then
 fi
 
 if [[ ! -d "$SOURCE_ROOT" ]]; then
-    echo "SourceRoot not found: $SOURCE_ROOT" >&2
+    echo "--source-root directory not found: $SOURCE_ROOT" >&2
     exit 1
 fi
 

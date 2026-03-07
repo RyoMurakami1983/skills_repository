@@ -249,7 +249,7 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 ### Self-Review Checklist
 
 - [ ] `Deploy-PythonSkills.ps1` または `Deploy-PythonSkills.sh` を使っている
-- [ ] `-SourceRoot` が `python/` を指している
+- [ ] ソースルート（`-SourceRoot` / `--source-root`）が `python/` を指している
 - [ ] サマリー出力が期待した配布対象と一致している
 - [ ] 配布後にターゲット `.github/skills/` を一覧表示して確認した
 
