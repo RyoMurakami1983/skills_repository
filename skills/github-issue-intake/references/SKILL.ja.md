@@ -59,7 +59,7 @@ metadata:
 
 ```text
 # ✅ CORRECT - スコープ外はIssue化
-Issue: "Bug: CSV import fails on UTF-8 BOM"
+Issue: "🟡 CSV import: UTF-8 BOM を受け付けない"
 Scope: 現PRでは不要
 Action: Issueを作成して続行
 
@@ -103,6 +103,7 @@ optimizer_project の internal_function_name バグ修正時に実践。
 ### Step 2: タイトルと本文を書く（または既存Issueを具体化する）
 
 検索しやすいタイトルと、構造化された本文を書きます。曖昧Issueはここで「目的・範囲・DoD」が分かる形に書き直します。
+このリポジトリでは、Issue のタイトルと本文は日本語を既定にします。認知しやすさを優先し、固有名詞・CLI コマンド・コード識別子・外部サービス名は必要に応じて英語のまま残します。
 
 #### 推奨: タイトルの優先度マーカー（カラー丸）
 
@@ -116,29 +117,26 @@ optimizer_project の internal_function_name バグ修正時に実践。
 | 🔵 | Low / P3 | 軽微/整理 |
 
 例：
-- `🟡 validate_skill.py: Workflow/Router向けにセクション抽出を堅牢化`
-- `🟢 Windows: UTF-8 入出力（PowerShell/gh/python）の標準化`
+- `🟡 validate_skill.py: Workflow/Router向けのセクション抽出を堅牢化する`
+- `🟢 github-issue-intake: Issueは日本語で起票する方針を明記する`
 
 #### 本文テンプレ
 
 ```markdown
-Title: "🟡 Bug: CSV import fails on UTF-8 BOM"
+Title: "🟢 github-issue-intake: Issueは日本語で起票する方針を明記する"
 
-## Summary
-CSV import rejects files with UTF-8 BOM encoding.
+## 背景
+Issue #123 / #124 を英語で起票した後、日本語へ修正する手戻りが発生した。
 
-## Steps to Reproduce
-1. Upload CSV with UTF-8 BOM
-2. Click Import
+## 問題
+Issue の言語方針が明文化されておらず、起票者ごとに英語 / 日本語が揺れる。
 
-## Expected Result
-Import succeeds.
+## 提案
+このリポジトリでは Issue を日本語で起票する方針を `github-issue-intake` に追記する。
 
-## Actual Result
-"Invalid encoding" error displayed.
-
-## Impact
-Blocks users with Excel-exported CSVs.
+## Definition of Done
+- [ ] 日本語起票ルールが明記されている
+- [ ] 英語併記を許容する条件が分かる
 ```
 
 **注意（Markdownの罠）**: 本文内で `<path>` のような表記はHTMLタグ扱いで消える場合があります。`PATH` / `FILE` のようなプレースホルダにするか、フェンス付きコードブロックを使ってください。
@@ -158,7 +156,7 @@ Blocks users with Excel-exported CSVs.
 
 ```yaml
 # ✅ CORRECT
-labels: [bug, priority/P1, area/import]
+labels: [t/bug, p/high, a/import]
 
 # ❌ WRONG
 labels: []
@@ -195,13 +193,13 @@ Log: 2026-02-12T12:03:11Z ERROR import failed (BOM detected)
 ```bash
 # 新規作成
 gh issue create \
-  --title "🟡 Bug: CSV import fails on UTF-8 BOM" \
+  --title "🟢 github-issue-intake: Issueは日本語で起票する方針を明記する" \
   --body-file issue.md \
-  --label bug,priority/P1,area/import \
+  --label t/chore,p/medium,a/skills \
   --assignee @me
 
 # 更新（具体化）
-gh issue edit 123 --title "🟢 Windows: UTF-8 入出力の標準化" --body-file issue.md
+gh issue edit 123 --title "🟢 Windows: UTF-8 入出力の標準化を行う" --body-file issue.md
 ```
 
 #### Windows / PowerShell: 最も安全な body-file 手順（UTF-8）
@@ -210,8 +208,8 @@ PowerShellで `--body` に長文を直接渡すと、クォート崩れやハン
 
 ```powershell
 $bodyLines = @(
-  '## 背景 / 問題',
-  '- ...',
+  '## 背景',
+  '- 英語 Issue を後から日本語へ直す手戻りが発生した',
   '',
   '## Definition of Done (DoD)',
   '- [ ] ...'
@@ -262,7 +260,10 @@ Fixes owner/repo#123
 ## ベストプラクティス
 
 - **「分からないIssue」を放置しない**：背景→目的→スコープ→DoD に整形して具体化する
+- このリポジトリでは、日本語タイトル・日本語本文を既定にする
+- ただし固有名詞・CLI コマンド・コード識別子・外部サービス名は、認知しやすさを優先して英語併記または英語のままでもよい
 - タイトルの優先度マーカー（🔴🟡🟢🔵）をチームで統一する
+- タイトルでは `標準化する`、`明記する`、`棚卸しする` のような明示的な日本語の動詞を使う
 - 1 Issue = 1 問題に絞る
 - トリアージ前に影響度と優先度を付ける
 - 可能な限り再現手順か証拠を記載
@@ -277,6 +278,7 @@ Fixes owner/repo#123
 - 1つのIssueに複数の問題を混在させる
 - PowerShellで `gh issue edit --body ...` に長文を直接渡す
 - `<PATH>` のような表記が本文から消える（HTMLタグ扱い）
+- リポジトリ内で英語起票と日本語起票が混在し、後から言語統一の手戻りが発生する
 
 Fix: 標準テンプレートを使い、スコープ別にIssueを分割する。
 Fix: 再現手順か証拠リンクを必ず追加する。
@@ -300,6 +302,12 @@ A: 修正がスコープ外、またはタイムボックスを超える場合�
 **Q: 既存Issueが曖昧で分からないときは？**
 A: コメントで済ませず、title/bodyを具体化（背景・目的・DoD）して「次の人が動ける」状態にする。
 
+**Q: このリポジトリのIssueは日本語と英語のどちらで書くべき？**
+A: 既定は日本語。固有名詞・CLI コマンド・コード識別子・外部サービス名は、認知しやすさを優先して英語のまま使ってよい。
+
+**Q: 最低限必要なラベルは？**
+A: 少なくとも種別ラベル（`t/*`）を1つと、優先度ラベル（`p/*`）を1つ付ける。
+
 ---
 
 ## クイックリファレンス
@@ -314,5 +322,23 @@ A: コメントで済ませず、title/bodyを具体化（背景・目的・DoD�
 | 5 | CLIで作成/更新（`--body-file`） | 高速で安全 |
 | 6 | Web UIで作成 | リッチフォーマット |
 | 7 | PRにリンク | マージで自動クローズ |
+
+---
+```bash
+# CLI で新規作成
+gh issue create --title "🟢 改善: ..." --body-file issue.md --label t/feature,p/medium,a/skills
+
+# CLI で更新
+gh issue edit 123 --title "🟢 〜を明記する" --body-file issue.md
+```
+
+---
+
+## Resources
+
+- [About issues](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues)
+- [Closing issues with keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue)
+- [GitHub CLI issue create](https://cli.github.com/manual/gh_issue_create)
+- [GitHub CLI issue edit](https://cli.github.com/manual/gh_issue_edit)
 
 ---

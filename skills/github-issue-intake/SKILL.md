@@ -59,7 +59,7 @@ Determine whether to fix inline or defer. Use a simple decision matrix based on 
 
 ```text
 # ✅ CORRECT - File issue when out of scope
-Issue: "Bug: CSV import fails on UTF-8 BOM"
+Issue: "🟡 CSV import: UTF-8 BOM を受け付けない"
 Scope: Not required for current PR
 Action: Create issue and continue
 
@@ -102,6 +102,7 @@ See: (private repo / internal PR)
 ### Step 2: Write (or Refactor) Title and Body
 
 Write a clear, searchable title and a structured body.
+In this repository, default to Japanese issue titles and bodies. Keep proper nouns, CLI commands, code identifiers, and external service names in English when that improves recognition.
 
 #### Recommended: priority markers in the title
 
@@ -115,31 +116,28 @@ Use color-circle markers for quick scanning during triage. Keep labels as the so
 | 🔵 | Low / P3 | Minor / cleanup |
 
 Examples:
-- `🟡 validate_skill.py: Harden section extraction for Workflow/Router`
-- `🟢 Windows: Standardize UTF-8 I/O (PowerShell/gh/python)`
+- `🟡 validate_skill.py: Workflow/Router向けのセクション抽出を堅牢化する`
+- `🟢 github-issue-intake: Issueは日本語で起票する方針を明記する`
 
 #### Body template
 
-A good title starts with `Bug:`, `Feature:`, or `Chore:` (or uses the marker + component style above) and is followed by a specific description.
+A good title in this repository uses a priority marker plus a short Japanese summary. Keep English only where it improves recognition, such as product names, CLI commands, or code identifiers.
 
 ```markdown
-Title: "🟡 Bug: CSV import fails on UTF-8 BOM"
+Title: "🟢 github-issue-intake: Issueは日本語で起票する方針を明記する"
 
-## Summary
-CSV import rejects files with UTF-8 BOM encoding.
+## 背景
+Issue #123 / #124 を英語で起票した後、日本語へ修正する手戻りが発生した。
 
-## Steps to Reproduce
-1. Upload CSV with UTF-8 BOM
-2. Click Import
+## 問題
+Issue の言語方針が明文化されておらず、起票者ごとに英語 / 日本語が揺れる。
 
-## Expected Result
-Import succeeds.
+## 提案
+このリポジトリでは Issue を日本語で起票する方針を `github-issue-intake` に追記する。
 
-## Actual Result
-"Invalid encoding" error displayed.
-
-## Impact
-Blocks users with Excel-exported CSVs.
+## Definition of Done
+- [ ] 日本語起票ルールが明記されている
+- [ ] 英語併記を許容する条件が分かる
 ```
 
 **Note (Markdown gotcha)**: Avoid placeholders like `<path>` in issue bodies — they may be treated as HTML tags and disappear. Prefer `PATH` / `FILE` or fenced code blocks.
@@ -159,7 +157,7 @@ Assign labels for type, priority, and area so the backlog is sortable. At minimu
 
 ```yaml
 # ✅ CORRECT
-labels: [bug, priority/P1, area/import]
+labels: [t/bug, p/high, a/import]
 
 # ❌ WRONG
 labels: []
@@ -196,13 +194,13 @@ Use `gh issue create` for fast, repeatable creation, and `gh issue edit` to refa
 ```bash
 # Create
 gh issue create \
-  --title "🟡 Bug: CSV import fails on UTF-8 BOM" \
+  --title "🟢 github-issue-intake: Issueは日本語で起票する方針を明記する" \
   --body-file issue.md \
-  --label bug,priority/P1,area/import \
+  --label t/chore,p/medium,a/skills \
   --assignee @me
 
 # Edit
-gh issue edit 123 --title "🟢 Windows: Standardize UTF-8 I/O" --body-file issue.md
+gh issue edit 123 --title "🟢 Windows: UTF-8 入出力の標準化を行う" --body-file issue.md
 ```
 
 #### Windows / PowerShell: safest body-file approach (UTF-8)
@@ -211,8 +209,8 @@ Avoid passing large multiline strings via `--body` (quoting can break or hang). 
 
 ```powershell
 $bodyLines = @(
-  '## Background',
-  '- ...',
+  '## 背景',
+  '- 英語 Issue を後から日本語へ直す手戻りが発生した',
   '',
   '## Definition of Done (DoD)',
   '- [ ] ...'
@@ -263,8 +261,10 @@ Fixes owner/repo#123
 ## Best Practices
 
 - Refactor unclear issues into an actionable format (Background → Goal → Scope → DoD)
+- In this repository, default to Japanese issue titles and bodies
+- Keep proper nouns, CLI commands, code identifiers, and service names in English when that improves recognition
 - Use the priority marker scheme (🔴🟡🟢🔵) consistently in titles
-- Use action verbs in titles (Fix, Add, Remove)
+- Use explicit Japanese action phrases in titles when helpful (for example: `標準化する`, `明記する`, `棚卸しする`)
 - Keep one issue per problem
 - Add impact and priority before triage meetings
 - Include repro steps or evidence whenever possible
@@ -280,6 +280,7 @@ Fixes owner/repo#123
 - Mixing multiple problems into one issue
 - Passing long bodies via `gh issue edit --body ...` on PowerShell
 - Using placeholders like `<PATH>` that may disappear in Markdown rendering
+- Mixing English-first and Japanese-first issue styles in the same repository without a policy
 
 Fix: Use the standard template and split issues by scope.
 Fix: Always add repro steps or evidence links.
@@ -301,7 +302,10 @@ Fix: Prefer `--body-file` with UTF-8 for CLI edits.
 A: File an issue when the fix is out of scope or exceeds your timebox.
 
 **Q: What labels are mandatory?**
-A: At minimum, include type and priority labels.
+A: At minimum, include one type label (`t/*`) and one priority label (`p/*`).
+
+**Q: Should issues in this repository be written in Japanese or English?**
+A: Default to Japanese for titles and bodies. Keep proper nouns, CLI commands, code identifiers, and external service names in English when that improves recognition.
 
 **Q: Can I edit existing issues to make them clearer?**
 A: Yes — treat it as backlog maintenance. Update title/body (and add DoD) so the next owner can act without questions.
@@ -323,10 +327,10 @@ A: Yes — treat it as backlog maintenance. Update title/body (and add DoD) so t
 
 ```bash
 # CLI quick create
-gh issue create --title "🟡 Bug: ..." --body-file issue.md --label bug,priority/P1
+gh issue create --title "🟢 改善: ..." --body-file issue.md --label t/feature,p/medium,a/skills
 
 # CLI quick edit
-gh issue edit 123 --title "🟢 ..." --body-file issue.md
+gh issue edit 123 --title "🟢 〜を明記する" --body-file issue.md
 ```
 
 ---
