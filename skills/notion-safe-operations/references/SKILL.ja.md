@@ -65,7 +65,7 @@ notion-notion-fetch(id="collection://<your-data-source-id>")
 | シグナル | 判断 |
 |---|---|
 | fetch成功 | Step 2へ進む |
-| "unauthorized" / "401" / "authentication" を含むエラー | 認証切れ → ユーザーに `/mcp r` を実行するよう案内 |
+| "unauthorized" / "401" / "authentication" を含むエラー | 認証切れ → ユーザーに `/mcp r` を実行するよう案内 → 再認証後に Step 1 を再実行 |
 | ツール未検出/その他失敗 | Step 5フォールバックへ |
 
 **なぜ？** `/mcp show` で見えても、実行コンテキストで呼べない場合があるため。

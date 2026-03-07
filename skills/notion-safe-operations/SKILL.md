@@ -65,7 +65,7 @@ notion-notion-fetch(id="collection://<your-data-source-id>")
 | Signal | Decision |
 |---|---|
 | Fetch succeeds | Continue to Step 2 |
-| Error contains "unauthorized" / "401" / "authentication" | Auth expired → ask user to run `/mcp r` then retry |
+| Error contains "unauthorized" / "401" / "authentication" | Auth expired → ask user to run `/mcp r`, then re-run the Step 1 preflight fetch (retry Step 1) |
 | Tool missing / fetch fails (other) | Stop writes and use Step 5 fallback |
 
 Why: `/mcp show` can list integrations while current runtime still cannot invoke the tool.
@@ -201,7 +201,7 @@ Why: a structured fallback preserves momentum even when tools are unstable.
 | DS ID unknown | Run Step 2 resolution flow |
 | Property error occurs | Re-run Step 3 schema check |
 | Auth expired (401 / unauthorized) | Run `/mcp r` to re-authenticate, then retry Step 1 |
-| Tool call fails in runtime | Use Step 5 fallback payload |
+| Tool call fails in runtime (non-auth error) | Use Step 5 fallback payload |
 
 ### Minimal Checklist
 
