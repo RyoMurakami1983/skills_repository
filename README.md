@@ -204,6 +204,19 @@ production/ や言語別Skillsは、プロジェクトの`.github/skills/`にコ
     -Category dev-env
 ```
 
+```bash
+# WSL/bash からカテゴリ一覧を表示
+"$SKILLS_REPO/skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh" \
+  --source-root "$SKILLS_REPO/python" \
+  --list
+
+# WSL/bash から Python 開発環境スキルをデプロイ
+"$SKILLS_REPO/skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh" \
+  --source-root "$SKILLS_REPO/python" \
+  --target /path/to/my-project \
+  --category dev-env
+```
+
 **productionスキルの手動コピー**:
 
 ```bash
