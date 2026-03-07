@@ -95,7 +95,7 @@ if ($List) {
     Write-Host "`n=== Available Python Skill Categories ===" -ForegroundColor Cyan
     Write-Host ""
 
-    $listCategories = @('dev-env', 'all')
+    $listCategories = @($CategoryMap.Keys) + 'all'
     foreach ($cat in $listCategories) {
         $skillsInCategory = @(Resolve-CategorySkills -CategoryName $cat -AvailableSkills $AvailableSkills)
         $label = switch ($cat) {
