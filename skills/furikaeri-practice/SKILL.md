@@ -273,6 +273,12 @@ Invoke `notion-safe-operations` and pass this mapped content into the create-pag
 
 Use when finishing any furikaeri in this workspace or team context. Enables long-term trend tracking.
 
+> **Completion gate (default)**: Do not end a furikaeri after Step 5 alone. Treat the session as complete only when **both** of the following are done:
+> 1. Prioritized actions are converted into GitHub Issues (or explicitly declined with a reason) in **Step 6a**
+> 2. The furikaeri record is saved in Notion when **Step 6b** applies
+>
+> If Step 6b does not apply in the current context, still finish Step 6a and explicitly record where the retrospective note will live.
+
 > **Values**: 継続は力 / 成長の複利 / 基礎と型
 
 ### Step 7: Anonymization Gate (Before Output)
@@ -289,6 +295,7 @@ If the furikaeri content may flow into a public skill or reference, apply the `k
 - Use KPT for problem-focused sessions, YWT for learning-focused ones
 - Write down action items immediately — don't rely on memory
 - Link action items to GitHub Issues for tracking
+- Treat **Issue creation + note persistence** as the default finish line, not optional cleanup
 - Review previous furikaeri notes before starting a new one
 
 ## Common Pitfalls
@@ -307,6 +314,9 @@ If the furikaeri content may flow into a public skill or reference, apply the `k
 
 5. **Never reviewing past furikaeri**
    Fix: Spend 1 minute reading the previous session's notes before starting.
+
+6. **Stopping after analysis**
+   Fix: Do not finish at Step 5. Close the loop with Issue registration and note persistence in Step 6.
 
 ## Anti-Patterns
 
@@ -388,13 +398,13 @@ A: 5–10 minutes for a solo AI session. 15–30 minutes for a team session.
 A: KPT for problem-solving sessions, YWT for learning-focused ones. Try both and see what fits.
 
 **Q: Do I need to do all 7 steps every time?**
-A: Steps 1–3, 5, and 6 are recommended for most sessions. Step 4 (5 Whys + SMART) is for complex or recurring problems, and Step 7 (Anonymization Gate) is required only when content may be published/shared.
+A: In most sessions, treat Steps 1–3, 5, and 6 as the default path. Step 4 (5 Whys + SMART) is for complex or recurring problems, and Step 7 (Anonymization Gate) is required only when content may be published/shared. In practice, do not consider the furikaeri complete until Step 6 is finished.
 
 **Q: What if nothing went wrong?**
 A: Great sessions still have Keep items and Try items. "What could be even better?" always yields insights.
 
 **Q: Should I store furikaeri notes somewhere?**
-A: Yes. For `RyoMurakami1983` sessions, save to your designated private Notion database for furikaeri logs via Step 6b. For other contexts, create a GitHub Issue with the `furikaeri` label, or keep a `FURIKAERI.md` in your project.
+A: Yes. For `RyoMurakami1983` sessions, save to your designated private Notion database for furikaeri logs via Step 6b. For other contexts, create GitHub Issues for follow-up actions and keep the retrospective note in a durable place (for example, a project note or agreed team workspace). Do not treat the session as done until action tracking and note storage are both handled.
 
 ---
 
