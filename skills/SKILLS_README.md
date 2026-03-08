@@ -60,12 +60,9 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 | [github-issue-intake](github-issue-intake/) | Capture Deferred Work as Issues | ✅ 移行済み |
 | [skills-revise-skill](skills-revise-skill/) | Revise and Version Skills | ✅ 移行済み |
 
-### アーカイブ済みスキル
+### 削除済み旧スキル
 
-| Skill名 | 説明 | 状態 |
-|---------|------|------|
-| skill-git-review-standards | Gitレビュー標準 | 📦 アーカイブ（archive/） |
-| skill-git-history-learning | Git履歴学習 | 📦 アーカイブ（archive/） |
+- Git系の旧 archive skill は、現行の `git-commit-practices` / `github-pr-workflow` / `github-pr-review-response` へ整理済み
 
 ## 🔧 依存関係
 

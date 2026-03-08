@@ -333,7 +333,7 @@
 
 ### Values: 成長の複利 / 基礎と型
 
-詳細は `skills/skill-git-commit-practices`、`skills/skill-github-pr-workflow`、`skills/skill-git-review-standards` を参照してください。
+詳細は `skills/git-commit-practices` と `skills/github-pr-workflow` を参照してください。
 
 **要点**:
 - ✅ **Conventional Commits形式**を使用
@@ -436,7 +436,7 @@
 ## 🔗 関連ドキュメント
 
 - **要約版**: `.github/copilot-instructions.md` - Copilotが常に参照
-- **実践ガイド**: `skills/skill-git-commit-practices` / `skills/skill-github-pr-workflow` / `skills/skill-git-review-standards` / `skills/skill-git-history-learning` - Git運用の詳細
+- **実践ガイド**: `skills/git-commit-practices` / `skills/github-pr-workflow` - Git運用の詳細
 - **品質基準**: `skill-quality-gaps-analysis.md` - スキル品質分析
 
 ---

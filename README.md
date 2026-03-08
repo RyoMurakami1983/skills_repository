@@ -388,7 +388,7 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - `session-issue-autopilot` は上記を包む高レベルセッションオーケストレーター
 
 **後方互換メモ**:
-- 旧ルータースキル/統合元スキルの `SKILL.md` は `archive/phase3-deprecated/` に移動済み
+- 旧ルータースキル/統合元スキルの内容は、現行の `skills/` 配下へ整理・統合済み
 - `skill-quality-validation/scripts/validate_skill.py` は現行検証スクリプトとして維持
 
 ## 🤖 Agents

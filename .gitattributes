@@ -42,6 +42,8 @@
 .gitignore text eol=lf
 .gitattributes text eol=lf
 .editorconfig text eol=lf
+*.toml text eol=lf
+*.lock text eol=lf
 
 # Binary files
 *.png binary
