@@ -156,18 +156,19 @@ Use when validation is green. Why: Option A keeps one canonical PR creation + wa
 
 Immediately after PR creation, keep an explicit waiting artifact active (for example, `pr-<number>-review-wait`) so review waiting remains a tracked task instead of disappearing into implicit session state.
 
-Run a bounded short observation window only once, immediately after PR creation:
+Run a bounded short observation window automatically only once, immediately after PR creation:
 - Check for a real review signal at most once per minute
 - Stop after 7 minutes maximum if no signal arrives
 - Treat this as a short post-creation observation window, not open-ended polling
+- Allow any later additional checks only when the user explicitly asks for them
 
 If a review, review request, or explicit user signal arrives during that window, hand off to `github-pr-review-response`.
 
 If no signal arrives after 7 minutes:
-- stop polling
+- stop automatic polling
 - report `review-wait continues`
 - keep `pr-<number>-review-wait` (or equivalent explicit waiting artifact) active
-- switch to user-waiting mode
+- wait for explicit user instruction before resuming or ending the workflow
 - do **not** call task completion for the overall workflow
 
 ```markdown
