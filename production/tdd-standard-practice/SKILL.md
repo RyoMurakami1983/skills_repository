@@ -30,9 +30,9 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skill-git-commit-practices`** - Commit hygiene for small safe steps
-- **`skill-git-review-standards`** - Review quality and evidence checks
-- **`skill-issue-intake`** - Capture deferred test debt as issues
+- **`git-commit-practices`** - Commit hygiene for small safe steps
+- **`github-pr-workflow`** - Open review-ready PRs with clear test evidence
+- **`github-issue-intake`** - Capture deferred test debt as issues
 
 ---
 

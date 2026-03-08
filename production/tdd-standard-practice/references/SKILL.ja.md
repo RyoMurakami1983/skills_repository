@@ -30,9 +30,9 @@ Reason: フィードバックが短いほど不安が減り、変更の安全性
 
 ## 関連スキル
 
-- **`skill-git-commit-practices`** - 小さな変更を安全にコミット
-- **`skill-git-review-standards`** - レビューでテスト証跡を確認
-- **`skill-issue-intake`** - テスト負債をIssue化
+- **`git-commit-practices`** - 小さな変更を安全にコミット
+- **`github-pr-workflow`** - テスト証跡を明記したレビュー準備済みPRを作成
+- **`github-issue-intake`** - テスト負債をIssue化
 
 ---
 
