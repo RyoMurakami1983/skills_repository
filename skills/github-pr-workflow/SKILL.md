@@ -319,7 +319,7 @@ Use when one PR from a parallel set has merged and other review branches still r
 ## Common Pitfalls
 
 1. **PR body written in English**
-   Fix: Use the team's Japanese PR template heading order—Summary, Reason, Test, Related—in that sequence.
+   Fix: Use the team's Japanese PR template heading order shown in Step 3, not the English Summary/Reason/Test/Related sequence.
 
 2. **Missing issue link**
    Fix: Always include `Closes #N` in the Related section.

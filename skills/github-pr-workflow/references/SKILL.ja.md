@@ -1,6 +1,6 @@
 ---
 name: github-pr-workflow
-description: "実装の検証が終わり、ブランチ状態の確認からPR作成・レビュー待機・人間へのマージ引き継ぎまで標準フローで進めたいときに使用します。Use when 実装からPRハンドオフまでを標準化したいとき。"
+description: "実装の検証が終わり、ブランチ状態の確認からPR作成・レビュー待機・人間へのマージ引き継ぎまで標準フローで進めたいときに使用します。"
 metadata:
   author: RyoMurakami1983
   tags: [github, pull-requests, workflow, git, pr-create]

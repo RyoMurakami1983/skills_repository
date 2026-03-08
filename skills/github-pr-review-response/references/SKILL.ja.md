@@ -1,6 +1,6 @@
 ---
 name: github-pr-review-response
-description: "Use when PRレビューのシグナルが届き、コメント分類から再レビュー依頼・人間へのマージ引き継ぎまで標準フローで対応したいとき。"
+description: "PRレビューのシグナルが届き、コメント分類から再レビュー依頼・人間へのマージ引き継ぎまで標準フローで対応したいときに使用します。"
 license: MIT
 compatibility:
   platforms: [windows, macos, linux]

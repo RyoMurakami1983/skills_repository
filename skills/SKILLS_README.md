@@ -50,15 +50,15 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 
 ### Git/GitHub/Issue ワークフロースキル（移行済み・リネーム済み）
 
-| Skill名 | ワークフロー | 行数 | 状態 |
-|---------|-------------|------|------|
-| [git-commit-practices](git-commit-practices/) | Write Quality Commits | 228 | ✅ 移行済み |
-| [git-initial-setup](git-initial-setup/) | Protect Main Branch | 276 | ✅ 移行済み |
-| [github-pr-workflow](github-pr-workflow/) | Ship via Pull Request | 419 | ✅ 標準PR作成 + 待機 |
-| [github-pr-review-response](github-pr-review-response/) | Respond to PR Review | 484 | ✅ 標準レビュー応答 |
-| [session-issue-autopilot](session-issue-autopilot/) | Run Session Issue Autopilot | 289 | ✅ セッションラッパー |
-| [github-issue-intake](github-issue-intake/) | Capture Deferred Work as Issues | 269 | ✅ 移行済み |
-| [skills-revise-skill](skills-revise-skill/) | Revise and Version Skills | 312 | ✅ 移行済み |
+| Skill名 | ワークフロー | 状態 |
+|---------|-------------|------|
+| [git-commit-practices](git-commit-practices/) | Write Quality Commits | ✅ 移行済み |
+| [git-initial-setup](git-initial-setup/) | Protect Main Branch | ✅ 移行済み |
+| [github-pr-workflow](github-pr-workflow/) | Ship via Pull Request | ✅ 標準PR作成 + 待機 |
+| [github-pr-review-response](github-pr-review-response/) | Respond to PR Review | ✅ 標準レビュー応答 |
+| [session-issue-autopilot](session-issue-autopilot/) | Run Session Issue Autopilot | ✅ セッションラッパー |
+| [github-issue-intake](github-issue-intake/) | Capture Deferred Work as Issues | ✅ 移行済み |
+| [skills-revise-skill](skills-revise-skill/) | Revise and Version Skills | ✅ 移行済み |
 
 ### アーカイブ済みスキル
 
