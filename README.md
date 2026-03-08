@@ -89,6 +89,31 @@ uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\
 
 > 📖 Windows固有の設定（UTF-8、改行コード等）は [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md) を参照
 
+### README / ドキュメント更新前の軽量チェック
+
+README や手順書を更新したら、PR 前に次を確認します。
+
+- [ ] **内部アンカー**: 変更した README 内リンクが GitHub の自動アンカーと一致している
+- [ ] **前提ツール**: 追加したコマンドに必要な CLI / 実行環境（例: `git`, `node`, `npm`, `uv`, `gh`, `wsl`, `rsync`）を明記した
+- [ ] **可変パス**: 運用コマンドは固定パスの直書きではなく `SKILLS_REPO` / `$env:SKILLS_REPO` などの変数を優先した
+- [ ] **コピペ実行性**: 変更したコマンドを想定シェルで少なくとも 1 回は実行確認した
+- [ ] **差分健全性**: 空白・改行崩れがない
+
+軽量な確認コマンド例:
+
+```bash
+npm run lint:text
+git diff --check -- README.md
+grep -n '\](#' README.md
+command -v git node npm uv gh rsync grep
+```
+
+```powershell
+Get-Command git, node, npm, uv, gh, wsl -ErrorAction Stop | Select-Object Name, Source
+```
+
+> 内部リンクは GitHub 上でクリック確認するのが確実です。README の見出しに絵文字があっても、リンク先は `#agents` / `#dotnet-skills` のような GitHub 自動アンカーに合わせてください。
+
 ### 🗃️ ローカル参照ディレクトリ運用
 
 - `local_reference_skills/`: 外部skillの一時参照置き場（開発時のみ使用）
@@ -207,14 +232,12 @@ Set-Location $env:SKILLS_REPO
 git pull --ff-only
 
 $skillsRepoWsl = wsl wslpath -a "$env:SKILLS_REPO"
-
-wsl bash -lc 'mkdir -p ~/.copilot/skills ~/.copilot/agents'
-wsl bash -lc "rsync -a --delete '$skillsRepoWsl/skills/' ~/.copilot/skills/"
-wsl bash -lc "rsync -a --delete '$skillsRepoWsl/agents/' ~/.copilot/agents/"
-wsl bash -lc "cp '$skillsRepoWsl/copilot/copilot-instructions.md' ~/.copilot/copilot-instructions.md"
+wsl env "SKILLS_REPO_WSL=$skillsRepoWsl" bash -lc 'set -euo pipefail; mkdir -p ~/.copilot/skills ~/.copilot/agents; rsync -a --delete "$SKILLS_REPO_WSL/skills/" ~/.copilot/skills/; rsync -a --delete "$SKILLS_REPO_WSL/agents/" ~/.copilot/agents/; cp "$SKILLS_REPO_WSL/copilot/copilot-instructions.md" ~/.copilot/copilot-instructions.md'
 ```
 
-> `wsl ...` は既定ディストリビューション / 既定ユーザーを対象にします。複数の WSL ディストリビューションを使う場合は `wsl -d <DistroName> bash -lc '...'` を使用してください。`rsync` が未導入なら WSL 側で `sudo apt install rsync` などを先に実行します。
+> `wsl ...` は既定ディストリビューション / 既定ユーザーを対象にします。複数の WSL ディストリビューションを使う場合は `wsl -d <DistroName> env "SKILLS_REPO_WSL=..." bash -lc '...'` を使用してください。`rsync` が未導入なら WSL 側で `sudo apt install rsync` などを先に実行します。
+>
+> PowerShell の文字列へ WSL パスを直接埋め込むと、quoting の組み合わせによってコピー元が `/skills` / `/agents` として解釈されることがあります。`wsl env ... bash -lc` で WSL 側環境変数として渡す形を標準にしてください。
 
 **Windows と WSL の両方を確認**:
 
