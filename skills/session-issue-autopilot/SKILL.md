@@ -152,20 +152,36 @@ Use when validation is green. Why: Option A keeps one canonical PR creation + wa
 
 > **Values**: 基礎と型 / 温故知新
 
-### Step 7: Wait for a Review Signal, Then Delegate to `github-pr-review-response`
+### Step 7: Keep an Explicit Review-Wait Task, Observe Briefly, Then Hand Off on Signal
 
-Do not actively poll just because the PR is open. Wait for a new review, review request, or explicit user signal, then hand off to `github-pr-review-response`.
+Immediately after PR creation, keep an explicit waiting artifact active (for example, `pr-<number>-review-wait`) so review waiting remains a tracked task instead of disappearing into implicit session state.
+
+Run a bounded short observation window automatically only once, immediately after PR creation:
+- Check for a real review signal at most once per minute
+- Stop after 7 minutes maximum if no signal arrives
+- Treat this as a short post-creation observation window, not open-ended polling
+- Allow any later additional checks only when the user explicitly asks for them
+
+If a review, review request, or explicit user signal arrives during that window, hand off to `github-pr-review-response`.
+
+If no signal arrives after 7 minutes:
+- stop automatic polling
+- report `review-wait continues`
+- keep `pr-<number>-review-wait` (or equivalent explicit waiting artifact) active
+- wait for explicit user instruction before resuming or ending the workflow
+- do **not** call task completion for the overall workflow
 
 ```markdown
-Review-signal handoff:
-wait for signal
--> github-pr-review-response
--> comment triage
--> fixes and replies
--> re-review request
+Review-wait handoff:
+PR created
+-> create/keep `pr-<number>-review-wait`
+-> observe up to 7 minutes (1 check/minute max)
+-> if signal arrives: github-pr-review-response
+-> if no signal: report "review-wait continues"
+-> stop polling and wait for user instruction
 ```
 
-Use when the PR already exists and review work is triggered by a real signal. Why: signal-driven delegation keeps waiting rules aligned with the canonical PR skill pair.
+Use when the PR has just been created and review work may start soon. Why: the bounded observation window captures near-immediate review activity without violating the low-consumption waiting rule of the canonical PR review skills.
 
 > **Values**: 継続は力 / ニュートラル
 
@@ -235,6 +251,7 @@ Use when collaborative retrospective is approved. Why: recorded actions turn ref
 - Enforce one-day scope hard; split oversized issues into follow-ups.
 - Keep agent checkpoint mandatory and blocking.
 - Prefer `--body-file` for all non-trivial `gh` issue/PR/comment content.
+- Keep `pr-<number>-review-wait` (or equivalent) as an explicit active task after PR creation until a real review signal or user instruction changes the state.
 - Keep merge on GitHub human-only, then run post-merge sync only after merge confirmation
 - Keep retrospective outputs linked to concrete tracking artifacts.
 
@@ -248,9 +265,11 @@ Use when collaborative retrospective is approved. Why: recorded actions turn ref
    - Fix: require explicit user answer before Step 5.
 4. Posting multiline `gh` content inline and breaking markdown/backticks.
    - Fix: use temporary markdown files with `--body-file`.
-5. Auto-merging or syncing before human confirmation.
+5. Letting review waiting disappear after PR creation or polling indefinitely.
+   - Fix: keep an explicit review-wait task active, use only the bounded 7-minute observation window, then report `review-wait continues` and stop polling.
+6. Auto-merging or syncing before human confirmation.
    - Fix: stop at the merge gate, then verify merge confirmation and a clean tree before syncing.
-6. Running retrospective automatically without user collaboration.
+7. Running retrospective automatically without user collaboration.
    - Fix: block on Step 9 yes/no response.
 
 ## Anti-Patterns
@@ -271,7 +290,7 @@ Use when collaborative retrospective is approved. Why: recorded actions turn ref
 | Agent Checkpoint | User-selected agent (include skill-shihan) | "Which specialist should join?" |
 | Build & Validate | Branch + passing evidence | "Are validations green?" |
 | PR | Delegation to `github-pr-workflow` | "Did `github-pr-workflow` create the PR and enter review waiting?" |
-| Review Loop | Delegation to `github-pr-review-response` | "Did a real review signal arrive, and were all review threads addressed?" |
+| Review Loop | Active `pr-<number>-review-wait` + bounded 7-minute observation window, then delegation on signal | "Did a real review signal arrive within the short observation window, or did we report `review-wait continues` and stop polling?" |
 | Merge Gate | Human merge decision + safe local sync | "Has a human merged this PR already?" |
 | Retro Checkpoint | Explicit user yes/no | "Shall we run collaborative retrospective now?" |
 | KPT/YWT Record | Action items in Issue/Notion | "Were actions recorded with links?" |
