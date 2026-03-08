@@ -1,17 +1,25 @@
 ---
 name: github-pr-review-response
-description: "Systematic workflow for responding to PR review feedback. Use when addressing reviewer comments with fixes and replies."
+description: "Use when a PR review signal arrives and you need the canonical response flow from comment triage through re-review request and human merge handoff."
+license: MIT
+compatibility:
+  platforms: [windows, macos, linux]
+  tools: [github-cli, git]
 metadata:
   author: RyoMurakami1983
-  license: MIT
-  compatibility:
-    platforms: [windows, macos, linux]
-    tools: [github-cli, git]
+  tags: [github, pull-requests, review, workflow, response]
+  invocable: false
+  tool_versions:
+    git: ">=2.30"
+    gh: ">=2.0"
+  last_reviewed: "2026-03-08"
 ---
 
 # GitHub PR Review Response
 
-A single-workflow skill for systematically responding to PR (Pull Request) review feedback — from analysis through fix implementation to reviewer reply.
+A single-workflow skill for systematically responding to PR (Pull Request) review feedback — from analysis through fix implementation, reviewer reply, re-review request, and human merge handoff.
+
+Canonical route for Option A: implementation -> `github-pr-workflow` -> wait for a real review signal -> `github-pr-review-response` -> human merge decision/handoff. Enter this skill only at the highlighted response step.
 
 **Review Response**: The structured process of reading, categorizing, fixing, and replying to PR review comments.
 
@@ -47,9 +55,12 @@ Low-consumption waiting rules:
 
 Exit waiting mode when the PR is closed, merged, or no review action remains.
 
+Re-review request rule: request re-review only after new commits or substantive replies are ready. Do not ping reviewers again when nothing changed.
+
 ## Related Skills
 
-- **`github-pr-workflow`** — PR creation and issue linking (upstream workflow)
+- **`github-pr-workflow`** — PR creation, issue linking, and signal-driven review waiting (upstream workflow)
+- **`session-issue-autopilot`** — Session-level wrapper that delegates PR creation/waiting to `github-pr-workflow` and review handling to this skill
 - **`git-commit-practices`** — Commit formatting and atomic changes (delegated from Step 5)
 - **`github-issue-intake`** — Creating follow-up issues for deferred review items
 
@@ -91,6 +102,18 @@ Use this table in Step 1 to classify each comment before writing any code.
 
 ---
 
+## Responsibility Boundaries
+
+| Phase | Agent responsibility | Human responsibility |
+|---|---|---|
+| Review signal intake | Inspect the new review once and triage comments | Confirm whether the signal changes priorities |
+| Fixes and replies | Implement fixes, explain rationale, and keep evidence traceable | Judge whether the proposed response matches team expectations |
+| Re-review request | Request re-review only after actionable updates are pushed or posted | Decide whether another reviewer should be involved |
+| Merge decision | Summarize readiness only | Decide whether and when to merge on GitHub |
+
+Use when the user asks where this skill stops.
+
+> **Values**: ニュートラル / 余白の設計
 ## Workflow: PR Review Response
 
 ### Step 1: Receive and Categorize Review Comments
@@ -291,7 +314,7 @@ Use when all commits are pushed and you need to close the feedback loop.
 
 ### Step 7: Request Re-review
 
-After all comments are addressed and pushed, request a re-review from the original reviewer.
+After all comments are addressed and pushed, request a re-review from the original reviewer. Tie the request to actual updates so reviewers only get pinged when something changed.
 
 ```bash
 # Request re-review from the reviewer
@@ -325,19 +348,28 @@ gh pr edit --add-reviewer reviewer-username
 gh pr comment --body "All review comments addressed. Ready for re-review."
 ```
 
+Re-review decision table:
+
+| Situation | Request re-review? | Why |
+|---|---|---|
+| New commits or substantive replies are complete | Yes | Reviewer attention is now actionable |
+| Only acknowledgement was posted and no real update exists | No | Avoid noisy reviewer pings |
+| Another review arrives after an earlier re-review request | Return to Step 1 first | Keep each request tied to fresh work |
+
 Use when every review comment has a fix commit or a reply, and all tests pass.
 
 > **Values**: 成長の複利 / ニュートラル
 
 ### Step 8: Stop at the Human Merge Gate
 
-After requesting re-review, stop. Summarize readiness if helpful, but do not merge the PR yourself.
+After requesting re-review, return to waiting for the next real review signal or hand the PR to a human merge decision. Summarize readiness if helpful, but do not merge the PR yourself.
 
 ```markdown
 Ready for human merge decision:
 - Review comments addressed
 - Validation rerun and green
 - Re-review requested
+- Ready either for the next review signal or a human merge decision
 ```
 
 If the PR is later merged and the user explicitly asks for local cleanup, follow your repository's post-merge sync or cleanup procedure and first verify the worktree is clean.
@@ -358,6 +390,7 @@ Use when review response work is complete and the next action is a merge decisio
 - Use `gh pr review --comment` to reply directly in the review thread
 - Stop at readiness; do not merge on behalf of the user
 - Start this workflow only on a real review trigger, not on repeated idle checks
+- Request re-review only when new commits or substantive replies are ready
 - Prefer `--body-file` for multi-line review summaries and replies
 
 ---
@@ -411,6 +444,7 @@ Use when review response work is complete and the next action is a merge decisio
 
 - React to new reviews or review requests, not to an unchanged open PR
 - Batch manual checks instead of polling repeatedly
+- Request re-review only after new work is ready
 - Exit waiting mode when there is nothing new to address
 
 ### Reply Template
@@ -436,7 +470,7 @@ A: No. Push fixes to the same PR branch. This keeps the review conversation inta
 A: Acknowledge the comment, create a follow-up issue via `github-issue-intake`, and link it in your reply.
 
 **Q: Does this skill handle the initial PR creation?**
-A: No. Use `github-pr-workflow` to create the PR. This skill starts after review comments arrive.
+A: No. Use `github-pr-workflow` to create the PR and enter review waiting first. The standard route is implementation -> `github-pr-workflow` -> wait for review signal -> this skill -> human merge decision.
 
 **Q: Does this skill merge the PR after re-review?**
 A: No. Merge remains a human decision. This skill ends after replies, validation, and re-review request are complete.

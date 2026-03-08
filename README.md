@@ -351,9 +351,18 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 **Git/GitHub系**:
 - `git-commit-practices` — コミット規約と原子性
 - `git-initial-setup` — git init/clone時のブランチ保護
-- `github-pr-workflow` — PRフローの標準化
+- `github-pr-workflow` — 実装→PR作成→レビュー待機の標準化
+- `github-pr-review-response` — レビューシグナル後の指摘対応・返信・再レビュー依頼
+- `session-issue-autopilot` — 挨拶トリガーから上記フローへ委譲するセッションラッパー
 - `github-issue-intake` — スコープ外作業のIssue化
 - `skills-revise-skill` — スキルの修正・バージョン管理
+
+**標準ルート（Option A）**:
+- 実装・検証
+- `github-pr-workflow` で PR作成 + Issue連携 + シグナル駆動のレビュー待機
+- 実際のレビューシグナル到着後に `github-pr-review-response`
+- マージ判断は人間へ引き継ぎ
+- `session-issue-autopilot` は上記を包む高レベルセッションオーケストレーター
 
 **後方互換メモ**:
 - 旧ルータースキル/統合元スキルの `SKILL.md` は `archive/phase3-deprecated/` に移動済み
