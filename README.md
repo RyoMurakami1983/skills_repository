@@ -19,37 +19,57 @@ GitHub Copilot Agent Skillsのコレクション
 | カテゴリ | 説明 | 配置先 | 詳細 |
 |---------|------|--------|------|
 | `copilot/` | グローバル開発憲法（copilot-instructions.md） | グローバル（~/.copilot/） | [copilot-instructions.md](copilot/copilot-instructions.md) |
-| `agents/` | 師範エージェント（dotnet/python/typescript/skill） | グローバル（~/.copilot/agents/） | [下記参照](#-agents) |
+| `agents/` | 師範エージェント（dotnet/python/typescript/skill） | グローバル（~/.copilot/agents/） | [下記参照](#agents) |
 | `skills/` | Skill作成支援 + Git/GitHub ワークフロー | グローバル（~/.copilot/skills/） | [SKILLS_README.md](skills/SKILLS_README.md) |
-| `dotnet/` | .NET/C# WPF開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#-dotnet-skills) |
+| `dotnet/` | .NET/C# WPF開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#dotnet-skills) |
+| `python/` | Python開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#python-skills) |
+| `typescript/` | TypeScript/Node.js開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#typescript-skills) |
 | `production/` | MVP/本番向け開発プラクティス | プロジェクト（.github/skills/） | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
-
-### 📌 今後追加予定のカテゴリ
-
-- **python/** - Python開発ワークフロー（FastAPI、Pytest等）
-- **typescript/** - TypeScript/Node.js開発ワークフロー
 
 ## 🏁 Developer Quickstart
 
 ### 前提ツール
 
 - **Git** — バージョン管理
-- **[uv](https://docs.astral.sh/uv/)** — Python ランタイム管理（`winget install astral-sh.uv`）
-- **[gh](https://cli.github.com/)** — GitHub CLI（`winget install GitHub.cli`）
+- **[uv](https://docs.astral.sh/uv/)** — Python ランタイム管理
+  - Windows（ホスト）: `winget install astral-sh.uv`
+  - WSL（`uv sync` を実行する環境）:
+    ```bash
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    exec "$SHELL" -l
+    ```
+- **[gh](https://cli.github.com/)** — GitHub CLI
+  - Windows（ホスト）: `winget install GitHub.cli`
+  - WSL: [Linux 向けインストール手順](https://github.com/cli/cli#linux) を参照
 
-### セットアップ（Windows PowerShell）
+> 下記の `uv sync` は **WSL 側** で実行する前提です。WSL 側にも `uv` をインストールしてください。
 
-```powershell
-# 1. クローン
-git clone https://github.com/RyoMurakami1983/skills_repository.git
-cd skills_repository
+### セットアップ（このRepoの推奨: Windows側にclone + WSLで利用）
 
-# 2. 依存関係の同期
+```bash
+# 1. 前提: Windows側に clone 済み（例: C:\tools\skills_repository）
+#    git clone https://github.com/RyoMurakami1983/skills_repository.git C:\tools\skills_repository
+
+# 2. WSL から作業ディレクトリへ移動
+cd /mnt/c/tools/skills_repository
+
+# 3. 依存関係の同期
 uv sync
 
-# 3. 動作確認：スキル検証を実行
+# 4. 動作確認：スキル検証を実行
+uv run python skills/skill-quality-validation/scripts/validate_skill.py skills/git-initial-setup/SKILL.md
+```
+
+**Windows PowerShell で直接作業する場合**:
+
+```powershell
+git clone https://github.com/RyoMurakami1983/skills_repository.git C:\tools\skills_repository
+Set-Location C:\tools\skills_repository
+uv sync
 uv run python skills\skill-quality-validation\scripts\validate_skill.py skills\git-initial-setup\SKILL.md
 ```
+
+> この `skills_repository` は `SKILL.md` 作成・文書更新・軽い検証が中心のため、Windows 側に置いて Windows/WSL の両方から触りやすくする運用を標準とします。
 
 ### よく使うコマンド
 
@@ -81,6 +101,10 @@ uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\
 
 このリポジトリのパスは環境によって異なります。以下の環境変数を設定しておくと、後述のコマンドをそのまま使用できます。
 
+> **推奨運用（このRepo向け）**: リポジトリは Windows 側 (`C:\tools\skills_repository`) に置き、普段の編集・検証は WSL から `/mnt/c/tools/skills_repository` を使って進めます。
+
+> 将来の実アプリ用リポジトリは同じ基準で固定せず、**Windows デスクトップ系は Windows 側、Python/TypeScript/Linux 系は WSL 側**を基本に使い分ける運用を推奨します。
+
 | 環境 | 推奨クローン先 | 環境変数設定 |
 |------|--------------|-------------|
 | Windows (PowerShell) | `C:\tools\skills_repository` | `$env:SKILLS_REPO = "C:\tools\skills_repository"` |
@@ -88,18 +112,59 @@ uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\
 | Linux/macOS (bash) | `/tmp/skills-repository` | `export SKILLS_REPO="/tmp/skills-repository"` |
 
 ```powershell
-# PowerShell: セッション永続化（$PROFILE に追記）
+# PowerShell: まずセッションに設定
 $env:SKILLS_REPO = "C:\tools\skills_repository"
+
+# PowerShell: 永続化（$PROFILE が無ければ作成してから追記）
+if (!(Test-Path -Path $PROFILE)) { New-Item -ItemType File -Path $PROFILE -Force | Out-Null }
+if (-not (Select-String -Path $PROFILE -Pattern 'SKILLS_REPO' -SimpleMatch -Quiet)) {
+    Add-Content -Path $PROFILE -Value "`n`$env:SKILLS_REPO = `"C:\tools\skills_repository`""
+}
 ```
 
 ```bash
-# bash/WSL: セッション永続化（~/.bashrc または ~/.zshrc に追記）
+# bash/WSL: まずセッションに設定
 export SKILLS_REPO="/mnt/c/tools/skills_repository"
+
+# bash/WSL: 永続化（bash は ~/.bashrc、zsh は ~/.zshrc）
+grep -qxF 'export SKILLS_REPO="/mnt/c/tools/skills_repository"' ~/.bashrc 2>/dev/null || \
+  echo 'export SKILLS_REPO="/mnt/c/tools/skills_repository"' >> ~/.bashrc
+
+# zsh を使う場合はこちら
+# grep -qxF 'export SKILLS_REPO="/mnt/c/tools/skills_repository"' ~/.zshrc 2>/dev/null || \
+#   echo 'export SKILLS_REPO="/mnt/c/tools/skills_repository"' >> ~/.zshrc
 ```
+
+```bash
+# 反映確認
+echo "$SKILLS_REPO"
+test -d "$SKILLS_REPO/.git" && echo "SKILLS_REPO is ready"
+```
+
+```powershell
+# 反映確認
+$env:SKILLS_REPO
+Test-Path "$env:SKILLS_REPO\.git"
+```
+
+> PowerShell の `$PROFILE` 自体の作成方法や UTF-8 設定は [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md) も参照してください。
+
+### 🪟+🐧 Windows に clone / WSL で開発する場合の基本フロー
+
+1. **clone の正本は Windows 側** (`C:\tools\skills_repository`)
+2. **日常開発は WSL 側** (`/mnt/c/tools/skills_repository`)
+3. **Copilot の同期先は別管理**
+   - Windows Copilot: `%USERPROFILE%\.copilot\`
+   - WSL Copilot: `~/.copilot/`
+4. **両方使うなら両方同期** — 片方にコピーしただけでは、もう片方には反映されません
+
+> 補足: `/mnt/c/...` 上の開発は便利ですが、重い watcher や大量ファイル監視では Linux ネイティブ側のファイルシステムのほうが安定する場合があります。
+
+> この注意は主に実アプリ開発向けです。この `skills_repository` は watcher 依存の重い開発が中心ではないため、Windows 側配置を標準にして問題ありません。
 
 ### グローバルインストール（全プロジェクト共通）
 
-**Skills + Agents + 開発憲法 をグローバルに配置（Windows推奨: 安全同期）**:
+**まず Windows 側に clone を用意**:
 
 ```powershell
 # 0) 環境変数を設定（未設定の場合）
@@ -108,19 +173,11 @@ $env:SKILLS_REPO = "C:\tools\skills_repository"
 # 1) 専用のローカルcloneを作成（初回のみ）
 git clone https://github.com/RyoMurakami1983/skills_repository.git $env:SKILLS_REPO
 
-# 2) 同期先フォルダを作成（初回のみ）
+# 2) Windows 側の同期先フォルダを作成（初回のみ）
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\skills | Out-Null
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\agents | Out-Null
 
-# 3) 初回同期（Skills + Agents + copilot-instructions.md を完全同期）
-robocopy $env:SKILLS_REPO\skills $env:USERPROFILE\.copilot\skills /MIR
-robocopy $env:SKILLS_REPO\agents $env:USERPROFILE\.copilot\agents /MIR
-Copy-Item $env:SKILLS_REPO\copilot\copilot-instructions.md $env:USERPROFILE\.copilot\copilot-instructions.md
-```
-
-**更新時（常に最新へ安全同期）**:
-
-```powershell
+# 3) Windows 側へ同期
 Set-Location $env:SKILLS_REPO
 git pull --ff-only
 robocopy skills $env:USERPROFILE\.copilot\skills /MIR
@@ -129,6 +186,42 @@ Copy-Item copilot\copilot-instructions.md $env:USERPROFILE\.copilot\copilot-inst
 ```
 
 > 注意: `/MIR` は同期先の不要ファイルを削除します。`$env:USERPROFILE\.copilot\skills` と `$env:USERPROFILE\.copilot\agents` を専用同期先として使用してください。
+
+**WSL 側の `.copilot` に同期（WSL から実行）**:
+
+```bash
+cd "$SKILLS_REPO"
+git pull --ff-only
+mkdir -p ~/.copilot/skills ~/.copilot/agents
+rsync -a --delete "$SKILLS_REPO/skills/" ~/.copilot/skills/
+rsync -a --delete "$SKILLS_REPO/agents/" ~/.copilot/agents/
+cp "$SKILLS_REPO/copilot/copilot-instructions.md" ~/.copilot/copilot-instructions.md
+```
+
+> 注意: `rsync --delete` は同期先の不要ファイルを削除します。`~/.copilot/skills` と `~/.copilot/agents` を専用同期先として使用してください。
+
+**Windows PowerShell から WSL 側の `.copilot` もまとめて同期**:
+
+```powershell
+Set-Location $env:SKILLS_REPO
+git pull --ff-only
+
+$skillsRepoWsl = wsl wslpath -a "$env:SKILLS_REPO"
+
+wsl bash -lc 'mkdir -p ~/.copilot/skills ~/.copilot/agents'
+wsl bash -lc "rsync -a --delete '$skillsRepoWsl/skills/' ~/.copilot/skills/"
+wsl bash -lc "rsync -a --delete '$skillsRepoWsl/agents/' ~/.copilot/agents/"
+wsl bash -lc "cp '$skillsRepoWsl/copilot/copilot-instructions.md' ~/.copilot/copilot-instructions.md"
+```
+
+> `wsl ...` は既定ディストリビューション / 既定ユーザーを対象にします。複数の WSL ディストリビューションを使う場合は `wsl -d <DistroName> bash -lc '...'` を使用してください。`rsync` が未導入なら WSL 側で `sudo apt install rsync` などを先に実行します。
+
+**Windows と WSL の両方を確認**:
+
+```powershell
+Test-Path "$env:USERPROFILE\.copilot\skills\git-commit-practices\SKILL.md"
+wsl bash -lc 'test -f ~/.copilot/skills/git-commit-practices/SKILL.md && echo OK'
+```
 
 > **エージェント優先順位**: ユーザーレベル（`~/.copilot/agents/`）> リポレベル（`.github/agents/`）> Organization。グローバルに配置した師範エージェントは、どのプロジェクトでも `@dotnet-shihan`, `@python-shihan`, `@typescript-shihan`, `@skill-shihan` として呼び出し可能です。
 
@@ -217,11 +310,18 @@ production/ や言語別Skillsは、プロジェクトの`.github/skills/`にコ
   --category dev-env
 ```
 
+**typescriptスキルの手動コピー**:
+
+```bash
+mkdir -p .github/skills
+cp -r "$SKILLS_REPO/typescript/"* .github/skills/
+```
+
 **productionスキルの手動コピー**:
 
 ```bash
 mkdir -p .github/skills
-cp -r /tmp/skills-repository/production/* .github/skills/
+cp -r "$SKILLS_REPO/production/"* .github/skills/
 ```
 
 ## 🛠️ 使い方
@@ -299,11 +399,31 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 | `dotnet-generic-matching` | 汎用フィールドマッチング（重み付きスコアリング+Specificationパターン） |
 | `dotnet-ocr-matching-workflow` | OCR→DB照合エンドツーエンドワークフローオーケストレーター（12ステップ） |
 
+## 🐍 Python Skills
+
+Python 開発ワークフローのためのスキル群（2スキル）。
+
+| スキル | 説明 |
+|--------|------|
+| `python-setup-dev-environment` | `uv` / `ruff` / `mypy` / VSCode を使った再現可能な Python 開発環境の標準化 |
+| `python-debug-tdd` | Red → investigation → Green の流れで Python バグを最小修正する TDD 型デバッグ |
+
+## 🟦 TypeScript Skills
+
+TypeScript / Node.js / デスクトップ拡張のためのスキル群（2スキル）。
+
+| スキル | 説明 |
+|--------|------|
+| `typescript-setup-dev-environment` | Node.js / npm / ESLint / Prettier / Jest / VSCode による再現可能な TypeScript 開発環境 |
+| `typescript-tauri-setup` | 既存 TypeScript プロジェクトに Tauri v2 デスクトップアプリ環境を追加 |
+
 ## 📚 ドキュメント
 
 - **[PHILOSOPHY.md](PHILOSOPHY.md)** - 開発憲法（Values / Mission / Vision）
 - **[copilot/copilot-instructions.md](copilot/copilot-instructions.md)** - グローバル開発規律（全プロジェクト適用）
 - **[skills/SKILLS_README.md](skills/SKILLS_README.md)** - Skills詳細情報・一覧
+- **[python/](python/)** - Python skills 一覧
+- **[typescript/](typescript/)** - TypeScript skills 一覧
 - **[production/PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md)** - Production Skills詳細情報
 
 ### 💬 エージェントの動作を知りたいとき
