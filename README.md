@@ -19,11 +19,11 @@ GitHub Copilot Agent Skillsのコレクション
 | カテゴリ | 説明 | 配置先 | 詳細 |
 |---------|------|--------|------|
 | `copilot/` | グローバル開発憲法（copilot-instructions.md） | グローバル（~/.copilot/） | [copilot-instructions.md](copilot/copilot-instructions.md) |
-| `agents/` | 師範エージェント（dotnet/python/typescript/skill） | グローバル（~/.copilot/agents/） | [下記参照](#-agents) |
+| `agents/` | 師範エージェント（dotnet/python/typescript/skill） | グローバル（~/.copilot/agents/） | [下記参照](#agents) |
 | `skills/` | Skill作成支援 + Git/GitHub ワークフロー | グローバル（~/.copilot/skills/） | [SKILLS_README.md](skills/SKILLS_README.md) |
-| `dotnet/` | .NET/C# WPF開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#-dotnet-skills) |
-| `python/` | Python開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#-python-skills) |
-| `typescript/` | TypeScript/Node.js開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#-typescript-skills) |
+| `dotnet/` | .NET/C# WPF開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#dotnet-skills) |
+| `python/` | Python開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#python-skills) |
+| `typescript/` | TypeScript/Node.js開発ワークフロー | プロジェクト（.github/skills/） | [下記参照](#typescript-skills) |
 | `production/` | MVP/本番向け開発プラクティス | プロジェクト（.github/skills/） | [PRODUCTION_SKILLS_README.md](production/PRODUCTION_SKILLS_README.md) |
 
 ## 🏁 Developer Quickstart
@@ -31,8 +31,18 @@ GitHub Copilot Agent Skillsのコレクション
 ### 前提ツール
 
 - **Git** — バージョン管理
-- **[uv](https://docs.astral.sh/uv/)** — Python ランタイム管理（`winget install astral-sh.uv`）
-- **[gh](https://cli.github.com/)** — GitHub CLI（`winget install GitHub.cli`）
+- **[uv](https://docs.astral.sh/uv/)** — Python ランタイム管理
+  - Windows（ホスト）: `winget install astral-sh.uv`
+  - WSL（`uv sync` を実行する環境）:
+    ```bash
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    exec "$SHELL" -l
+    ```
+- **[gh](https://cli.github.com/)** — GitHub CLI
+  - Windows（ホスト）: `winget install GitHub.cli`
+  - WSL: [Linux 向けインストール手順](https://github.com/cli/cli#linux) を参照
+
+> 下記の `uv sync` は **WSL 側** で実行する前提です。WSL 側にも `uv` をインストールしてください。
 
 ### セットアップ（このRepoの推奨: Windows側にclone + WSLで利用）
 
@@ -117,11 +127,11 @@ if (-not (Select-String -Path $PROFILE -Pattern 'SKILLS_REPO' -SimpleMatch -Quie
 export SKILLS_REPO="/mnt/c/tools/skills_repository"
 
 # bash/WSL: 永続化（bash は ~/.bashrc、zsh は ~/.zshrc）
-grep -qxF 'export SKILLS_REPO="/mnt/c/tools/skills_repository"' ~/.bashrc || \
+grep -qxF 'export SKILLS_REPO="/mnt/c/tools/skills_repository"' ~/.bashrc 2>/dev/null || \
   echo 'export SKILLS_REPO="/mnt/c/tools/skills_repository"' >> ~/.bashrc
 
 # zsh を使う場合はこちら
-# grep -qxF 'export SKILLS_REPO="/mnt/c/tools/skills_repository"' ~/.zshrc || \
+# grep -qxF 'export SKILLS_REPO="/mnt/c/tools/skills_repository"' ~/.zshrc 2>/dev/null || \
 #   echo 'export SKILLS_REPO="/mnt/c/tools/skills_repository"' >> ~/.zshrc
 ```
 
@@ -196,10 +206,12 @@ cp "$SKILLS_REPO/copilot/copilot-instructions.md" ~/.copilot/copilot-instruction
 Set-Location $env:SKILLS_REPO
 git pull --ff-only
 
+$skillsRepoWsl = wsl wslpath -a "$env:SKILLS_REPO"
+
 wsl bash -lc 'mkdir -p ~/.copilot/skills ~/.copilot/agents'
-wsl bash -lc 'rsync -a --delete "/mnt/c/tools/skills_repository/skills/" ~/.copilot/skills/'
-wsl bash -lc 'rsync -a --delete "/mnt/c/tools/skills_repository/agents/" ~/.copilot/agents/'
-wsl bash -lc 'cp "/mnt/c/tools/skills_repository/copilot/copilot-instructions.md" ~/.copilot/copilot-instructions.md'
+wsl bash -lc "rsync -a --delete '$skillsRepoWsl/skills/' ~/.copilot/skills/"
+wsl bash -lc "rsync -a --delete '$skillsRepoWsl/agents/' ~/.copilot/agents/"
+wsl bash -lc "cp '$skillsRepoWsl/copilot/copilot-instructions.md' ~/.copilot/copilot-instructions.md"
 ```
 
 > `wsl ...` は既定ディストリビューション / 既定ユーザーを対象にします。複数の WSL ディストリビューションを使う場合は `wsl -d <DistroName> bash -lc '...'` を使用してください。`rsync` が未導入なら WSL 側で `sudo apt install rsync` などを先に実行します。
