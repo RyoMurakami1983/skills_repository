@@ -94,7 +94,7 @@ uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\
 README や手順書を更新したら、PR 前に次を確認します。
 
 - [ ] **内部アンカー**: 変更した README 内リンクが GitHub の自動アンカーと一致している
-- [ ] **前提ツール**: 追加したコマンドに必要な CLI / 実行環境（例: `git`, `uv`, `gh`, `wsl`, `rsync`）を明記した
+- [ ] **前提ツール**: 追加したコマンドに必要な CLI / 実行環境（例: `git`, `node`, `npm`, `uv`, `gh`, `wsl`, `rsync`）を明記した
 - [ ] **可変パス**: 運用コマンドは固定パスの直書きではなく `SKILLS_REPO` / `$env:SKILLS_REPO` などの変数を優先した
 - [ ] **コピペ実行性**: 変更したコマンドを想定シェルで少なくとも 1 回は実行確認した
 - [ ] **差分健全性**: 空白・改行崩れがない
@@ -104,12 +104,12 @@ README や手順書を更新したら、PR 前に次を確認します。
 ```bash
 npm run lint:text
 git diff --check -- README.md
-rg -n '\]\(#' README.md
-command -v git uv gh rsync
+grep -n '\](#' README.md
+command -v git node npm uv gh rsync grep
 ```
 
 ```powershell
-Get-Command git, uv, gh, wsl -ErrorAction Stop | Select-Object Name, Source
+Get-Command git, node, npm, uv, gh, wsl -ErrorAction Stop | Select-Object Name, Source
 ```
 
 > 内部リンクは GitHub 上でクリック確認するのが確実です。README の見出しに絵文字があっても、リンク先は `#agents` / `#dotnet-skills` のような GitHub 自動アンカーに合わせてください。
