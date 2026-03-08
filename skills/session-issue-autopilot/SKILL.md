@@ -9,24 +9,34 @@ metadata:
 
 # Session Issue Autopilot
 
-Single-workflow skill for running an issue-focused session from trigger detection to implementation, PR, review response, and collaborative retrospective.
+Single-workflow skill for running an issue-focused session from trigger detection to implementation, canonical PR delegation, signal-driven review response, and collaborative retrospective.
+
+Under Option A, this is the greeting-triggered session wrapper. It delegates PR creation and review waiting to `github-pr-workflow`, then delegates review handling to `github-pr-review-response` instead of defining a competing PR standard.
 
 ## When to Use This Skill
 
 Use this skill when:
-- A user greeting also signals issue handling intent and asks to begin immediate, focused execution.
-- You need one guided flow from issue selection through coding, PR creation, review handling, and closure.
-- You want to prioritize one issue with high compound impact that still fits a one-day implementation scope.
-- You must keep human checkpoints explicit, especially agent selection and collaborative retrospective decisions.
+- Detecting a greeting-triggered request to start focused issue execution immediately.
+- Orchestrating one guided path from issue selection through coding, PR delegation, review waiting, review response, and closure.
+- Prioritizing one issue with high compound impact that still fits a one-day implementation scope.
+- Preserving explicit human checkpoints for agent selection, merge handoff, and collaborative retrospective decisions.
+- Delegating implementation follow-through to the canonical Option A PR skills instead of inventing a parallel PR routine.
+
+> **Scope**: This skill is a session-level orchestrator. It selects and implements one issue, then delegates PR creation/waiting to `github-pr-workflow`, delegates review handling to `github-pr-review-response`, preserves the human merge gate, and finally invites a collaborative retrospective.
+
+## Related Skills
+
+- **`github-pr-workflow`** — Canonical PR creation, issue linkage, and signal-driven review waiting
+- **`github-pr-review-response`** — Canonical review comment triage, fixes, replies, and re-review request
+- **`furikaeri-practice`** — Follow-up retrospective facilitation when the user wants deeper reflection
 
 ## Core Principles
 
 1. **Intent First, Then Execution** — Detect the greeting-trigger correctly before touching implementation work (基礎と型)
 2. **One Day, High Compound Impact** — Choose one issue that compounds future speed, quality, or learning (成長の複利)
-3. **Human-in-the-Loop Checkpoints** — Mandatory user confirmation for agent choice and retrospective participation (ニュートラル)
-4. **Traceable Conversation to Artifact** — Move decisions into issues, PRs, and records so progress survives sessions (継続は力)
-5. **Safe Automation Boundaries** — Automate mechanics, never bypass collaborative reflection and consent checkpoints (余白の設計)
-6. **Human Merge Decision** — Merge on GitHub stays with a human; automation resumes only for confirmed post-merge sync (基礎と型)
+3. **Delegate to Canonical Delivery Skills** — Use `github-pr-workflow` and `github-pr-review-response` for PR mechanics instead of improvising a parallel standard (温故知新)
+4. **Human-in-the-Loop Checkpoints** — Mandatory user confirmation for agent choice, merge handoff, and retrospective participation (ニュートラル)
+5. **Traceable Conversation to Artifact** — Move decisions into issues, PRs, and records so progress survives sessions (継続は力)
 
 ## Workflow: Run Session Issue Autopilot
 
@@ -125,56 +135,43 @@ Use when coding is approved. Why: implementation without validation creates revi
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 6: Create PR (with Body File Safety)
+### Step 6: Delegate PR Creation and Review Waiting to `github-pr-workflow`
 
-Open a PR with clear context, test evidence, and issue linkage.
+Once implementation is validated, hand off the delivery flow to `github-pr-workflow` instead of restating a separate PR routine here.
 
-**Use body-file for `gh` commands** to avoid shell quoting/backtick breakage in multiline markdown.
-
-```bash
-cat > /tmp/pr_body.md <<'MD'
-## Summary
-- Implemented #<issue-id>
-
-## Validation
-- [x] tests
-- [x] lint
-
-## Link
-- Closes #<issue-id>
-MD
-
-gh pr create --title "feat: resolve #<issue-id> <short-title>" --body-file /tmp/pr_body.md
+```markdown
+Canonical handoff:
+implementation complete
+-> github-pr-workflow
+-> PR created with issue linkage
+-> PR URL recorded once
+-> signal-driven review waiting begins
 ```
 
-Use when validation is green. Why: body-file prevents fragile CLI escaping issues and preserves markdown fidelity.
+Use when validation is green. Why: Option A keeps one canonical PR creation + waiting workflow, so this session wrapper does not compete with it.
 
 > **Values**: 基礎と型 / 温故知新
 
-### Step 7: Monitor and Reply to Review Comments
+### Step 7: Wait for a Review Signal, Then Delegate to `github-pr-review-response`
 
-Track PR feedback and respond with fix commits or rationale. Keep replies concise and evidence-based.
+Do not actively poll just because the PR is open. Wait for a new review, review request, or explicit user signal, then hand off to `github-pr-review-response`.
 
-**Also use body-file for long comments**.
-
-```bash
-cat > /tmp/review_reply.md <<'MD'
-Thanks for the review.
-Addressed in commit <sha>:
-- Fixed null-handling path
-- Added regression test
-MD
-
-gh pr comment <pr-number> --body-file /tmp/review_reply.md
+```markdown
+Review-signal handoff:
+wait for signal
+-> github-pr-review-response
+-> comment triage
+-> fixes and replies
+-> re-review request
 ```
 
-Use when review starts. Why: fast, structured response shortens cycle time and prevents context loss.
+Use when the PR already exists and review work is triggered by a real signal. Why: signal-driven delegation keeps waiting rules aligned with the canonical PR skill pair.
 
 > **Values**: 継続は力 / ニュートラル
 
 ### Step 8: Human Merge Gate and Safe Post-Merge Sync
 
-After review response is complete, stop at the merge gate. A human decides whether to merge on GitHub.
+After `github-pr-review-response` finishes, stop at the merge gate. A human decides whether to merge on GitHub.
 
 Only after the merge is confirmed should you help with local sync, and only if the worktree is clean.
 
@@ -191,7 +188,7 @@ Safety rules:
 - If `git status --short` is not clean, stop and ask the user
 - If `git pull --ff-only` fails, stop and surface the divergence
 
-Use when review response is complete and the next step is merge or post-merge cleanup.
+Use when review response is complete and the next step is human merge handoff or post-merge cleanup.
 
 > **Values**: 基礎と型 / 余白の設計
 
@@ -273,8 +270,8 @@ Use when collaborative retrospective is approved. Why: recorded actions turn ref
 | Prioritize | One issue (1-day, high compound) | "Can we finish this today?" |
 | Agent Checkpoint | User-selected agent (include skill-shihan) | "Which specialist should join?" |
 | Build & Validate | Branch + passing evidence | "Are validations green?" |
-| PR | PR created via `--body-file` | "Does PR body include link + evidence?" |
-| Review Loop | Responses and fix commits | "Did we address all review threads?" |
+| PR | Delegation to `github-pr-workflow` | "Did `github-pr-workflow` create the PR and enter review waiting?" |
+| Review Loop | Delegation to `github-pr-review-response` | "Did a real review signal arrive, and were all review threads addressed?" |
 | Merge Gate | Human merge decision + safe local sync | "Has a human merged this PR already?" |
 | Retro Checkpoint | Explicit user yes/no | "Shall we run collaborative retrospective now?" |
 | KPT/YWT Record | Action items in Issue/Notion | "Were actions recorded with links?" |

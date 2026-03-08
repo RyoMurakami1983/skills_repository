@@ -1,6 +1,6 @@
 ---
 name: github-pr-workflow
-description: "Use when you need to create a PR from repo state, link issues, and hand off a review-ready branch."
+description: "Use when implementation is validated and you need the canonical flow from branch state to PR creation, review waiting, and human merge handoff."
 metadata:
   author: RyoMurakami1983
   tags: [github, pull-requests, workflow, git, pr-create]
@@ -13,7 +13,9 @@ metadata:
 
 # GitHub PR Workflow
 
-A state-driven workflow that routes from uncommitted changes through PR creation, issue linkage, and review-wait handoff.
+A state-driven workflow that routes from validated implementation through PR creation, issue linkage, review waiting, and human merge handoff.
+
+Canonical route: implementation -> `github-pr-workflow` -> wait for a real review signal -> `github-pr-review-response` -> human merge decision/handoff.
 
 **Pull Request (PR)**: A reviewed change proposal in GitHub.
 
@@ -32,6 +34,7 @@ Use this skill when:
 
 ## Related Skills
 
+- **`github-pr-review-response`** - Review comment triage, fixes, replies, and re-review request after a real review signal
 - **`git-commit-practices`** - Commit formatting and atomic changes (delegated from Step 1)
 - **`git-initial-setup`** - Branch protection defaults
 - **`github-issue-intake`** - Issue creation and triage
@@ -48,26 +51,11 @@ Use this skill when:
 
 ## Core Principles
 
-1. **Branch First** (基礎と型) - Work stays off main until reviewed
+1. **Branch First, Clean Main** (基礎と型) - Keep work off main until review and only let verified changes reach main
 2. **Traceability** (成長の複利) - Link PRs to issues so future developers learn why
 3. **Japanese PR Body** (ニュートラル) - Write PR descriptions in Japanese for the team
-4. **Clean Main** (継続は力) - Only verified changes reach main
-5. **State-Driven** (温故知新) - Detect current state and route to the right action
-6. **Event-Driven Waiting** (余白の設計) - Wait for review signals instead of repeatedly re-checking the same PR
-
----
-
-## Decision Table
-
-Use this table to choose the next action at a glance.
-
-| Current state | Next move | Why |
-|---|---|---|
-| On `main` | Create a feature branch first | Keeps reviewable work off default branch |
-| Uncommitted changes exist | Commit before PR creation | Preserves traceable state |
-| Commits are local only | Push branch first | `gh pr create` needs the remote branch |
-| PR does not exist yet | Create the PR | Opens review flow and issue links |
-| PR already exists | Report status and stop | Avoids duplicate PRs |
+4. **State-Driven** (温故知新) - Detect current state and route to the right action
+5. **Event-Driven Waiting** (余白の設計) - Wait for review signals instead of repeatedly re-checking the same PR
 
 ---
 
@@ -93,6 +81,8 @@ Keep the merge boundary explicit so automation does not overreach.
 |---|---|---|
 | Before PR | Detect state, create branch, prepare validated changes | Confirm the work is ready to propose |
 | PR creation | Open the PR, link issues, summarize evidence | Decide who reviews and when |
+| Review waiting | Record the PR URL once, stop polling, and wait for a real review signal | Decide whether to reprioritize before a signal arrives |
+| Review response | Hand off to `github-pr-review-response` when a review signal arrives | Review the response and decide whether approval is sufficient |
 | Merge decision | Summarize readiness only | Decide whether and when to merge on GitHub |
 | After merge | Help with local sync only after merge is confirmed | Confirm the merge actually happened |
 | Parallel PR cleanup | Sync remaining PR branches from `origin/main`, rerun checks, summarize re-review needs | Decide merge order and resolve any product-level reprioritization |
@@ -237,7 +227,7 @@ Why: one clean handoff preserves traceability and avoids duplicate effort.
 
 ### Step 4: Enter Review Waiting Mode Efficiently
 
-After the PR is open, stop active polling. Wait for a concrete trigger, then hand off to `github-pr-review-response`.
+After the PR is open, stop active polling. Wait for a concrete trigger, then hand off to `github-pr-review-response` exactly once per new signal.
 
 ```bash
 # Capture the PR URL once, then stop looping on checks
@@ -247,17 +237,19 @@ gh pr view --json url,updatedAt --jq '{url: .url, updatedAt: .updatedAt}'
 gh pr status
 ```
 
-| Trigger | Action | Avoid |
-|---------|--------|-------|
-| New review notification or user says review arrived | Open `github-pr-review-response` and inspect comments once | Re-checking before any signal |
-| Planned batch check after finishing another task | Run one consolidated `gh pr status` | Per-PR polling loops |
-| No new activity signal | Stay idle | "Just checking again" behavior |
-| PR closed or merged | Exit waiting mode | Continuing review checks |
+| Signal | Stay in waiting mode? | Next action | Avoid |
+|---|---|---|---|
+| New review submitted | No | Open `github-pr-review-response` and inspect comments once | Re-checking before any signal |
+| Review requested from you | No | Open `github-pr-review-response` and inspect comments once | Re-checking before any signal |
+| User reports new review activity | No | Verify once, then open `github-pr-review-response` | Re-checking before any signal |
+| PR is still open but unchanged | Yes | Stay idle | "Just checking again" behavior |
+| Only a CI status changed | Usually | Check once only if review work may be blocked | Treating CI noise as review input |
+| PR closed or merged | Exit | Stop waiting and move to the next confirmed state | Continuing review checks |
 
-Exit waiting mode when one of these happens:
-- A new review or review request needs action
-- The PR is closed or merged
-- The user explicitly reprioritizes the session
+Waiting rules:
+- Do not re-check the PR just because it remains open
+- If you must check manually, batch all PR checks into one pass at a natural pause
+- After `github-pr-review-response` requests re-review, return to this signal-driven waiting mode until a new review signal or explicit human merge direction arrives
 
 Use when the PR exists and work has shifted from creation to waiting.
 
@@ -327,7 +319,7 @@ Use when one PR from a parallel set has merged and other review branches still r
 ## Common Pitfalls
 
 1. **PR body written in English**
-   Fix: Use the team's Japanese PR template headings—概要、理由、テスト、関連—in that order.
+   Fix: Use the team's Japanese PR template heading order shown in Step 3, not the English Summary/Reason/Test/Related sequence.
 
 2. **Missing issue link**
    Fix: Always include `Closes #N` in the Related section.
@@ -377,7 +369,9 @@ Use when one PR from a parallel set has merged and other review branches still r
 - [ ] Commit via `git-commit-practices` if needed
 - [ ] Push branch to origin
 - [ ] Create PR with `gh pr create` (Japanese body + `Closes #N`)
-- [ ] Record the PR URL once, then wait for review signals instead of polling
+- [ ] Record the PR URL once, then enter signal-driven review waiting
+- [ ] On a real review signal, hand off to `github-pr-review-response` for fixes, replies, and re-review request
+- [ ] Hand the merge decision to a human after review work is complete
 - [ ] If a sibling PR merges first, sync this branch with `origin/main`, rerun checks, and re-request review as needed
 
 ### Self-Review Checklist (Before finishing)
@@ -412,7 +406,7 @@ Closes #N
 A: No. Team policy requires Japanese PR descriptions.
 
 **Q: Does this skill handle reviews and merges?**
-A: It handles PR creation plus confirmed post-merge sync for remaining PR branches. Review response is handled by `github-pr-review-response`, and the merge decision remains human-only.
+A: It handles PR creation, signal-driven review waiting, and confirmed post-merge sync for remaining PR branches. The standard route is implementation -> `github-pr-workflow` -> wait for review signal -> `github-pr-review-response` -> human merge decision/handoff.
 
 **Q: What if `gh` is not installed?**
 A: `gh auth status` will fail. Install [GitHub CLI](https://cli.github.com/) first.

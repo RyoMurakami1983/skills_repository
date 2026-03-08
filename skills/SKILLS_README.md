@@ -50,13 +50,15 @@ GitHub Copilot Agent Skillsを作成・管理するための支援システム
 
 ### Git/GitHub/Issue ワークフロースキル（移行済み・リネーム済み）
 
-| Skill名 | ワークフロー | 行数 | 状態 |
-|---------|-------------|------|------|
-| [git-commit-practices](git-commit-practices/) | Write Quality Commits | 228 | ✅ 移行済み |
-| [git-initial-setup](git-initial-setup/) | Protect Main Branch | 276 | ✅ 移行済み |
-| [github-pr-workflow](github-pr-workflow/) | Ship via Pull Request | 229 | ✅ 移行済み |
-| [github-issue-intake](github-issue-intake/) | Capture Deferred Work as Issues | 269 | ✅ 移行済み |
-| [skills-revise-skill](skills-revise-skill/) | Revise and Version Skills | 312 | ✅ 移行済み |
+| Skill名 | ワークフロー | 状態 |
+|---------|-------------|------|
+| [git-commit-practices](git-commit-practices/) | Write Quality Commits | ✅ 移行済み |
+| [git-initial-setup](git-initial-setup/) | Protect Main Branch | ✅ 移行済み |
+| [github-pr-workflow](github-pr-workflow/) | Ship via Pull Request | ✅ 標準PR作成 + 待機 |
+| [github-pr-review-response](github-pr-review-response/) | Respond to PR Review | ✅ 標準レビュー応答 |
+| [session-issue-autopilot](session-issue-autopilot/) | Run Session Issue Autopilot | ✅ セッションラッパー |
+| [github-issue-intake](github-issue-intake/) | Capture Deferred Work as Issues | ✅ 移行済み |
+| [skills-revise-skill](skills-revise-skill/) | Revise and Version Skills | ✅ 移行済み |
 
 ### アーカイブ済みスキル
 
@@ -138,6 +140,21 @@ uv run python skill-template-generator/scripts/generate_template.py --name "git-
 2. **内容修正** - 必要な変更を実施
 3. **品質再検証** - `skills-validate-skill`で品質維持確認
 4. **CHANGELOG更新** - 変更内容を記録
+
+### GitHub実装→PR→レビュー応答の標準ルート（Option A）
+
+| フェーズ | 使うスキル | 役割 |
+|---|---|---|
+| 実装・検証 | （各実装スキル / セッション作業） | 変更を実装し、テスト・lint・検証を通す |
+| PR作成 + 待機 | `github-pr-workflow` | ブランチ状態確認、PR作成、Issue連携、シグナル駆動のレビュー待機 |
+| レビュー応答 | `github-pr-review-response` | レビューコメント分類、修正、返信、再レビュー依頼 |
+| マージ判断 | Human handoff | GitHub上のマージ可否は人間が判断する |
+| セッション全体の包み | `session-issue-autopilot` | 挨拶トリガーから上記フローへ委譲する高レベルラッパー |
+
+ポイント:
+- `session-issue-autopilot` は上位のセッションオーケストレーターであり、PR標準そのものではありません。
+- 待機はシグナル駆動です。レビュー到着前に同じPRを繰り返し見に行きません。
+- 再レビュー依頼は、新しいコミットまたは実質的な返信がそろったときだけ行います。
 
 ## 📊 品質基準
 

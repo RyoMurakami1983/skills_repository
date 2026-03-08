@@ -313,7 +313,8 @@ SKILL.md は英語で記述するため、日本語トリガーはこの辞書�
 
 | 日本語指示 | English Skill / Action | 説明 |
 |-----------|----------------------|------|
-| プルリクして / PR作成して / PRを作って | `github-pr-workflow` | 状態検知→PR作成→Issue close |
+| プルリクして / PR作成して / PRを作って | `github-pr-workflow` | 状態検知→PR作成→Issue連携→レビュー待機への引き渡し |
+| レビュー対応して / PRレビュー返信して / レビューコメント返して | `github-pr-review-response` | レビューシグナル後にコメント対応・返信・再レビュー依頼まで進める |
 | コミットして | `git-commit-practices` | Conventional Commits でコミット |
 | Issueにして / Issue起票 | `github-issue-intake` | Issue作成とトリアージ |
 | セットアップして / Git初期設定 | `git-initial-setup` | ブランチ保護・フック設定 |
@@ -323,11 +324,11 @@ SKILL.md は英語で記述するため、日本語トリガーはこの辞書�
 | テンプレ作って | `skills-generate-skill-template` | スキルの雛形生成 |
 | ふりかえりして / ふりかえり | `furikaeri-practice` | セッション後のKPT/YWT改善サイクル |
 | 匿名化して / 固有名詞チェック | `knowledge-capture` | 文書・スキル例の匿名化ゲート（AC-1〜AC-4） |
-| 「おはよう。Issueを解決しましょう」 / 「挨拶してIssue対応開始」 | `session-issue-autopilot` | 挨拶トリガーからIssue選定・実装・PR・協働ふりかえりまでを単一フローで実行 |
+| 「おはよう。Issueを解決しましょう」 / 「挨拶してIssue対応開始」 | `session-issue-autopilot` | 挨拶トリガーからIssue選定・実装・`github-pr-workflow`・`github-pr-review-response`・協働ふりかえりまでを束ねる |
 
 > **運用ルール**: スキルの新規作成・改訂時は、この辞書も合わせて更新すること。
 
-**Glossary Last Updated**: 2026-03-05
+**Glossary Last Updated**: 2026-03-08
 
 ---
 
@@ -342,4 +343,4 @@ SKILL.md は英語で記述するため、日本語トリガーはこの辞書�
 ---
 
 **Author**: RyoMurakami1983  
-**Last Updated**: 2026-03-05
+**Last Updated**: 2026-03-08
