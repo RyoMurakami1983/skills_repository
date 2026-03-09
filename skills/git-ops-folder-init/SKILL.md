@@ -144,12 +144,17 @@ git check-ignore -v some-document.xlsx   # should output: ignored
 
 ## Allowlist Template
 
-Copy and customize this `.gitignore` for your folder:
+Two approaches are available. Choose based on how well-separated your knowledge artifacts are from business documents.
+
+### Approach A: File-Type Allowlist (general purpose)
+
+Tracks all files matching the listed extensions, regardless of which folder they are in.
+Best for: code repositories, documentation-only folders, or when you intentionally want all `.md` files tracked everywhere.
 
 ```gitignore
 # ============================================================
-# Git Allowlist: Knowledge Artifacts Only
-# Pattern: Ignore everything, allow only what is explicitly listed.
+# Git Allowlist: Knowledge Artifacts Only (File-Type Approach)
+# Pattern: Ignore everything, allow only explicitly listed extensions.
 # Add new file types by adding "!*.extension" lines below.
 # ============================================================
 
@@ -180,16 +185,50 @@ Copy and customize this `.gitignore` for your folder:
 !.gitattributes
 ```
 
+### Approach B: Directory Allowlist ✅ Recommended for operational folders
+
+Tracks ONLY files inside explicitly named tool/config directories.
+Best for: business or operational folders that contain mixed content — business documents (.docx, .pdf, .xlsx), images, and your knowledge artifacts all live together. Using file extensions would accidentally track business documents that happen to have `.md` or `.txt` extensions.
+
+```gitignore
+# ============================================================
+# Git Allowlist: Tool/Config Directories Only (Directory Approach)
+# Pattern: Ignore everything; allow only explicitly named directories.
+# Add new directories by adding "!.yourdir/**" lines below.
+# ============================================================
+
+# Default: ignore everything
+*
+
+# Allow directory traversal (required for allowlist to work)
+!*/
+
+# ── AI / Tool Configuration Directories ──────────────────────
+# Only files inside these directories are tracked.
+# Business document folders are completely untouched.
+!.github/**    # GitHub Actions, Skills, Copilot config
+!.claude/**    # Claude / Anthropic agent config
+!.codex/**     # OpenAI Codex config
+!.cursor/**    # Cursor IDE config
+
+# ── Root-level Config Files ───────────────────────────────────
+!.gitignore
+!.gitattributes
+```
+
+> **Why Approach B for operational folders**: A folder like `09_0.IATF資料/` contains business documents in subfolders (e.g., `2026年 回答書類/report.md`). With Approach A, that `report.md` would be tracked unintentionally. Approach B ensures only `.github/`, `.claude/`, etc. are ever tracked — zero surprises.
+
 ---
 
 ## Allowlist Customization
 
 Adjust the allowed file types based on your operational context:
 
-### Manufacturing / Quality (IATF, ISO)
+### Manufacturing / Quality (IATF, ISO) — use Approach B
 ```gitignore
-# Same as template above — no additions needed
-# PDFs, Excel, Word documents are intentionally excluded
+# Use the Directory Allowlist (Approach B) above.
+# PDFs, Excel, Word documents in business subfolders are intentionally excluded.
+# Place all skills and knowledge docs inside .github/skills/ or .claude/
 ```
 
 ### Software Development Support
