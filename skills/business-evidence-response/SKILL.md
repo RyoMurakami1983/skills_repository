@@ -9,7 +9,7 @@ metadata:
   tags: [business, evidence, questionnaire, audit, compliance, template, knowledge-management]
   invocable: true
   version: 1.0.0
-  created: "2026-03-09"
+  last_reviewed: "2026-03-09"
   freshness_check_interval_days: 365
   language: [en, ja]
   model_recommendation: "Claude (via GitHub Copilot) — optimized for long-context knowledge retrieval"
@@ -30,19 +30,6 @@ trigger:
 
 A template skill for building **evidence-based response systems** in operational domains. When your organization repeatedly receives structured inquiries — audits, questionnaires, compliance surveys — this skill provides the **reusable workflow pattern** and **scaffolding files** to respond accurately using historical evidence.
 
-## Decision Table
-
-| Current situation | Action | Start at |
-|---|---|---|
-| **First time** setting up evidence-response | Copy templates, define taxonomy | Setup Checklist |
-| **New inquiry** received for existing domain | Run the 7-step workflow | Step 1 |
-| **Similar question** answered before | Search response index first | Step 4 |
-| **Annual review** date reached | Run freshness protocol | Freshness Management |
-| **New domain** to add | Create new instance from templates | Scaffolding Files |
-| **One-off inquiry** with no recurring pattern | ❌ Do NOT use this skill | — |
-
----
-
 ## When to Use This Skill
 
 - **Responding** to recurring structured inquiries systematically
@@ -55,6 +42,19 @@ A template skill for building **evidence-based response systems** in operational
 - ❌ Handling a one-time unique request with no recurring pattern
 - ❌ Responding without needing evidence or historical references
 - ❌ A domain-specific skill already exists — use it instead
+
+---
+
+## Decision Table
+
+| Current situation | Action | Start at |
+|---|---|---|
+| **First time** setting up evidence-response | Copy templates, define taxonomy | Setup Checklist |
+| **New inquiry** received for existing domain | Run the 7-step workflow | Step 1 |
+| **Similar question** answered before | Search response index first | Step 4 |
+| **Annual review** date reached | Run freshness protocol | Freshness Management |
+| **New domain** to add | Create new instance from templates | Scaffolding Files |
+| **One-off inquiry** with no recurring pattern | ❌ Do NOT use this skill | — |
 
 ---
 
