@@ -2,9 +2,9 @@
 name: git-ops-folder-init
 description: >
   Initialize any operational or business folder as a git repository that tracks
-  ONLY knowledge artifacts (Markdown, scripts, configs) while ignoring all binary
-  files (Office documents, PDFs, images, media). Uses an allowlist-based .gitignore
-  approach for zero-surprise version control.
+  ONLY tool/config directories (.github, .claude, .codex, .cursor) while ignoring
+  all business files (Office documents, PDFs, images, media). Uses a directory-based
+  allowlist .gitignore for zero-surprise version control.
 author: RyoMurakami1983
 tags: [git, gitignore, allowlist, operational-folder, knowledge-management, manufacturing, business]
 invocable: true
@@ -144,57 +144,17 @@ git check-ignore -v some-document.xlsx   # should output: ignored
 
 ## Allowlist Template
 
-Two approaches are available. Choose based on how well-separated your knowledge artifacts are from business documents.
+Copy and customize this `.gitignore` for your operational or business folder.
 
-### Approach A: File-Type Allowlist (general purpose)
+The **directory-based allowlist** tracks ONLY files inside explicitly named hidden tool/config directories (`.github/`, `.claude/`, etc.). Everything else — business documents, Excel files, PDFs, images — is automatically ignored.
 
-Tracks all files matching the listed extensions, regardless of which folder they are in.
-Best for: code repositories, documentation-only folders, or when you intentionally want all `.md` files tracked everywhere.
-
-```gitignore
-# ============================================================
-# Git Allowlist: Knowledge Artifacts Only (File-Type Approach)
-# Pattern: Ignore everything, allow only explicitly listed extensions.
-# Add new file types by adding "!*.extension" lines below.
-# ============================================================
-
-# Default: ignore everything
-*
-
-# Allow directory traversal (required for allowlist to work)
-!*/
-
-# ── Knowledge Documents ──────────────────────────────────────
-!*.md          # Markdown (skills, docs, README)
-!*.txt         # Plain text (notes, logs)
-
-# ── Scripts ──────────────────────────────────────────────────
-!*.py          # Python
-!*.ps1         # PowerShell
-!*.sh          # Bash/Shell
-
-# ── Configuration & Data ─────────────────────────────────────
-!*.yml
-!*.yaml        # YAML (config, CI/CD workflows)
-!*.json        # JSON (config, data)
-!*.toml        # TOML (config)
-!*.csv         # CSV (structured data — optional, remove if large)
-
-# ── Git Configuration ────────────────────────────────────────
-!.gitignore
-!.gitattributes
-```
-
-### Approach B: Directory Allowlist ✅ Recommended for operational folders
-
-Tracks ONLY files inside explicitly named tool/config directories.
-Best for: business or operational folders that contain mixed content — business documents (.docx, .pdf, .xlsx), images, and your knowledge artifacts all live together. Using file extensions would accidentally track business documents that happen to have `.md` or `.txt` extensions.
+This design is intentional: hidden directories (names starting with `.`) are not visible in Windows Explorer by default, so only tool configurations end up under version control. Business files in normal subfolders are never touched.
 
 ```gitignore
 # ============================================================
-# Git Allowlist: Tool/Config Directories Only (Directory Approach)
-# Pattern: Ignore everything; allow only explicitly named directories.
-# Add new directories by adding "!.yourdir/**" lines below.
+# Git Allowlist: Tool/Config Directories Only
+# Pattern: Ignore everything; allow only explicitly named hidden directories.
+# Add new tool directories by adding "!.yourdir/**" lines below.
 # ============================================================
 
 # Default: ignore everything
@@ -204,8 +164,8 @@ Best for: business or operational folders that contain mixed content — busines
 !*/
 
 # ── AI / Tool Configuration Directories ──────────────────────
-# Only files inside these directories are tracked.
-# Business document folders are completely untouched.
+# Only files inside these hidden directories are tracked.
+# Business document folders (.xlsx, .pdf, etc.) are completely untouched.
 !.github/**    # GitHub Actions, Skills, Copilot config
 !.claude/**    # Claude / Anthropic agent config
 !.codex/**     # OpenAI Codex config
@@ -216,56 +176,25 @@ Best for: business or operational folders that contain mixed content — busines
 !.gitattributes
 ```
 
-> **Why Approach B for operational folders**: A folder like `09_0.IATF資料/` contains business documents in subfolders (e.g., `2026年 回答書類/report.md`). With Approach A, that `report.md` would be tracked unintentionally. Approach B ensures only `.github/`, `.claude/`, etc. are ever tracked — zero surprises.
-
 ---
 
 ## Allowlist Customization
 
-Adjust the allowed file types based on your operational context:
+### Adding More Tool Directories
 
-### Manufacturing / Quality (IATF, ISO) — use Approach B
+Add a line for each additional hidden directory you want to track:
+
 ```gitignore
-# Use the Directory Allowlist (Approach B) above.
+# Add to template:
+!.vscode/**    # VS Code workspace config
+!.copilot/**   # GitHub Copilot config
+```
+
+### Manufacturing / Quality (IATF, ISO)
+```gitignore
+# Use the template above as-is.
 # PDFs, Excel, Word documents in business subfolders are intentionally excluded.
 # Place all skills and knowledge docs inside .github/skills/ or .claude/
-```
-
-### Software Development Support
-```gitignore
-# Add to template:
-!*.ts
-!*.js
-!*.cs        # C#
-!*.sql
-!*.dockerfile
-!Dockerfile
-!*.env.example
-```
-
-### Data Analysis / Reporting
-```gitignore
-# Add to template:
-!*.csv       # if CSV files are small enough to track
-!*.ipynb     # Jupyter notebooks (note: contains output — consider .gitignore for output)
-!*.r
-!*.sql
-```
-
-### Documentation / Technical Writing
-```gitignore
-# Add to template:
-!*.rst       # reStructuredText
-!*.tex       # LaTeX
-!*.adoc      # AsciiDoc
-```
-
-### Removing Items from the Template
-
-If you do NOT want `.txt` files tracked (e.g., they contain temp notes):
-```gitignore
-# Simply remove the line: !*.txt
-# That's it — .txt files will be ignored automatically
 ```
 
 ---
