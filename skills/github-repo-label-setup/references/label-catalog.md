@@ -4,16 +4,16 @@
 
 | Prefix | Category | Purpose | Example |
 |--------|----------|---------|---------|
-| `t/` | Type | What kind of work | `t/feat`, `t/bug`, `t/chore`, `t/docs` |
+| `t/` | Type | What kind of work | `t/feature`, `t/bug`, `t/chore`, `t/docs` |
 | `a/` | Area | Which domain/skill | `a/skills`, `a/python`, `a/dotnet`, `a/ci` |
-| `s/` | Status | Current state | `s/blocked`, `s/needs-review`, `s/in-progress` |
+| `s/` | Status | Current state | `s/blocked`, `s/review`, `s/in-progress` |
 | `p/` | Priority | Urgency level | `p/critical`, `p/high`, `p/medium`, `p/low` |
 
 ## Standard Color Palette
 
 | Label | Color hex | Visual |
 |-------|-----------|--------|
-| t/feat | `#0075CA` | Blue |
+| t/feature | `#0075CA` | Blue |
 | t/bug | `#D73A4A` | Red |
 | t/chore | `#006B75` | Teal |
 | t/docs | `#0075CA` | Blue |

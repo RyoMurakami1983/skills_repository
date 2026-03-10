@@ -229,7 +229,7 @@ git config --global --add safe.directory '%(prefix)///server/share/folder'
 | Running `git add .` before creating `.gitignore` | Binary files get committed on first commit; cleanup requires `git rm --cached` to implement removal | Always create and commit `.gitignore` first, then use `git add --dry-run .` to verify |
 | Missing `!*/` in allowlist | Subdirectories are not traversed; only root-level files are visible | Add `!*/` on its own line before any `!*.ext` entries to implement directory traversal |
 | Allowlist pattern `!*.*` | Negates the allowlist entirely — all files become tracked | Use explicit extension patterns `!*.md`, `!*.py` to define each allowed file type method |
-| Not running `safe.directory` on UNC path | Git refuses to initialize with "unsafe repository" error | Run `git config --global --add safe.directory '%(prefix)///server/share'` before `git init` |
+| Not running `safe.directory` on UNC path | Git refuses to initialize with "unsafe repository" error | Run `git config --global --add safe.directory '%(prefix)///server/share/folder'` before `git init` |
 
 - Use `git add --dry-run .` before every first commit to verify only intended files are staged
 - Implement the allowlist `.gitignore` before running `git init`, not after

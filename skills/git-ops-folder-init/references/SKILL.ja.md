@@ -260,7 +260,7 @@ git config --global --add safe.directory '%(prefix)///server/share/folder'
 | `.gitignore`を作る前に`git add .`を実行 | バイナリファイルが初回コミットに含まれる。`git rm --cached`でのクリーンアップが必要 | 常に`.gitignore`を最初にコミットし、その後`git add --dry-run .`で確認 |
 | アローリストに`!*/`が欠けている | サブディレクトリが走査されず、ルートのファイルのみ追跡される | `!*.ext`より前に`!*/`を単独行で追加して走査を実装 |
 | `!*.*`でファイルを許可しようとする | アローリストが完全に無効化され、全ファイルが追跡対象になる | `!*.md`、`!*.py`のように拡張子を明示的に定義する |
-| UNCパス上で`safe.directory`を設定しない | 「unsafe repository」エラーでgitの初期化が失敗 | `git init`の前に`git config --global --add safe.directory`を実行 |
+| UNCパス上で`safe.directory`を設定しない | 「unsafe repository」エラーでgitの初期化が失敗 | `git init`の前に`git config --global --add safe.directory '%(prefix)///server/share/folder'`を実行 |
 
 - Use `git add --dry-run .`で、意図したファイルだけがステージされるか必ず確認する
 - Implement アローリストの`.gitignore`を`git init`の前に作成する
