@@ -243,6 +243,8 @@ KPT とは「続けること（Keep）・問題（Problem）・改善提案（Tr
 - `evals/<skill_id>/evals.json` をコミットしてテスト履歴を管理する。`runs/` は `.gitignore` に追加
 - `skills-eval-pipeline` の前に `skills-validate-skill` を実行して静的問題を先に修正する
 - 予期しない振る舞いを発見したとき、リグレッション後だけでなくリアルタイムでテストケースを追加する
+- ビューアHTML実装では、HTML挿入が不要な箇所は `textContent` を優先する
+- `innerHTML` に変数を埋め込む場合は、すべての変数を `escHtml()` でエスケープしてから挿入する
 
 ---
 
@@ -260,6 +262,9 @@ KPT とは「続けること（Keep）・問題（Problem）・改善提案（Tr
 4. **evals ディレクトリ未コミット**: テストケースを失うと再現性が壊れる。
    修正方法: `evals/<skill_id>/evals.json` をコミット。`runs/` と `viewer.html` は `.gitignore` に追加。
 
+5. **`innerHTML` への変数埋め込みでエスケープしていない**
+   修正方法: 可能なら `textContent` を使う。`innerHTML` が必要な場合は、埋め込む全変数を `escHtml()` で必ずエスケープする。
+
 ---
 
 ## 事前チェックリスト
@@ -269,6 +274,7 @@ KPT とは「続けること（Keep）・問題（Problem）・改善提案（Tr
 - [ ] 各テストケースに ≥1 の `llm_grade` アサーションがある
 - [ ] `skills-validate-skill` がテスト対象スキルで PASS している
 - [ ] Python 3.10+ が使用可能（`python --version` で確認）
+- [ ] ビューア実装のセルフチェック: `innerHTML` へ変数を埋め込む箇所は全変数を `escHtml()` 済み、または `textContent` を使用している
 
 ---
 

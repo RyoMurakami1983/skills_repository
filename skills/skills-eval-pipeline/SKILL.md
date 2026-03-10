@@ -263,6 +263,8 @@ Why: one run with 3 cases is signal, not proof. The pipeline is a loop, not a on
 - Commit `evals/<skill_id>/evals.json` to track test history; `.gitignore` the `runs/` directory
 - Run `skills-validate-skill` before `skills-eval-pipeline` — static issues should be fixed first
 - Add new test cases when you discover unexpected behaviors, not just after regressions
+- For viewer HTML implementations, prefer `textContent` when HTML injection is unnecessary
+- If `innerHTML` must include interpolated variables, escape every variable with `escHtml()` before insertion
 
 ---
 
@@ -280,6 +282,9 @@ Why: one run with 3 cases is signal, not proof. The pipeline is a loop, not a on
 4. **Evals directory not committed**: Losing test cases breaks reproducibility.
    Fix: Commit `evals/<skill_id>/evals.json`; add `runs/` and `viewer.html` to `.gitignore`.
 
+5. **Interpolating variables into `innerHTML` without escaping**
+   Fix: Use `textContent` when possible. If `innerHTML` is required, escape all interpolated variables with `escHtml()`.
+
 ---
 
 ## Preflight Checklist
@@ -289,6 +294,7 @@ Why: one run with 3 cases is signal, not proof. The pipeline is a loop, not a on
 - [ ] Each test case has ≥1 `llm_grade` assertion
 - [ ] `skills-validate-skill` has passed on the target skill
 - [ ] Python 3.10+ available (`python --version`)
+- [ ] Viewer self-check: variable interpolation into `innerHTML` uses `escHtml()` for every variable, or uses `textContent` instead
 
 ---
 
