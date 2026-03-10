@@ -219,7 +219,7 @@ class TestAutoDetectSkillsDir:
         )
 
     def test_script_is_three_levels_deep_in_skills(self):
-        """Verify the depth assumption: scripts/ dir is 2 levels below skills/ root."""
+        """Verify depth assumption: analyze_skill_gaps.py is three levels under skills/ root."""
         analyzer_path = Path(_mod.__file__).resolve()
         # File is: skills/skill-quality-validation/scripts/analyze_skill_gaps.py
         # So going up from the FILE: scripts -> skill-quality-validation -> skills
