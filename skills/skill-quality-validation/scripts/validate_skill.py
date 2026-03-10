@@ -251,31 +251,9 @@ class StructureValidator(SkillValidator):
             "Found" if has_required_fields else "Missing or incomplete"
         ))
 
-        # 1.2b Metadata includes author/tags/invocable (legacy top-level also accepted)
-        metadata = frontmatter_data.get('metadata', {}) if isinstance(frontmatter_data.get('metadata', {}), dict) else {}
-        has_author = (
-            'author' in metadata or
-            ('author' in frontmatter_data and bool(frontmatter_data.get('author')))
-        )
-        checks.append(CheckResult(
-            "1.2b",
-            "YAML frontmatter includes metadata author",
-            has_author,
-            "Found" if has_author else "Missing metadata.author"
-        ))
-
-        # 1.2c No forbidden top-level keys (must be under metadata:)
-        forbidden_top_level = {'version', 'author', 'tags', 'invocable'}
-        found_forbidden = []
-        if frontmatter_data:
-            found_forbidden = [k for k in forbidden_top_level if k in frontmatter_data and k not in (frontmatter_data.get('metadata', {}) or {})]
-        no_forbidden = len(found_forbidden) == 0
-        checks.append(CheckResult(
-            "1.2c",
-            "No forbidden top-level keys (version/author/tags/invocable)",
-            no_forbidden,
-            f"Found forbidden: {', '.join(found_forbidden)}" if found_forbidden else "Clean"
-        ))
+        # 1.2b/1.2c: Removed — metadata: block is no longer required.
+        # Frontmatter is minimal: name + description only.
+        # Author attribution lives in git history (温故知新).
 
         # 1.3 frontmatter name matches folder (kebab-case)
         name_match = re.search(r'name:\s*["\']?([^"\'\n]+)["\']?', frontmatter or '', re.IGNORECASE)
@@ -1088,13 +1066,7 @@ class LanguageValidator(SkillValidator):
 
 
 class WarningValidator:
-    """Generates warning-level checks (EN/JA parity, Values, safety risks, Japanese leak, tool freshness)"""
-
-    TOOL_KEYWORDS = [
-        'git', 'dotnet', 'python', 'uv', 'ruff', 'mypy', 'powershell',
-        'cli', 'npm', 'node', 'typescript', 'gh', 'docker', 'kubectl',
-        'pip', 'cargo', 'rust', 'java', 'maven', 'gradle',
-    ]
+    """Generates warning-level checks (EN/JA parity, Values, safety risks, Japanese leak)"""
 
     def __init__(self, content: str, file_path: str):
         self.content = content
@@ -1162,7 +1134,6 @@ class WarningValidator:
         warnings.extend(self._check_ja_safety_risks())
         warnings.extend(self._check_glossary_freshness())
         warnings.extend(self._check_en_japanese_leak())
-        warnings.extend(self._check_tool_freshness())
         return warnings
 
     # --- W1: EN/JA structural parity ---
@@ -1392,58 +1363,6 @@ class WarningValidator:
                 "W5",
                 "EN SKILL.md contains Japanese text — verify intentional or move to JA version",
                 f"Found in {len(found_lines)} line(s): {'; '.join(found_lines[:5])}"
-            ))
-
-        return warnings
-
-    # --- W6: Tool freshness check ---
-
-    def _check_tool_freshness(self) -> List[WarningResult]:
-        """W6: Warn when a tool-dependent skill lacks tool_versions or last_reviewed in frontmatter."""
-        warnings: List[WarningResult] = []
-
-        # Only check EN files
-        if Path(self.file_path).name.endswith('.ja.md'):
-            return warnings
-
-        fm_match = re.match(r'^---\s*\n(.*?)\n---\s*\n', self.content, re.DOTALL)
-        if not fm_match:
-            return warnings
-
-        fm_text = fm_match.group(1).lower()
-
-        # Detect tool-dependency via tags
-        tags_match = re.search(r'tags:\s*\[([^\]]+)\]', fm_text)
-        if not tags_match:
-            return warnings
-
-        tags_str = tags_match.group(1)
-        # Normalize tags into discrete tokens to avoid substring matches (e.g. 'gh' matching 'github')
-        raw_tokens = re.split(r'[,\s]+', tags_str)
-        normalized_tags = {
-            token.strip(" '\"").lower()
-            for token in raw_tokens
-            if token.strip(" '\"")
-        }
-        matched_tools = [kw for kw in self.TOOL_KEYWORDS if kw in normalized_tags]
-        if not matched_tools:
-            return warnings
-
-        # W6.1: tool_versions missing under metadata: block (indented key)
-        if not re.search(r'^\s+tool_versions\s*:', fm_match.group(1), re.MULTILINE):
-            warnings.append(WarningResult(
-                "W6.1",
-                "Tool-dependent skill lacks tool_versions in frontmatter",
-                f"Detected tools: {', '.join(matched_tools[:5])}"
-                + " — add metadata.tool_versions: {tool: version}"
-            ))
-
-        # W6.2: last_reviewed missing under metadata: block (indented key)
-        if not re.search(r'^\s+last_reviewed\s*:', fm_match.group(1), re.MULTILINE):
-            warnings.append(WarningResult(
-                "W6.2",
-                "Tool-dependent skill lacks last_reviewed in frontmatter",
-                "Add metadata.last_reviewed: YYYY-MM-DD to track freshness"
             ))
 
         return warnings
