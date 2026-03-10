@@ -4,10 +4,6 @@ description: >
   Initialize a local directory as a git repo and push to GitHub in one workflow.
   Use when starting a new project from scratch with no existing git history
   and creating the corresponding GitHub repository.
-metadata:
-  author: RyoMurakami1983
-  tags: [git, github, repository, bootstrap, push]
-  invocable: false
 ---
 
 # Git Init to GitHub Push

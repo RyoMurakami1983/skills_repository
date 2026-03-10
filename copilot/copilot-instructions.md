@@ -56,7 +56,7 @@
 ### スキル作成時（SKILL.md）
 
 **構造**:
-- YAMLフロントマター完備（name, description, metadata）
+- YAMLフロントマター最小構成（name, description のみ — 余白の設計）
 - "When to Use This Skill"を最初のH2セクションに
 - "Core Principles"でValuesとの整合性を明示
 - パターン形式で段階的学習（Basic → Intermediate → Advanced）

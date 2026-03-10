@@ -1,10 +1,6 @@
 ---
 name: session-issue-autopilot
 description: End-to-end issue handling autopilot for a working session. Use when a greeting indicates you want to start focused Issue work and carry it through PR, review response, and collaborative retrospective.
-metadata:
-  author: RyoMurakami1983
-  tags: [session, issue, workflow, github, pr, retrospective, kpt, ywt, autopilot]
-  invocable: false
 ---
 
 # Session Issue Autopilot

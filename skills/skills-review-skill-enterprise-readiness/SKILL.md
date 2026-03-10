@@ -1,10 +1,6 @@
 ---
 name: skills-review-skill-enterprise-readiness
-description: Review a skill for enterprise deployment readiness — governance, security, testing, and operational concerns.
-metadata:
-  author: RyoMurakami1983
-  tags: [copilot, agent-skills, enterprise, governance, security, review]
-  invocable: false
+description: "Review a skill for enterprise deployment readiness covering governance, security, testing, and operational concerns. Use when deploying skills to teams or organizations, adopting third-party skills, or auditing existing deployed skills for compliance."
 ---
 
 # Review Skill Enterprise Readiness

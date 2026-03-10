@@ -1,18 +1,6 @@
 ---
 name: github-pr-review-response
-description: "Use when a PR review signal arrives and you need the canonical response flow from comment triage through re-review request and human merge handoff."
-license: MIT
-compatibility:
-  platforms: [windows, macos, linux]
-  tools: [github-cli, git]
-metadata:
-  author: RyoMurakami1983
-  tags: [github, pull-requests, review, workflow, response]
-  invocable: false
-  tool_versions:
-    git: ">=2.30"
-    gh: ">=2.0"
-  last_reviewed: "2026-03-08"
+description: "Respond to pull request reviews with the canonical flow from comment triage through fixes, re-review request, and human merge handoff. Use when a PR review signal arrives and you need structured review response."
 ---
 
 # GitHub PR Review Response

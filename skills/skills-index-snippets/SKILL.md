@@ -4,10 +4,6 @@ description: >
   Create and maintain AGENTS.md / CLAUDE.md snippet indexes that route
   coding assistant tasks to the correct skills and agents. Use when
   adding, removing, or updating skills in a repository index.
-metadata:
-  author: RyoMurakami1983
-  tags: [skills, routing, agents, index]
-  invocable: false
 ---
 
 # Maintaining Skill Index Snippets

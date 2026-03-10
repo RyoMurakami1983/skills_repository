@@ -1,10 +1,6 @@
 ---
 name: skills-validate-skill
-description: Run quality validation on a SKILL.md with scoring and actionable report. Use when reviewing skills.
-metadata:
-  author: RyoMurakami1983
-  tags: [copilot, agent-skills, validation, quality]
-  invocable: false
+description: "Run quality validation on a SKILL.md with scoring and actionable report across 4 categories (58 checks). Use when reviewing skills before merging, checking EN/JA bilingual parity, or verifying the 85% overall / 80% per-category pass thresholds."
 ---
 
 # Validate a Skill

@@ -1,10 +1,6 @@
 ---
 name: github-repo-label-setup
 description: Standardize repository labels with prefix-based naming conventions. Use when setting up or migrating repository labels for consistent issue and PR management.
-metadata:
-  author: RyoMurakami1983
-  tags: [github, labels, issue-management, repository-setup, conventions]
-  invocable: false
 ---
 
 # GitHub Repository Label Setup

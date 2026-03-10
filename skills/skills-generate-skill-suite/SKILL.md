@@ -1,10 +1,6 @@
 ---
 name: skills-generate-skill-suite
-description: Generate multiple related skills as a coordinated suite. Use when splitting a domain into workflow skills.
-metadata:
-  author: RyoMurakami1983
-  tags: [copilot, agent-skills, generator, suite, migration]
-  invocable: false
+description: "Generate multiple related skills as a coordinated suite with consistent naming and cross-references. Use when splitting a domain into workflow skills, creating a family of related skills, or bootstrapping a new skill category from scratch."
 ---
 
 # Generate a Skill Suite

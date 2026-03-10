@@ -37,8 +37,6 @@ FRONTMATTER = """\
 ---
 name: test-skill
 description: A test skill.
-metadata:
-  author: tester
 ---
 """
 
@@ -127,7 +125,7 @@ class TestW5LineNumbers:
         v = _make_warning_validator(tmp_path, "SKILL.md", content)
         warnings = v._check_en_japanese_leak()
         assert len(warnings) == 1
-        # Frontmatter is 6 lines (---, name, description, metadata, author, ---),
+        # Frontmatter is 4 lines (---, name, description, ---),
         # then "## When to Use\n\n" is 2 lines, "English line.\n" is 1, "Another...\n" is 1
-        # "日本語が混入した行。" should be on line 11 of original
-        assert "L11" in warnings[0].details
+        # "日本語が混入した行。" should be on line 9 of original
+        assert "L9" in warnings[0].details

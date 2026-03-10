@@ -4,13 +4,6 @@ description: >
   On-demand explanation of agent behavior, modes, recent changes, and capabilities.
   Use when a user asks what the agent is doing, wants a mode explained, wants to know
   what changed in an update, or wants to understand what the agent can do.
-metadata:
-  author: RyoMurakami1983
-  tags: [agent, explanation, modes, onboarding, ux, on-demand]
-  invocable: false
-compatibility:
-  requires: []
-  optional: [fetch_copilot_cli_documentation]
 ---
 
 # Agent Explain On-Demand

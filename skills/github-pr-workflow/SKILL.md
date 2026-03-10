@@ -1,14 +1,6 @@
 ---
 name: github-pr-workflow
-description: "Use when implementation is validated and you need the canonical flow from branch state to PR creation, review waiting, and human merge handoff."
-metadata:
-  author: RyoMurakami1983
-  tags: [github, pull-requests, workflow, git, pr-create]
-  invocable: false
-  tool_versions:
-    git: ">=2.30"
-    gh: ">=2.0"
-  last_reviewed: "2026-03-07"
+description: "Create and manage pull requests with the canonical flow from branch validation to PR creation, review waiting, and human merge handoff. Use when implementation is validated and ready for the PR lifecycle."
 ---
 
 # GitHub PR Workflow

@@ -1,11 +1,6 @@
 ---
 name: notion-safe-operations
-description: Use when you need reliable and secure Notion MCP operations with preflight checks, DS ID handling, and fallback payloads.
-metadata:
-  author: RyoMurakami1983
-  tags: [notion, mcp, workflow, security, reliability]
-  invocable: false
-  last_reviewed: "2026-03-05"
+description: "Reliable and secure Notion MCP operations with preflight checks, data source ID handling, and fallback payloads. Use when creating, updating, or querying Notion pages and databases through MCP, especially when handling authentication errors or DS ID resolution."
 ---
 
 # Notion Safe Operations

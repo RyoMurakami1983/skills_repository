@@ -4,10 +4,6 @@ description: >
   Run multi-file batch operations with parallel agents and structured progress reporting.
   Use when processing multiple skills, files, or components in a single session with
   quality gates and branch-first discipline.
-metadata:
-  author: RyoMurakami1983
-  tags: [agent, batch, parallel, workflow, horenso, branch-management]
-  invocable: true
 ---
 
 # Agent Batch Workflow

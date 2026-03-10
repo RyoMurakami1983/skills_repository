@@ -1,10 +1,6 @@
 ---
 name: github-issue-intake
-description: Capture deferred work as actionable GitHub issues. Use when triaging scope.
-metadata:
-  author: RyoMurakami1983
-  tags: [github, issues, triage, workflow, documentation]
-  invocable: false
+description: "Capture deferred work as actionable GitHub issues with standardized titles, labels, and priority. Use when triaging out-of-scope bugs during PR review, deferring non-critical fixes to later sprints, converting support requests into engineering work, or clarifying vague existing issues."
 ---
 
 # Issue Intake

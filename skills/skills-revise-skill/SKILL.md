@@ -1,10 +1,6 @@
 ---
 name: skills-revise-skill
 description: Revise existing skills, synchronize EN/JA structure, and optimize discoverability metadata. Use when updating published skills.
-metadata:
-  author: RyoMurakami1983
-  tags: [copilot, agent-skills, revision, maintenance, changelog]
-  invocable: false
 ---
 
 # Skill Revision Guide
