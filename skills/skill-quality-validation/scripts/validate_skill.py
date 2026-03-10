@@ -1066,7 +1066,7 @@ class LanguageValidator(SkillValidator):
 
 
 class WarningValidator:
-    """Generates warning-level checks (EN/JA parity, Values, safety risks, Japanese leak)"""
+    """Generates warning-level checks (structural, safety, language, description, frontmatter, markdown quality)."""
 
     def __init__(self, content: str, file_path: str):
         self.content = content
@@ -1108,6 +1108,41 @@ class WarningValidator:
                 result.append(line)
 
         return '\n'.join(result)
+
+    @staticmethod
+    def _iter_non_frontmatter_non_fenced_lines(text: str):
+        """Yield (line_number, stripped_line) outside frontmatter and fenced code blocks."""
+        lines = text.split('\n')
+        in_frontmatter = bool(lines) and lines[0].strip() == '---'
+        in_fence = False
+        fence_char = ''
+        fence_len = 0
+
+        for idx, line in enumerate(lines, start=1):
+            stripped = line.strip()
+
+            if in_frontmatter:
+                if idx == 1:
+                    continue
+                if stripped == '---':
+                    in_frontmatter = False
+                continue
+
+            fence_match = re.match(r'^ {0,3}([`~]{3,})', line)
+            if fence_match:
+                marker = fence_match.group(1)
+                if not in_fence:
+                    in_fence = True
+                    fence_char = marker[0]
+                    fence_len = len(marker)
+                elif marker[0] == fence_char and len(marker) >= fence_len:
+                    in_fence = False
+                continue
+
+            if in_fence:
+                continue
+
+            yield idx, stripped
 
     def _extract_headings(self, text: str) -> List[Tuple[int, str]]:
         """Extract (level, title) pairs outside code blocks"""
@@ -1410,30 +1445,9 @@ class WarningValidator:
     def _check_table_leading_double_pipe(self) -> List[WarningResult]:
         """W9: Warn when a probable markdown table row starts with '||'."""
         warnings: List[WarningResult] = []
-        lines = self.content.splitlines()
-        in_frontmatter = False
-        in_fence = False
         findings: List[str] = []
 
-        for idx, line in enumerate(lines, start=1):
-            stripped = line.strip()
-
-            # Skip YAML frontmatter block.
-            if idx == 1 and stripped == '---':
-                in_frontmatter = True
-                continue
-            if in_frontmatter:
-                if stripped == '---':
-                    in_frontmatter = False
-                continue
-
-            # Skip fenced code blocks.
-            if stripped.startswith('```') or stripped.startswith('~~~'):
-                in_fence = not in_fence
-                continue
-            if in_fence:
-                continue
-
+        for idx, stripped in self._iter_non_frontmatter_non_fenced_lines(self.content):
             # Probable malformed table row: starts with || and still contains another pipe.
             if stripped.startswith('||') and '|' in stripped[2:]:
                 findings.append(f"L{idx}: {stripped[:80]}")

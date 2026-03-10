@@ -412,3 +412,22 @@ def test_no_warning_table_normal_single_pipe(tmp_path: Path):
     report = mod.validate_skill_file(str(file_path))
     w_ids = [w.id for w in report.warnings]
     assert "W9" not in w_ids
+
+
+def test_no_warning_table_double_pipe_inside_fenced_code(tmp_path: Path):
+    """W9: || inside fenced code blocks should not trigger warning"""
+    mod = _load_validator_module()
+    desc = "Use when validating markdown table formatting while ignoring malformed examples in fenced code blocks."
+    en = (
+        f"---\nname: test\ndescription: \"{desc}\"\n---\n"
+        "## Example\n"
+        "````markdown\n"
+        "|| Bad | Row |\n"
+        "````\n"
+        "| Good | Row |\n"
+    )
+    ja = "# dummy\n"
+    file_path = _write_skill_with_ja(tmp_path, "table-double-pipe-in-fence", en, ja)
+    report = mod.validate_skill_file(str(file_path))
+    w_ids = [w.id for w in report.warnings]
+    assert "W9" not in w_ids
