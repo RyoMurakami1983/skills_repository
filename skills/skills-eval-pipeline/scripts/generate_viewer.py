@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -36,8 +37,11 @@ def render(template: str, data: dict) -> str:
     payload to prevent script-block injection.
     """
     json_str = json.dumps(data, ensure_ascii=False, indent=2)
-    # Escape '</script>' in data values to prevent script-block breakout
-    json_str = json_str.replace("</script>", "<\\/script>")
+    # Escape </script> (case-insensitive) to prevent script-block breakout.
+    # HTML end tags are case-insensitive, so </SCRIPT> would also terminate the block.
+    json_str = re.sub(r'</script', r'<\\/script', json_str, flags=re.IGNORECASE)
+    # Escape U+2028/U+2029 (JS line/paragraph separators) which terminate string literals.
+    json_str = json_str.replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
     # The template contains: const DATA = /* __BENCHMARK_DATA__ */null;
     # Replace the sentinel + the trailing 'null' literal as one atomic token.
     placeholder = "/* __BENCHMARK_DATA__ */null"

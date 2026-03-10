@@ -233,9 +233,9 @@ Output from `scripts/aggregate_benchmark.py`. Summarizes multiple runs across bo
         "type": "object",
         "properties": {
           "case_id": { "type": "string" },
-          "with_skill_mean": { "type": "number" },
-          "baseline_mean": { "type": "number" },
-          "delta": { "type": "number" }
+          "with_skill_mean": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
+          "baseline_mean": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
+          "delta": { "oneOf": [{ "type": "number" }, { "type": "null" }] }
         }
       }
     },

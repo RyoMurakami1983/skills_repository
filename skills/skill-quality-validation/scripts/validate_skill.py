@@ -1395,7 +1395,7 @@ class WarningValidator:
         if not data:
             return warnings
 
-        bloat = [k for k in data if k.lower() in self._BLOAT_FIELDS or k.lower() == 'metadata']
+        bloat = [k for k in data if k.lower() in self._BLOAT_FIELDS]
         if bloat:
             warnings.append(WarningResult(
                 "W8",
