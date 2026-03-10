@@ -14,14 +14,14 @@
 ```yaml
 ---
 name: "skill-name"        # 必須: kebab-case、スキルディレクトリ名と一致
-description: "..."        # 必須: 80〜1024文字、"use when" トリガーフレーズ含む
+description: "..."        # 必須: ≤1024文字、"use when" トリガーフレーズ含む（W7.1警告: 80文字未満は品質警告）
 ---
 ```
 
-### 禁止フィールド（top-level）
+### 非推奨フィールド（top-level）
 
 ```yaml
-# ❌ これらはトップレベルに置かない
+# ⚠️ これらはトップレベルに置かない（validate_skill.py では fail にならないが非推奨）
 version: "1.0.0"          # → git tag / CHANGELOG で管理
 author: "name"            # → git blame で管理
 tags: [...]               # → 現在どのシステムでも使用されていない
@@ -33,6 +33,7 @@ last_reviewed: "..."      # → git log で確認可能
 
 > **背景（温故知新）**: metadata: ブロックは Tier 1 アップデート（2026-02）で廃止。
 > 帰属・バージョン管理は git の責任領域。フロントマターは「発見」のためだけに使う。
+> これらのフィールドが存在しても `validate_skill.py` は fail にしない（check 1.2b/1.2c は廃止済み）。
 
 ### description フォーマット推奨（W7 警告対象）
 
@@ -67,11 +68,12 @@ description: >
 | セクション | 要件 | チェックID |
 |-----------|------|-----------|
 | `## When to Use This Skill` | 最初のH2であること | 1.5 |
-| `## Core Principles` | 番号付きリスト形式 | 1.8 |
-| `## Best Practices` | セクション存在 | 1.9 |
-| `## Anti-Patterns` | セクション存在 | 1.10 |
-| `## Quick Reference` | セクション存在 | 1.11 |
-| `references/SKILL.ja.md` | 対応する日本語版 | 1.12, 1.13 |
+| `## Core Principles / The Philosophy` | 番号付きリスト形式 | 1.6 |
+| `## Best Practices` | セクション存在 | 1.7 |
+| `## Common Pitfalls` | セクション存在 | 1.8 |
+| `## Anti-Patterns` | セクション存在 | 1.9 |
+| `## Quick Reference / Decision Tree` | セクション存在 | 1.10 |
+| `references/SKILL.ja.md` | 対応する日本語版（構造・内容パリティ） | 1.11〜1.13 |
 
 ### Core Principles フォーマット
 
@@ -124,14 +126,16 @@ $result = gh pr list --json state | ConvertFrom-Json
 
 ## Language 品質契約
 
-### 4.1〜4.4 の基準
+### 4.1〜4.4 の基準（設計意図・未実装）
 
-| チェック | 閾値 | 測定方法 |
-|---------|------|---------|
-| 能動態比率 | passive < 20% | passive 表現のカウント |
-| "should" 乱用回避 | < 5回 | 文書内出現回数 |
-| Headers に be 動詞禁止 | 0件 | 見出し内の be 動詞チェック |
-| ファイルサイズ | ≤ 500行 | wc -l |
+> **NOTE**: 現在の `validate_skill.py` の `LanguageValidator` は 4.1.1〜4.3.3（受動態比率 / 長文 / 命令形 / 曖昧語 / 定義 / 頭字語 / 見出し数 / 表の可読性 / 強調）のみを実装しており、以下のチェックは**設計意図（未実装）**である。将来の実装時の目標値として扱い、現時点の pass/fail 判定には影響しない。
+
+| チェック | 閾値 | 測定方法 | 実装状況 |
+|---------|------|---------|----------|
+| 能動態比率 | passive < 20% | passive 表現のカウント | 未実装（設計意図） |
+| "should" 乱用回避 | < 5回 | 文書内出現回数 | 未実装（設計意図） |
+| Headers に be 動詞禁止 | 0件 | 見出し内の be 動詞チェック | 未実装（設計意図） |
+| ファイルサイズ | ≤ 500行 | 行数カウント（現状は check 1.13 で管理） | 未実装（設計意図） |
 
 ---
 
@@ -184,5 +188,5 @@ uv run python skills/skill-quality-validation/scripts/validate_skill.py <path> -
 uv run python skills/skill-quality-validation/scripts/analyze_skill_gaps.py
 ```
 
-**前提条件**: プロジェクトルートから実行すること。
-`validate_skill.py` は `skills/` ルートへの相対パスを自動検出する。
+**前提条件**: 検証したい SKILL.md へのパスを正しく指定すること（カレントディレクトリには依存しない）。
+`validate_skill.py` は与えられた SKILL.md の場所から上方向に `.github/copilot-instructions.md` を探索し、その位置をリポジトリルートとして扱う。

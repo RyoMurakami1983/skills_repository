@@ -94,8 +94,9 @@ skill-shihan がオーナーとして品質管理を担当する。
 ## 品質基準（先生モードで使用）
 
 ### フロントマター
-- トップレベル許可キー: `name`, `description`, `tools`
-- `metadata:` ブロック（author/tags/invocable/tool_versions 等）は**廃止** → フロントマターは `name` + `description` のみ
+- **SKILL.md** のトップレベル許可キー: `name`, `description`（これのみ）
+- **agent.md** のトップレベル許可キー: `name`, `description`, `tools`（エージェント専用）
+- `metadata:` ブロック（author/tags/invocable/tool_versions 等）は**廃止** → フロントマターは `name` + `description`（SKILL.md）または `name` + `description` + `tools`（agent.md）のみ
 - `description` ≤1024文字、"Use when" トリガーフレーズ必須（W7 警告: ≥80文字、action verb、capability列挙）
 
 ### 構造

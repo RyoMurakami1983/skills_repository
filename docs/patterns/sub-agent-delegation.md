@@ -25,7 +25,7 @@
 │  機能レイヤー（Function Layer）                          │
 │  自己文書化・特化・再利用可能                            │
 │                                                         │
-│  grader.md  reviewer.md  formatter.md  validator.md     │
+│  grader.agent.md  reviewer.agent.md  formatter.agent.md  validator.agent.md  │
 └─────────────────────────────────────────────────────────┘
 ```
 

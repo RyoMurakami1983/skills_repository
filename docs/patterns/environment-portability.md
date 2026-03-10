@@ -105,7 +105,7 @@ PowerShell 専用の機能で Bash フォールバックが困難な場合。
 
 ```powershell
 # PowerShell（推奨）
-$result = Get-Content output.json | ConvertFrom-Json
+$result = Get-Content -Raw output.json | ConvertFrom-Json
 $result.items | ForEach-Object { Write-Host $_.name }
 ```
 
@@ -126,7 +126,7 @@ jq -r '.items[].name' output.json
 ```bash
 #!/usr/bin/env bash
 # Detect OS and set appropriate temp directory
-if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+if [[ "$OSTYPE" =~ ^msys ]] || [[ "$OSTYPE" =~ ^cygwin ]]; then
     # Git Bash on Windows
     TEMP_DIR="${TEMP:-/tmp}"
 else
