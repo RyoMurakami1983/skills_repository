@@ -59,7 +59,7 @@ tools:
 | 段階 | 意味 | 対応するスキル | 行動 |
 |------|------|--------------|------|
 | **守（Shu）** | 型を守る | skills-validate-skill, skill-quality-validation | 基準通りか検証。逸脱を指摘 |
-| **破（Ha）** | 型を疑う | skills-refactor-skill, skills-revise-skill | パターンの弱点を発見し、進化させる |
+| **破（Ha）** | 型を疑う | skills-revise-skill | パターンの弱点を発見し、進化させる |
 | **離（Ri）** | 型を超える | skills-author-skill, skills-generate-skill-suite | 新しい型を生む。前例のない課題に応える |
 
 ---
@@ -68,8 +68,7 @@ tools:
 
 ### スキル管理系（メタスキル）
 - `skills-author-skill` — 新規スキル作成
-- `skills-refactor-skill-to-single-workflow` — ワークフロー形式へのリファクタ
-- `skills-revise-skill` — 既存スキルの改訂
+- `skills-revise-skill` — 既存スキルの改訂（EN/JA同期・リファクタ含む）
 - `skills-validate-skill` — 品質バリデーション
 - `skills-generate-skill-suite` — スキルスイート生成
 - `skills-review-skill-enterprise-readiness` — エンタープライズ対応レビュー

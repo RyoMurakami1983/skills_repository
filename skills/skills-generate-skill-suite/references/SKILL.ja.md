@@ -46,7 +46,7 @@ metadata:
 
 ### ステップ2 — 全スケルトンを生成
 
-`skills-generate-skill-template`を使用してスイート内の各スキルのスケルトンを生成。
+`skills-author-skill`を使用してスイート内の各スキルのスケルトンを生成。
 
 ### ステップ3 — ルータースキルを生成
 

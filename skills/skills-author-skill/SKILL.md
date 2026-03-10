@@ -26,9 +26,7 @@ Use this skill when:
 ## Related Skills
 
 - **`skills-validate-skill`** — Validate the finished skill against quality criteria
-- **`skills-refactor-skill-to-single-workflow`** — Convert legacy multi-pattern skills
-- **`skills-revise-skill`** — Revise and optimize discoverability after publishing
-- **`skills-maintain-bilingual-skill`** — Maintain EN/JA structural parity for bilingual skills
+- **`skills-revise-skill`** — Revise, optimize discoverability, and maintain EN/JA parity
 - **`knowledge-capture`** — Anonymization gate for examples derived from real projects
 
 ---

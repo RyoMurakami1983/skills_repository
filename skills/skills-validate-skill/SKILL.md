@@ -22,8 +22,7 @@ Use this skill when:
 ## Related Skills
 
 - **`skills-author-skill`** — Write a new skill following best practices
-- **`skills-refactor-skill-to-single-workflow`** — Convert legacy multi-pattern skills
-- **`skills-revise-skill`** — Revise and version existing skills
+- **`skills-revise-skill`** — Revise, version, and maintain EN/JA parity for existing skills
 
 ---
 
