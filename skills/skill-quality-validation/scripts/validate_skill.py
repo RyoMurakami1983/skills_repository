@@ -13,7 +13,7 @@ Usage:
     python validate_skill.py path/to/SKILL.md --json
     python validate_skill.py path/to/SKILL.md --output report.txt
     
-Version: 4.0.0
+Version: 4.1.0
 Author: RyoMurakami1983
 Last Updated: 2026-02-13
 """
@@ -1127,6 +1127,13 @@ class WarningValidator:
         cleaned = self._strip_fenced_code(text)
         return bool(re.search(r'decision\s+table|判断テーブル|判断表', cleaned, re.IGNORECASE))
 
+    def _extract_description(self) -> str:
+        """Extract description value from YAML frontmatter using the shared SkillValidator parser."""
+        helper = SkillValidator(self.content, self.file_path)
+        data = helper.parse_frontmatter()
+        desc = data.get('description', '')
+        return desc.strip() if isinstance(desc, str) else ''
+
     def validate(self) -> List[WarningResult]:
         warnings: List[WarningResult] = []
         warnings.extend(self._check_en_ja_parity())
@@ -1134,6 +1141,7 @@ class WarningValidator:
         warnings.extend(self._check_ja_safety_risks())
         warnings.extend(self._check_glossary_freshness())
         warnings.extend(self._check_en_japanese_leak())
+        warnings.extend(self._check_description_quality())
         return warnings
 
     # --- W1: EN/JA structural parity ---
@@ -1363,6 +1371,62 @@ class WarningValidator:
                 "W5",
                 "EN SKILL.md contains Japanese text — verify intentional or move to JA version",
                 f"Found in {len(found_lines)} line(s): {'; '.join(found_lines[:5])}"
+            ))
+
+        return warnings
+
+    # --- W7: Description quality checks ---
+
+    # Action verbs that indicate a clear [What] purpose statement.
+    # Covers imperative verbs, gerunds-as-starters, and common compound forms.
+    _DESCRIPTION_ACTION_VERBS = re.compile(
+        r'\b('
+        r'add|analyze|apply|audit|automate|bootstrap|build|capture|check|commit|'
+        r'configure|create|define|deploy|detect|enforce|establish|execute|explain|'
+        r'format|generate|guide|handle|implement|initialize|install|integrate|'
+        r'maintain|manage|migrate|monitor|onboard|protect|report|respond|restore|'
+        r'review|revise|run|scan|scaffold|set\s+up|setup|standardize|sync|track|'
+        r'update|use|validate|write'
+        r')\b',
+        re.IGNORECASE,
+    )
+
+    def _check_description_quality(self) -> List[WarningResult]:
+        """W7: Description quality — [What] verb, minimum length, capability enumeration."""
+        warnings: List[WarningResult] = []
+
+        desc = self._extract_description()
+        if not desc:
+            return warnings
+
+        # W7.1: Minimum length — descriptions shorter than 80 chars are unlikely to carry
+        # enough context for the model to trigger this skill reliably.
+        if len(desc) < 80:
+            warnings.append(WarningResult(
+                "W7.1",
+                "Description may be too short for reliable triggering",
+                f"{len(desc)} chars — recommended ≥80",
+            ))
+
+        # W7.2: [What] action verb — the description should contain at least one clear
+        # action verb so the model understands what the skill does, not only when to use it.
+        if not self._DESCRIPTION_ACTION_VERBS.search(desc):
+            warnings.append(WarningResult(
+                "W7.2",
+                "Description missing [What] action verb — add a verb stating what the skill does",
+                f"First 80 chars: {desc[:80]!r}",
+            ))
+
+        # W7.3: Capability enumeration — comma-separated items signal specific use cases,
+        # improving discriminability when multiple skills are candidates.
+        # item_count = comma-clauses + 1 (first item before any comma also counts).
+        capabilities = re.findall(r',\s*(?:or\s+)?(?:\w+\s+){0,3}\w+', desc)
+        item_count = len(capabilities) + 1 if capabilities else 0
+        if item_count < 2:
+            warnings.append(WarningResult(
+                "W7.3",
+                "Description lacks capability enumeration — add comma-separated use cases",
+                f"Estimated {item_count} capability item(s) from {len(capabilities)} comma clause(s) — recommended ≥2",
             ))
 
         return warnings
