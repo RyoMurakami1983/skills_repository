@@ -18,7 +18,7 @@ Use this skill when:
 - Setting up a new .NET project that needs relevant dotnet skills deployed
 - Onboarding a team member who needs project-level coding standards
 - Updating project-level skills from the latest skills_repository
-- Responding to "dotnet skills をプロジェクトに追加して" or "deploy skills to my project"
+- Responding to a user request to add dotnet skills to a project ("deploy skills to my project")
 - Starting a new WPF, Blazor, or class library project with standardized patterns
 
 ## Related Skills
@@ -27,6 +27,21 @@ Use this skill when:
 - **`dotnet-wpf-mvvm-patterns`** — WPF MVVM foundation skill
 - **`dotnet-project-structure`** — Project structure skill
 - **`git-initial-setup`** — Often used alongside skill deployment for new projects
+
+---
+
+## Decision Table
+
+Use this to jump directly to the right step based on what you need.
+
+| Situation | Current state | Action |
+|-----------|---------------|--------|
+| New project setup | No skills deployed yet | Step 1 → 2 → 3 |
+| Check available categories | No deployment needed yet | Step 2, run `-List` |
+| First-time deployment | Target path confirmed | Step 3 (without `-Force`) |
+| Update existing skills | Skills already in `.github/skills/` | Step 3 with `-Force` |
+| Preview before committing | Scope unclear | Step 3 with `-WhatIf` |
+| Verify deployment result | Scripts just ran | Step 4 |
 
 ---
 
@@ -48,6 +63,8 @@ Use this skill when:
 
 ### Step 1 — Confirm Project Information
 
+Confirm the target project path and project type before running any deployment command.
+
 Gather deployment context from the user:
 
 1. **Target project path**: Confirm where `.github/skills/` should be created
@@ -65,6 +82,8 @@ Questions to ask:
 > **Values**: ニュートラルな視点（先入観なく、プロジェクトの実態に合わせる）
 
 ### Step 2 — Recommend Categories and Skills
+
+Run `-List` first to discover all available categories, then match to the project type.
 
 Based on the project type, recommend appropriate skill categories:
 
@@ -110,7 +129,7 @@ Would you like to proceed, or adjust the selection?"
 
 ### Step 3 — Execute Deployment
 
-Run the deployment script with confirmed parameters:
+Always preview with `-WhatIf` before the first deployment to a project. Then run the deployment script with confirmed parameters:
 
 **Category deployment**:
 
@@ -156,6 +175,9 @@ Run the deployment script with confirmed parameters:
 
 **Output**: Skills copied to `<project_path>\.github\skills\`.
 
+✅ **Good**: Run `-WhatIf` first, confirm the scope, then execute the real deployment.
+❌ **Bad**: Deploy directly without `-WhatIf` — unexpected files may appear in the project.
+
 > **Values**: 継続は力（繰り返し実行可能な自動化）
 
 ### Step 4 — Verify and Guide Next Steps
@@ -191,12 +213,18 @@ If you want to track them in your project repository, run:
 
 ## Best Practices
 
-- ✅ **Start with categories, refine with individual skills** — Use `-Category` for bulk, `-Skills` to add extras. Why: categories provide the right defaults for 80% of cases.
-- ✅ **Preview first** — Always offer `-WhatIf` before actual deployment. Why: transparency builds trust and prevents accidental overwrites.
-- ✅ **Deploy fewer, not more** — Extra skills add context noise for the agent. Why: Copilot's context window is finite; irrelevant skills dilute relevant guidance.
-- ✅ **Update periodically** — Re-run with `-Force` when skills_repository is updated. Why: skills evolve with new patterns and best practices.
-- ✅ **Match project type** — A WPF app doesn't need Blazor/Playwright skills. Why: precision > coverage for agent-assisted development.
-- ✅ **Keep category definitions in sync** — When dotnet skills are added/removed, update repo-root-relative `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` `CategoryMap`, verify composite `wpf-app`, and align `agents/dotnet-shihan.agent.md`. Why: drift causes missing or invalid deployments.
+- Use `-Category` for bulk deployment, then `-Skills` to add extras. Why: categories provide the right defaults for 80% of cases.
+- Avoid deploying `all` by default — select the category that fits your project type. Why: extra skills add context noise for the agent.
+- Apply `-WhatIf` before every deployment to preview what will be copied. Why: transparency builds trust and prevents accidental overwrites.
+- Define your project type clearly in Step 1 before selecting categories. Why: wrong category leads to irrelevant skills in the project.
+- Consider adding `-Force` on re-runs to ensure the latest skill patterns are applied. Why: skills evolve; outdated copies can mislead the agent.
+- Use `-SourceRoot` and `-Target` parameters explicitly — never hardcode paths. Why: reproducible commands work across environments.
+- Implement periodic updates when `skills_repository` is updated. Why: skills evolve with new patterns and best practices.
+
+✅ **Good**: Match the category to your project type — WPF app gets `wpf-app`, class library gets `foundation`.
+❌ **Bad**: Deploy `all` for every project — irrelevant skills dilute the agent's context window.
+✅ **Good**: Always preview with `-WhatIf` before the first deployment to a new project.
+❌ **Bad**: Skip the preview and deploy directly — accidental overwrites are hard to recover from.
 
 ### Category Maintenance Rule (when dotnet skills change)
 
@@ -224,6 +252,16 @@ If you want to track them in your project repository, run:
 ---
 
 ## Quick Reference
+
+**Decision: which flag to use?**
+
+| Flag | When to use | Example |
+|------|-------------|---------|
+| `-List` | Discover available categories and skills | `-List` |
+| `-WhatIf` | Preview deployment without writing files | `-Category wpf-app -WhatIf` |
+| `-Category` | Deploy all skills in a named category | `-Category foundation` |
+| `-Skills` | Deploy specific named skills | `-Skills skill1,skill2` |
+| `-Force` | Overwrite existing skills on update | `-Category wpf-app -Force` |
 
 ```
 # List available categories and skills
