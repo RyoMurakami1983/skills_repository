@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eval Viewer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f4f6f9;
+      color: #1a1a2e;
+      margin: 0;
+      padding: 24px;
+    }
+    h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+    .meta { color: #555; font-size: 0.85rem; margin-bottom: 24px; }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .card h2 { font-size: 1rem; font-weight: 600; margin: 0 0 12px; }
+    .verdict {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .verdict.improved { background: #d4f7e0; color: #1a7a42; }
+    .verdict.neutral  { background: #fff3cd; color: #856404; }
+    .verdict.degraded { background: #fde8e8; color: #a50000; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .stat-box {
+      background: #f8f9fc;
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+    .stat-box .label { font-size: 0.75rem; color: #888; margin-bottom: 4px; }
+    .stat-box .value { font-size: 1.5rem; font-weight: 700; }
+    .positive { color: #1a7a42; }
+    .negative { color: #a50000; }
+    .neutral-text { color: #856404; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { background: #f0f2f7; text-align: left; padding: 8px 12px; font-weight: 600; }
+    td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+    tr:last-child td { border-bottom: none; }
+    .delta-positive { color: #1a7a42; font-weight: 600; }
+    .delta-negative { color: #a50000; font-weight: 600; }
+    .footer { font-size: 0.78rem; color: #aaa; margin-top: 32px; text-align: center; }
+  </style>
+</head>
+<body>
+
+<h1 id="title">Eval Viewer</h1>
+<p class="meta" id="meta"></p>
+
+<div class="card">
+  <h2>サマリー</h2>
+  <span class="verdict" id="verdict-badge"></span>
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="label">スキルあり（mean）</div>
+      <div class="value" id="ws-mean">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="label">ベースライン（mean）</div>
+      <div class="value" id="bl-mean">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="label">改善差分 (Δ)</div>
+      <div class="value" id="delta">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="label">改善率</div>
+      <div class="value" id="improvement">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>ケース別スコア</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Case ID</th>
+        <th>スキルあり</th>
+        <th>ベースライン</th>
+        <th>Δ</th>
+      </tr>
+    </thead>
+    <tbody id="case-table"></tbody>
+  </table>
+</div>
+
+<p class="footer" id="footer"></p>
+
+<script>
+// Injected by generate_viewer.py
+const DATA = /* __BENCHMARK_DATA__ */null;
+
+(function render(d) {
+  if (!d) { document.title = "No data"; document.body.innerHTML = "<p>データがありません。generate_viewer.py を実行してください。</p>"; return; }
+
+  document.getElementById("title").textContent = `Eval Viewer — ${d.skill_id}`;
+  document.getElementById("meta").textContent =
+    `eval version: ${d.eval_version}  |  generated: ${new Date(d.generated_at).toLocaleString("ja-JP")}`;
+
+  const verdict = d.summary.verdict;
+  const badge = document.getElementById("verdict-badge");
+  badge.textContent = { improved: "✅ Improved", neutral: "⚠️ Neutral", degraded: "❌ Degraded" }[verdict] || verdict;
+  badge.className = `verdict ${verdict}`;
+
+  const fmt = v => (v == null ? "—" : v.toFixed(4));
+  const pct = v => (v == null ? "—" : `${v > 0 ? "+" : ""}${v.toFixed(1)}%`);
+
+  document.getElementById("ws-mean").textContent = fmt(d.runs.with_skill?.mean);
+  document.getElementById("bl-mean").textContent = fmt(d.runs.baseline?.mean);
+
+  const deltaEl = document.getElementById("delta");
+  const delta = d.summary.delta;
+  deltaEl.textContent = delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta.toFixed(4)}`;
+  deltaEl.className = `value ${delta > 0.05 ? "positive" : delta < -0.05 ? "negative" : "neutral-text"}`;
+
+  document.getElementById("improvement").textContent = pct(d.summary.improvement_pct);
+
+  const tbody = document.getElementById("case-table");
+  (d.case_breakdown || []).forEach(c => {
+    const tr = document.createElement("tr");
+    const cd = c.delta;
+    const dClass = cd == null ? "" : cd > 0.05 ? "delta-positive" : cd < -0.05 ? "delta-negative" : "";
+    const fmtDelta = cd == null ? "—" : `${cd > 0 ? "+" : ""}${cd.toFixed(4)}`;
+
+    [
+      c.case_id,
+      fmt(c.with_skill_mean),
+      fmt(c.baseline_mean),
+      fmtDelta
+    ].forEach((val, i) => {
+      const td = document.createElement("td");
+      td.textContent = val;
+      if (i === 3 && dClass) td.className = dClass;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("footer").textContent =
+    `skills-eval-pipeline  |  ${d.skill_id}  |  ${d.eval_version}`;
+})(DATA);
+</script>
+</body>
+</html>

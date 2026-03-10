@@ -48,8 +48,6 @@ def test_get_section_content_when_to_use_extracts_bullets():
     content = """---
 name: extraction-skill
 description: Minimal content for section extraction test.
-author: Tester
-invocable: true
 ---
 
 ## When to Use This Skill
@@ -71,8 +69,6 @@ def test_get_section_content_ignores_h2_inside_fenced_code_block():
     content = """---
 name: extraction-skill
 description: Ensure fenced headings do not truncate section extraction.
-author: Tester
-invocable: true
 ---
 
 ## Quick Reference
@@ -98,8 +94,6 @@ def test_get_section_content_stops_at_known_h2_when_fence_is_unclosed():
     content = """---
 name: extraction-skill
 description: Unclosed fence should not consume subsequent sections.
-author: Tester
-invocable: true
 ---
 
 ## Quick Reference
@@ -123,8 +117,6 @@ def test_get_section_content_does_not_treat_4space_fence_as_real_fence():
     content = """---
 name: extraction-skill
 description: Four-space indented fence marker should be treated as code text.
-author: Tester
-invocable: true
 ---
 
 ## Quick Reference
@@ -191,8 +183,6 @@ def test_structure_check_1_7_detects_workflow_or_legacy(tmp_path: Path, folder_n
     skill_md = f"""---
 name: {skill_name}
 description: This fixture validates structure detection behavior.
-author: Tester
-invocable: true
 ---
 
 ## When to Use This Skill
@@ -227,8 +217,6 @@ def test_router_skips_structure_1_8_and_score_totals_are_consistent(tmp_path: Pa
     skill_md = """---
 name: router-skill
 description: Router skill fixture for N/A checks.
-author: Tester
-invocable: true
 ---
 
 ## When to Use This Skill
@@ -282,8 +270,8 @@ def _write_skill_with_ja(tmp_path: Path, folder_name: str, en_content: str, ja_c
 def test_warning_en_ja_h2_mismatch(tmp_path: Path):
     """W1.1: H2 count mismatch between EN and JA triggers warning"""
     mod = _load_validator_module()
-    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n## B\n## C\n"
-    ja = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n## B\n"
+    en = "---\nname: test\ndescription: test\n---\n## A\n## B\n## C\n"
+    ja = "---\nname: test\ndescription: test\n---\n## A\n## B\n"
     file_path = _write_skill_with_ja(tmp_path, "h2-mismatch", en, ja)
     report = mod.validate_skill_file(str(file_path))
     w_ids = [w.id for w in report.warnings]
@@ -293,8 +281,8 @@ def test_warning_en_ja_h2_mismatch(tmp_path: Path):
 def test_warning_en_ja_step_mismatch(tmp_path: Path):
     """W1.3: Step count mismatch triggers warning"""
     mod = _load_validator_module()
-    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n### Step 1\nDo A\n### Step 2\nDo B\n"
-    ja = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n### Step 1\nDo A\n"
+    en = "---\nname: test\ndescription: test\n---\n### Step 1\nDo A\n### Step 2\nDo B\n"
+    ja = "---\nname: test\ndescription: test\n---\n### Step 1\nDo A\n"
     file_path = _write_skill_with_ja(tmp_path, "step-mismatch", en, ja)
     report = mod.validate_skill_file(str(file_path))
     w_ids = [w.id for w in report.warnings]
@@ -304,7 +292,7 @@ def test_warning_en_ja_step_mismatch(tmp_path: Path):
 def test_warning_step_missing_values(tmp_path: Path):
     """W2: Step without Values marker triggers warning"""
     mod = _load_validator_module()
-    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n### Step 1: Setup\nDo setup\n### Step 2: Run\nDo run\n> **Values**: 基礎と型\n"
+    en = "---\nname: test\ndescription: test\n---\n### Step 1: Setup\nDo setup\n### Step 2: Run\nDo run\n> **Values**: 基礎と型\n"
     ja = "# dummy\n"
     file_path = _write_skill_with_ja(tmp_path, "missing-values", en, ja)
     report = mod.validate_skill_file(str(file_path))
@@ -317,8 +305,8 @@ def test_warning_step_missing_values(tmp_path: Path):
 def test_warning_ja_safety_keywords(tmp_path: Path):
     """W3.1: Safety keywords in JA trigger warning"""
     mod = _load_validator_module()
-    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\nContent\n"
-    ja = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\nセキュリティに注意。削除は禁止。\n"
+    en = "---\nname: test\ndescription: test\n---\n## A\nContent\n"
+    ja = "---\nname: test\ndescription: test\n---\n## A\nセキュリティに注意。削除は禁止。\n"
     file_path = _write_skill_with_ja(tmp_path, "safety-kw", en, ja)
     report = mod.validate_skill_file(str(file_path))
     w_ids = [w.id for w in report.warnings]
@@ -329,8 +317,9 @@ def test_warning_ja_safety_keywords(tmp_path: Path):
 def test_no_warnings_when_aligned(tmp_path: Path):
     """No warnings when EN/JA are structurally aligned and no safety keywords"""
     mod = _load_validator_module()
-    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n## B\n"
-    ja = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n## B\n"
+    desc = "Use when verifying that aligned EN and JA skill files produce no warnings, structure checks pass, and keyword checks are clean."
+    en = f"---\nname: test\ndescription: \"{desc}\"\n---\n## A\n## B\n"
+    ja = f"---\nname: test\ndescription: \"{desc}\"\n---\n## A\n## B\n"
     file_path = _write_skill_with_ja(tmp_path, "aligned", en, ja)
     report = mod.validate_skill_file(str(file_path))
     assert len(report.warnings) == 0
@@ -339,8 +328,8 @@ def test_no_warnings_when_aligned(tmp_path: Path):
 def test_warnings_do_not_affect_pass_fail(tmp_path: Path):
     """Warnings must not change overall_passed result"""
     mod = _load_validator_module()
-    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n## B\n## C\n"
-    ja = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\nセキュリティ削除禁止\n"
+    en = "---\nname: test\ndescription: test\n---\n## A\n## B\n## C\n"
+    ja = "---\nname: test\ndescription: test\n---\n## A\nセキュリティ削除禁止\n"
     file_path = _write_skill_with_ja(tmp_path, "no-affect", en, ja)
     report = mod.validate_skill_file(str(file_path))
     # There should be warnings
@@ -364,7 +353,7 @@ def test_warning_glossary_missing_date(tmp_path: Path):
     )
     skill_dir = repo_root / "skills" / "test-skill"
     (skill_dir / "references").mkdir(parents=True, exist_ok=True)
-    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n"
+    en = "---\nname: test\ndescription: test\n---\n## A\n"
     (skill_dir / "SKILL.md").write_text(en, encoding="utf-8")
     report = mod.validate_skill_file(str(skill_dir / "SKILL.md"))
     w_ids = [w.id for w in report.warnings]
@@ -382,7 +371,7 @@ def test_warning_glossary_stale(tmp_path: Path):
     )
     skill_dir = repo_root / "skills" / "test-skill"
     (skill_dir / "references").mkdir(parents=True, exist_ok=True)
-    en = "---\nname: test\ndescription: test\nauthor: T\ninvocable: true\n---\n## A\n"
+    en = "---\nname: test\ndescription: test\n---\n## A\n"
     (skill_dir / "SKILL.md").write_text(en, encoding="utf-8")
     report = mod.validate_skill_file(str(skill_dir / "SKILL.md"))
     w_ids = [w.id for w in report.warnings]
