@@ -24,7 +24,6 @@ Use this skill when:
 - **`skills-author-skill`** - Skill writing workflow
 - **`skills-validate-skill`** - Validate revisions before publishing
 - **`skills-refactor-skill-to-single-workflow`** - Refactor legacy skills before revision
-- **`skills-maintain-bilingual-skill`** — Maintain EN/JA structural parity for bilingual skills
 - **`knowledge-capture`** — Anonymization gate for examples derived from real projects
 
 ---
@@ -130,11 +129,23 @@ For system skills, keep SKILL.md and references/SKILL.ja.md in sync. Update both
 | Wording improved | ⚠️ Maybe | Only if meaning changed |
 | Typo fixed | ❌ No | Unless in both versions |
 
+**Structural parity** (zero tolerance):
+- H2 section count must match
+- Step count (### Step N) must match
+
+**Safety vocabulary alignment** (W3.1/W3.2):
+- Verify 削除/delete, 認証/auth, 上書き/overwrite carry identical constraints in both languages
+- Verify negation patterns (しない, 不可, 禁止) have corresponding EN prohibitions
+
 **Sync checklist after editing English SKILL.md**:
 - [ ] Section count matches (EN = JA)
 - [ ] Step titles identical
 - [ ] Code block count similar (±2 acceptable)
 - [ ] Tables have matching columns
+- [ ] W3.1 safety terms cross-checked
+- [ ] W3.2 negation patterns cross-checked
+
+For the full parity workflow with detailed W3 vocabulary tables and validator commands, see [references/bilingual-parity.md](references/bilingual-parity.md).
 
 **When**: Every time a system skill (`author: RyoMurakami1983`) has substantial English changes.
 
