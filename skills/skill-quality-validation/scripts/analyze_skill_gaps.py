@@ -852,9 +852,11 @@ def main():
     if args.all:
         skills_dir = args.skills_dir or args.path
         if not skills_dir:
-            # Auto-detect from script location
-            script_dir = Path(__file__).parent
-            skills_dir = str(script_dir.parent.parent.parent)
+            # Auto-detect from script location (.resolve() ensures this works
+            # regardless of whether the script is invoked with a relative or
+            # absolute path — skills/ root is 2 levels above scripts/)
+            script_dir = Path(__file__).resolve().parent
+            skills_dir = str(script_dir.parent.parent)
         analyze_all(skills_dir, args.json)
     elif args.path:
         analyze_single(args.path, args.json)

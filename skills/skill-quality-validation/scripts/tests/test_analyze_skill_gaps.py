@@ -203,20 +203,26 @@ class TestAutoDetectSkillsDir:
         """
         analyze_skill_gaps.py lives at:
           skills/skill-quality-validation/scripts/analyze_skill_gaps.py
-        So __file__.parent.parent.parent should resolve to skills/ root.
+
+        main() uses:  script_dir = Path(__file__).resolve().parent  (= scripts/)
+                      skills_dir = script_dir.parent.parent          (= skills/)
+
+        This test verifies that 2 levels up from the resolved scripts/ dir
+        gives the skills/ root.
         """
         analyzer_path = Path(_mod.__file__).resolve()
-        # scripts/ -> skill-quality-validation/ -> skills/
-        auto_detected = analyzer_path.parent.parent.parent
-        # Must end in "skills" folder
+        script_dir = analyzer_path.parent          # scripts/
+        auto_detected = script_dir.parent.parent   # skills/
         assert auto_detected.name == "skills", (
             f"Expected auto-detect to resolve to 'skills/', got '{auto_detected}'. "
-            "Check the parent.parent.parent path in main()."
+            "Check the resolve().parent.parent path in main()."
         )
 
     def test_script_is_three_levels_deep_in_skills(self):
-        """Verify the depth assumption: scripts/ is 3 levels below a skills root."""
+        """Verify depth assumption: analyze_skill_gaps.py is three levels under skills/ root."""
         analyzer_path = Path(_mod.__file__).resolve()
+        # File is: skills/skill-quality-validation/scripts/analyze_skill_gaps.py
+        # So going up from the FILE: scripts -> skill-quality-validation -> skills
         depth_names = [
             analyzer_path.parent.name,           # scripts
             analyzer_path.parent.parent.name,    # skill-quality-validation
