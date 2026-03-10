@@ -341,8 +341,8 @@ const DATA = /* __BENCHMARK_DATA__ */null;
     const header = document.createElement("div");
     header.className = "case-header";
     header.innerHTML = `
-      <span class="case-id-badge">${c.case_id}</span>
-      <span class="case-prompt" title="${(c.prompt||"").replace(/"/g,"&quot;")}">${c.prompt || c.case_id}</span>
+      <span class="case-id-badge">${escHtml(c.case_id)}</span>
+      <span class="case-prompt" title="${escHtml(c.prompt||"")}">${escHtml(c.prompt || c.case_id)}</span>
       <span class="case-scores">
         <span class="score-pill skill">スキルあり ${wsScore}</span>
         <span class="score-pill base${bsOk ? " ok" : ""}">ベースライン ${blScore}</span>
@@ -374,7 +374,8 @@ const DATA = /* __BENCHMARK_DATA__ */null;
             <th>スキルあり</th><th>ベースライン</th><th>補足</th>
           </tr></thead><tbody>`;
       c.assertion_detail.forEach(a => {
-        const typeBadge = `<span class="type-badge ${a.type}">${escHtml(a.type)}</span>`;
+        const safeType = escHtml(a.type);
+        const typeBadge = `<span class="type-badge ${safeType}">${safeType}</span>`;
         const wsPass = a.with_skill_passed == null ? '<span class="na">—</span>'
           : a.with_skill_passed ? '<span class="pass">✅</span>' : '<span class="fail">❌</span>';
         const blPass = a.baseline_passed == null ? '<span class="na">—</span>'
