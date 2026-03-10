@@ -1,37 +1,45 @@
 ---
 name: git-ops-folder-init
-description: "Initialize business or operational folders as git repositories that track only tool/config directories (.github, .claude, .codex) while ignoring business files. Use when adding version control to manufacturing records, quality documentation, or mixed-content folders where only knowledge artifacts should be tracked."
+description: "Set up and configure operational folders as git repositories that selectively track tool and config directories (.github, .claude, .codex) while ignoring binary business files. Use when adding version control to manufacturing records, quality documentation, or any mixed-content folder where only knowledge artifacts — Markdown, scripts, config — should be versioned."
 ---
 
 # Git Ops Folder Init
 
 Initialize an operational or business folder as a git repository that tracks **only knowledge artifacts** — Markdown documents, scripts, and configuration files — while automatically ignoring all binary files (Office documents, PDFs, images, videos, etc.).
 
+**Prerequisites**: Git 2.30+ required (no additional package dependencies). This skill has no npm, pip, or NuGet dependencies.
+
 ## When to Use This Skill
 
 Use this skill when:
 
-- A **business or operational folder** (e.g., manufacturing records, quality documentation, project archives) needs version control for its **scripts and knowledge documents**
-- The folder contains **mixed content** — some files you want to version control, most you don't
-- You want **zero-surprise git management**: nothing unexpected gets committed
+- Initializing version control for a **business or operational folder** (manufacturing, quality docs)
+- Managing a folder with **mixed content** — some files versioned, most intentionally ignored
+- Implementing **zero-surprise git management** where nothing unexpected ever gets committed
 - Transitioning from "just files on a network drive" to **docs-as-code** for knowledge artifacts only
-- Setting up git for **non-developer teams** who shouldn't worry about accidentally committing large binary files
+- Setting up git for **non-developer teams** who must not accidentally commit large binary files
 
 **Do NOT use this skill when:**
-- The folder is primarily a code repository (use standard language-specific gitignore instead)
-- You need to track binary files (use Git LFS instead)
-- All files in the folder are text-based and should be tracked (use `git init` directly)
+- Using a standard language-specific gitignore when the folder is primarily a code repository
+- Tracking binary files across the repository — use Git LFS instead of this allowlist approach
+- Initializing a text-only folder where all files should be tracked — use `git init` directly
+
+---
+
+## Related Skills
+
+- **`git-initial-setup`** — Standard git setup and branch protection for conventional repositories
+- **`git-init-to-github`** — Initialize a local directory as a git repo and push to GitHub
+- **`git-commit-practices`** — Conventional commit standards for tracking ops folder changes
 
 ---
 
 ## Core Principles
 
-| Principle | Value Alignment | Why It Matters |
-|-----------|----------------|----------------|
-| Allowlist over blocklist | 基礎と型の追求 | "Ignore everything, allow only what you intend" prevents accidental commits of sensitive or large files |
-| Explicit intent | 余白の設計 | Every tracked file type is a conscious decision, creating intentional structure |
-| Knowledge-layer separation | 温故知新 | Binary documents contain the "what"; scripts and Markdown contain the "how and why" — only the latter grows in value under version control |
-| Safe for non-developers | 成長の複利 | Simple rules that anyone can understand and maintain |
+1. **Allowlist over blocklist** — "Ignore everything, allow only what you intend" prevents accidental commits of sensitive or large files (基礎と型の追求)
+2. **Explicit intent** — Every tracked file type is a conscious decision, creating intentional structure (余白の設計)
+3. **Knowledge-layer separation** — Binary documents contain "what"; scripts and Markdown contain "how and why" — only the latter grows in value under version control (温故知新)
+4. **Safe for non-developers** — Simple rules that anyone can understand and maintain (成長の複利)
 
 ---
 
@@ -61,29 +69,35 @@ Use this skill when:
 # Done. Anything not listed is automatically ignored.
 ```
 
-**Key insight**: With the allowlist approach, **adding a new file type accidentally is impossible**. You must explicitly opt in. This is safer in operational folders where new binary file types appear unpredictably.
+**Key insight**: With the allowlist approach, **adding a new file type accidentally is impossible**. You must explicitly opt in. This is why it is safer in operational folders where new binary file types appear unpredictably.
 
 ---
 
-## Setup Workflow
+## Workflow:
 
 ### Step 1: Assess the Folder
 
+> **Values**: 余白の設計 — Assess deliberately before committing to a structure.
+
 Before initializing, answer these questions:
 
-| Question | Guidance |
-|----------|---------|
-| What text-based files do you want to track? | See [Allowlist Customization](#allowlist-customization) |
-| Are there sensitive files (credentials, PII)? | Add them to the allowlist exclusions or use `.gitignore` to explicitly block |
-| Is this a network share (UNC path)? | See [Network Drive Setup](#network-drive-setup) |
-| Do you need a remote/GitHub? | This skill covers local git; use `git-init-to-github` for remote setup |
+| Question | Guidance | Action |
+|----------|---------|--------|
+| What text-based files do you want to track? | See [Allowlist Customization](#allowlist-customization) below | Enumerate extensions for allowlist |
+| Are there sensitive files (credentials, PII (Personally Identifiable Information))? | Add them to the allowlist exclusions | Explicitly block with `.gitignore` blocklist section |
+| Is this a network drive (UNC (Universal Naming Convention) path)? | See [Network Drive Setup](#network-drive-setup) below | Run `safe.directory` config first |
+| Do you need a remote/GitHub? | This skill covers local git only | Use `git-init-to-github` for remote |
 
 ### Step 2: Create .gitignore
+
+> **Values**: 基礎と型の追求 — The `.gitignore` template is the pattern that protects all subsequent work.
 
 Create a `.gitignore` file in the folder root using the template below.
 Customize the allowlist for your use case (see [Customization](#allowlist-customization)).
 
 ### Step 3: Initialize Git
+
+> **Values**: 継続は力 — Initialize once, configure correctly, maintain consistently from day one.
 
 ```powershell
 # Navigate to the folder
@@ -98,6 +112,8 @@ git config user.email "your@email.com"
 ```
 
 ### Step 4: Initial Commit
+
+> **Values**: 温故知新 — Commit your intentions clearly; future team members will read this as the origin of the knowledge structure.
 
 ```powershell
 # Stage only the .gitignore and your knowledge files
@@ -119,6 +135,8 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
 ```
 
 ### Step 5: Verify
+
+> **Values**: ニュートラルな視点 — Verify objectively that only intended files are tracked before pushing.
 
 ```powershell
 # Confirm tracked files look correct
@@ -189,7 +207,7 @@ Add a line for each additional hidden directory you want to track:
 
 ## Network Drive Setup
 
-When initializing git on a **UNC path** (Windows network share like `\\server\share\folder`):
+When initializing git on a **UNC (Universal Naming Convention) path** (Windows network share like `\\server\share\folder`):
 
 ```powershell
 # Git requires explicit trust for network drives
@@ -201,6 +219,24 @@ git config --global --add safe.directory '%(prefix)///server/share/folder'
 ```
 
 **Why this is needed**: Git 2.35.2+ requires explicit trust for directories whose ownership cannot be verified (network drives have no local ownership records).
+
+---
+
+## Common Pitfalls
+
+| Pitfall | Symptom | Fix |
+|---------|---------|-----|
+| Running `git add .` before creating `.gitignore` | Binary files get committed on first commit; cleanup requires `git rm --cached` to implement removal | Always create and commit `.gitignore` first, then use `git add --dry-run .` to verify |
+| Missing `!*/` in allowlist | Subdirectories are not traversed; only root-level files are visible | Add `!*/` on its own line before any `!*.ext` entries to implement directory traversal |
+| Allowlist pattern `!*.*` | Negates the allowlist entirely — all files become tracked | Use explicit extension patterns `!*.md`, `!*.py` to define each allowed file type method |
+| Not running `safe.directory` on UNC path | Git refuses to initialize with "unsafe repository" error | Run `git config --global --add safe.directory '%(prefix)///server/share'` before `git init` |
+
+- Use `git add --dry-run .` before every first commit to verify only intended files are staged
+- Implement the allowlist `.gitignore` before running `git init`, not after
+- Create `.gitignore` as the very first committed file to define the tracking function
+- Avoid `git add .` without verifying the dry-run output first
+- Consider `safe.directory` configuration before attempting git init on a UNC network drive
+- Define the complete allowlist before committing any project files
 
 ---
 
@@ -217,9 +253,20 @@ git config --global --add safe.directory '%(prefix)///server/share/folder'
 
 ---
 
-## FAQ / Quick Reference
+## Quick Reference
 
-**Q: Why does `git status` show untracked directories even though their files should be ignored?**  
+### When to Use Which Approach
+
+| Scenario | Approach | Skill |
+|----------|----------|-------|
+| Business/ops folder with mixed content | Allowlist-based .gitignore | This skill |
+| Pure code repository | Language-specific .gitignore | `git-initial-setup` |
+| Need to track binary files | Git LFS + standard .gitignore | Git LFS docs |
+| Push to GitHub after local setup | Remote repository setup | `git-init-to-github` |
+
+---
+
+**Q: Why does `git status` show untracked directories even though their files should be ignored?**
 A: With `!*/`, directories themselves are not ignored, so git shows them when they contain content. This is cosmetic — running `git add --dry-run .` confirms only allowed file types would actually be staged.
 
 **Q: I added a new script type (e.g., `.bat`) — do I need to change anything?**  
