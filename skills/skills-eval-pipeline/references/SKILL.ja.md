@@ -1,12 +1,6 @@
 ---
 name: skills-eval-pipeline
 description: "スキルの有効性をテストケースで評価したいとき、またはスキルあり・なしの応答品質を比較してベンチマークレポートを生成したいときに使用。"
-metadata:
-  author: RyoMurakami1983
-  version: "1.0.0"
-  tags: [eval, benchmark, testing, skills, quality, pipeline]
-  invocable: true
-  last_reviewed: "2026-03-10"
 ---
 
 # スキル評価パイプライン（Skills Eval Pipeline）

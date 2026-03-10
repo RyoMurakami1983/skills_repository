@@ -1,12 +1,6 @@
 ---
 name: skills-eval-pipeline
 description: "Use when you need to evaluate a skill's effectiveness by running test cases with and without skill injection, comparing results, and generating a visual benchmark report."
-metadata:
-  author: RyoMurakami1983
-  version: "1.0.0"
-  tags: [eval, benchmark, testing, skills, quality, pipeline]
-  invocable: true
-  last_reviewed: "2026-03-10"
 ---
 
 # Skills Eval Pipeline

@@ -36,12 +36,20 @@ def load_run_results(evals_dir: Path, skill_id: str, run_id: str) -> tuple[list[
     baseline: list[dict] = []
 
     for path in sorted(run_dir.glob(f"{run_id}_*_with_skill.json")):
-        with open(path, encoding="utf-8") as f:
-            with_skill.append(json.load(f))
+        try:
+            with open(path, encoding="utf-8") as f:
+                with_skill.append(json.load(f))
+        except json.JSONDecodeError as exc:
+            print(f"WARNING: Skipping malformed JSON in {path}: {exc}", file=sys.stderr)
+            with_skill.append({"case_id": path.stem.split("_")[2], "score": None})
 
     for path in sorted(run_dir.glob(f"{run_id}_*_baseline.json")):
-        with open(path, encoding="utf-8") as f:
-            baseline.append(json.load(f))
+        try:
+            with open(path, encoding="utf-8") as f:
+                baseline.append(json.load(f))
+        except json.JSONDecodeError as exc:
+            print(f"WARNING: Skipping malformed JSON in {path}: {exc}", file=sys.stderr)
+            baseline.append({"case_id": path.stem.split("_")[2], "score": None})
 
     if not with_skill:
         raise ValueError(f"No with_skill results found for run '{run_id}' in {run_dir}")

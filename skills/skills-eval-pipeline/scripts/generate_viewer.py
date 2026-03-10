@@ -29,9 +29,18 @@ def load_benchmark(evals_dir: Path, skill_id: str) -> dict:
 
 
 def render(template: str, data: dict) -> str:
-    """Inject benchmark JSON into the HTML template's data placeholder."""
+    """Inject benchmark JSON into the HTML template's data placeholder.
+
+    Replaces the sentinel token (including the trailing null literal) so the
+    resulting JavaScript is valid.  Also escapes '</script>' inside the JSON
+    payload to prevent script-block injection.
+    """
     json_str = json.dumps(data, ensure_ascii=False, indent=2)
-    placeholder = "/* __BENCHMARK_DATA__ */"
+    # Escape '</script>' in data values to prevent script-block breakout
+    json_str = json_str.replace("</script>", "<\\/script>")
+    # The template contains: const DATA = /* __BENCHMARK_DATA__ */null;
+    # Replace the sentinel + the trailing 'null' literal as one atomic token.
+    placeholder = "/* __BENCHMARK_DATA__ */null"
     if placeholder not in template:
         raise ValueError(f"Template is missing the placeholder: {placeholder!r}")
     return template.replace(placeholder, json_str)

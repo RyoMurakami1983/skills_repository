@@ -22,8 +22,8 @@ You produce `grading_result.json` files (see `references/schemas.md`) for each r
 ## Outputs
 
 For each test case:
-- `evals/<skill_id>/runs/<run_id>_with_skill.json`
-- `evals/<skill_id>/runs/<run_id>_baseline.json`
+- `evals/<skill_id>/runs/<run_id>_<case_id>_with_skill.json`
+- `evals/<skill_id>/runs/<run_id>_<case_id>_baseline.json`
 
 ---
 

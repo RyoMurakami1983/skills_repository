@@ -1142,6 +1142,7 @@ class WarningValidator:
         warnings.extend(self._check_glossary_freshness())
         warnings.extend(self._check_en_japanese_leak())
         warnings.extend(self._check_description_quality())
+        warnings.extend(self._check_frontmatter_bloat())
         return warnings
 
     # --- W1: EN/JA structural parity ---
@@ -1373,6 +1374,34 @@ class WarningValidator:
                 f"Found in {len(found_lines)} line(s): {'; '.join(found_lines[:5])}"
             ))
 
+        return warnings
+
+    # --- W8: Frontmatter bloat ---
+
+    # Fields that belong in git history, not in SKILL.md frontmatter.
+    # Presence of any of these signals a reversion to the old verbose pattern
+    # that was removed in Tier 1 (frontmatter minimization).
+    _BLOAT_FIELDS = frozenset(['metadata', 'author', 'version', 'tags', 'invocable', 'last_reviewed'])
+
+    def _check_frontmatter_bloat(self) -> List[WarningResult]:
+        """W8: Frontmatter must be minimal (name + description only).
+
+        Extra fields—especially a 'metadata:' block—waste context budget and
+        revert the Tier 1 minimization. Author attribution lives in git history.
+        """
+        warnings: List[WarningResult] = []
+        helper = SkillValidator(self.content, self.file_path)
+        data = helper.parse_frontmatter()
+        if not data:
+            return warnings
+
+        bloat = [k for k in data if k.lower() in self._BLOAT_FIELDS or k.lower() == 'metadata']
+        if bloat:
+            warnings.append(WarningResult(
+                "W8",
+                "Frontmatter has extra fields beyond name+description — remove to keep context minimal",
+                f"Extra field(s): {', '.join(bloat)} — move attribution to git history (温故知新)",
+            ))
         return warnings
 
     # --- W7: Description quality checks ---

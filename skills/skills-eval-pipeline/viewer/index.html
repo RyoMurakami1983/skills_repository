@@ -137,11 +137,19 @@ const DATA = /* __BENCHMARK_DATA__ */null;
     const tr = document.createElement("tr");
     const cd = c.delta;
     const dClass = cd == null ? "" : cd > 0.05 ? "delta-positive" : cd < -0.05 ? "delta-negative" : "";
-    tr.innerHTML = `
-      <td>${c.case_id}</td>
-      <td>${fmt(c.with_skill_mean)}</td>
-      <td>${fmt(c.baseline_mean)}</td>
-      <td class="${dClass}">${cd == null ? "—" : `${cd > 0 ? "+" : ""}${cd.toFixed(4)}`}</td>`;
+    const fmtDelta = cd == null ? "—" : `${cd > 0 ? "+" : ""}${cd.toFixed(4)}`;
+
+    [
+      c.case_id,
+      fmt(c.with_skill_mean),
+      fmt(c.baseline_mean),
+      fmtDelta
+    ].forEach((val, i) => {
+      const td = document.createElement("td");
+      td.textContent = val;
+      if (i === 3 && dClass) td.className = dClass;
+      tr.appendChild(td);
+    });
     tbody.appendChild(tr);
   });
 
