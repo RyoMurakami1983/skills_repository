@@ -49,12 +49,175 @@
     .positive { color: #1a7a42; }
     .negative { color: #a50000; }
     .neutral-text { color: #856404; }
+
+    /* Summary table */
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
     th { background: #f0f2f7; text-align: left; padding: 8px 12px; font-weight: 600; }
-    td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+    td { padding: 8px 12px; border-bottom: 1px solid #eee; vertical-align: top; }
     tr:last-child td { border-bottom: none; }
     .delta-positive { color: #1a7a42; font-weight: 600; }
     .delta-negative { color: #a50000; font-weight: 600; }
+
+    /* Case detail cards */
+    .case-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .case-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: #f8f9fc;
+      border-bottom: 1px solid #e8eaf0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .case-header:hover { background: #eef0f6; }
+    .case-id-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 2px 10px;
+      border-radius: 12px;
+      white-space: nowrap;
+    }
+    .case-prompt {
+      flex: 1;
+      font-size: 0.9rem;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .case-scores {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      white-space: nowrap;
+      font-size: 0.82rem;
+    }
+    .score-pill {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    .score-pill.skill  { background: #d4f7e0; color: #1a7a42; }
+    .score-pill.base   { background: #fde8e8; color: #a50000; }
+    .score-pill.base.ok { background: #fff3cd; color: #856404; }
+    .toggle-icon { font-size: 0.8rem; color: #888; }
+    .case-body {
+      padding: 20px;
+      display: none;
+    }
+    .case-body.open { display: block; }
+
+    /* Prompt block */
+    .prompt-block {
+      background: #f8f9fc;
+      border-left: 3px solid #6366f1;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.88rem;
+      color: #333;
+      margin-bottom: 16px;
+      white-space: pre-wrap;
+    }
+
+    /* Tag badges */
+    .tags { margin-bottom: 14px; }
+    .tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      background: #e0e7ff;
+      color: #4338ca;
+      padding: 1px 8px;
+      border-radius: 10px;
+      margin-right: 4px;
+    }
+
+    /* Section label */
+    .section-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 16px 0 8px;
+    }
+
+    /* Assertion table */
+    .assertion-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-bottom: 4px; }
+    .assertion-table th { background: #f0f2f7; padding: 6px 10px; text-align: left; font-weight: 600; }
+    .assertion-table td { padding: 6px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+    .assertion-table tr:last-child td { border-bottom: none; }
+    .pass  { color: #1a7a42; font-weight: 600; }
+    .fail  { color: #a50000; font-weight: 600; }
+    .na    { color: #999; }
+    .value-cell { color: #555; max-width: 260px; overflow-wrap: break-word; }
+    .detail-cell { color: #666; font-size: 0.8rem; font-style: italic; }
+    .type-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 1px 7px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .type-badge.contains     { background: #dbeafe; color: #1e40af; }
+    .type-badge.not_contains { background: #fce7f3; color: #9d174d; }
+    .type-badge.llm_grade    { background: #ede9fe; color: #6d28d9; }
+
+    /* Snippet tabs */
+    .snippet-tabs { display: flex; gap: 0; margin-bottom: 0; }
+    .tab-btn {
+      padding: 6px 18px;
+      font-size: 0.82rem;
+      border: 1px solid #e0e0e0;
+      background: #f8f9fc;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      font-weight: 500;
+      color: #555;
+    }
+    .tab-btn.active { background: #fff; border-bottom: 1px solid #fff; color: #1a1a2e; font-weight: 700; }
+    .snippet-panel {
+      display: none;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 0 6px 6px 6px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      color: #333;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .snippet-panel.active { display: block; }
+
+    /* Gap & Recommendation */
+    .gap-box {
+      background: #fff7ed;
+      border-left: 3px solid #f97316;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 10px;
+    }
+    .gap-box .gap-title { font-size: 0.78rem; font-weight: 700; color: #c2410c; margin-bottom: 6px; }
+    .gap-box ul { margin: 0; padding-left: 18px; }
+    .gap-box li { font-size: 0.83rem; color: #7c2d12; margin-bottom: 3px; }
+    .rec-box {
+      background: #f0fdf4;
+      border-left: 3px solid #22c55e;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+    }
+    .rec-box .rec-title { font-size: 0.78rem; font-weight: 700; color: #15803d; margin-bottom: 4px; }
+    .rec-box p { margin: 0; font-size: 0.83rem; color: #14532d; }
+
     .footer { font-size: 0.78rem; color: #aaa; margin-top: 32px; text-align: center; }
   </style>
 </head>
@@ -63,6 +226,7 @@
 <h1 id="title">Eval Viewer</h1>
 <p class="meta" id="meta"></p>
 
+<!-- Summary card -->
 <div class="card">
   <h2>サマリー</h2>
   <span class="verdict" id="verdict-badge"></span>
@@ -86,12 +250,14 @@
   </div>
 </div>
 
+<!-- Quick overview table -->
 <div class="card">
-  <h2>ケース別スコア</h2>
+  <h2>ケース別スコア概要</h2>
   <table>
     <thead>
       <tr>
         <th>Case ID</th>
+        <th>テスト内容（要約）</th>
         <th>スキルあり</th>
         <th>ベースライン</th>
         <th>Δ</th>
@@ -101,14 +267,20 @@
   </table>
 </div>
 
+<!-- Detailed case cards -->
+<div id="case-details"></div>
+
 <p class="footer" id="footer"></p>
 
 <script>
-// Injected by generate_viewer.py
 const DATA = /* __BENCHMARK_DATA__ */null;
 
 (function render(d) {
-  if (!d) { document.title = "No data"; document.body.innerHTML = "<p>データがありません。generate_viewer.py を実行してください。</p>"; return; }
+  if (!d) {
+    document.title = "No data";
+    document.body.innerHTML = "<p>データがありません。generate_viewer.py を実行してください。</p>";
+    return;
+  }
 
   document.getElementById("title").textContent = `Eval Viewer — ${d.skill_id}`;
   document.getElementById("meta").textContent =
@@ -129,33 +301,156 @@ const DATA = /* __BENCHMARK_DATA__ */null;
   const delta = d.summary.delta;
   deltaEl.textContent = delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta.toFixed(4)}`;
   deltaEl.className = `value ${delta > 0.05 ? "positive" : delta < -0.05 ? "negative" : "neutral-text"}`;
-
   document.getElementById("improvement").textContent = pct(d.summary.improvement_pct);
 
+  const cases = d.case_breakdown || [];
+
+  // Overview table
   const tbody = document.getElementById("case-table");
-  (d.case_breakdown || []).forEach(c => {
+  cases.forEach(c => {
     const tr = document.createElement("tr");
     const cd = c.delta;
     const dClass = cd == null ? "" : cd > 0.05 ? "delta-positive" : cd < -0.05 ? "delta-negative" : "";
     const fmtDelta = cd == null ? "—" : `${cd > 0 ? "+" : ""}${cd.toFixed(4)}`;
+    const promptShort = (c.prompt || c.case_id).slice(0, 40) + ((c.prompt || "").length > 40 ? "…" : "");
 
-    [
-      c.case_id,
-      fmt(c.with_skill_mean),
-      fmt(c.baseline_mean),
-      fmtDelta
-    ].forEach((val, i) => {
-      const td = document.createElement("td");
-      td.textContent = val;
-      if (i === 3 && dClass) td.className = dClass;
-      tr.appendChild(td);
-    });
+    [c.case_id, promptShort, fmt(c.with_skill_mean), fmt(c.baseline_mean), fmtDelta]
+      .forEach((val, i) => {
+        const td = document.createElement("td");
+        td.textContent = val;
+        if (i === 4 && dClass) td.className = dClass;
+        tr.appendChild(td);
+      });
     tbody.appendChild(tr);
+  });
+
+  // Detailed case cards
+  const detailsContainer = document.getElementById("case-details");
+
+  cases.forEach((c, idx) => {
+    const card = document.createElement("div");
+    card.className = "case-card";
+
+    const cd = c.delta;
+    const bsOk = (c.baseline_mean || 0) >= 0.8;
+    const wsScore = c.with_skill_mean != null ? c.with_skill_mean.toFixed(4) : "—";
+    const blScore = c.baseline_mean != null ? c.baseline_mean.toFixed(4) : "—";
+    const deltaStr = cd == null ? "" : ` Δ${cd > 0 ? "+" : ""}${cd.toFixed(2)}`;
+
+    // Header (clickable)
+    const header = document.createElement("div");
+    header.className = "case-header";
+    header.innerHTML = `
+      <span class="case-id-badge">${c.case_id}</span>
+      <span class="case-prompt" title="${(c.prompt||"").replace(/"/g,"&quot;")}">${c.prompt || c.case_id}</span>
+      <span class="case-scores">
+        <span class="score-pill skill">スキルあり ${wsScore}</span>
+        <span class="score-pill base${bsOk ? " ok" : ""}">ベースライン ${blScore}</span>
+        <span style="color:#555;font-size:0.82rem;">${deltaStr}</span>
+      </span>
+      <span class="toggle-icon" id="toggle-icon-${idx}">▼</span>
+    `;
+
+    const body = document.createElement("div");
+    body.className = "case-body";
+    body.id = `case-body-${idx}`;
+
+    // Prompt
+    if (c.prompt) {
+      body.innerHTML += `<div class="section-label">📝 テストプロンプト</div><div class="prompt-block">${escHtml(c.prompt)}</div>`;
+    }
+
+    // Tags
+    if (c.tags && c.tags.length) {
+      body.innerHTML += `<div class="tags">${c.tags.map(t => `<span class="tag">${escHtml(t)}</span>`).join("")}</div>`;
+    }
+
+    // Assertion table
+    if (c.assertion_detail && c.assertion_detail.length) {
+      let assertHtml = `<div class="section-label">🔍 アサーション詳細</div>
+        <table class="assertion-table">
+          <thead><tr>
+            <th>種別</th><th>期待値 / 評価基準</th><th>重み</th>
+            <th>スキルあり</th><th>ベースライン</th><th>補足</th>
+          </tr></thead><tbody>`;
+      c.assertion_detail.forEach(a => {
+        const typeBadge = `<span class="type-badge ${a.type}">${escHtml(a.type)}</span>`;
+        const wsPass = a.with_skill_passed == null ? '<span class="na">—</span>'
+          : a.with_skill_passed ? '<span class="pass">✅</span>' : '<span class="fail">❌</span>';
+        const blPass = a.baseline_passed == null ? '<span class="na">—</span>'
+          : a.baseline_passed ? '<span class="pass">✅</span>' : '<span class="fail">❌</span>';
+        assertHtml += `<tr>
+          <td>${typeBadge}</td>
+          <td class="value-cell">${escHtml(a.value)}</td>
+          <td>${a.weight}</td>
+          <td>${wsPass}</td>
+          <td>${blPass}</td>
+          <td class="detail-cell">${escHtml(a.detail || "")}</td>
+        </tr>`;
+      });
+      assertHtml += `</tbody></table>`;
+      body.innerHTML += assertHtml;
+    }
+
+    // Response snippets (tabbed)
+    const hasWs = c.with_skill_snippet;
+    const hasBl = c.baseline_snippet;
+    if (hasWs || hasBl) {
+      body.innerHTML += `<div class="section-label">💬 回答スニペット</div>
+        <div class="snippet-tabs">
+          <button class="tab-btn active" onclick="switchTab(this,'ws-${idx}','bl-${idx}')">スキルあり</button>
+          <button class="tab-btn" onclick="switchTab(this,'bl-${idx}','ws-${idx}')">ベースライン</button>
+        </div>
+        <div class="snippet-panel active" id="ws-${idx}">${escHtml(hasWs || "(なし)")}</div>
+        <div class="snippet-panel" id="bl-${idx}">${escHtml(hasBl || "(なし)")}</div>`;
+    }
+
+    // Gap analysis
+    if (c.gap_summary && c.gap_summary.length) {
+      let gapHtml = `<div class="section-label" style="margin-top:16px;">⚠️ ギャップ分析（ベースライン不足点）</div>
+        <div class="gap-box"><div class="gap-title">ベースラインが不足している点</div><ul>`;
+      c.gap_summary.forEach(g => { gapHtml += `<li>${escHtml(g)}</li>`; });
+      gapHtml += `</ul></div>`;
+      body.innerHTML += gapHtml;
+    } else {
+      body.innerHTML += `<div class="gap-box" style="margin-top:16px;"><div class="gap-title">ギャップなし</div>
+        <ul><li>ベースラインも全アサーションをクリア。スキル固有の知識を必要としないケースです。</li></ul></div>`;
+    }
+
+    // Recommendation
+    if (c.recommendation) {
+      body.innerHTML += `<div class="rec-box"><div class="rec-title">💡 改善提案（AI私見）</div>
+        <p>${escHtml(c.recommendation)}</p></div>`;
+    }
+
+    header.addEventListener("click", () => {
+      const open = body.classList.toggle("open");
+      document.getElementById(`toggle-icon-${idx}`).textContent = open ? "▲" : "▼";
+    });
+
+    card.appendChild(header);
+    card.appendChild(body);
+    detailsContainer.appendChild(card);
   });
 
   document.getElementById("footer").textContent =
     `skills-eval-pipeline  |  ${d.skill_id}  |  ${d.eval_version}`;
 })(DATA);
+
+function switchTab(btn, showId, hideId) {
+  btn.parentElement.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById(showId).classList.add("active");
+  document.getElementById(hideId).classList.remove("active");
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 </script>
 </body>
 </html>

@@ -25,34 +25,228 @@
   "case_breakdown": [
     {
       "case_id": "tc-001",
+      "prompt": "新しいWPFアプリケーションのプロジェクトを C:\\Projects\\MyWpfApp に作成しました。このプロジェクトに必要なdotnetスキルをデプロイしてください。skills_repositoryは C:\\tools\\skills_repository にあります。",
+      "tags": [
+        "happy-path",
+        "wpf"
+      ],
       "with_skill_mean": 1.0,
       "baseline_mean": 0.0,
-      "delta": 1.0
+      "delta": 1.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "wpf-app",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "WhatIf",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "Deploy-DotnetSkills.ps1",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "-SourceRoot",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "-Target",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "プロジェクト種別(WPF)に適したカテゴリ(wpf-appなど)を推奨し、DeployスクリプトのPowerShellコマンドを具体的に提示しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "プロジェクト種別(WPF)を正しく識別し、wpf-appカテゴリを推奨。Deploy-DotnetSkills.ps1の-WhatIfプレビューを含む具体的なPowerShellコマンドを提示している。"
+        }
+      ],
+      "with_skill_snippet": "WPFアプリケーションですね。`wpf-app` カテゴリをお勧めします（foundationサブセット + wpf + infraサブセットの複合、15スキル）。\n\nまず `-WhatIf` でプレビューを確認しましょう：\n\n```powershell\n& \"C:\\tools\\skills_repository\\skills\\dotnet-skill-deploy\\scripts\\Deploy-DotnetSkills.ps1\" `\n    -SourceRoot \"C:\\tools\\skills_repository\\dotnet\" `\n    -Target \"C:\\Projects\\MyWpfApp\" `\n    -Category wpf-app `\n    -WhatIf\n```\n\n問題なければ、実際にデプロイします：\n\n```powershell\n& \"C:\\tools\\skills_repository\\skills\\dotnet-skill-deploy\\scripts\\Deploy-DotnetSkills.ps1\" `\n    -SourceRoot \"C:\\to",
+      "baseline_snippet": "WPFアプリケーションにdotnetスキルをデプロイするには、以下の手順が考えられます。\n\nまず、プロジェクトに `.github/skills` ディレクトリを作成します：\n\n```powershell\nNew-Item -ItemType Directory -Force -Path \"C:\\Projects\\MyWpfApp\\.github\\skills\"\n```\n\n次に、`C:\\tools\\skills_repository\\dotnet` から必要なスキルファイルをコピーします。\nWPFプロジェクト向けには以下が参考になります：\n- WPFパターン関連スキル（MVVM、コードビハインドなど）\n- 基礎的なC#スキル（型設計、プロジェクト構造など）\n- インフラ/DI関連スキル（依存性注入、設定管理など）\n\n```powershell\n# skills_repositoryの内容を確認\nGet-ChildItem \"C:\\tools\\skills_repository\\dotnet\" -Directory | Select-Object Name\n\n# 必要なスキルを個別にコピ",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「wpf-app」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「WhatIf」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「Deploy-DotnetSkills.ps1」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「-SourceRoot」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「-Target」が回答に現れない）",
+        "推論・判断力が不足（プロジェクト種別(WPF)に適したカテゴリ(wpf-appなど)を推奨し、DeployスクリプトのPowerShellコマンドを具体的に提示しているか）"
+      ],
+      "recommendation": "スキル固有の専門知識（wpf-app, WhatIf, Deploy-DotnetSkills.ps1）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
     },
     {
       "case_id": "tc-002",
+      "prompt": "クラスライブラリプロジェクト C:\\Projects\\MyLib にdotnetスキルをデプロイしたい。どのカテゴリを使えばいい？",
+      "tags": [
+        "project-type-selection"
+      ],
       "with_skill_mean": 1.0,
       "baseline_mean": 0.2,
-      "delta": 0.8
+      "delta": 0.8,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "foundation",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "wpf-app",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "クラスライブラリに適したカテゴリ(foundationやdata)を推奨し、wpf専用スキルは不要と判断できているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "クラスライブラリに適したfoundation+dataカテゴリを明示的に推奨し、WPF専用スキルは不要と判断してデスクトップUI専用スキルを除外している。"
+        }
+      ],
+      "with_skill_snippet": "クラスライブラリには `foundation` + `data` の組み合わせをお勧めします（合計8スキル）。\n\n**推奨カテゴリ：**\n- `foundation` (5スキル): modern-csharp, type-design, project-structure など\n- `data` (3スキル): efcore, database-performance, serialization\n\nデプロイコマンド（まず -WhatIf でプレビュー）：\n\n```powershell\n& \"C:\\tools\\skills_repository\\skills\\dotnet-skill-deploy\\scripts\\Deploy-DotnetSkills.ps1\" `\n    -SourceRoot \"C:\\tools\\skills_repository\\dotnet\" `\n    -Target \"C:\\Projects\\MyLib\" `\n    -Category foundation `\n    -WhatIf\n```\n\n```powershell\n& \"C:\\tools\\ski",
+      "baseline_snippet": "クラスライブラリプロジェクト向けのdotnetスキルについてアドバイスします。\n\nまず利用可能なスキルを確認しましょう：\n\n```powershell\nGet-ChildItem \"C:\\tools\\skills_repository\\dotnet\" -Directory | Select-Object Name\n```\n\nクラスライブラリには以下が参考になります：\n- **基礎的なC#スキル**: 型設計、プロジェクト構造、コーディング規約\n- **データアクセス**: Entity Framework Core、シリアライゼーション\n- **テスト**: 単体テスト戦略\n\nWPF特有のUIパターンスキルは通常不要です。\n\n具体的なカテゴリ名はskills_repositoryのREADMEを確認してください。\n適切なスキルを特定したら、`.github/skills/` ディレクトリにコピーする形になります。",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「foundation」が回答に現れない）",
+        "推論・判断力が不足（クラスライブラリに適したカテゴリ(foundationやdata)を推奨し、wpf専用スキルは不要と判断できているか）"
+      ],
+      "recommendation": "スキル固有の専門知識（foundation）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
     },
     {
       "case_id": "tc-003",
+      "prompt": "既にdotnetスキルをデプロイ済みのプロジェクトがあります。skills_repositoryが更新されたので、最新版に更新したいです。",
+      "tags": [
+        "update-existing"
+      ],
       "with_skill_mean": 1.0,
       "baseline_mean": 0.7143,
-      "delta": 0.2857
+      "delta": 0.2857,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "-Force",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "Deploy-DotnetSkills.ps1",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "-Forceフラグを使った更新コマンドを提示し、既存スキルが上書きされる旨を説明しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "-Forceフラグを含む更新コマンドを2つ（WhatIfプレビュー版と実行版）提示し、既存スキルが上書きされることを明示している。"
+        }
+      ],
+      "with_skill_snippet": "既存のスキルを最新版に更新するには、-Force フラグを使用します。これにより、.github/skills/ にある既存のスキルファイルが上書きされます。\n\nまず更新前に -WhatIf でプレビューすることをお勧めします：\n\n`powershell\n& \"<skills_repository>\\skills\\dotnet-skill-deploy\\scripts\\Deploy-DotnetSkills.ps1\" `\n    -SourceRoot \"<skills_repository>\\dotnet\" `\n    -Target \"<project_path>\" `\n    -Category <category> `\n    -WhatIf\n`\n\n内容を確認したら、-Force で実際に更新します：\n\n`powershell\n& \"<skills_repository>\\skills\\dotnet-skill-deploy\\scripts\\Deploy-DotnetSkills.ps1\" `\n    -SourceRoot \"<skills_repository>\\dotne",
+      "baseline_snippet": "既存のdotnetスキルを最新版に更新するには、デプロイスクリプトを再実行するか、ファイルを手動で上書きコピーする方法があります。\n\nPowerShellで既存ファイルを強制上書きする場合は -Force オプションを使います：\n\n`powershell\nCopy-Item -Path \"<skills_repository>\\dotnet\\*\" -Destination \"<project>\\.github\\skills\\\" -Recurse -Force\n`\n\n-Force を指定することで、既に存在するファイルも上書きされます。\n\nプロジェクト専用のデプロイスクリプトがある場合は、そのスクリプトの上書きオプション（-Force や -Overwrite など）を確認してください。更新前にバックアップを取ることも推奨します。",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「Deploy-DotnetSkills.ps1」が回答に現れない）"
+      ],
+      "recommendation": "スキル固有の専門知識（Deploy-DotnetSkills.ps1）をスキルに明示することで発火率が上がります。"
     },
     {
       "case_id": "tc-004",
+      "prompt": "プロジェクトにスキルをデプロイする前に、何がコピーされるか確認したい。実際には変更を加えずに確認する方法を教えて。",
+      "tags": [
+        "preview-mode"
+      ],
       "with_skill_mean": 1.0,
       "baseline_mean": 1.0,
-      "delta": 0.0
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "-WhatIf",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "-WhatIfパラメータを使ったプレビューコマンドを具体的に提示し、ファイルが実際にはコピーされないことを説明しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "Deploy-DotnetSkills.ps1 に -WhatIf を付けた具体的なプレビューコマンドを提示し、ファイルが実際にはコピーされないことを明示している。"
+        }
+      ],
+      "with_skill_snippet": "変更を加えずに何がコピーされるかプレビューするには、-WhatIf パラメータを使用します。ファイルは実際にはコピーされず、実行予定の操作だけが表示されます。\n\n`powershell\n& \"<skills_repository>\\skills\\dotnet-skill-deploy\\scripts\\Deploy-DotnetSkills.ps1\" `\n    -SourceRoot \"<skills_repository>\\dotnet\" `\n    -Target \"<project_path>\" `\n    -Category wpf-app `\n    -WhatIf\n`\n\n-WhatIf を指定するとスクリプトはコピー対象ファイルの一覧を出力しますが、.github/skills/ には何も書き込まれません。内容を確認した後、-WhatIf を外して実際のデプロイを実行してください。これはスキルの「Transparency First」原則に基づき、初回デプロイ前には必ずこの手順を踏むことを推奨します。",
+      "baseline_snippet": "実際に変更を加えずに確認する方法として、PowerShell の -WhatIf パラメータが利用できます。\n\n`powershell\nCopy-Item -Path \"<source>\\skills\\*\" -Destination \".github\\skills\\\" -Recurse -WhatIf\n`\n\n-WhatIf を付けると、コマンドは実行されるはずの操作を表示するだけで、実際にはファイルをコピーしません。これにより、何が変更されるかを安全に確認できます。\n\nまた、-Verbose を組み合わせるとより詳細な出力が得られます。専用のデプロイスクリプトがある場合も、多くは -WhatIf に対応しています。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
     },
     {
       "case_id": "tc-005",
+      "prompt": "dotnetプロジェクトに全部のスキルをデプロイして。とにかく全部入れたい。",
+      "tags": [
+        "anti-pattern-check"
+      ],
       "with_skill_mean": 1.0,
       "baseline_mean": 0.0,
-      "delta": 1.0
+      "delta": 1.0,
+      "assertion_detail": [
+        {
+          "type": "llm_grade",
+          "value": "allカテゴリを使う前に、プロジェクト種別に合わせた選択的デプロイを推奨し、不要なスキルがエージェントのコンテキストノイズになることを説明しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "allカテゴリ使用を明示的にアンチパターンと位置付け、プロジェクト種別ごとの推奨カテゴリ表を示し、不要スキルがエージェントのコンテキストノイズになる理由を説明している。"
+        },
+        {
+          "type": "not_contains",
+          "value": "-Category all",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        }
+      ],
+      "with_skill_snippet": "全スキルを一括デプロイしたい気持ちはわかりますが、それはアンチパターンです。不要なスキルがエージェントのコンテキストに混入しノイズとなるため、プロジェクト種別に合わせた選択的デプロイを推奨します。\n\n| プロジェクト種別 | 推奨カテゴリ |\n|----------------|------------|\n| WPFアプリ       | wpf-app（foundation + wpf + infraのサブセット） |\n| クラスライブラリ  | \foundation + data |\n| Blazorアプリ    | \foundation + \testing |\n| コンソールアプリ  | \foundation |\n\n例（WPFプロジェクトの場合）：\n\n`powershell\n& \"<skills_repository>\\skills\\dotnet-skill-deploy\\scripts\\Deploy-DotnetSkills.ps1\" `\n    -SourceRoot \"<skills_repository>\\dotnet\" `\n    -Target \"<project_p",
+      "baseline_snippet": "全スキルをデプロイするには、デプロイスクリプトに全カテゴリを指定するか、ファイルを一括コピーします。\n\nスクリプトが -Category all パラメータに対応していれば：\n\n`powershell\n& \".\\Deploy-DotnetSkills.ps1\" -SourceRoot \"...\\dotnet\" -Target \"<project_path>\" -Category all\n`\n\nまたは、PowerShellで直接一括コピー：\n\n`powershell\nCopy-Item -Path \"<skills_repository>\\dotnet\\*\" -Destination \"<project>\\.github\\skills\\\" -Recurse -Force\n`\n\nこれですべてのdotnetスキルがデプロイされます。",
+      "gap_summary": [
+        "推論・判断力が不足（allカテゴリを使う前に、プロジェクト種別に合わせた選択的デプロイを推奨し、不要なスキルがエージェントのコンテキストノイズになることを説明しているか）",
+        "アンチパターン防止の知識が不足（「-Category all」を使ってしまう）"
+      ],
+      "recommendation": "Anti-Patterns セクションに「-Category all」を避ける理由を追記すると効果的です。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
     }
   ],
-  "generated_at": "2026-03-10T09:07:44.871529+00:00"
+  "generated_at": "2026-03-10T09:24:16.698502+00:00"
 }
