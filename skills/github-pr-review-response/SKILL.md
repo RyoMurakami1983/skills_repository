@@ -285,7 +285,15 @@ gh pr review --comment --body-file "$REVIEW_BODY"
 # PowerShell: push and add review comment
 git push origin HEAD
 
-gh pr review --comment --body "All review comments addressed. See individual commits for details."
+$reviewBody = @"
+All review comments addressed. See individual commits for details.
+
+- Fixed null-handling in `build_payload()`
+- Added a regression test for the failure path
+"@
+[System.IO.File]::WriteAllText("$env:TEMP\review_response.md", $reviewBody, [System.Text.UTF8Encoding]::new($false))
+gh pr review --comment --body-file "$env:TEMP\review_response.md"
+Remove-Item "$env:TEMP\review_response.md"
 ```
 
 Reply guidelines:
@@ -333,7 +341,17 @@ gh pr comment --body-file "$REREVIEW_BODY"
 # PowerShell: request re-review
 gh pr edit --add-reviewer reviewer-username
 
-gh pr comment --body "All review comments addressed. Ready for re-review."
+$reReviewBody = @"
+All review comments addressed:
+- Fixed SQL injection (commit abc1234)
+- Added error handling (commit def5678)
+- Refactored to guard clause (commit ghi9012)
+
+Ready for re-review. Thank you for the feedback!
+"@
+[System.IO.File]::WriteAllText("$env:TEMP\rereview_summary.md", $reReviewBody, [System.Text.UTF8Encoding]::new($false))
+gh pr comment --body-file "$env:TEMP\rereview_summary.md"
+Remove-Item "$env:TEMP\rereview_summary.md"
 ```
 
 Re-review decision table:

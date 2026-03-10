@@ -123,6 +123,24 @@ EOF
 gh pr create --title "feat: 変更" --body-file "$BODY_FILE"
 ```
 
+**同じテンプレートで使うコマンド（複数行本文は `--body-file` を標準化）**:
+
+```powershell
+gh issue create --title "🟢 改善: 変更" --body-file "$env:TEMP\pr_body.md"
+gh issue comment 123 --body-file "$env:TEMP\pr_body.md"
+gh pr create --title "feat: 変更" --body-file "$env:TEMP\pr_body.md"
+gh pr comment 123 --body-file "$env:TEMP\pr_body.md"
+gh pr review 123 --comment --body-file "$env:TEMP\pr_body.md"
+```
+
+```bash
+gh issue create --title "🟢 改善: 変更" --body-file "$BODY_FILE"
+gh issue comment 123 --body-file "$BODY_FILE"
+gh pr create --title "feat: 変更" --body-file "$BODY_FILE"
+gh pr comment 123 --body-file "$BODY_FILE"
+gh pr review 123 --comment --body-file "$BODY_FILE"
+```
+
 **PowerShell 優先の理由**: このリポジトリの開発環境が Windows/PowerShell 主体
 （`docs/WINDOWS_SETUP.md` 参照）。
 

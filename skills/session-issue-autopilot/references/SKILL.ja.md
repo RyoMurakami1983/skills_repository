@@ -99,7 +99,27 @@ Open Issueが複数あるときに使う。Why: 先に棚卸しすると重複�
 
 > **Values**: 成長の複利 / 継続は力
 
-### Step 4: 必須エージェント選択チェックポイント
+### Step 4: 着手前の現行規約差分チェック（必須）
+
+実装に入る前に、Issue本文の前提が古くないかを **現行** の frontmatter/validator 規約で短時間チェックします。
+
+```bash
+# 着手前プリフライト: 今日の規約を一次ソースで確認
+CHECK_LOG="preflight-issue-<id>.log"
+{
+  echo "[preflight] validator/frontmatter convention check"
+  rg -n "required|name|description|Use when|metadata" skills/skill-quality-validation/scripts/validate_skill.py
+  rg -n "frontmatter|name, description" copilot/copilot-instructions.md
+} | tee "$CHECK_LOG"
+```
+
+実行後は、作業ログまたはIssueコメントに痕跡を1行残します（例: `preflight done: preflight-issue-162.log`）。
+
+Issue選定から実装へ移る直前に使う。Why: 旧前提のまま着手して後からリスコープする手戻りを防ぐ。
+
+> **Values**: 基礎と型 / 温故知新
+
+### Step 5: 必須エージェント選択チェックポイント
 
 実装前に、どの専門エージェントを使うかをユーザーへ確認する。`skill-shihan` を明示選択肢に含める。
 
@@ -120,7 +140,7 @@ Open Issueが複数あるときに使う。Why: 先に棚卸しすると重複�
 
 > **Values**: ニュートラル / 基礎と型
 
-### Step 5: 実装と検証
+### Step 6: 実装と検証
 
 選定Issueを専用ブランチで実装し、対象範囲のテスト/リンター/検証を実施する。
 
@@ -136,7 +156,7 @@ git checkout -b feature/issue-<id>-short-title
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 6: `github-pr-workflow` へ PR作成とレビュー待機を委譲する
+### Step 7: `github-pr-workflow` へ PR作成とレビュー待機を委譲する
 
 実装と検証が終わったら、ここで別のPR手順を再定義せず `github-pr-workflow` へ渡します。
 
@@ -153,7 +173,7 @@ implementation complete
 
 > **Values**: 基礎と型 / 温故知新
 
-### Step 7: 明示的なレビュー待機タスクを維持し、短時間観測後にシグナルで委譲する
+### Step 8: 明示的なレビュー待機タスクを維持し、短時間観測後にシグナルで委譲する
 
 PR作成直後は、レビュー待機が暗黙状態に埋もれないよう、`pr-<number>-review-wait` のような明示的な待機アーティファクトを active のまま維持します。
 
@@ -186,7 +206,7 @@ PR作成直後で、レビューがすぐ始まる可能性があるときに使
 
 > **Values**: 継続は力 / ニュートラル
 
-### Step 8: 人間のマージ判断ゲートと安全なマージ後同期
+### Step 9: 人間のマージ判断ゲートと安全なマージ後同期
 
 `github-pr-review-response` が完了したら、マージ判断ゲートで止まります。GitHub上でマージするかどうかは人間が決めます。
 
@@ -209,7 +229,7 @@ git pull --ff-only
 
 > **Values**: 基礎と型 / 余白の設計
 
-### Step 9: 必須 協働ふりかえりチェックポイント
+### Step 10: 必須 協働ふりかえりチェックポイント
 
 マージ後（またはレビュー一区切り後）、ユーザー参加のふりかえり実施可否を確認する。
 
@@ -225,7 +245,7 @@ git pull --ff-only
 
 > **Values**: 余白の設計 / 成長の複利
 
-### Step 10: KPT/YWT実施とアクション記録（Issue/Notion）
+### Step 11: KPT/YWT実施とアクション記録（Issue/Notion）
 
 Step 9 で参加同意が得られたら、KPTまたはYWTを実施し、次アクションを記録する。
 
@@ -251,7 +271,7 @@ Step 9 で参加同意が得られたら、KPTまたはYWTを実施し、次ア�
 - 優先順位決定前にIssue棚卸し表を可視化する。
 - 1日完了条件を厳守し、大きいIssueは分割する。
 - エージェント選択チェックポイントを必須かつブロッキングにする。
-- `gh` の本文は原則 `--body-file` を使う。
+- `gh` の本文は原則 `--body-file` を使い、`docs/patterns/environment-portability.md` のテンプレート2を再利用する。
 - PR作成後は `pr-<number>-review-wait`（または同等物）を明示的な active task として維持し、レビュー待機を追跡可能にする。
 - GitHub上のマージは人間に残し、マージ確認後にだけローカル同期へ進む。
 - ふりかえり結果は追跡可能な成果物（Issue/Notion）へ接続する。
@@ -263,7 +283,7 @@ Step 9 で参加同意が得られたら、KPTまたはYWTを実施し、次ア�
 2. 1日で終わらないIssueを選ぶ。
    - Fix: 実現可能性ゲートでスコープ分割。
 3. エージェント選択チェックポイントを飛ばす。
-   - Fix: Step 5前にユーザー回答を必須化。
+   - Fix: Step 6前にユーザー回答を必須化。
 4. `gh`本文をインラインで書いてMarkdown/バッククォートを壊す。
    - Fix: 一時Markdownファイル + `--body-file` を使用。
 5. PR作成後にレビュー待機が消える、または無期限にポーリングし続ける。
@@ -271,7 +291,7 @@ Step 9 で参加同意が得られたら、KPTまたはYWTを実施し、次ア�
 6. 人間確認なしでマージや同期を進める。
    - Fix: マージ判断ゲートで止まり、マージ確認と clean tree を確認してから同期する。
 7. ユーザー不在でふりかえりを自動実行する。
-   - Fix: Step 9 の yes/no 応答待ちでブロック。
+   - Fix: Step 10 の yes/no 応答待ちでブロック。
 
 ## Anti-Patterns
 

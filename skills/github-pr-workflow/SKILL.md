@@ -148,26 +148,15 @@ Use when starting new work or when Step 1 detected you are on main. Why: creatin
 
 Create a PR with a Japanese body (team policy). Use `Closes` to auto-close issues on merge.
 
-**Inline body** (short PRs):
+**Inline body** (single-line only):
 
 ```bash
 gh pr create \
   --title "feat: 支払い画面にフィルタを追加" \
-  --body "## 概要
-注文履歴画面に検索フィルタを追加。
-
-## 理由
-サポートから検索要求が多く、対応工数を削減するため。
-
-## テスト
-ローカルで動作確認済み。
-
-## 関連
-Closes #123
-Refs #130"
+  --body "注文履歴画面に検索フィルタを追加。Closes #123. Refs #130."
 ```
 
-**File-based body** (recommended default for multiline Markdown, code fences, or backticks):
+**File-based body** (standard default for multiline Markdown, code fences, or backticks):
 
 ```bash
 # Write body to a unique temp file with a quoted heredoc.
@@ -198,7 +187,7 @@ EOF
 gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file "$BODY_FILE"
 ```
 
-Prefer this pattern for any non-trivial body, especially when Markdown contains backticks, shell examples, or multiple paragraphs.
+Prefer this pattern for any non-trivial body. For reusable shell-safe templates (PowerShell + Bash), see `docs/patterns/environment-portability.md` (Template 2).
 
 ✅ **Good**: Generate the body file, inspect it, then call `gh pr create --body-file`.
 ❌ **Bad**: Paste multiline Markdown with backticks directly into `--body` and hope shell quoting survives.
