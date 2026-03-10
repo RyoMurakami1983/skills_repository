@@ -7,6 +7,12 @@ Detailed parity workflow for `skills-revise-skill` Step 4. Covers structural ver
 ### 1. Run Validator on EN Baseline
 
 ```bash
+# Bash / macOS / Linux
+uv run python skills/skill-quality-validation/scripts/validate_skill.py <skill>/SKILL.md
+```
+
+```powershell
+# PowerShell (Windows)
 uv run python skills\skill-quality-validation\scripts\validate_skill.py <skill>/SKILL.md
 ```
 
@@ -75,6 +81,12 @@ Fix: Add EN: "Do not run against production environments."
 ### 5. Re-run Validator
 
 ```bash
+# Bash / macOS / Linux
+uv run python skills/skill-quality-validation/scripts/validate_skill.py <skill>/SKILL.md
+```
+
+```powershell
+# PowerShell (Windows)
 uv run python skills\skill-quality-validation\scripts\validate_skill.py <skill>/SKILL.md
 ```
 

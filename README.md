@@ -367,8 +367,7 @@ uv run python ~/.copilot/skills/skill-quality-validation/scripts/validate_skill.
 - `skills-author-skill` — 新しいスキルを一から執筆
 - `skills-validate-skill` — スキルの品質検証
 - `skills-generate-skill-suite` — 関連スキル群を一括生成
-- `skills-refactor-skill-to-single-workflow` — レガシー形式から移行
-- `skills-revise-skill` — スキル改訂 + 発見性最適化
+- `skills-revise-skill` — スキル改訂 + 発見性最適化（EN/JA同期を含む）
 - `skills-review-skill-enterprise-readiness` — エンタープライズ適性レビュー
 
 **Git/GitHub系**:

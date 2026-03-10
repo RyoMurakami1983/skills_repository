@@ -85,7 +85,8 @@ GitHub Copilot Agent Skills — 24スキル + 2スクリプトライブラリ
 
 - ✅ **1 Skill = 1 Workflow**: 単一ワークフローに特化
 - ✅ **500行以内**: SKILL.md本体は簡潔に（超過分はreferences/へ）
-- ✅ **88%以上**: validate_skill.py 全体スコア ≥85%、各カテゴリ ≥80%
+- ✅ **合格条件**: validate_skill.py 全体スコア ≥85%、各カテゴリ ≥80%
+- ✅ **推奨目標**: 全体スコア ≥88%（スキルメタ系は特に高品質を維持）
 - ✅ **憲法との整合**: PHILOSOPHY.md の Values と明示的に接続
 - ✅ **国際化**: 英日両言語対応
 

@@ -133,7 +133,7 @@ For system skills, keep SKILL.md and references/SKILL.ja.md in sync. Update both
 - Step count (### Step N) must match
 
 **Safety vocabulary alignment** (W3.1/W3.2):
-- Verify 削除/delete, 認証/auth, 上書き/overwrite carry identical constraints in both languages
+- Verify 削除/delete, 認証/auth, 上書き/overwrite, 移行/migration carry identical constraints in both languages
 - Verify negation patterns (しない, 不可, 禁止) have corresponding EN prohibitions
 
 **Sync checklist after editing English SKILL.md**:
