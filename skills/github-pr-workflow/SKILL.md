@@ -307,6 +307,8 @@ Use when one PR from a parallel set has merged and other review branches still r
 - [ ] Branch can be pushed to remote (no protection conflict)
 - [ ] If changes include `.github/workflows/*`, token includes `workflow` scope
 - [ ] Existing open PR for the branch is checked (`gh pr list --head BRANCH --state open`)
+- [ ] If `skills/**/SKILL.md` changed, run `uv run python skills/skill-quality-validation/scripts/validate_skill.py skills/<skill_id>/SKILL.md` before PR creation
+- [ ] For skill changes, confirm validation gate: overall score ≥85% and each category ≥80% (review warnings and fix high-signal items before review)
 
 ---
 

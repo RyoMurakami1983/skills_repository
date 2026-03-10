@@ -61,6 +61,23 @@
 
 ---
 
+## helper/deploy script 棚卸し（Issue #123）
+
+既存の代表スクリプトを、選定マトリクスの観点で一次分類する。
+
+| Script | Primary users | Runtime today | Recommendation | Notes |
+|---|---|---|---|---|
+| `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` | Windows/.NET 利用者 | PowerShell | keep + wrap候補 | dotnet利用者向け入口として低摩擦。共通化が必要になったら Python 共通コア + 薄いラッパーを検討。 |
+| `skills/python-skill-deploy/scripts/Deploy-PythonSkills.ps1` | Windows/Python 利用者 | PowerShell | keep + wrap候補 | `Deploy-PythonSkills.sh` と責務が近く、オプション解析の重複が増える場合は共通コア候補。 |
+| `skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh` | WSL/macOS/Linux 利用者 | Bash | keep | Unix系利用者への低摩擦入口として維持。PowerShell 版との挙動差は定期確認対象。 |
+
+### 次アクション（Issue運用）
+
+- `keep` 判定スクリプトは、挙動差分チェックを継続運用する。  
+- `wrap候補` は、重複実装が増えたタイミングで後続Issueへ分割し、共有コア抽出を検討する。  
+
+---
+
 ## 標準テンプレート
 
 ### テンプレート1: 共通コマンド（推奨）

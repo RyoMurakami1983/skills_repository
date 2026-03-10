@@ -1066,7 +1066,7 @@ class LanguageValidator(SkillValidator):
 
 
 class WarningValidator:
-    """Generates warning-level checks (EN/JA parity, Values, safety risks, Japanese leak)"""
+    """Generates warning-level checks (structural, safety, language, description, frontmatter, markdown quality)."""
 
     def __init__(self, content: str, file_path: str):
         self.content = content
@@ -1109,6 +1109,41 @@ class WarningValidator:
 
         return '\n'.join(result)
 
+    @staticmethod
+    def _iter_non_frontmatter_non_fenced_lines(text: str):
+        """Yield (line_number, stripped_line) outside frontmatter and fenced code blocks."""
+        lines = text.split('\n')
+        in_frontmatter = bool(lines) and lines[0].strip() == '---'
+        in_fence = False
+        fence_char = ''
+        fence_len = 0
+
+        for idx, line in enumerate(lines, start=1):
+            stripped = line.strip()
+
+            if in_frontmatter:
+                if idx == 1:
+                    continue
+                if stripped == '---':
+                    in_frontmatter = False
+                continue
+
+            fence_match = re.match(r'^ {0,3}([`~]{3,})', line)
+            if fence_match:
+                marker = fence_match.group(1)
+                if not in_fence:
+                    in_fence = True
+                    fence_char = marker[0]
+                    fence_len = len(marker)
+                elif marker[0] == fence_char and len(marker) >= fence_len:
+                    in_fence = False
+                continue
+
+            if in_fence:
+                continue
+
+            yield idx, stripped
+
     def _extract_headings(self, text: str) -> List[Tuple[int, str]]:
         """Extract (level, title) pairs outside code blocks"""
         cleaned = self._strip_fenced_code(text)
@@ -1143,6 +1178,7 @@ class WarningValidator:
         warnings.extend(self._check_en_japanese_leak())
         warnings.extend(self._check_description_quality())
         warnings.extend(self._check_frontmatter_bloat())
+        warnings.extend(self._check_table_leading_double_pipe())
         return warnings
 
     # --- W1: EN/JA structural parity ---
@@ -1402,6 +1438,27 @@ class WarningValidator:
                 "Frontmatter has extra fields beyond name+description — remove to keep context minimal",
                 f"Extra field(s): {', '.join(bloat)} — move attribution to git history (温故知新)",
             ))
+        return warnings
+
+    # --- W9: Markdown table leading '||' ---
+
+    def _check_table_leading_double_pipe(self) -> List[WarningResult]:
+        """W9: Warn when a probable markdown table row starts with '||'."""
+        warnings: List[WarningResult] = []
+        findings: List[str] = []
+
+        for idx, stripped in self._iter_non_frontmatter_non_fenced_lines(self.content):
+            # Probable malformed table row: starts with || and still contains another pipe.
+            if stripped.startswith('||') and '|' in stripped[2:]:
+                findings.append(f"L{idx}: {stripped[:80]}")
+
+        if findings:
+            warnings.append(WarningResult(
+                "W9",
+                "Markdown table row starts with '||' — likely empty first column",
+                "; ".join(findings[:5]),
+            ))
+
         return warnings
 
     # --- W7: Description quality checks ---
