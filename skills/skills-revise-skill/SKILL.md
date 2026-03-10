@@ -23,7 +23,6 @@ Use this skill when:
 
 - **`skills-author-skill`** - Skill writing workflow
 - **`skills-validate-skill`** - Validate revisions before publishing
-- **`skills-refactor-skill-to-single-workflow`** - Refactor legacy skills before revision
 - **`knowledge-capture`** — Anonymization gate for examples derived from real projects
 
 ---

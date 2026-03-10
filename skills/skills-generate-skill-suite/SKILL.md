@@ -23,8 +23,6 @@ Use this skill when:
 ## Related Skills
 
 - **`skills-author-skill`** — Generate and author a single skill (this skill generates multiple)
-- **`skills-refactor-skill-to-single-workflow`** — Migration methodology for existing skills
-- **`skills-author-skill`** — Fill each generated skeleton with content
 - **`skills-validate-skill`** — Validate each skill in the suite
 
 ---
@@ -193,7 +191,7 @@ Use `skills-author-skill` to fill each skeleton, then `skills-validate-skill` to
 ## Resources
 
 - [skills-author-skill](../skills-author-skill/SKILL.md) — Single skill generation and authoring
-- [skills-refactor-skill-to-single-workflow](../skills-refactor-skill-to-single-workflow/SKILL.md) — Migration guide
+- [skills-validate-skill](../skills-validate-skill/SKILL.md) — Quality validation
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — Development constitution and Values
 
 ---

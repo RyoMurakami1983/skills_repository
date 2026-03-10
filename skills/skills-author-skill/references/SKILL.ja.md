@@ -35,8 +35,7 @@ metadata:
 ## Related Skills
 
 - **`skills-validate-skill`** — 完成したスキルを品質基準で検証
-- **`skills-refactor-skill-to-single-workflow`** — レガシーのマルチパターンスキルを変換
-- **`skills-revise-skill`** — 公開後の改訂と発見性最適化
+- **`skills-revise-skill`** — 公開後の改訂、発見性最適化、EN/JAパリティ維持
 
 ---
 
