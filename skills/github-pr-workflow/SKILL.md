@@ -298,7 +298,7 @@ Use when one PR from a parallel set has merged and other review branches still r
 - Batch PR status checks at natural context switches instead of polling one PR at a time
 - After one PR merges from a parallel set, sync every remaining branch with `origin/main` before continuing review
 - Do not create stacked dependent PR branches from feature branches
-- After a base PR merges, create the next work branch from latest `main` before opening another PR
+- After a base PR merges, run `git fetch origin` and create the next work branch from latest `origin/main` before opening another PR
 
 ### Preflight Checklist (Before `gh pr create`)
 
@@ -331,7 +331,7 @@ Use when one PR from a parallel set has merged and other review branches still r
    Fix: Merge `origin/main` into each open sibling branch, rerun checks, and request re-review if the branch changed.
 
 7. **Creating a PR branch from another feature branch (stacked dependency)**
-   Fix: Do not stack dependent PR branches. Merge the base PR first, then branch fresh from latest `main`.
+   Fix: Do not stack dependent PR branches. Merge the base PR first, run `git fetch origin`, then branch fresh from latest `origin/main`.
 
 ## Troubleshooting
 
