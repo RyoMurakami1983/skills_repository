@@ -1,9 +1,11 @@
 ---
 name: business-evidence-response
 description: >
-  Template skill for responding to recurring business inquiries (audits, questionnaires,
-  compliance surveys) using historical evidence and past response archives. Use when
-  building a reusable evidence-response system for any operational domain.
+  Build a reusable evidence-response system for recurring business inquiries — audits,
+  questionnaires, compliance surveys — using historical evidence archives and structured
+  workflows. Use when your organization repeatedly receives the same structured inquiries,
+  you need to leverage past responses instead of starting from scratch, or you are setting
+  up a new operational domain response capability.
 ---
 
 # Business Evidence Response
@@ -38,6 +40,14 @@ A template skill for building **evidence-based response systems** in operational
 
 ---
 
+## Related Skills
+
+- **`knowledge-capture`** — Structured capture and anonymization of domain knowledge before building evidence archives
+- **`git-commit-practices`** — Version-controlled evidence archive management with meaningful commit history
+- **`furikaeri-practice`** — Post-response retrospective to improve the response process
+
+---
+
 ## Core Principles
 
 1. **Evidence over Memory** — Document responses; recall is unreliable
@@ -48,11 +58,11 @@ A template skill for building **evidence-based response systems** in operational
 
 | Principle | Value Alignment | Why It Matters |
 |---|---|---|
-| Evidence over Memory | Onko Chishin | Past documented responses beat recalled answers |
-| Structured Classification | Kiso to Kata | Categorizing enables repeatable responses |
-| Intentional Blank Space | Yohaku no Sekkei | Template provides structure; you fill the gaps |
-| Cumulative Knowledge | Seicho no Fukuri | Each response makes the next one faster |
-| Annual Freshness | Keizoku wa Chikara | Scheduled review prevents knowledge decay |
+| Evidence over Memory | 温故知新 (Onko Chishin) | Past documented responses beat recalled answers |
+| Structured Classification | 基礎と型 (Kiso to Kata) | Categorizing enables repeatable responses |
+| Intentional Blank Space | 余白の設計 (Yohaku no Sekkei) | Template provides structure; you fill the gaps |
+| Cumulative Knowledge | 成長の複利 (Seicho no Fukuri) | Each response makes the next one faster |
+| Annual Freshness | 継続は力 (Keizoku wa Chikara) | Scheduled review prevents knowledge decay |
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: github-repo-label-setup
-description: Standardize repository labels with prefix-based naming conventions. Use when setting up or migrating repository labels for consistent issue and PR management.
+description: "Set up and manage repository labels using prefix-based naming conventions (t/, a/, s/, p/ prefixes) for consistent issue and PR triage. Use when setting up a new repository, migrating an existing repo to standard labels, or aligning labels across multiple team repositories."
 ---
 
 # GitHub Repository Label Setup
