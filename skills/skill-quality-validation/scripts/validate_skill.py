@@ -1128,29 +1128,11 @@ class WarningValidator:
         return bool(re.search(r'decision\s+table|判断テーブル|判断表', cleaned, re.IGNORECASE))
 
     def _extract_description(self) -> str:
-        """Extract description value from YAML frontmatter (handles inline and block scalar)."""
-        fm_match = re.match(r'^---\s*\n(.*?)\n---\s*\n', self.content, re.DOTALL)
-        if not fm_match:
-            return ""
-        fm_text = fm_match.group(1)
-        lines = fm_text.split('\n')
-        for i, line in enumerate(lines):
-            m = re.match(r'^description:\s*(.*)$', line)
-            if not m:
-                continue
-            raw = m.group(1).strip()
-            if raw in ('>', '|', '>-', '|-', '>+', '|+'):
-                # Block scalar: collect subsequent indented lines
-                desc_lines = []
-                for sub in lines[i + 1:]:
-                    if sub and not sub.startswith(' ') and not sub.startswith('\t'):
-                        break
-                    if sub.strip():
-                        desc_lines.append(sub.strip())
-                return ' '.join(desc_lines).strip()
-            # Inline value — strip surrounding quotes
-            return raw.strip('"\'')
-        return ""
+        """Extract description value from YAML frontmatter using the shared SkillValidator parser."""
+        helper = SkillValidator(self.content, self.file_path)
+        data = helper.parse_frontmatter()
+        desc = data.get('description', '')
+        return desc.strip() if isinstance(desc, str) else ''
 
     def validate(self) -> List[WarningResult]:
         warnings: List[WarningResult] = []
@@ -1437,12 +1419,14 @@ class WarningValidator:
 
         # W7.3: Capability enumeration — comma-separated items signal specific use cases,
         # improving discriminability when multiple skills are candidates.
+        # item_count = comma-clauses + 1 (first item before any comma also counts).
         capabilities = re.findall(r',\s*(?:or\s+)?(?:\w+\s+){0,3}\w+', desc)
-        if len(capabilities) < 2:
+        item_count = len(capabilities) + 1 if capabilities else 0
+        if item_count < 2:
             warnings.append(WarningResult(
                 "W7.3",
                 "Description lacks capability enumeration — add comma-separated use cases",
-                f"Found {len(capabilities)} comma-clause(s) — recommended ≥2",
+                f"Estimated {item_count} capability item(s) from {len(capabilities)} comma clause(s) — recommended ≥2",
             ))
 
         return warnings

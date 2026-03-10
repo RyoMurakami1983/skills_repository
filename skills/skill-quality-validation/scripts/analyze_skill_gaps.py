@@ -443,7 +443,7 @@ class GapAnalyzer:
             r"configure|create|define|deploy|detect|enforce|establish|execute|explain|"
             r"format|generate|guide|handle|implement|initialize|install|integrate|"
             r"maintain|manage|migrate|monitor|onboard|protect|report|respond|restore|"
-            r"review|revise|run|scan|scaffold|set.up|setup|standardize|sync|track|"
+            r"review|revise|run|scan|scaffold|set\s+up|setup|standardize|sync|track|"
             r"update|use|validate|write|"
             r"作成|実行|検証|レビュー|管理|生成|分析)\b",
             desc_lower,
