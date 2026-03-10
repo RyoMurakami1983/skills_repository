@@ -135,3 +135,7 @@ local_reference_skills/*
 !local_reference_skills/.gitkeep
 !local_reference_skills/.gitignore
 .github/skills/
+
+# Eval run artifacts (not committed)
+evals/**/runs/
+evals/**/viewer.html

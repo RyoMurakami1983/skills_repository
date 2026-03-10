@@ -1,0 +1,58 @@
+{
+  "skill_id": "dotnet-skill-deploy",
+  "version": "1.0.0",
+  "description": "dotnet-skill-deploy スキルの有効性評価テストスイート",
+  "cases": [
+    {
+      "id": "tc-001",
+      "prompt": "新しいWPFアプリケーションのプロジェクトを C:\\Projects\\MyWpfApp に作成しました。このプロジェクトに必要なdotnetスキルをデプロイしてください。skills_repositoryは C:\\tools\\skills_repository にあります。",
+      "tags": ["happy-path", "wpf"],
+      "assertions": [
+        { "type": "contains", "value": "wpf-app", "weight": 1.0 },
+        { "type": "contains", "value": "WhatIf", "weight": 0.8 },
+        { "type": "contains", "value": "Deploy-DotnetSkills.ps1", "weight": 1.0 },
+        { "type": "contains", "value": "-SourceRoot", "weight": 0.8 },
+        { "type": "contains", "value": "-Target", "weight": 0.8 },
+        { "type": "llm_grade", "value": "プロジェクト種別(WPF)に適したカテゴリ(wpf-appなど)を推奨し、DeployスクリプトのPowerShellコマンドを具体的に提示しているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-002",
+      "prompt": "クラスライブラリプロジェクト C:\\Projects\\MyLib にdotnetスキルをデプロイしたい。どのカテゴリを使えばいい？",
+      "tags": ["project-type-selection"],
+      "assertions": [
+        { "type": "contains", "value": "foundation", "weight": 1.0 },
+        { "type": "not_contains", "value": "wpf-app", "weight": 0.5 },
+        { "type": "llm_grade", "value": "クラスライブラリに適したカテゴリ(foundationやdata)を推奨し、wpf専用スキルは不要と判断できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-003",
+      "prompt": "既にdotnetスキルをデプロイ済みのプロジェクトがあります。skills_repositoryが更新されたので、最新版に更新したいです。",
+      "tags": ["update-existing"],
+      "assertions": [
+        { "type": "contains", "value": "-Force", "weight": 1.0 },
+        { "type": "contains", "value": "Deploy-DotnetSkills.ps1", "weight": 0.8 },
+        { "type": "llm_grade", "value": "-Forceフラグを使った更新コマンドを提示し、既存スキルが上書きされる旨を説明しているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-004",
+      "prompt": "プロジェクトにスキルをデプロイする前に、何がコピーされるか確認したい。実際には変更を加えずに確認する方法を教えて。",
+      "tags": ["preview-mode"],
+      "assertions": [
+        { "type": "contains", "value": "-WhatIf", "weight": 1.0 },
+        { "type": "llm_grade", "value": "-WhatIfパラメータを使ったプレビューコマンドを具体的に提示し、ファイルが実際にはコピーされないことを説明しているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-005",
+      "prompt": "dotnetプロジェクトに全部のスキルをデプロイして。とにかく全部入れたい。",
+      "tags": ["anti-pattern-check"],
+      "assertions": [
+        { "type": "llm_grade", "value": "allカテゴリを使う前に、プロジェクト種別に合わせた選択的デプロイを推奨し、不要なスキルがエージェントのコンテキストノイズになることを説明しているか", "weight": 1.0 },
+        { "type": "not_contains", "value": "-Category all", "weight": 0.5 }
+      ]
+    }
+  ]
+}

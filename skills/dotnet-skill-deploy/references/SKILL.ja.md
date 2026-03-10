@@ -6,10 +6,6 @@ description: >
   またはskills_repositoryからのスキル更新時に使用。
 allowed-tools:
   - powershell
-metadata:
-  author: RyoMurakami1983
-  tags: [dotnet, deployment, skills, project-setup, automation]
-  invocable: false
 ---
 
 # dotnetスキルをプロジェクトにデプロイする
@@ -31,6 +27,21 @@ metadata:
 - **`dotnet-wpf-mvvm-patterns`** — WPF MVVM基盤スキル
 - **`dotnet-project-structure`** — プロジェクト構造スキル
 - **`git-initial-setup`** — 新規プロジェクトでスキルデプロイと併用
+
+---
+
+## Decision Table
+
+現在の状況に応じて適切なステップに直接ジャンプできる。
+
+| 状況 | 現在の状態 | アクション |
+|------|-----------|-----------|
+| 新規プロジェクトセットアップ | スキル未デプロイ | Step 1 → 2 → 3 |
+| 利用可能なカテゴリを確認したい | デプロイ不要 | Step 2 で `-List` 実行 |
+| 初回デプロイ | ターゲットパス確定済み | Step 3（`-Force` なし） |
+| 既存スキルを最新版に更新 | `.github/skills/` に既存スキルあり | Step 3 に `-Force` |
+| 変更内容をプレビューしたい | スコープ不明 | Step 3 に `-WhatIf` |
+| デプロイ結果を確認 | スクリプト実行直後 | Step 4 |
 
 ---
 
@@ -217,6 +228,17 @@ Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 
 ---
 
+## Common Pitfalls
+
+| 問題 | 症状 | 対処 |
+|------|------|------|
+| `-SourceRoot` のパスが間違っている | "SourceRoot not found" エラー | `skills_repository\dotnet` パスの存在を確認 |
+| `.github\skills\` ディレクトリが見えない | エージェントにスキルが表示されない | スクリプトが自動作成するので `-Target` パスを確認 |
+| `-WhatIf` なしでデプロイ | 意図しないファイルがプロジェクトに入る | 必ずプレビューしてからデプロイ |
+| カテゴリが重複してスキルが混在 | 重複コピーの警告 | スクリプトが自動重複排除するため対応不要 |
+
+---
+
 ## スクリプトリファレンス
 
 デプロイスクリプトは repoルート相対パス `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` に配置。
@@ -251,3 +273,22 @@ A: 自動的には管理されない。ユーザーが `git add` するかどう
 
 **Q: production/ スキルもデプロイできる？**
 A: このスキルはdotnet専用。productionスキルは手動コピー: `Copy-Item -Recurse production\* .github\skills\`。
+
+---
+
+## Quick Reference
+
+```
+# 利用可能カテゴリとスキルを一覧表示
+Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -List
+
+# カテゴリデプロイ（プレビュー→実行）
+Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Category wpf-app -WhatIf
+Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Category wpf-app
+
+# 個別スキルデプロイ
+Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Skills skill1,skill2
+
+# 既存スキルを最新版に更新
+Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Category wpf-app -Force
+```

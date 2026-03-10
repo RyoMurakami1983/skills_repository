@@ -1,0 +1,58 @@
+{
+  "skill_id": "dotnet-skill-deploy",
+  "eval_version": "1.0.0",
+  "runs": {
+    "with_skill": {
+      "count": 5,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    },
+    "baseline": {
+      "count": 5,
+      "mean": 0.3829,
+      "stddev": 0.4043,
+      "min": 0.0,
+      "max": 1.0
+    }
+  },
+  "summary": {
+    "delta": 0.6171,
+    "improvement_pct": 161.16,
+    "verdict": "improved"
+  },
+  "case_breakdown": [
+    {
+      "case_id": "tc-001",
+      "with_skill_mean": 1.0,
+      "baseline_mean": 0.0,
+      "delta": 1.0
+    },
+    {
+      "case_id": "tc-002",
+      "with_skill_mean": 1.0,
+      "baseline_mean": 0.2,
+      "delta": 0.8
+    },
+    {
+      "case_id": "tc-003",
+      "with_skill_mean": 1.0,
+      "baseline_mean": 0.7143,
+      "delta": 0.2857
+    },
+    {
+      "case_id": "tc-004",
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0
+    },
+    {
+      "case_id": "tc-005",
+      "with_skill_mean": 1.0,
+      "baseline_mean": 0.0,
+      "delta": 1.0
+    }
+  ],
+  "generated_at": "2026-03-10T09:07:44.871529+00:00"
+}
