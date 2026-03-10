@@ -7,9 +7,9 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 from pathlib import Path
-
-import pytest
+from unittest.mock import MagicMock, patch
 
 
 # ---------------------------------------------------------------------------
@@ -20,6 +20,7 @@ def _load_module():
     here = Path(__file__).parent
     script = here.parent / "optimize_descriptions.py"
     spec = importlib.util.spec_from_file_location("optimize_descriptions", script)
+    assert spec and spec.loader, "Could not locate optimize_descriptions.py"
     mod = importlib.util.module_from_spec(spec)
     # Register in sys.modules BEFORE exec so dataclass forward-ref resolution works
     import sys as _sys
@@ -86,9 +87,31 @@ def test_check_w7_fails_no_enumeration():
     assert "W7.3" in result.failing_ids
 
 
-# ---------------------------------------------------------------------------
-# Rule-based provider tests
-# ---------------------------------------------------------------------------
+def test_parse_frontmatter_block_scalar(tmp_path: Path):
+    """_parse_frontmatter should collapse YAML block scalar description into one string."""
+    mod = _load_module()
+    skill_dir = tmp_path / "skill-block"
+    skill_dir.mkdir()
+    content = (
+        "---\n"
+        "name: skill-block\n"
+        "description: >\n"
+        "  Use when deploying dotnet skills to a project directory.\n"
+        "  Supports multiple skill categories and target directories.\n"
+        "---\n\n"
+        "## When to Use This Skill\n- Deploying skills\n"
+    )
+    path = skill_dir / "SKILL.md"
+    path.write_text(content, encoding="utf-8")
+
+    fm = mod._parse_frontmatter(content)
+    assert "description" in fm
+    assert "Use when deploying" in fm["description"]
+    # Should be a single string (no newlines from block scalar continuation)
+    assert "\n" not in fm["description"]
+
+
+
 
 def test_rule_based_produces_w7_compliant_description():
     mod = _load_module()
@@ -218,11 +241,17 @@ def test_json_output_structure(tmp_path: Path, capsys):
 # GitHubModelsProvider fallback test
 # ---------------------------------------------------------------------------
 
-def test_github_models_provider_falls_back_on_error():
+def test_github_models_provider_falls_back_on_error(monkeypatch):
     """When gh api fails, GitHubModelsProvider should return a rule-based result."""
     mod = _load_module()
+
+    # Simulate `gh api` returning a non-zero exit code
+    def _failing_run(*args, **kwargs):
+        return MagicMock(returncode=1, stdout="", stderr="connection error")
+
+    monkeypatch.setattr(subprocess, "run", _failing_run)
+
     provider = mod.GitHubModelsProvider()
-    # gh api will fail in test env (no GitHub Models access / no valid endpoint)
     result = provider.improve("skills-author-skill", "短い", ["Creating skills", "Reviewing quality"])
     # Should not raise; should return a non-empty string
     assert isinstance(result, str)
