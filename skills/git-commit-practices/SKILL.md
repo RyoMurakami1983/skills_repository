@@ -1,13 +1,6 @@
 ---
 name: git-commit-practices
-description: Commit practices with Conventional Commits and atomic changes. Use when standardizing team history.
-metadata:
-  author: RyoMurakami1983
-  tags: [git, commits, conventional-commits, workflow, quality]
-  invocable: false
-  tool_versions:
-    git: ">=2.30"
-  last_reviewed: "2026-03-01"
+description: "Commit practices with Conventional Commits, atomic changes, and Japanese commit subjects. Use when standardizing commit messages across a team, splitting work into atomic commits for safe reviews, or teaching new teammates a repeatable commit workflow."
 ---
 
 # Git Commit Practices

@@ -4,10 +4,6 @@ description: >
   Convert a legacy multi-pattern skill into a single-workflow skill, or
   modernize a reference skill to production quality. Use when migrating
   existing skills during the repository-wide cosmos modernization effort.
-metadata:
-  author: RyoMurakami1983
-  tags: [copilot, agent-skills, refactoring, migration, cosmos]
-  invocable: false
 ---
 
 # Refactor a Skill to Single Workflow

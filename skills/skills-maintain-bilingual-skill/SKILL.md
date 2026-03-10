@@ -4,10 +4,6 @@ description: >
   Maintain EN/JA structural parity for bilingual skills. Use when updating a
   SKILL.md and its references/SKILL.ja.md, synchronizing after adding/removing
   steps or sections, or resolving validate_skill.py W1/W3 warnings.
-metadata:
-  author: RyoMurakami1983
-  tags: [copilot, agent-skills, bilingual, maintenance, parity]
-  invocable: false
 ---
 
 # Maintain Bilingual Skill Parity

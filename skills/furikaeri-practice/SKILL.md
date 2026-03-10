@@ -1,10 +1,6 @@
 ---
 name: furikaeri-practice
-description: Guided retrospective after sessions or PR reviews. Use when reflecting on work and planning improvements.
-metadata:
-  author: RyoMurakami1983
-  tags: [retrospective, kaizen, kpt, ywt, continuous-improvement, team-growth]
-  invocable: false
+description: "Guided retrospective after sessions or PR reviews using KPT and YWT frameworks. Use when reflecting on completed work, planning improvements, capturing lessons learned, or logging retrospectives to a Notion furikaeri database."
 ---
 
 # Furikaeri Practice

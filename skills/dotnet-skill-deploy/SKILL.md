@@ -6,10 +6,6 @@ description: >
   or updating project-level skills from the skills_repository.
 allowed-tools:
   - powershell
-metadata:
-  author: RyoMurakami1983
-  tags: [dotnet, deployment, skills, project-setup, automation]
-  invocable: false
 ---
 
 # Deploy Dotnet Skills to Project

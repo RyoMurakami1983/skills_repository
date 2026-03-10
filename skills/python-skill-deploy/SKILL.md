@@ -7,14 +7,6 @@ description: >
 allowed-tools:
   - powershell
   - bash
-metadata:
-  author: RyoMurakami1983
-  tags: [python, deployment, skills, project-setup, automation]
-  invocable: false
-  tool_versions:
-    bash: ">=4.0"
-    powershell: ">=5.1"
-  last_reviewed: "2026-03-07"
 ---
 
 # Deploy Python Skills to Project

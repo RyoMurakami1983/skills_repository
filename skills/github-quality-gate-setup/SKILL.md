@@ -1,14 +1,6 @@
 ---
 name: github-quality-gate-setup
 description: "Add gitleaks + textlint quality gate CI to any GitHub repository. Use when setting up a new repo or hardening an existing one against secret leaks and Markdown issues."
-metadata:
-  author: RyoMurakami1983
-  tags: [github, ci, gitleaks, textlint, security, quality-gate, actions]
-  invocable: false
-  tool_versions:
-    git: ">=2.30"
-    gh: ">=2.0"
-  last_reviewed: "2026-03-04"
 ---
 
 # GitHub Quality Gate Setup

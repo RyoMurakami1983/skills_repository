@@ -1,18 +1,6 @@
 ---
 name: git-ops-folder-init
-description: >
-  Initialize any operational or business folder as a git repository that tracks
-  ONLY tool/config directories (.github, .claude, .codex, .cursor) while ignoring
-  all business files (Office documents, PDFs, images, media). Uses a directory-based
-  allowlist .gitignore for zero-surprise version control.
-author: RyoMurakami1983
-tags: [git, gitignore, allowlist, operational-folder, knowledge-management, manufacturing, business]
-invocable: true
-version: 1.0.0
-values_alignment:
-  - "基礎と型の追求: Allowlist approach prevents accidental tracking — the pattern itself is the safeguard"
-  - "温故知新: Business folders already have history; git captures only the knowledge layer going forward"
-  - "余白の設計: Explicit allowlist creates intentional space — only what matters is tracked"
+description: "Initialize business or operational folders as git repositories that track only tool/config directories (.github, .claude, .codex) while ignoring business files. Use when adding version control to manufacturing records, quality documentation, or mixed-content folders where only knowledge artifacts should be tracked."
 ---
 
 # Git Ops Folder Init

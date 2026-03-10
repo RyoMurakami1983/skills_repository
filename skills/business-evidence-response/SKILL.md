@@ -4,26 +4,6 @@ description: >
   Template skill for responding to recurring business inquiries (audits, questionnaires,
   compliance surveys) using historical evidence and past response archives. Use when
   building a reusable evidence-response system for any operational domain.
-metadata:
-  author: RyoMurakami1983
-  tags: [business, evidence, questionnaire, audit, compliance, template, knowledge-management]
-  invocable: true
-  version: 1.0.0
-  last_reviewed: "2026-03-09"
-  freshness_check_interval_days: 365
-  language: [en, ja]
-  model_recommendation: "Claude (via GitHub Copilot) — optimized for long-context knowledge retrieval"
-values_alignment:
-  - "Kiso to Kata (Foundation and Form): The 7-step workflow is the kata — learn once, apply to any domain"
-  - "Yohaku no Sekkei (Designing White Space): Template provides structure; domain knowledge is intentionally left blank"
-  - "Onko Chishin (Old Wisdom, New Knowledge): Past responses inform future answers — the core of this skill"
-  - "Seicho no Fukuri (Compound Growth): Every response enriches the knowledge base, compounding value"
-  - "Keizoku wa Chikara (Persistence is Power): Freshness management keeps the knowledge base current"
-trigger:
-  - Recurring external questionnaire or survey received
-  - Audit preparation requiring evidence-backed responses
-  - Compliance inquiry from customer, regulator, or certification body
-  - Need to set up a new evidence-response system for an operational domain
 ---
 
 # Business Evidence Response

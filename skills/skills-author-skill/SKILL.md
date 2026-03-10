@@ -5,10 +5,6 @@ description: >
   Use when creating a new skill and deciding the right pattern (workflow,
   cycle, situational/router, cascade, parallel, or multi-MCP), defining
   trigger-focused frontmatter, and structuring bilingual documentation.
-metadata:
-  author: RyoMurakami1983
-  tags: [copilot, agent-skills, authoring, documentation]
-  invocable: false
 ---
 
 # Author a New Agent Skill

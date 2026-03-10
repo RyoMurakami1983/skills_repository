@@ -5,10 +5,6 @@ description: >
   become public skills or references.
   Use when creating furikaeri, ADR, incident reports, or any document that
   could flow into a public repository.
-metadata:
-  author: RyoMurakami1983
-  tags: [documentation, anonymization, knowledge-management, cross-cutting]
-  invocable: false
 ---
 
 # Knowledge Capture
