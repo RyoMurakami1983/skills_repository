@@ -30,7 +30,7 @@ import json
 import re
 import subprocess
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, asdict, field
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
@@ -110,11 +110,7 @@ class ScanReport:
 # ---------------------------------------------------------------------------
 
 def _parse_frontmatter(content: str) -> dict[str, str]:
-    """Extract YAML frontmatter as a simple key→value dict (single level).
-
-    Handles block scalar values (``description: >`` / ``description: |``)
-    by joining the indented continuation lines into a single string.
-    """
+    """Extract YAML frontmatter as a simple key→value dict (single level)."""
     lines = content.splitlines()
     if not lines or lines[0].strip() != "---":
         return {}
@@ -126,26 +122,10 @@ def _parse_frontmatter(content: str) -> dict[str, str]:
     if end < 0:
         return {}
     data: dict[str, str] = {}
-    i = 1
-    while i < end:
-        line = lines[i]
-        if ":" in line and not line.startswith(" "):
+    for line in lines[1:end]:
+        if ":" in line:
             k, _, v = line.partition(":")
-            v = v.strip()
-            # Block scalar indicator: collect subsequent indented lines
-            if v in (">", "|", ">-", "|-", ">+", "|+", ">2", "|2"):
-                continuation: list[str] = []
-                j = i + 1
-                while j < end and (lines[j].startswith("  ") or lines[j].strip() == ""):
-                    stripped = lines[j].strip()
-                    if stripped:
-                        continuation.append(stripped)
-                    j += 1
-                data[k.strip()] = " ".join(continuation)
-                i = j
-                continue
-            data[k.strip()] = v.strip('"').strip("'")
-        i += 1
+            data[k.strip()] = v.strip().strip('"').strip("'")
     return data
 
 
@@ -250,48 +230,6 @@ class RuleBasedProvider:
         "suite": "generate",
     }
 
-    # Gerund forms for verbs that don't follow simple +ing rules.
-    _GERUND_MAP: dict[str, str] = {
-        "set up": "setting up",
-        "use": "using",
-        "create": "creating",
-        "manage": "managing",
-        "automate": "automating",
-        "capture": "capturing",
-        "integrate": "integrating",
-        "generate": "generating",
-        "configure": "configuring",
-        "initialize": "initializing",
-        "migrate": "migrating",
-        "standardize": "standardizing",
-        "enforce": "enforcing",
-        "execute": "executing",
-        "analyze": "analyzing",
-        "revise": "revising",
-        "guide": "guiding",
-        "handle": "handling",
-        "maintain": "maintaining",
-        "monitor": "monitoring",
-        "onboard": "onboarding",
-        "optimize": "optimizing",
-        "respond": "responding",
-        "restore": "restoring",
-        "validate": "validating",
-        "write": "writing",
-        "evaluate": "evaluating",
-        "provide": "providing",
-    }
-
-    @classmethod
-    def _to_gerund(cls, verb: str) -> str:
-        """Convert a verb to its gerund (-ing) form."""
-        if verb in cls._GERUND_MAP:
-            return cls._GERUND_MAP[verb]
-        # Drop trailing 'e' (but not 'ee') before appending 'ing'
-        if verb.endswith("e") and not verb.endswith("ee"):
-            return verb[:-1] + "ing"
-        return verb + "ing"
-
     def _infer_verb(self, skill_name: str) -> str:
         parts = skill_name.lower().replace("_", "-").split("-")
         for part in parts:
@@ -330,12 +268,11 @@ class RuleBasedProvider:
 
         # Compose description
         caps_str = ", ".join(caps)
-        gerund = self._to_gerund(verb)
-        desc = f"Use when {gerund} a skill — {caps_str}."
+        desc = f"Use when {verb}ing a skill — {caps_str}."
 
         # Ensure W7.1 (≥80 chars): pad with more detail if needed
         if len(desc) < _W7_MIN_LENGTH:
-            extra = f" Covers {gerund} workflows, quality checks, and best-practice guidance."
+            extra = f" Covers {verb}ing workflows, quality checks, and best-practice guidance."
             desc = desc.rstrip('.') + extra
 
         # Final safety: truncate at 512 to avoid overly long descriptions
@@ -457,55 +394,25 @@ def scan_all(skills_dir: Path, provider: DescriptionProvider, skill_id_filter: s
 # ---------------------------------------------------------------------------
 
 def apply_improvement(result: SkillScanResult) -> bool:
-    """Overwrite the description field in the SKILL.md frontmatter.
-
-    Safely patches only within the ``--- ... ---`` frontmatter block and
-    removes orphaned block-scalar continuation lines when present.
-    """
+    """Overwrite the description field in the SKILL.md frontmatter."""
     if not result.suggested_desc or result.w7.passes_all:
         return False
     path = Path(result.file_path)
     content = path.read_text(encoding="utf-8")
 
-    lines = content.splitlines(keepends=True)
-    if not lines or lines[0].strip() != "---":
+    # Replace description: "..." or description: '...' or description: bare value
+    new_line = f'description: "{result.suggested_desc}"'
+    # Match both quoted and unquoted single-line description
+    patched, count = re.subn(
+        r'^description:[ \t].*$',
+        new_line,
+        content,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    if count == 0:
         return False
-
-    # Locate closing frontmatter delimiter
-    fm_end = -1
-    for i, line in enumerate(lines[1:], start=1):
-        if line.strip() == "---":
-            fm_end = i
-            break
-    if fm_end < 0:
-        return False
-
-    # Escape double-quotes in the new description value
-    safe_desc = result.suggested_desc.replace('"', '\\"')
-    new_desc_line = f'description: "{safe_desc}"\n'
-
-    # Rebuild frontmatter lines, replacing description (+ skipping block continuations)
-    new_fm_lines: list[str] = []
-    replaced = False
-    i = 1
-    while i < fm_end:
-        line = lines[i]
-        if re.match(r'^description:', line):
-            new_fm_lines.append(new_desc_line)
-            replaced = True
-            i += 1
-            # Skip any block-scalar continuation lines (indented lines)
-            while i < fm_end and lines[i].startswith(" "):
-                i += 1
-        else:
-            new_fm_lines.append(line)
-            i += 1
-
-    if not replaced:
-        return False
-
-    patched_lines = [lines[0]] + new_fm_lines + [lines[fm_end]] + lines[fm_end + 1:]
-    path.write_text("".join(patched_lines), encoding="utf-8")
+    path.write_text(patched, encoding="utf-8")
     return True
 
 
