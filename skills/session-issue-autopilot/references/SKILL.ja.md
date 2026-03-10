@@ -247,7 +247,7 @@ git pull --ff-only
 
 ### Step 11: KPT/YWT実施とアクション記録（Issue/Notion）
 
-Step 9 で参加同意が得られたら、KPTまたはYWTを実施し、次アクションを記録する。
+Step 10 で参加同意が得られたら、KPTまたはYWTを実施し、次アクションを記録する。
 
 ```markdown
 形式選択: KPT or YWT

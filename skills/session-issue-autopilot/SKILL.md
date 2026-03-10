@@ -242,7 +242,7 @@ Use when execution loop is complete. Why: reflection without participant alignme
 
 ### Step 11: Run KPT/YWT and Record Actions (Issue/Notion)
 
-If user joined Step 9, run KPT or YWT and persist next actions.
+If user joined Step 10, run KPT or YWT and persist next actions.
 
 ```markdown
 Choose format: KPT or YWT
