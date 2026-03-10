@@ -315,6 +315,8 @@ Why: 早期同期の方がレビュー状態を正確に保てて、並行PR間�
 - [ ] ブランチをリモートへ push できる（保護ルールに抵触しない）
 - [ ] `.github/workflows/*` を変更する場合、トークンに `workflow` scope がある
 - [ ] 対象ブランチに既存のOpen PRがないことを確認済み（`gh pr list --head BRANCH --state open`）
+- [ ] `skills/**/SKILL.md` を変更した場合、PR作成前に `uv run python skills/skill-quality-validation/scripts/validate_skill.py skills/<skill_id>/SKILL.md` を実行している
+- [ ] スキル変更時は検証ゲートを確認している（overall ≥85%、各カテゴリ ≥80%、warning は高シグナル項目を優先修正）
 
 ---
 

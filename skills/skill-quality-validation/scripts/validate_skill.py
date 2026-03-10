@@ -1143,6 +1143,7 @@ class WarningValidator:
         warnings.extend(self._check_en_japanese_leak())
         warnings.extend(self._check_description_quality())
         warnings.extend(self._check_frontmatter_bloat())
+        warnings.extend(self._check_table_leading_double_pipe())
         return warnings
 
     # --- W1: EN/JA structural parity ---
@@ -1402,6 +1403,48 @@ class WarningValidator:
                 "Frontmatter has extra fields beyond name+description — remove to keep context minimal",
                 f"Extra field(s): {', '.join(bloat)} — move attribution to git history (温故知新)",
             ))
+        return warnings
+
+    # --- W9: Markdown table leading '||' ---
+
+    def _check_table_leading_double_pipe(self) -> List[WarningResult]:
+        """W9: Warn when a probable markdown table row starts with '||'."""
+        warnings: List[WarningResult] = []
+        lines = self.content.splitlines()
+        in_frontmatter = False
+        in_fence = False
+        findings: List[str] = []
+
+        for idx, line in enumerate(lines, start=1):
+            stripped = line.strip()
+
+            # Skip YAML frontmatter block.
+            if idx == 1 and stripped == '---':
+                in_frontmatter = True
+                continue
+            if in_frontmatter:
+                if stripped == '---':
+                    in_frontmatter = False
+                continue
+
+            # Skip fenced code blocks.
+            if stripped.startswith('```') or stripped.startswith('~~~'):
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
+
+            # Probable malformed table row: starts with || and still contains another pipe.
+            if stripped.startswith('||') and '|' in stripped[2:]:
+                findings.append(f"L{idx}: {stripped[:80]}")
+
+        if findings:
+            warnings.append(WarningResult(
+                "W9",
+                "Markdown table row starts with '||' — likely empty first column",
+                "; ".join(findings[:5]),
+            ))
+
         return warnings
 
     # --- W7: Description quality checks ---

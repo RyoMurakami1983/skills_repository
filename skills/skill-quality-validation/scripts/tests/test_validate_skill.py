@@ -376,3 +376,39 @@ def test_warning_glossary_stale(tmp_path: Path):
     report = mod.validate_skill_file(str(skill_dir / "SKILL.md"))
     w_ids = [w.id for w in report.warnings]
     assert "W4" in w_ids
+
+
+def test_warning_table_leading_double_pipe(tmp_path: Path):
+    """W9: markdown table rows starting with || trigger warning"""
+    mod = _load_validator_module()
+    desc = "Use when validating markdown table formatting and catching malformed leading pipes before review."
+    en = (
+        f"---\nname: test\ndescription: \"{desc}\"\n---\n"
+        "## Table\n"
+        "| Col A | Col B |\n"
+        "|---|---|\n"
+        "|| Bad | Row |\n"
+    )
+    ja = "# dummy\n"
+    file_path = _write_skill_with_ja(tmp_path, "table-leading-double-pipe", en, ja)
+    report = mod.validate_skill_file(str(file_path))
+    w_ids = [w.id for w in report.warnings]
+    assert "W9" in w_ids
+
+
+def test_no_warning_table_normal_single_pipe(tmp_path: Path):
+    """W9: normal markdown tables should not trigger warning"""
+    mod = _load_validator_module()
+    desc = "Use when validating markdown table formatting and accepting correctly formatted single-pipe rows."
+    en = (
+        f"---\nname: test\ndescription: \"{desc}\"\n---\n"
+        "## Table\n"
+        "| Col A | Col B |\n"
+        "|---|---|\n"
+        "| Good | Row |\n"
+    )
+    ja = "# dummy\n"
+    file_path = _write_skill_with_ja(tmp_path, "table-normal-single-pipe", en, ja)
+    report = mod.validate_skill_file(str(file_path))
+    w_ids = [w.id for w in report.warnings]
+    assert "W9" not in w_ids
