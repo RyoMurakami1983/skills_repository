@@ -297,7 +297,15 @@ gh pr review --comment --body-file "$REVIEW_BODY"
 # PowerShell: プッシュとレビューコメント追加
 git push origin HEAD
 
-gh pr review --comment --body "全レビューコメントに対応済み。各コミットの詳細を参照してください。"
+$reviewBody = @"
+全レビューコメントに対応済みです。各コミットの詳細を参照してください。
+
+- `build_payload()` の nullハンドリングを修正
+- 失敗経路の回帰テストを追加
+"@
+[System.IO.File]::WriteAllText("$env:TEMP\review_response.md", $reviewBody, [System.Text.UTF8Encoding]::new($false))
+gh pr review --comment --body-file "$env:TEMP\review_response.md"
+Remove-Item "$env:TEMP\review_response.md"
 ```
 
 返信ガイドライン：
@@ -345,7 +353,17 @@ gh pr comment --body-file "$REREVIEW_BODY"
 # PowerShell: 再レビュー依頼
 gh pr edit --add-reviewer reviewer-username
 
-gh pr comment --body "すべてのレビューコメントに対応しました。再レビューをお願いします。"
+$reReviewBody = @"
+すべてのレビューコメントに対応しました：
+- SQLインジェクション修正（コミットabc1234）
+- エラーハンドリング追加（コミットdef5678）
+- ガード句にリファクタ（コミットghi9012）
+
+再レビューをお願いします。フィードバックありがとうございました！
+"@
+[System.IO.File]::WriteAllText("$env:TEMP\rereview_summary.md", $reReviewBody, [System.Text.UTF8Encoding]::new($false))
+gh pr comment --body-file "$env:TEMP\rereview_summary.md"
+Remove-Item "$env:TEMP\rereview_summary.md"
 ```
 
 再レビュー判断テーブル:

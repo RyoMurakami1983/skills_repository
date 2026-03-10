@@ -94,7 +94,27 @@ Use when prioritizing execution. Why: one finished high-leverage issue beats man
 
 > **Values**: 成長の複利 / 継続は力
 
-### Step 4: Mandatory Agent Selection Checkpoint
+### Step 4: Mandatory Current-Convention Diff Check Before Starting Work
+
+Before touching implementation, run a fast preflight check against **current** frontmatter/validator rules to avoid re-scope caused by stale assumptions in issue text.
+
+```bash
+# Preflight: verify today's conventions from authoritative sources
+CHECK_LOG="preflight-issue-<id>.log"
+{
+  echo "[preflight] validator/frontmatter convention check"
+  rg -n "required|name|description|Use when|metadata" skills/skill-quality-validation/scripts/validate_skill.py
+  rg -n "frontmatter|name, description" copilot/copilot-instructions.md
+} | tee "$CHECK_LOG"
+```
+
+Record a short evidence line in the working log/issue comment (for example: `preflight done: preflight-issue-162.log`).
+
+Use when moving from issue selection to execution. Why: this catches outdated premises before coding starts.
+
+> **Values**: 基礎と型 / 温故知新
+
+### Step 5: Mandatory Agent Selection Checkpoint
 
 Before implementation, ask the user which specialist to involve. Include `skill-shihan` as an explicit option.
 
@@ -115,7 +135,7 @@ Use when crossing from planning into execution. Why: explicit role assignment im
 
 > **Values**: ニュートラル / 基礎と型
 
-### Step 5: Implement and Validate
+### Step 6: Implement and Validate
 
 Implement the selected issue in a focused branch, then run relevant tests/lint/validation.
 
@@ -131,7 +151,7 @@ Use when coding is approved. Why: implementation without validation creates revi
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 6: Delegate PR Creation and Review Waiting to `github-pr-workflow`
+### Step 7: Delegate PR Creation and Review Waiting to `github-pr-workflow`
 
 Once implementation is validated, hand off the delivery flow to `github-pr-workflow` instead of restating a separate PR routine here.
 
@@ -148,7 +168,7 @@ Use when validation is green. Why: Option A keeps one canonical PR creation + wa
 
 > **Values**: 基礎と型 / 温故知新
 
-### Step 7: Keep an Explicit Review-Wait Task, Observe Briefly, Then Hand Off on Signal
+### Step 8: Keep an Explicit Review-Wait Task, Observe Briefly, Then Hand Off on Signal
 
 Immediately after PR creation, keep an explicit waiting artifact active (for example, `pr-<number>-review-wait`) so review waiting remains a tracked task instead of disappearing into implicit session state.
 
@@ -181,7 +201,7 @@ Use when the PR has just been created and review work may start soon. Why: the b
 
 > **Values**: 継続は力 / ニュートラル
 
-### Step 8: Human Merge Gate and Safe Post-Merge Sync
+### Step 9: Human Merge Gate and Safe Post-Merge Sync
 
 After `github-pr-review-response` finishes, stop at the merge gate. A human decides whether to merge on GitHub.
 
@@ -204,7 +224,7 @@ Use when review response is complete and the next step is human merge handoff or
 
 > **Values**: 基礎と型 / 余白の設計
 
-### Step 9: Mandatory Collaborative Retrospective Checkpoint
+### Step 10: Mandatory Collaborative Retrospective Checkpoint
 
 After merge (or after review cycle pause), ask user to join retrospective.
 
@@ -220,9 +240,9 @@ Use when execution loop is complete. Why: reflection without participant alignme
 
 > **Values**: 余白の設計 / 成長の複利
 
-### Step 10: Run KPT/YWT and Record Actions (Issue/Notion)
+### Step 11: Run KPT/YWT and Record Actions (Issue/Notion)
 
-If user joined Step 9, run KPT or YWT and persist next actions.
+If user joined Step 10, run KPT or YWT and persist next actions.
 
 ```markdown
 Choose format: KPT or YWT
@@ -246,7 +266,7 @@ Use when collaborative retrospective is approved. Why: recorded actions turn ref
 - Keep issue inventory visible as a table before prioritization.
 - Enforce one-day scope hard; split oversized issues into follow-ups.
 - Keep agent checkpoint mandatory and blocking.
-- Prefer `--body-file` for all non-trivial `gh` issue/PR/comment content.
+- Prefer `--body-file` for all non-trivial `gh` issue/PR/comment content, and reuse `docs/patterns/environment-portability.md` Template 2.
 - Keep `pr-<number>-review-wait` (or equivalent) as an explicit active task after PR creation until a real review signal or user instruction changes the state.
 - Keep merge on GitHub human-only, then run post-merge sync only after merge confirmation
 - Keep retrospective outputs linked to concrete tracking artifacts.
@@ -258,7 +278,7 @@ Use when collaborative retrospective is approved. Why: recorded actions turn ref
 2. Selecting a large issue that cannot finish in a day.
    - Fix: apply one-day feasibility gate and split scope.
 3. Skipping agent selection checkpoint.
-   - Fix: require explicit user answer before Step 5.
+   - Fix: require explicit user answer before Step 6.
 4. Posting multiline `gh` content inline and breaking markdown/backticks.
    - Fix: use temporary markdown files with `--body-file`.
 5. Letting review waiting disappear after PR creation or polling indefinitely.
@@ -266,7 +286,7 @@ Use when collaborative retrospective is approved. Why: recorded actions turn ref
 6. Auto-merging or syncing before human confirmation.
    - Fix: stop at the merge gate, then verify merge confirmation and a clean tree before syncing.
 7. Running retrospective automatically without user collaboration.
-   - Fix: block on Step 9 yes/no response.
+   - Fix: block on Step 10 yes/no response.
 
 ## Anti-Patterns
 
