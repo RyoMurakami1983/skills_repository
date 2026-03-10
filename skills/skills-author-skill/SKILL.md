@@ -45,20 +45,18 @@ Use this skill when:
 
 ## Workflow: Author a New Skill
 
-### Step 1 — Define Metadata (YAML Frontmatter)
+### Step 1 — Define Frontmatter (name + description)
 
 Choose a name following the `<context>-<workflow>` convention (kebab-case, verb-led workflow, ≤ 64 chars).
 
 ```yaml
 ---
 name: <context>-<verb>-<object>
-description: <what it does>. Use when <activation scenario>. # ≤ 1024 chars
-metadata:
-  author: RyoMurakami1983
-  tags: [tag1, tag2, tag3]   # 3-5 technology-focused tags
-  invocable: false
+description: <what it does>. Use when <activation scenario>.
 ---
 ```
+
+Description follows the **[What] + [When] + [Capabilities]** pattern (≤ 1024 chars). This is the primary trigger for skill activation — make it specific and "pushy".
 
 **Naming examples**:
 
@@ -72,10 +70,10 @@ metadata:
 **Rules**:
 - `name` must equal directory name
 - `description` includes concrete "Use when..." triggers (this is used for skill activation)
-- Use only standard top-level keys: `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility`
-- Place custom fields (`author`, `tags`, `invocable`) under `metadata`
+- Frontmatter contains only `name` and `description` — author attribution lives in git history
+- Platform-functional keys (`allowed-tools`) are permitted when needed
 
-> **Values**: 基礎と型（フロントマターが発動のトリガー）
+> **Values**: 基礎と型 + 余白の設計（最小フロントマターが発動のトリガー）
 
 ### Step 2 — Generate Initial Skeleton (Integrated)
 

@@ -854,7 +854,7 @@ def main():
         if not skills_dir:
             # Auto-detect from script location
             script_dir = Path(__file__).parent
-            skills_dir = str(script_dir.parent.parent)
+            skills_dir = str(script_dir.parent.parent.parent)
         analyze_all(skills_dir, args.json)
     elif args.path:
         analyze_single(args.path, args.json)

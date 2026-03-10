@@ -42,37 +42,35 @@ Use this skill when:
 
 ## Workflow: Refactor to Single Workflow
 
-### Step 0 — Modernize Frontmatter
+### Step 0 — Minimize Frontmatter
 
-Convert flat frontmatter to nested `metadata:` format:
+Strip frontmatter to minimal `name` + `description` only:
 
 ```yaml
-# Before (legacy flat format)
+# Before (legacy bloated format)
 ---
 name: my-skill
 description: Does something. Use when doing X.
 invocable: false
+tags: [a, b, c]
 ---
 
-# After (production nested format)
+# After (minimal format)
 ---
 name: my-skill
 description: >
   Does something specific. Use when doing X
   and needing to achieve Y.
-metadata:
-  author: RyoMurakami1983
-  tags: [relevant, tags, here]
-  invocable: false
 ---
 ```
 
 **Checklist**:
-- `description` contains "Use when" trigger phrase
-- `metadata:` nests `author`, `tags`, `invocable`
-- Top-level keys limited to: `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility`
+- `description` contains "Use when" trigger phrase with [What]+[When]+[Capabilities] pattern
+- Frontmatter contains only `name` and `description` (author attribution via git history)
+- Remove `metadata:`, `tags`, `invocable`, `tool_versions`, `last_reviewed`, `values_alignment`
+- Keep `allowed-tools` only if platform-functional
 
-> **Values**: 基礎と型（最小形式で最大可能性を生む設計）
+> **Values**: 基礎と型 + 余白の設計（最小形式で最大可能性を生む設計）
 
 ### Step 1 — Audit the Existing Skill
 
@@ -154,10 +152,6 @@ name: skill-writing-guide
 description: >
   Router skill. Use when unsure which skill-authoring
   workflow to use.
-metadata:
-  author: RyoMurakami1983
-  tags: [copilot, agent-skills, router]
-  invocable: false
 ---
 ```
 
