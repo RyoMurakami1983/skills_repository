@@ -228,14 +228,55 @@ Output from `scripts/aggregate_benchmark.py`. Summarizes multiple runs across bo
     },
     "case_breakdown": {
       "type": "array",
-      "description": "Per-case score comparison",
+      "description": "Per-case score comparison with prompt, assertion detail, and gap analysis",
       "items": {
         "type": "object",
         "properties": {
           "case_id": { "type": "string" },
           "with_skill_mean": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
           "baseline_mean": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
-          "delta": { "oneOf": [{ "type": "number" }, { "type": "null" }] }
+          "delta": { "oneOf": [{ "type": "number" }, { "type": "null" }] },
+          "prompt": {
+            "type": "string",
+            "description": "Full test prompt text used for this case"
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Capability tags from evals.json"
+          },
+          "assertion_detail": {
+            "type": "array",
+            "description": "Per-assertion breakdown for each assertion in this case",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string", "description": "Assertion type (e.g. contains, quality_score)" },
+                "value": { "type": "string", "description": "Expected value or evaluation criterion" },
+                "weight": { "type": "number" },
+                "with_skill_passed": { "oneOf": [{ "type": "boolean" }, { "type": "null" }] },
+                "baseline_passed": { "oneOf": [{ "type": "boolean" }, { "type": "null" }] },
+                "detail": { "type": "string", "description": "Human-readable explanation of the assertion" }
+              }
+            }
+          },
+          "with_skill_snippet": {
+            "oneOf": [{ "type": "string" }, { "type": "null" }],
+            "description": "First 500 chars of the with_skill agent response"
+          },
+          "baseline_snippet": {
+            "oneOf": [{ "type": "string" }, { "type": "null" }],
+            "description": "First 500 chars of the baseline agent response"
+          },
+          "gap_summary": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of gap messages where baseline failed but with_skill passed"
+          },
+          "recommendation": {
+            "oneOf": [{ "type": "string" }, { "type": "null" }],
+            "description": "AI-generated improvement suggestion for this case"
+          }
         }
       }
     },
