@@ -80,6 +80,15 @@ skills/skills-eval-pipeline/
     └── SKILL.ja.md             # Japanese version
 ```
 
+### Eval Output Directories
+
+| Skill type | Eval directory | Git tracking |
+|------------|---------------|--------------|
+| Public skill (`skills/`, `production/`) | `evals/<skill_id>/` | ✅ Committed (evals.json) |
+| Private skill (`local_private_skills/`) | `local_private_skill_evals/<skill_id>/` | ❌ Git-ignored (all content) |
+
+Use `--evals-dir` to switch between directories (see Step 3 and Step 4).
+
 ---
 
 ## Workflow: Evaluate a Skill
@@ -87,6 +96,8 @@ skills/skills-eval-pipeline/
 ### Step 1: Design Test Cases
 
 Create `evals/<skill_id>/evals.json` with at least 3 test cases.
+
+> **Private skills**: Use `local_private_skill_evals/<skill_id>/evals.json` instead. This directory is git-ignored and never committed.
 
 **Assertion types** (from `references/schemas.md`):
 
@@ -155,17 +166,29 @@ Use when test cases are ready. Why: parallel execution gives comparable results 
 Run the aggregation script to compute statistics across all runs:
 
 ```bash
-# Bash / macOS / Linux
+# Bash / macOS / Linux — public skill
 python skills/skills-eval-pipeline/scripts/aggregate_benchmark.py \
   --skill-id skills-author-skill \
   --run-id run-20260310-001
+
+# Bash / macOS / Linux — private skill
+python skills/skills-eval-pipeline/scripts/aggregate_benchmark.py \
+  --skill-id facility-create-knowledge-index \
+  --run-id run-20260310-001 \
+  --evals-dir local_private_skill_evals
 ```
 
 ```powershell
-# PowerShell (Windows)
+# PowerShell (Windows) — public skill
 python skills\skills-eval-pipeline\scripts\aggregate_benchmark.py `
   --skill-id skills-author-skill `
   --run-id run-20260310-001
+
+# PowerShell (Windows) — private skill
+python skills\skills-eval-pipeline\scripts\aggregate_benchmark.py `
+  --skill-id facility-create-knowledge-index `
+  --run-id run-20260310-001 `
+  --evals-dir local_private_skill_evals
 ```
 
 Output: `evals/<skill_id>/benchmark_summary.json`
@@ -183,15 +206,25 @@ Use when all run results are collected. Why: aggregation makes patterns visible 
 ### Step 4: Generate HTML Viewer
 
 ```bash
-# Bash / macOS / Linux
+# Bash / macOS / Linux — public skill
 python skills/skills-eval-pipeline/scripts/generate_viewer.py \
   --skill-id skills-author-skill
+
+# Bash / macOS / Linux — private skill
+python skills/skills-eval-pipeline/scripts/generate_viewer.py \
+  --skill-id facility-create-knowledge-index \
+  --evals-dir local_private_skill_evals
 ```
 
 ```powershell
-# PowerShell (Windows)
+# PowerShell (Windows) — public skill
 python skills\skills-eval-pipeline\scripts\generate_viewer.py `
   --skill-id skills-author-skill
+
+# PowerShell (Windows) — private skill
+python skills\skills-eval-pipeline\scripts\generate_viewer.py `
+  --skill-id facility-create-knowledge-index `
+  --evals-dir local_private_skill_evals
 ```
 
 Output: `evals/<skill_id>/viewer.html` — open in any browser, no server required.
