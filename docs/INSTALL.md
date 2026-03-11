@@ -80,12 +80,13 @@ uv run python skills\skill-quality-validation\scripts\validate_skill.py skills\g
 ### WSL からの作業
 
 ```bash
-cd /mnt/c/tools/skills_repository
+export SKILLS_REPO="/mnt/c/tools/skills_repository"
+cd "$SKILLS_REPO"
 uv sync
 uv run python skills/skill-quality-validation/scripts/validate_skill.py skills/git-initial-setup/SKILL.md
 ```
 
-> `uv sync` は **WSL 側** で実行する前提です。WSL 側にも `uv` をインストールしてください。
+> WSL で作業する場合は、`uv sync` も **WSL 側** で実行します。WSL 環境にも `uv` をインストールしてください。
 
 ---
 

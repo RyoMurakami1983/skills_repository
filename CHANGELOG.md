@@ -15,7 +15,7 @@
 
 ### Changed
 
-- `business-evidence-response` を `business/` 配下へ移動し、業務向けワークフローとして整理
+- skill `evidence-response` を `business/evidence-response` へ移動し、業務向けワークフローとして整理
 - `business/pdf` を復旧し、`business/` カテゴリを `.copilot` 同期対象へ追加
 - frontmatter 最小構成方針に合わせて、validation / instructions / skills 周辺の規約を整理
 - `README.md` を入口中心に簡素化し、詳細手順を `docs/INSTALL.md` へ分離

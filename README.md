@@ -16,8 +16,9 @@ GitHub Copilot Agent / CLI で使う skills・agents・business workflows を管
 ## クイックスタート
 
 ```powershell
-git clone https://github.com/RyoMurakami1983/skills_repository.git C:\tools\skills_repository
-Set-Location C:\tools\skills_repository
+$env:SKILLS_REPO = "C:\tools\skills_repository"
+git clone https://github.com/RyoMurakami1983/skills_repository.git $env:SKILLS_REPO
+Set-Location $env:SKILLS_REPO
 uv sync
 uv run python skills\skill-quality-validation\scripts\validate_skill.py skills\git-initial-setup\SKILL.md
 ```
@@ -29,7 +30,8 @@ WSL / Linux / macOS を含む詳細手順は `docs/INSTALL.md` を参照して�
 最もよく使う想定の手順です。`skills` に加えて `agents` と `business` も同期します。
 
 ```powershell
-Set-Location C:\tools\skills_repository
+$env:SKILLS_REPO = "C:\tools\skills_repository"  # 未設定なら先に設定
+Set-Location $env:SKILLS_REPO
 git pull --ff-only
 
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\skills | Out-Null
