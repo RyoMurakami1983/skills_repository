@@ -27,7 +27,7 @@ WSL / Linux / macOS を含む詳細手順は `docs/INSTALL.md` を参照して�
 
 ## Windows の `.copilot` へ同期
 
-最もよく使う想定の手順です。`skills` に加えて `agents` と `business` も同期します。
+最もよく使う想定の手順です。`skills` と `agents` を同期し、`business/` 配下の skill は `~/.copilot/skills/` に統合して同期します。
 
 ```powershell
 $env:SKILLS_REPO = "C:\tools\skills_repository"  # 未設定なら先に設定
@@ -36,15 +36,16 @@ git pull --ff-only
 
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\skills | Out-Null
 New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\agents | Out-Null
-New-Item -ItemType Directory -Force -Path $env:USERPROFILE\.copilot\business | Out-Null
 
 robocopy skills   $env:USERPROFILE\.copilot\skills   /MIR
 robocopy agents   $env:USERPROFILE\.copilot\agents   /MIR
-robocopy business $env:USERPROFILE\.copilot\business /MIR
+Get-ChildItem -Path business -Directory | ForEach-Object {
+  robocopy $_.FullName (Join-Path $env:USERPROFILE ".copilot\skills\$($_.Name)") /MIR
+}
 Copy-Item copilot\copilot-instructions.md $env:USERPROFILE\.copilot\copilot-instructions.md
 ```
 
-`/MIR` は同期先の不要ファイルを削除します。専用同期先として使ってください。
+`/MIR` は同期先の不要ファイルを削除します。`business/` は skill ごとに `.copilot\skills\{skill-name}` へ個別同期しています。
 
 WSL 側の `~/.copilot/` への同期、クロス環境パス設定、Linux/macOS 手順は `docs/INSTALL.md` にまとめています。
 
@@ -55,7 +56,7 @@ WSL 側の `~/.copilot/` への同期、クロス環境パス設定、Linux/macO
 | `copilot/` | グローバル開発規律 | `~/.copilot/` | [`copilot/copilot-instructions.md`](copilot/copilot-instructions.md) |
 | `agents/` | 師範エージェント | `~/.copilot/agents/` | [Agents](#agents) |
 | `skills/` | 汎用 skill 群 | `~/.copilot/skills/` | [`skills/SKILLS_README.md`](skills/SKILLS_README.md) |
-| `business/` | 業務向け skill 群 | `~/.copilot/business/` | [`business/`](business/) |
+| `business/` | 業務向け skill 群 | `~/.copilot/skills/{skill-name}/` | [`business/`](business/) |
 | `dotnet/` | .NET / C# / WPF 向け | `.github/skills/` | [`dotnet/`](dotnet/) |
 | `python/` | Python 向け | `.github/skills/` | [`python/`](python/) |
 | `typescript/` | TypeScript / Node.js 向け | `.github/skills/` | [`typescript/`](typescript/) |
