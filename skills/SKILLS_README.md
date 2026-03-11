@@ -55,7 +55,6 @@ GitHub Copilot Agent Skills — 24スキル + 2スクリプトライブラリ
 | [furikaeri-practice](furikaeri-practice/) | KPT/YWTによるふりかえりワークフロー |
 | [knowledge-capture](knowledge-capture/) | 匿名化ゲート付きナレッジキャプチャ |
 | [notion-safe-operations](notion-safe-operations/) | Notion MCP操作のプリフライトチェック |
-| [business-evidence-response](business-evidence-response/) | ビジネスエビデンスに基づく回答作成 |
 
 ### スクリプトライブラリ（SKILL.mdなし）
 
