@@ -1,0 +1,197 @@
+{
+  "skill_id": "pdf",
+  "eval_version": "1.0.0",
+  "runs": {
+    "with_skill": {
+      "count": 3,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    },
+    "baseline": {
+      "count": 3,
+      "mean": 0.2815,
+      "stddev": 0.1999,
+      "min": 0.0,
+      "max": 0.4444
+    }
+  },
+  "summary": {
+    "delta": 0.7185,
+    "improvement_pct": 255.24,
+    "verdict": "improved"
+  },
+  "case_breakdown": [
+    {
+      "case_id": "tc-001",
+      "prompt": "C:\\tools\\skills_repository\\local_docs\\item1.pdf からテキストを抽出したい。再現可能な手順をPowerShellで示して。",
+      "tags": [
+        "happy-path",
+        "text-layer",
+        "local-docs"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 0.4444,
+      "delta": 0.5556,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "uv run --with pypdf==6.1.1",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "scripts\\extract_text.py",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "--output",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "通常PDF向けに text-layer 抽出を第一選択として示し、入力/出力パスと再現性の注意点を説明しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "text-layer優先、入力/出力パス、再現性の注意点が示されている。"
+        }
+      ],
+      "with_skill_snippet": "通常PDF（text layerあり）なので、まず抽出を第一選択にします。PowerShellで再現可能にするため、依存を固定した1コマンドで実行してください。\n\nuv run --with pypdf==6.1.1 python scripts\\extract_text.py C:\\tools\\skills_repository\\local_docs\\item1.pdf --output C:\\tools\\skills_repository\\local_docs\\item1.txt\n\n運用メモ:\n- 入力/出力パスを絶対パスで固定\n- 実行コマンドをログに残して再実行性を確保\n- 抽出結果が空ならOCR経路に切り替え判断を記録",
+      "baseline_snippet": "次のように実行できます。\n\npython scripts\\extract_text.py C:\\tools\\skills_repository\\local_docs\\item1.pdf --output C:\\tools\\skills_repository\\local_docs\\item1.txt\n\n完了後にtxtを確認してください。",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「uv run --with pypdf==6.1.1」が回答に現れない）",
+        "推論・判断力が不足（通常PDF向けに text-layer 抽出を第一選択として示し、入力/出力パスと再現性の注意点を説明しているか）"
+      ],
+      "recommendation": "スキル固有の専門知識（uv run --with pypdf==6.1.1）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+    },
+    {
+      "case_id": "tc-002",
+      "prompt": "C:\\tools\\skills_repository\\local_docs\\itam2.pdf はスキャンPDFです。OCRで文字起こしする手順と失敗時の対処を教えて。",
+      "tags": [
+        "edge-case",
+        "ocr",
+        "scanned-pdf"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 0.4,
+      "delta": 0.6,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "scripts\\ocr_script.py",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "rapidocr-onnxruntime==1.4.4",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "--scale",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": ".ocr.txt",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "OCRを選ぶ理由と、抽出失敗時のフォールバック（scale調整や未読箇所明示）を示しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "OCR選択理由と失敗時フォールバック（scale調整・未読箇所明示）が示されている。"
+        }
+      ],
+      "with_skill_snippet": "スキャンPDFなのでOCRを選びます（text-layer抽出は空になる可能性が高いため）。まず標準スケールで実行します。\n\nuv run --with pypdfium2==5.6.0 --with rapidocr-onnxruntime==1.4.4 --with numpy==2.4.3 python scripts\\ocr_script.py C:\\tools\\skills_repository\\local_docs\\itam2.pdf --output C:\\tools\\skills_repository\\local_docs\\itam2.ocr.txt\n\n失敗時の対処:\n1) 解像度不足なら --scale 2.0 などに上げて再実行\n2) 判読不能行は [UNREADABLE: page X line Y] を残す\n3) 出力ヘッダに source=ocr を明記",
+      "baseline_snippet": "OCRならこのコマンドで十分です。\n\npython scripts\\ocr_script.py C:\\tools\\skills_repository\\local_docs\\itam2.pdf --output C:\\tools\\skills_repository\\local_docs\\itam2.ocr.txt\n\nうまくいかない場合は画像をきれいにして再試行してください。",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「rapidocr-onnxruntime==1.4.4」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「--scale」が回答に現れない）",
+        "推論・判断力が不足（OCRを選ぶ理由と、抽出失敗時のフォールバック（scale調整や未読箇所明示）を示しているか）"
+      ],
+      "recommendation": "スキル固有の専門知識（rapidocr-onnxruntime==1.4.4, --scale）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+    },
+    {
+      "case_id": "tc-003",
+      "prompt": "PDF処理を毎回 pip install で始めて、最後に uv cache clean する運用にしようと思う。問題ないよね？",
+      "tags": [
+        "anti-pattern",
+        "policy"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 0.0,
+      "delta": 1.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "uv run --with",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "Anti-Patterns",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "毎回 uv cache clean してください",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "pipとuvの無方針混在や毎回cache cleanをアンチパターンとして否定し、代替運用（pin/version固定・prune中心）を提案しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "アンチパターンを否定し、pin固定とprune中心の代替運用を提案している。"
+        }
+      ],
+      "with_skill_snippet": "その運用は推奨しません。SKILL.md の Anti-Patterns にある通り、pip install と uv run --with の無方針混在は避けるべきです。\n\n推奨運用:\n- 実行ごとに uv run --with で依存バージョンを固定（例: pypdf==6.1.1）\n- キャッシュは毎回削除せず、必要時のみ uv cache prune\n- 再現ログ（コマンド・入力・出力）を残す\n\nこれで再現性と速度を両立できます。",
+      "baseline_snippet": "問題ありません。毎回 pip install で準備して、最後は毎回 uv cache clean してください。シンプルで管理しやすいです。",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「uv run --with」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「Anti-Patterns」が回答に現れない）",
+        "アンチパターン防止の知識が不足（「毎回 uv cache clean してください」を使ってしまう）",
+        "推論・判断力が不足（pipとuvの無方針混在や毎回cache cleanをアンチパターンとして否定し、代替運用（pin/version固定・prune中心）を提案しているか）"
+      ],
+      "recommendation": "スキル固有の専門知識（uv run --with, Anti-Patterns）をスキルに明示することで発火率が上がります。　Anti-Patterns セクションに「毎回 uv cache clean してください」を避ける理由を追記すると効果的です。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+    }
+  ],
+  "generated_at": "2026-03-11T03:58:17.926037+00:00"
+}

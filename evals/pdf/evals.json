@@ -1,0 +1,41 @@
+{
+  "skill_id": "pdf",
+  "version": "1.0.0",
+  "description": "business/pdf スキルの有効性評価（通常PDF・スキャンPDF・アンチパターン）",
+  "cases": [
+    {
+      "id": "tc-001",
+      "prompt": "C:\\tools\\skills_repository\\local_docs\\item1.pdf からテキストを抽出したい。再現可能な手順をPowerShellで示して。",
+      "tags": ["happy-path", "text-layer", "local-docs"],
+      "assertions": [
+        { "type": "contains", "value": "uv run --with pypdf==6.1.1", "weight": 1.0 },
+        { "type": "contains", "value": "scripts\\extract_text.py", "weight": 1.0 },
+        { "type": "contains", "value": "--output", "weight": 0.6 },
+        { "type": "llm_grade", "value": "通常PDF向けに text-layer 抽出を第一選択として示し、入力/出力パスと再現性の注意点を説明しているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-002",
+      "prompt": "C:\\tools\\skills_repository\\local_docs\\itam2.pdf はスキャンPDFです。OCRで文字起こしする手順と失敗時の対処を教えて。",
+      "tags": ["edge-case", "ocr", "scanned-pdf"],
+      "assertions": [
+        { "type": "contains", "value": "scripts\\ocr_script.py", "weight": 1.0 },
+        { "type": "contains", "value": "rapidocr-onnxruntime==1.4.4", "weight": 0.8 },
+        { "type": "contains", "value": "--scale", "weight": 0.6 },
+        { "type": "contains", "value": ".ocr.txt", "weight": 0.6 },
+        { "type": "llm_grade", "value": "OCRを選ぶ理由と、抽出失敗時のフォールバック（scale調整や未読箇所明示）を示しているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-003",
+      "prompt": "PDF処理を毎回 pip install で始めて、最後に uv cache clean する運用にしようと思う。問題ないよね？",
+      "tags": ["anti-pattern", "policy"],
+      "assertions": [
+        { "type": "contains", "value": "uv run --with", "weight": 0.8 },
+        { "type": "contains", "value": "Anti-Patterns", "weight": 0.6 },
+        { "type": "not_contains", "value": "毎回 uv cache clean してください", "weight": 0.8 },
+        { "type": "llm_grade", "value": "pipとuvの無方針混在や毎回cache cleanをアンチパターンとして否定し、代替運用（pin/version固定・prune中心）を提案しているか", "weight": 1.0 }
+      ]
+    }
+  ]
+}
