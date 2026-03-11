@@ -1,0 +1,26 @@
+{
+  "skill_id": "pdf",
+  "eval_version": "1.0.0",
+  "items": [
+    {
+      "type": "keep",
+      "content": "tc-001 で with_skill が 1.0（baseline 0.4444, delta +0.5556）。`uv run --with pypdf==6.1.1` と text-layer優先判断、再現性注意点（絶対パス・ログ化）が assertion/llm_grade ともに満たされている。",
+      "case_id": "tc-001",
+      "priority": 2
+    },
+    {
+      "type": "keep",
+      "content": "tc-002 で with_skill が 1.0（baseline 0.4, delta +0.6）。`rapidocr-onnxruntime==1.4.4`、`--scale`、`.ocr.txt` を含み、OCR選択理由と失敗時フォールバック（未読明示含む）が llm_grade で合格。",
+      "case_id": "tc-002",
+      "priority": 2
+    },
+    {
+      "type": "keep",
+      "content": "tc-003 で with_skill が 1.0（baseline 0.0, delta +1.0）。Anti-Patterns に沿って pip/uv混在と毎回 cache clean を否定し、`uv run --with` + `uv cache prune` の代替運用を提示できている。",
+      "case_id": "tc-003",
+      "priority": 1
+    }
+  ],
+  "next_action": "accept",
+  "created_at": "2026-03-11T03:59:22.9306065Z"
+}
