@@ -1,5 +1,5 @@
 ---
-name: business-evidence-response
+name: evidence-response
 description: >
   繰り返し発生する業務問い合わせ（監査、アンケート、コンプライアンス調査）に対して、
   過去の回答実績とエビデンスを活用して回答するためのテンプレートスキル。

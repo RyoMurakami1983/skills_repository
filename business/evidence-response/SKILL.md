@@ -1,5 +1,5 @@
 ---
-name: business-evidence-response
+name: evidence-response
 description: >
   Build a reusable evidence-response system for recurring business inquiries — audits,
   questionnaires, compliance surveys — using historical evidence archives and structured
@@ -8,7 +8,7 @@ description: >
   up a new operational domain response capability.
 ---
 
-# Business Evidence Response
+# Evidence Response
 
 A template skill for building **evidence-based response systems** in operational domains. When your organization repeatedly receives structured inquiries — audits, questionnaires, compliance surveys — this skill provides the **reusable workflow pattern** and **scaffolding files** to respond accurately using historical evidence.
 
