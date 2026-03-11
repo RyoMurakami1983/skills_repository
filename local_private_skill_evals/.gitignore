@@ -1,0 +1,4 @@
+# Keep this directory tracked, but ignore all private skill eval results.
+*
+!.gitkeep
+!.gitignore

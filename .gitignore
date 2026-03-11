@@ -136,6 +136,11 @@ local_reference_skills/*
 !local_reference_skills/.gitignore
 .github/skills/
 
+## Private skill eval results（コミットしないローカル評価結果）
+local_private_skill_evals/*
+!local_private_skill_evals/.gitkeep
+!local_private_skill_evals/.gitignore
+
 # Eval run artifacts (not committed)
 evals/**/runs/
 evals/**/viewer.html
