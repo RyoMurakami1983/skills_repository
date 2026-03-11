@@ -1,0 +1,4 @@
+# Keep this directory tracked, but ignore all temporary local reference skills.
+*
+!.gitkeep
+!.gitignore
