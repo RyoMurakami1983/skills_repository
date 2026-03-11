@@ -84,7 +84,7 @@ skills/skills-eval-pipeline/
 
 | Skill type | Eval directory | Git tracking |
 |------------|---------------|--------------|
-| Public skill (`skills/`, `production/`) | `evals/<skill_id>/` | ✅ Committed (evals.json) |
+| Public skill (`skills/`, `production/`) | `evals/<skill_id>/` | ✅ Committed (`evals.json`, `benchmark_summary.json`; `runs/` & generated HTML ignored) |
 | Private skill (`local_private_skills/`) | `local_private_skill_evals/<skill_id>/` | ❌ Git-ignored (all content) |
 
 Use `--evals-dir` to switch between directories (see Step 3 and Step 4).
@@ -155,7 +155,7 @@ For each case:
 
 Each sub-agent passes its response to `agents/grader.md`, which returns a `grading_result.json`.
 
-Results are written to `evals/<skill_id>/runs/`.
+Results are written to `(<evals-dir>)/<skill_id>/runs/` (default: `evals/`).
 
 Use when test cases are ready. Why: parallel execution gives comparable results with minimum latency.
 
@@ -191,7 +191,7 @@ python skills\skills-eval-pipeline\scripts\aggregate_benchmark.py `
   --evals-dir local_private_skill_evals
 ```
 
-Output: `evals/<skill_id>/benchmark_summary.json`
+Output: `(<evals-dir>)/<skill_id>/benchmark_summary.json` (default: `evals/`)
 
 | Field | Meaning |
 |-------|---------|
@@ -227,7 +227,7 @@ python skills\skills-eval-pipeline\scripts\generate_viewer.py `
   --evals-dir local_private_skill_evals
 ```
 
-Output: `evals/<skill_id>/viewer.html` — open in any browser, no server required.
+Output: `(<evals-dir>)/<skill_id>/viewer.html` (default: `evals/<skill_id>/viewer.html`) — open in any browser, no server required.
 
 The viewer shows:
 - Verdict badge (✅ Improved / ⚠️ Neutral / ❌ Degraded)

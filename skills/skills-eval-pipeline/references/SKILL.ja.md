@@ -84,7 +84,7 @@ skills/skills-eval-pipeline/
 
 | スキル種別 | eval ディレクトリ | Git 追跡 |
 |------------|-----------------|---------|
-| 公開スキル（`skills/`, `production/`） | `evals/<skill_id>/` | ✅ コミット（evals.json のみ） |
+| 公開スキル（`skills/`, `production/`） | `evals/<skill_id>/` | ✅ コミット（`evals.json` と `benchmark_summary.json`。`runs/` と生成 HTML は無視） |
 | プライベートスキル（`local_private_skills/`） | `local_private_skill_evals/<skill_id>/` | ❌ 全内容 git 無視 |
 
 ディレクトリを切り替えるには `--evals-dir` オプションを使用（ステップ3・4 参照）。
@@ -134,7 +134,7 @@ skills/skills-eval-pipeline/
 
 各サブエージェントの応答は `agents/grader.md` に渡され、`grading_result.json` が返される。
 
-結果の書き込み先: `evals/<skill_id>/runs/`
+結果の書き込み先: `(<evals-dir>)/<skill_id>/runs/`（デフォルトは `evals/`）
 
 このステップを使う理由: 並列実行は同等条件での比較を最小レイテンシで実現する。
 
@@ -168,7 +168,7 @@ python skills\skills-eval-pipeline\scripts\aggregate_benchmark.py `
   --evals-dir local_private_skill_evals
 ```
 
-出力: `evals/<skill_id>/benchmark_summary.json`
+出力: `(<evals-dir>)/<skill_id>/benchmark_summary.json`（デフォルトは `evals/`）
 
 | フィールド | 意味 |
 |-----------|------|
@@ -204,7 +204,7 @@ python skills\skills-eval-pipeline\scripts\generate_viewer.py `
   --evals-dir local_private_skill_evals
 ```
 
-出力: `evals/<skill_id>/viewer.html` — ブラウザで開くだけ、サーバー不要。
+出力: `(<evals-dir>)/<skill_id>/viewer.html`（デフォルトは `evals/<skill_id>/viewer.html`） — ブラウザで開くだけ、サーバー不要。
 
 ビューアに表示される情報:
 - 判定バッジ（✅ Improved / ⚠️ Neutral / ❌ Degraded）
