@@ -218,6 +218,35 @@ Use when finishing any furikaeri. Even 1 sentence improves the next one.
 
 > **Values**: 継続は力 / 成長の複利
 
+#### Skill-ization Check
+
+After the meta question, ask one additional question:
+
+> "Was there any tacit know-how surfaced in this session that could become a reusable skill?"
+
+Examples of skill-ization candidates:
+- A checklist invented on the fly (e.g., "domain-first design checklist")
+- A pattern for handling a recurring problem class
+- A decision framework that proved useful and could apply to other contexts
+- A workflow improvement discovered during meta-furikaeri
+
+Action routing:
+- **New skill needed** → Invoke `skills-author-skill`
+- **Existing skill needs update** → Invoke `skills-revise-skill` on the relevant skill
+- **Nothing identified** → Proceed to Step 6
+
+```markdown
+## Skill-ization Check
+
+Candidates:
+- [Pattern/checklist name]: → skills-author-skill / skills-revise-skill ([skill-name])
+- None identified this session
+```
+
+> **Why this matters**: Furikaeri surfaces know-how. Skills preserve it. Without this step, tacit knowledge is verbalized once and then lost. Closing the loop here turns individual learning into a reusable team asset.
+
+> **Values**: 基礎と型 / 成長の複利 / 教える→広める→仕組み化
+
 ### Step 6: Persist the Furikaeri Record
 
 #### 6a: Register Actions as GitHub Issues
@@ -348,6 +377,9 @@ If the furikaeri content may flow into a public skill or reference, apply the `k
 
 ### Meta
 - Next furikaeri change: 
+
+### Skill-ization Check
+- Candidate: 
 ```
 
 ### YWT Template
@@ -372,6 +404,9 @@ If the furikaeri content may flow into a public skill or reference, apply the `k
 
 ### Meta
 - Next furikaeri change: 
+
+### Skill-ization Check
+- Candidate: 
 ```
 
 ### Decision Table
