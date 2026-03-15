@@ -231,15 +231,15 @@ Examples of skill-ization candidates:
 - A workflow improvement discovered during meta-furikaeri
 
 Action routing:
-- **New skill needed** → Invoke `skills-author-skill`
-- **Existing skill needs update** → Invoke `skills-revise-skill` on the relevant skill
+- **New skill needed** → Invoke `skill`
+- **Existing skill needs update** → Invoke `skill` on the relevant skill
 - **Nothing identified** → Proceed to Step 6
 
 ```markdown
 ## Skill-ization Check
 
 Candidates:
-- [Pattern/checklist name]: → skills-author-skill / skills-revise-skill ([skill-name])
+- [Pattern/checklist name]: → skill / skill ([skill-name])
 - None identified this session
 ```
 
@@ -268,7 +268,7 @@ Convert prioritized actions from Steps 3–4 into trackable execution items.
 
 > **Action type routing**
 > - **Coding/process improvements** → Create a GitHub Issue (this step)
-> - **Skill/pattern/workflow improvements** → Invoke `skills-revise-skill` to update the relevant skill
+> - **Skill/pattern/workflow improvements** → Invoke `skill` to update the relevant skill
 
 #### 6b: Save to Notion (RyoMurakami1983 only)
 
@@ -445,3 +445,4 @@ A: Yes. For `RyoMurakami1983` sessions, save to your designated private Notion d
 - https://www.funretrospectives.com
 - Toyota Production System — 5 Whys
 - George T. Doran, "There's a S.M.A.R.T. Way to Write Management Goals and Objectives"
+

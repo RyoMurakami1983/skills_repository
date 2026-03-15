@@ -74,7 +74,7 @@ $env:SKILLS_REPO = "C:\tools\skills_repository"
 git clone https://github.com/RyoMurakami1983/skills_repository.git $env:SKILLS_REPO
 Set-Location $env:SKILLS_REPO
 uv sync
-uv run python skills\skill-quality-validation\scripts\validate_skill.py skills\git-initial-setup\SKILL.md
+uv run python skills\skill\_eval\scripts\validate_skill.py skills\git-initial-setup\SKILL.md --level L2
 ```
 
 ### WSL からの作業
@@ -83,7 +83,7 @@ uv run python skills\skill-quality-validation\scripts\validate_skill.py skills\g
 export SKILLS_REPO="/mnt/c/tools/skills_repository"
 cd "$SKILLS_REPO"
 uv sync
-uv run python skills/skill-quality-validation/scripts/validate_skill.py skills/git-initial-setup/SKILL.md
+uv run python skills/skill/_eval/scripts/validate_skill.py skills/git-initial-setup/SKILL.md --level L2
 ```
 
 > WSL で作業する場合は、`uv sync` も **WSL 側** で実行します。WSL 環境にも `uv` をインストールしてください。
@@ -265,16 +265,16 @@ cp -r "$SKILLS_REPO/production/"* .github/skills/
 
 ```powershell
 # スキル検証（単体）
-uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\SKILL.md
+uv run python skills\skill\_eval\scripts\validate_skill.py path\to\SKILL.md --level L2
 
 # スキル検証（一括）
-.\skills\skill-quality-validation\scripts\validate_all_skills.ps1
+Get-ChildItem skills -Recurse -Filter SKILL.md | ForEach-Object { uv run python skills\skill\_eval\scripts\validate_skill.py $_.FullName --level L1 }
 
 # テスト実行
 uv run pytest
 
 # JSON形式で出力
-uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\SKILL.md --json
+uv run python skills\skill\_eval\scripts\validate_skill.py path\to\SKILL.md --level L2 --json
 ```
 
 ### README / ドキュメント更新前の軽量チェック

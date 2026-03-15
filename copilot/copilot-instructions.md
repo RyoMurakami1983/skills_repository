@@ -318,10 +318,10 @@ SKILL.md は英語で記述するため、日本語トリガーはこの辞書�
 | コミットして | `git-commit-practices` | Conventional Commits でコミット |
 | Issueにして / Issue起票 | `github-issue-intake` | Issue作成とトリアージ |
 | セットアップして / Git初期設定 | `git-initial-setup` | ブランチ保護・フック設定 |
-| スキル作って / スキル新規作成 | `skills-author-skill` | SKILL.md を新規作成 |
-| スキル修正して / スキル改善 | `skills-revise-skill` | 既存スキルを改訂 |
-| バリデーションして / 検証して | `skill-quality-validation` | SKILL.md の品質検証 |
-| テンプレ作って | `skills-author-skill` | スキルの新規作成（雛形生成含む） |
+| スキル作って / スキル新規作成 | `skill` | SKILL.md を新規作成 |
+| スキル修正して / スキル改善 | `skill` | 既存スキルを改訂 |
+| バリデーションして / 検証して | `skill` | SKILL.md の品質検証 |
+| テンプレ作って | `skill` | スキルの新規作成（雛形生成含む） |
 | ふりかえりして / ふりかえり | `furikaeri-practice` | セッション後のKPT/YWT改善サイクル |
 | 匿名化して / 固有名詞チェック | `knowledge-capture` | 文書・スキル例の匿名化ゲート（AC-1〜AC-4） |
 | 「おはよう。Issueを解決しましょう」 / 「挨拶してIssue対応開始」 | `session-issue-autopilot` | 挨拶トリガーからIssue選定・実装・`github-pr-workflow`・`github-pr-review-response`・協働ふりかえりまでを束ねる |
@@ -344,3 +344,4 @@ SKILL.md は英語で記述するため、日本語トリガーはこの辞書�
 
 **Author**: RyoMurakami1983  
 **Last Updated**: 2026-03-08
+

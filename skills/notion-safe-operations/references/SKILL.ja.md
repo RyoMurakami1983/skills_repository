@@ -26,7 +26,7 @@ Notion操作をスキル横断で共通化し、セッション差分による�
 
 - **`furikaeri-practice`** - ふりかえりログの保存
 - **`knowledge-capture`** - 公開前の匿名化
-- **`skills-revise-skill`** - 既存スキルへの適用
+- **`skill`** - 既存スキルへの適用
 
 ---
 
@@ -230,3 +230,4 @@ A: Model Context Protocol の略で、Notion など外部ツール呼び出し�
 ## Resources
 
 - https://developers.notion.com/reference/intro
+

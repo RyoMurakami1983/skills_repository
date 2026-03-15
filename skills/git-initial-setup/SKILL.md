@@ -22,8 +22,8 @@ Use this skill when:
 
 - **`git-commit-practices`** - Commit workflow and conventions
 - **`github-pr-workflow`** - PR creation and merge flow
-- **`skills-author-skill`** - Skill documentation standards
-- **`skills-validate-skill`** - Validate skill quality
+- **`skill`** - Skill documentation standards
+- **`skill`** - Validate skill quality
 
 ---
 
@@ -309,3 +309,4 @@ git branch --show-current
 - [Git Hooks Documentation](https://git-scm.com/docs/githooks)
 
 ---
+

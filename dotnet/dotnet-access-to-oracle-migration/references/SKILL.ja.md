@@ -28,7 +28,7 @@ AccessデータベースクエリをOracleに移行し、.NET（C#）IOracle実�
 
 ## Related Skills
 
-- **`skill-quality-validation`** — スキル品質の検証
+- **`skill`** — 公開前のスキル検証・改善
 - **`skill-writing-guide`** — スキル作成のベストプラクティス
 
 ---

@@ -30,7 +30,7 @@ metadata:
 
 ## Related Skills
 
-- **`skills-validate-skill`** — このSkill文書を検証するときに使用
+- **`skill`** — このSkill文書の検証や改善をするときに使用
 - **`git-commit-practices`** — 環境変更を原子的にコミットするときに使用
 - **`github-pr-workflow`** — 環境変更をPR経由で反映するときに使用
 

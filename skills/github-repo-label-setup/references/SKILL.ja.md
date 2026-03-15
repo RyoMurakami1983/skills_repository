@@ -26,7 +26,7 @@ metadata:
 - **`github-issue-intake`** - ラベルを活用したIssue作成とトリアージ
 - **`github-pr-workflow`** - PR作成とマージフロー
 - **`git-initial-setup`** - リポジトリの初期設定と保護
-- **`skills-author-skill`** - Skill執筆の標準
+- **`skill`** - Skill執筆の標準
 
 ---
 
@@ -319,3 +319,4 @@ gh label create "a/docs"    --color "3FB950" --description "Documentation domain
 - [GitHub Default Labels](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels#about-default-labels)
 
 ---
+

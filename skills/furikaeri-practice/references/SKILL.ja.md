@@ -234,15 +234,15 @@ Problem項目の根本原因が不明な場合、またはTry項目に具体的�
 - メタふりかえりで発見したワークフロー改善
 
 アクション分岐：
-- **新スキルが必要** → `skills-author-skill` を起動
-- **既存スキルの更新** → 該当スキルに対して `skills-revise-skill` を起動
+- **新スキルが必要** → `skill` を起動
+- **既存スキルの更新** → 該当スキルに対して `skill` を起動
 - **候補なし** → Step 6 に進む
 
 ```markdown
 ## スキル化候補チェック
 
 候補：
-- [パターン名/チェックリスト名]: → skills-author-skill / skills-revise-skill（[スキル名]）
+- [パターン名/チェックリスト名]: → skill / skill（[スキル名]）
 - 今回のセッションでは候補なし
 ```
 
@@ -271,7 +271,7 @@ Problem項目の根本原因が不明な場合、またはTry項目に具体的�
 
 > **アクション種別による分岐**
 > - **コーディング・プロセスの改善** → GitHub Issue を作成（本ステップ）
-> - **skill・型・ワークフローの改善** → `skills-revise-skill` を起動して該当スキルを更新
+> - **skill・型・ワークフローの改善** → `skill` を起動して該当スキルを更新
 
 #### 6b: Notion へ保存（RyoMurakami1983 のみ）
 
@@ -448,3 +448,4 @@ A: `RyoMurakami1983` のセッションでは Step 6b で自分専用のプラ�
 - https://www.funretrospectives.com
 - トヨタ生産方式 — 5つのなぜ
 - George T. Doran, "There's a S.M.A.R.T. Way to Write Management Goals and Objectives"
+
