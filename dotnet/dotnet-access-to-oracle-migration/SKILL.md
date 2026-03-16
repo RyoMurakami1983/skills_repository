@@ -26,7 +26,7 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skill-quality-validation`** — Validate this skill's quality before publishing
+- **`skill`** — Validate or improve this skill before publishing
 - **`skill-writing-guide`** — Learn skill writing best practices
 
 ---

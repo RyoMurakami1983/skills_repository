@@ -23,8 +23,7 @@ Use this skill when:
 ## Related Skills
 
 - **`furikaeri-practice`** — Retrospective workflow (references this skill's anonymization gate)
-- **`skills-author-skill`** — Skill creation (references this skill's anonymization checklist)
-- **`skills-revise-skill`** — Skill revision (references this skill's anonymization checklist)
+- **`skill`** — Skill creation and improvement workflow (references this skill's anonymization checklist)
 - **`github-issue-intake`** — Capture improvement items as tracked issues
 
 ---
@@ -100,7 +99,7 @@ Deliver the document to its destination and link to next actions. Check the rout
 | Destination | Action |
 |------------|--------|
 | `docs/furikaeri/` | Commit, PR, link to improvement issues |
-| Skill example | Feed into `skills-author-skill` or `skills-revise-skill` |
+| Skill example | Feed into `skill` for creation or improvement |
 | ADR | Commit to `docs/adr/`, update ADR index |
 | GitHub Issue | Apply AC-1 through AC-4 before writing; create via `github-issue-intake` |
 
@@ -275,6 +274,7 @@ Document created
 
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — Development constitution and Values
 - [furikaeri-practice](../furikaeri-practice/SKILL.md) — Retrospective workflow
-- [skills-author-skill](../skills-author-skill/SKILL.md) — Skill creation workflow
+- [skill](../skill/SKILL.md) — Skill creation workflow
 
 ---
+

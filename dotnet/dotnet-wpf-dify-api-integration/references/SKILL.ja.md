@@ -31,7 +31,7 @@ WPFアプリケーションにDify API連携を追加するためのエンドツ
 - **`dotnet-oracle-wpf-integration`** — 同じアプリでSecureConfigServiceを共有
 - **`tdd-standard-practice`** — Red-Green-Refactorで生成コードをテスト
 - **`git-commit-practices`** — 各ステップをアトミックな変更としてコミット
-- **`skills-validate-skill`** — このスキルの品質を検証
+- **`skill`** — このスキルの品質を検証・改善
 
 ---
 

@@ -28,7 +28,7 @@ Trigger only on an explicit signal of confusion or curiosity.
 - **`session-issue-autopilot`** — Autopilot session workflow (often a source of "what's happening?" questions)
 - **`furikaeri-practice`** — Retrospective; may surface "what changed?" questions
 - **`github-issue-intake`** — Issue intake workflow users may ask about
-- **`skills-validate-skill`** — If a user asks "what does validation do?"
+- **`skill`** — If a user asks "what does validation do?"
 
 ---
 
@@ -261,3 +261,4 @@ User question → Lane → First-layer (≤3 sentences) → Offer depth → Deli
 - 4 explanation lanes: Behavior, Modes, Changes, Identity
 - Short-first, depth-on-demand response pattern
 - CLI capability questions routed through `fetch_copilot_cli_documentation`
+

@@ -12,6 +12,7 @@
 - `typescript-shihan` を追加し、師範エージェント群を拡張
 - `python-skill-deploy` の workflow と Bash entrypoint を追加
 - `github-quality-gate-setup`、`skills-eval-pipeline`、関連 viewer / optimizer を追加
+- `skills/skill/` を追加し、sub_skills / `_foundation` / `_eval` / `scripts` を含む統合メタスキル構造を導入
 
 ### Changed
 
@@ -20,6 +21,7 @@
 - frontmatter 最小構成方針に合わせて、validation / instructions / skills 周辺の規約を整理
 - `README.md` を入口中心に簡素化し、詳細手順を `docs/INSTALL.md` へ分離
 - repo 固有の documentation maintenance ルールを `.github/copilot-instructions.md` に追加
+- `skills-author-skill` などの旧メタスキル群を `skill` へ集約し、validator / generator / eval assets も新配置へ移行
 
 ### Docs
 

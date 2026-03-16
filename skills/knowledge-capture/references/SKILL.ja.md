@@ -32,8 +32,7 @@ metadata:
 ## Related Skills
 
 - **`furikaeri-practice`** — ふりかえりワークフロー（本スキルの匿名化ゲートを参照）
-- **`skills-author-skill`** — スキル作成（本スキルの匿名化チェックリストを参照）
-- **`skills-revise-skill`** — スキル改訂（本スキルの匿名化チェックリストを参照）
+- **`skill`** — スキル作成・改善ワークフロー（本スキルの匿名化チェックリストを参照）
 - **`github-issue-intake`** — 改善項目をIssueとして捕捉
 
 ---
@@ -107,7 +106,7 @@ OrderProcessorの出力で注文ORD-394072を処理した際、
 | 保存先 | アクション |
 |--------|----------|
 | `docs/furikaeri/` | コミット、PR、改善issueにリンク |
-| スキルの実例 | `skills-author-skill` または `skills-revise-skill` に連携 |
+| スキルの実例 | 作成または改善のため `skill` に連携 |
 | ADR | `docs/adr/` にコミット、ADRインデックスを更新 |
 | GitHub Issue | 書く前に AC-1〜AC-4 を適用；`github-issue-intake` で作成 |
 
@@ -269,6 +268,7 @@ OrderProcessorの出力で注文ORD-394072を処理した際、
 
 - [PHILOSOPHY.md](../../PHILOSOPHY.md) — 開発憲法とValues
 - [furikaeri-practice](../furikaeri-practice/SKILL.md) — ふりかえりワークフロー
-- [skills-author-skill](../skills-author-skill/SKILL.md) — スキル作成ワークフロー
+- [skill](../skill/SKILL.md) — スキル作成ワークフロー
 
 ---
+

@@ -58,21 +58,21 @@ tools:
 
 | 段階 | 意味 | 対応するスキル | 行動 |
 |------|------|--------------|------|
-| **守（Shu）** | 型を守る | skills-validate-skill, skill-quality-validation | 基準通りか検証。逸脱を指摘 |
-| **破（Ha）** | 型を疑う | skills-revise-skill | パターンの弱点を発見し、進化させる |
-| **離（Ri）** | 型を超える | skills-author-skill, skills-generate-skill-suite | 新しい型を生む。前例のない課題に応える |
+| **守（Shu）** | 型を守る | `skill` + `skill/_eval/scripts/validate_skill.py` | Critical / Recommended の観点で逸脱を指摘する |
+| **破（Ha）** | 型を疑う | `skill/sub_skills/improve/` | パターンの弱点を発見し、進化させる |
+| **離（Ri）** | 型を超える | `skill/sub_skills/new/` | 新しい型やスキル群を生む |
 
 ---
 
 ## 管轄スキル
 
 ### スキル管理系（メタスキル）
-- `skills-author-skill` — 新規スキル作成
-- `skills-revise-skill` — 既存スキルの改訂（EN/JA同期・リファクタ含む）
-- `skills-validate-skill` — 品質バリデーション
-- `skills-generate-skill-suite` — スキルスイート生成
-- `skills-review-skill-enterprise-readiness` — エンタープライズ対応レビュー
-- `skill-quality-validation` — バリデーションスクリプト
+- `skill` — 単一入口のルーター
+- `skill/sub_skills/new/` — 新規スキル作成・スイート生成
+- `skill/sub_skills/improve/` — 既存スキルの改善
+- `skill/sub_skills/validate/` — L1-L4 検証フロー
+- `skill/sub_skills/evaluate/` — with-skill / baseline 評価
+- `skill/_eval/scripts/validate_skill.py` — Critical / Recommended validator
 
 ### 全shihan共通管轄（運用系）
 
@@ -93,9 +93,9 @@ skill-shihan がオーナーとして品質管理を担当する。
 ## 品質基準（先生モードで使用）
 
 ### フロントマター
-- **SKILL.md** のトップレベル許可キー: `name`, `description`（これのみ）
+- **SKILL.md** のトップレベル許可キー: `name`, `description`, `compatibility`（必要時のみ）
 - **agent.md** のトップレベル許可キー: `name`, `description`, `tools`（エージェント専用）
-- `metadata:` ブロック（author/tags/invocable/tool_versions 等）は**廃止** → フロントマターは `name` + `description`（SKILL.md）または `name` + `description` + `tools`（agent.md）のみ
+- `metadata:` ブロック（author/tags/invocable/tool_versions 等）は**廃止**
 - `description` ≤1024文字、"Use when" トリガーフレーズ必須（W7 警告: ≥80文字、action verb、capability列挙）
 
 ### 構造
@@ -109,7 +109,7 @@ skill-shihan がオーナーとして品質管理を担当する。
 - "Use when..." ガイダンスを独立した文として記述
 
 ### バリデーション
-- `uv run python skills/skill-quality-validation/scripts/validate_skill.py <path>` で ≥85% PASS
+- `uv run python skills/skill/_eval/scripts/validate_skill.py <path>` で Critical 全PASS
 
 ---
 
@@ -119,11 +119,13 @@ skill-shihan がオーナーとして品質管理を担当する。
 ## Skill Review — @skill-shihan
 
 - [ ] フロントマター: 非標準キーなし（version等）
+- [ ] `compatibility` は実在する制約がある場合のみ
 - [ ] description: "Use when" トリガーフレーズあり
 - [ ] 500行以内（超過は references/ に分離済み）
 - [ ] references/SKILL.ja.md 存在、EN/JA構造パリティ
 - [ ] 全StepにValues blockquote
 - [ ] 運用リスクがある場合、Preflight / Self-Review / Troubleshooting がある
 - [ ] コードブロック: コンパイル可能 or 明示的に擬似コード
-- [ ] validate_skill.py ≥85% PASS
+- [ ] validate_skill.py の Critical 全PASS
 ```
+

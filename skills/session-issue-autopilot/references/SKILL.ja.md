@@ -108,7 +108,7 @@ Open Issueが複数あるときに使う。Why: 先に棚卸しすると重複�
 CHECK_LOG="preflight-issue-<id>.log"
 {
   echo "[preflight] validator/frontmatter convention check"
-  rg -n "required|name|description|Use when|metadata" skills/skill-quality-validation/scripts/validate_skill.py
+  rg -n "required|name|description|Use when|metadata" skills/skill/_eval/scripts/validate_skill.py
   rg -n "frontmatter|name, description" copilot/copilot-instructions.md
 } | tee "$CHECK_LOG"
 ```
@@ -327,3 +327,4 @@ MD
 gh issue comment <issue-number> --body-file /tmp/body.md
 gh pr comment <pr-number> --body-file /tmp/body.md
 ```
+

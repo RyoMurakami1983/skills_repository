@@ -39,7 +39,7 @@ compatibility:
 - **`session-issue-autopilot`** — 自律実行セッション（「何してる？」質問の発生源になりやすい）
 - **`furikaeri-practice`** — ふりかえり（「何が変わった？」質問が発生しやすい）
 - **`github-issue-intake`** — Issue取り込みワークフロー（説明を求められることがある）
-- **`skills-validate-skill`** — 「バリデーションって何をしてるの？」質問に対応
+- **`skill`** — 「バリデーションって何をしてるの？」質問に対応
 
 ---
 
@@ -272,3 +272,4 @@ Fix rule:
 - 4つの説明レーン: 動作・モード・変更点・自己紹介
 - 短答先出し・深掘りオンデマンドの応答パターン
 - CLIの能力質問は `fetch_copilot_cli_documentation` 経由に統一
+

@@ -31,8 +31,8 @@ git init/clone後のmain保護をデフォルト化するため、GitHubブラ�
 
 - **`git-commit-practices`** - コミット運用と規約
 - **`github-pr-workflow`** - PR作成とマージフロー
-- **`skills-author-skill`** - Skill執筆の標準
-- **`skills-validate-skill`** - Skill品質の検証
+- **`skill`** - Skill執筆の標準
+- **`skill`** - Skill品質の検証
 
 ---
 
@@ -317,3 +317,4 @@ git branch --show-current
 - [Git Hooks Documentation](https://git-scm.com/docs/githooks)
 
 ---
+

@@ -21,7 +21,7 @@ Use this skill when:
 
 - **`furikaeri-practice`** - Stores retrospective logs to Notion
 - **`knowledge-capture`** - Applies anonymization before public outputs
-- **`skills-revise-skill`** - Applies this base pattern to existing skills
+- **`skill`** - Applies this base pattern to existing skills
 
 ---
 
@@ -227,3 +227,4 @@ A: MCP means Model Context Protocol, the tool bridge used to call integrations l
 ## Resources
 
 - https://developers.notion.com/reference/intro
+

@@ -162,10 +162,10 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 ```powershell
 # ✅ 推奨
-uv run python skills/skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
+uv run python skills/skill/_eval/scripts/validate_skill.py path/to/SKILL.md --level L2
 
 # ❌ 非推奨（直接呼び出し）
-python skills/skill-quality-validation/scripts/validate_skill.py path/to/SKILL.md
+python skills/skill/_eval/scripts/validate_skill.py path/to/SKILL.md --level L2
 ```
 
 ### 理由
@@ -178,7 +178,7 @@ python skills/skill-quality-validation/scripts/validate_skill.py path/to/SKILL.m
 
 ```powershell
 # スキル検証
-uv run python skills\skill-quality-validation\scripts\validate_skill.py path\to\SKILL.md
+uv run python skills\skill\_eval\scripts\validate_skill.py path\to\SKILL.md --level L2
 
 # テスト実行
 uv run pytest

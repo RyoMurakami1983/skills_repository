@@ -29,7 +29,7 @@ Use this skill when:
 - **`dotnet-oracle-wpf-integration`** — Shares SecureConfigService when used in the same app
 - **`tdd-standard-practice`** — Test generated code with Red-Green-Refactor
 - **`git-commit-practices`** — Commit each step as an atomic change
-- **`skills-validate-skill`** — Validate this skill's quality
+- **`skill`** — Validate or improve this skill's quality
 
 ---
 

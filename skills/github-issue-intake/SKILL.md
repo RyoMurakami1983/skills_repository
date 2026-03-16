@@ -23,8 +23,8 @@ Use this skill when:
 - **`git-commit-practices`** - Commit workflow and conventions
 - **`github-pr-workflow`** - PR workflow and merge policies
 - **`git-initial-setup`** - Default repo protections for new repos
-- **`skills-revise-skill`** - Revision and change log practices
-- **`skills-validate-skill`** - Validate documentation quality
+- **`skill`** - Revision and change log practices
+- **`skill`** - Validate documentation quality
 - **`knowledge-capture`** - Anonymization gate for public-repo content
 
 ---
@@ -339,3 +339,4 @@ gh issue edit 123 --title "🟢 〜を明記する" --body-file issue.md
 - [GitHub CLI issue edit](https://cli.github.com/manual/gh_issue_edit)
 
 ---
+

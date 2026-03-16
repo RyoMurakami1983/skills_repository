@@ -20,7 +20,7 @@ $env:SKILLS_REPO = "C:\tools\skills_repository"
 git clone https://github.com/RyoMurakami1983/skills_repository.git $env:SKILLS_REPO
 Set-Location $env:SKILLS_REPO
 uv sync
-uv run python skills\skill-quality-validation\scripts\validate_skill.py skills\git-initial-setup\SKILL.md
+uv run python skills\skill\_eval\scripts\validate_skill.py skills\git-initial-setup\SKILL.md
 ```
 
 WSL / Linux / macOS を含む詳細手順は `docs/INSTALL.md` を参照してください。
@@ -101,8 +101,8 @@ ADR は「なぜその設計判断を採ったのか」を後から追えるよ�
 
 **2026-03**
 
-- `business/` カテゴリを整理し、`evidence-response` と `pdf` を業務向け workflow として扱いやすくした
-- `CHANGELOG.md` を月次サマリ方針に見直し、repo 固有の更新ルールを `.github/copilot-instructions.md` に追加した
+- `skills/skill/` を追加し、メタスキル群を単一入口 + sub_skills / _foundation / _eval / scripts 構成へ統合した
+- `skill/_eval/scripts/validate_skill.py`、`skill/scripts/create_skill.py` などを新構造へ移し、スキル用ツールチェインを同梱した
 - README は Windows の `.copilot` 同期を最優先に保ちつつ、詳細を `docs/INSTALL.md` へ分離した
 
 詳細は [`CHANGELOG.md`](CHANGELOG.md) を参照してください。ユーザーから最新化の指示があったときは、この欄も合わせて更新します。
@@ -114,3 +114,4 @@ ADR は「なぜその設計判断を採ったのか」を後から追えるよ�
 ## 作成者
 
 **RyoMurakami1983**
+

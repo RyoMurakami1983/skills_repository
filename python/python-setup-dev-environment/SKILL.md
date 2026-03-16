@@ -30,7 +30,7 @@ Use this skill when:
 
 ## Related Skills
 
-- **`skills-validate-skill`** — Validate this skill document after edits
+- **`skill`** — Validate or improve this skill document after edits
 - **`git-commit-practices`** — Commit environment changes as atomic, reviewable units
 - **`github-pr-workflow`** — Ship setup changes through PR workflow
 

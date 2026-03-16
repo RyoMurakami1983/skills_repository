@@ -27,8 +27,8 @@ metadata:
 - **`git-commit-practices`** - コミット運用と実践
 - **`github-pr-workflow`** - PR運用とマージ方針
 - **`git-initial-setup`** - リポジトリ初期保護
-- **`skills-revise-skill`** - 変更管理と履歴整理
-- **`skills-validate-skill`** - ドキュメント品質検証
+- **`skill`** - 変更管理と履歴整理
+- **`skill`** - ドキュメント品質検証
 - **`knowledge-capture`** - 公開リポジトリ向けコンテンツの匿名化ゲート
 
 ---
@@ -342,3 +342,4 @@ gh issue edit 123 --title "🟢 〜を明記する" --body-file issue.md
 - [GitHub CLI issue edit](https://cli.github.com/manual/gh_issue_edit)
 
 ---
+

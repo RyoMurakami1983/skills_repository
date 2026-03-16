@@ -35,7 +35,7 @@ Use this skill when:
 - **`python-setup-dev-environment`** — Pythonプロジェクトで最初に配布しやすい基盤スキル
 - **`python-debug-tdd`** — `all` で一緒に配布できる追加ワークフロー
 - **`git-initial-setup`** — 新規リポジトリの初期整備と併用しやすい
-- **`skills-validate-skill`** — このスキル文書を検証するときに使う
+- **`skill`** — このスキル文書を検証するときに使う
 
 ---
 
@@ -301,3 +301,4 @@ Deploy-PythonSkills.sh --source-root <python_path> --target <project> --category
 - [uv documentation](https://docs.astral.sh/uv/)
 - [Python Setup Dev Environment](../../../python/python-setup-dev-environment/SKILL.md)
 - [Deploy Dotnet Skills to Project](../../dotnet-skill-deploy/SKILL.md)
+

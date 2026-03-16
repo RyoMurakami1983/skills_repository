@@ -1,0 +1,50 @@
+{
+  "skill_id": "skill",
+  "version": "1.0.0",
+  "description": "Unified skill router evaluation suite",
+  "cases": [
+    {
+      "id": "tc-001",
+      "prompt": "新しいスキル 'git-commit-practices' を作成したい。テンプレートからSKILL.mdとreferencesを生成する手順を教えてください。",
+      "tags": ["author","create"],
+      "assertions": [
+        { "type": "contains", "value": "SKILL.md", "weight": 1.0 },
+        { "type": "contains", "value": "_foundation/TEMPLATE.md", "weight": 0.8 },
+        { "type": "contains", "value": "create_skill.py", "weight": 1.0 },
+        { "type": "llm_grade", "value": "テンプレートとcreate_skill.pyを使い、必要ファイルと作成手順を具体例で示しているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-002",
+      "prompt": "SKILL.md を検証して公開可能か確認したい。どのコマンドでどのレベルの検証を実行すれば良い？",
+      "tags": ["validate","quality"],
+      "assertions": [
+        { "type": "contains", "value": "validate_skill.py", "weight": 1.0 },
+        { "type": "contains", "value": "--level", "weight": 0.8 },
+        { "type": "contains", "value": "When to Use This Skill", "weight": 0.8 },
+        { "type": "llm_grade", "value": "検証コマンドとレベル(L1/L2)の説明、期待されるCriticalチェックの内容を示しているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-003",
+      "prompt": "あるスキルを .skill ファイルとして配布したい。パッケージ化手順を教えてください。",
+      "tags": ["package"],
+      "assertions": [
+        { "type": "contains", "value": "package_skill.py", "weight": 1.0 },
+        { "type": "contains", "value": ".skill", "weight": 1.0 },
+        { "type": "llm_grade", "value": "package_skill.py を使った具体的なコマンド例と出力アーティファクト(.skill)を示しているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-004",
+      "prompt": "skill の評価パイプラインを回して評価レポートを生成したい。どのスクリプトを使い、どのファイルが出力されるか教えてください。",
+      "tags": ["evaluate","pipeline"],
+      "assertions": [
+        { "type": "contains", "value": "aggregate_benchmark.py", "weight": 1.0 },
+        { "type": "contains", "value": "benchmark_summary.json", "weight": 1.0 },
+        { "type": "contains", "value": "viewer.html", "weight": 0.8 },
+        { "type": "llm_grade", "value": "評価スクリプトと生成されるレポート(viewer.html)の説明を具体的に示しているか", "weight": 1.0 }
+      ]
+    }
+  ]
+}

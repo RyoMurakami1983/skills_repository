@@ -1,0 +1,233 @@
+{
+  "skill_id": "skill",
+  "eval_version": "1.0.0",
+  "runs": {
+    "with_skill": {
+      "count": 4,
+      "mean": 0.9125,
+      "stddev": 0.0259,
+      "min": 0.88,
+      "max": 0.95
+    },
+    "baseline": {
+      "count": 4,
+      "mean": 0.3675,
+      "stddev": 0.0466,
+      "min": 0.3,
+      "max": 0.42
+    }
+  },
+  "summary": {
+    "delta": 0.545,
+    "improvement_pct": 148.3,
+    "verdict": "improved"
+  },
+  "case_breakdown": [
+    {
+      "case_id": "tc-001",
+      "prompt": "新しいスキル 'git-commit-practices' を作成したい。テンプレートからSKILL.mdとreferencesを生成する手順を教えてください。",
+      "tags": [
+        "author",
+        "create"
+      ],
+      "with_skill_mean": 0.95,
+      "baseline_mean": 0.42,
+      "delta": 0.53,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "SKILL.md",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "SKILL.md mentioned"
+        },
+        {
+          "type": "contains",
+          "value": "_foundation/TEMPLATE.md",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "TEMPLATE referenced"
+        },
+        {
+          "type": "contains",
+          "value": "create_skill.py",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "create_skill.py usage shown"
+        },
+        {
+          "type": "llm_grade",
+          "value": "テンプレートとcreate_skill.pyを使い、必要ファイルと作成手順を具体例で示しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "LLM grade: concrete step-by-step example"
+        }
+      ],
+      "with_skill_snippet": "Generated SKILL.md with sections: name, description, When to Use This Skill. Used _foundation/TEMPLATE.md and create_skill.py invocation example.",
+      "baseline_snippet": "Generic instructions about creating docs; missing concrete create_skill.py example and TEMPLATE reference.",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「_foundation/TEMPLATE.md」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「create_skill.py」が回答に現れない）",
+        "推論・判断力が不足（テンプレートとcreate_skill.pyを使い、必要ファイルと作成手順を具体例で示しているか）"
+      ],
+      "recommendation": "スキル固有の専門知識（_foundation/TEMPLATE.md, create_skill.py）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+    },
+    {
+      "case_id": "tc-002",
+      "prompt": "SKILL.md を検証して公開可能か確認したい。どのコマンドでどのレベルの検証を実行すれば良い？",
+      "tags": [
+        "validate",
+        "quality"
+      ],
+      "with_skill_mean": 0.9,
+      "baseline_mean": 0.35,
+      "delta": 0.55,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "validate_skill.py",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "validate_skill.py mentioned"
+        },
+        {
+          "type": "contains",
+          "value": "--level",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "--level explained"
+        },
+        {
+          "type": "contains",
+          "value": "When to Use This Skill",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "When to Use This Skill present"
+        },
+        {
+          "type": "llm_grade",
+          "value": "検証コマンドとレベル(L1/L2)の説明、期待されるCriticalチェックの内容を示しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "LLM grade: explains critical checks"
+        }
+      ],
+      "with_skill_snippet": "Run: python skills/skill/_eval/scripts/validate_skill.py --level L1 SKILL.md; explains Critical checks and --level semantics.",
+      "baseline_snippet": "Mentions a generic validator but not validate_skill.py or level flags; lacks specifics about Critical checks.",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「validate_skill.py」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「--level」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「When to Use This Skill」が回答に現れない）",
+        "推論・判断力が不足（検証コマンドとレベル(L1/L2)の説明、期待されるCriticalチェックの内容を示しているか）"
+      ],
+      "recommendation": "スキル固有の専門知識（validate_skill.py, --level, When to Use This Skill）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+    },
+    {
+      "case_id": "tc-003",
+      "prompt": "あるスキルを .skill ファイルとして配布したい。パッケージ化手順を教えてください。",
+      "tags": [
+        "package"
+      ],
+      "with_skill_mean": 0.88,
+      "baseline_mean": 0.3,
+      "delta": 0.58,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "package_skill.py",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "package_skill.py usage shown"
+        },
+        {
+          "type": "contains",
+          "value": ".skill",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ".skill artifact described"
+        },
+        {
+          "type": "llm_grade",
+          "value": "package_skill.py を使った具体的なコマンド例と出力アーティファクト(.skill)を示しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "LLM grade: concrete command example"
+        }
+      ],
+      "with_skill_snippet": "Describes package_skill.py usage and .skill artifact generation; includes command example and outputs.",
+      "baseline_snippet": "High-level packaging notes; no concrete script or .skill example.",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「package_skill.py」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「.skill」が回答に現れない）",
+        "推論・判断力が不足（package_skill.py を使った具体的なコマンド例と出力アーティファクト(.skill)を示しているか）"
+      ],
+      "recommendation": "スキル固有の専門知識（package_skill.py, .skill）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+    },
+    {
+      "case_id": "tc-004",
+      "prompt": "skill の評価パイプラインを回して評価レポートを生成したい。どのスクリプトを使い、どのファイルが出力されるか教えてください。",
+      "tags": [
+        "evaluate",
+        "pipeline"
+      ],
+      "with_skill_mean": 0.92,
+      "baseline_mean": 0.4,
+      "delta": 0.52,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "aggregate_benchmark.py",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "aggregate_benchmark.py usage"
+        },
+        {
+          "type": "contains",
+          "value": "benchmark_summary.json",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "benchmark_summary.json output referenced"
+        },
+        {
+          "type": "contains",
+          "value": "viewer.html",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "viewer.html generation mentioned"
+        },
+        {
+          "type": "llm_grade",
+          "value": "評価スクリプトと生成されるレポート(viewer.html)の説明を具体的に示しているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": "LLM grade: concrete pipeline steps"
+        }
+      ],
+      "with_skill_snippet": "Explains running aggregate_benchmark.py with --run-id and generating benchmark_summary.json and viewer.html; includes example commands.",
+      "baseline_snippet": "Generic mention of evaluation and reports; missing specific scripts and viewer generation steps.",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「aggregate_benchmark.py」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「benchmark_summary.json」が回答に現れない）",
+        "スキル固有のキーワード・コマンド名の知識が不足（「viewer.html」が回答に現れない）",
+        "推論・判断力が不足（評価スクリプトと生成されるレポート(viewer.html)の説明を具体的に示しているか）"
+      ],
+      "recommendation": "スキル固有の専門知識（aggregate_benchmark.py, benchmark_summary.json, viewer.html）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+    }
+  ],
+  "generated_at": "2026-03-15T21:35:43.393087+00:00"
+}

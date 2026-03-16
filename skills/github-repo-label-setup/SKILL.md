@@ -22,7 +22,7 @@ Use this skill when:
 - **`github-issue-intake`** - Issue creation and triage using labels
 - **`github-pr-workflow`** - PR creation and merge flow
 - **`git-initial-setup`** - Repository bootstrap and protection
-- **`skills-author-skill`** - Skill documentation standards
+- **`skill`** - Skill documentation standards
 
 ---
 
@@ -318,3 +318,4 @@ gh label create "a/docs"    --color "3FB950" --description "Documentation domain
 - [GitHub Default Labels](https://docs.github.com/en/issues/using-labels-and-milestones-to-track-work/managing-labels#about-default-labels)
 
 ---
+
