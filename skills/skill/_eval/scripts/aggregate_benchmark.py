@@ -3,7 +3,7 @@
 Aggregate grading_result.json files into benchmark_summary.json.
 
 Usage:
-    python skills/skill/_eval/scripts/aggregate_benchmark.py \\
+    uv run python skills/skill/_eval/scripts/aggregate_benchmark.py \\
         --skill-id skill \\
         --run-id run-20260310-001 \\
         [--evals-dir evals]

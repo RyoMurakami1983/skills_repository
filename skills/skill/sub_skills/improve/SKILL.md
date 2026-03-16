@@ -39,7 +39,7 @@ Update `references/`, Japanese documentation, and bundled assets when the meanin
 
 ### Step 5 — Re-validate
 
-Run L1-L2 validation again after the revision with `uv run python skills\skill\_eval\scripts\validate_skill.py <path-to-skill> --level L2`. Improvement is not finished until the updated guidance still holds together structurally.
+Run L1-L2 validation again after the revision with `uv run python skills/skill/_eval/scripts/validate_skill.py <path-to-skill>/SKILL.md --level L2`. Improvement is not finished until the updated guidance still holds together structurally.
 
 ## Pitfalls
 

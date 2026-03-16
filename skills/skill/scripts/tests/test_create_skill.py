@@ -36,3 +36,21 @@ def test_create_skill_creates_expected_structure(tmp_path: Path):
     assert (created / "references" / "SKILL.ja.md").exists()
     assert (created / "scripts").is_dir()
     assert (created / "assets").is_dir()
+
+
+def test_build_ja_stub_uses_folded_description_and_omits_empty_compatibility():
+    mod = load_module()
+
+    stub = mod.build_ja_stub(
+        "sample-skill",
+        'Handle YAML-sensitive text like ":" "#" "[" and quotes safely. Use when drafting metadata.',
+        "Sample Skill",
+        "",
+    )
+
+    assert "description: >\n" in stub
+    assert (
+        '  Handle YAML-sensitive text like ":" "#" "[" and quotes safely. Use when drafting metadata.\n'
+        in stub
+    )
+    assert "compatibility:" not in stub

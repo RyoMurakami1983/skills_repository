@@ -53,15 +53,24 @@ def render_template(template: str, *, name: str, description: str, title: str, c
 
 
 def build_ja_stub(name: str, description: str, title: str, compatibility: str) -> str:
-    return (
-        "---\n"
-        f"name: {name}\n"
-        f"description: {description}\n"
-        f"compatibility: {compatibility}\n"
-        "---\n\n"
-        f"# {title}\n\n"
-        "日本語版は必要になった段階で追加してください。\n"
+    lines = [
+        "---",
+        f"name: {name}",
+        "description: >",
+        *(f"  {line}" if line else "  " for line in description.splitlines() or [""]),
+    ]
+    if compatibility:
+        lines.append(f"compatibility: {compatibility}")
+    lines.extend(
+        [
+            "---",
+            "",
+            f"# {title}",
+            "",
+            "日本語版は必要になった段階で追加してください。",
+        ]
     )
+    return "\n".join(lines) + "\n"
 
 
 def create_skill(output_root: Path, template: str, item: dict[str, str]) -> Path:

@@ -24,7 +24,7 @@ Use this skill when:
 
 ### Step 1 — Run L1 Critical Checks
 
-Confirm the five Critical checks from `_foundation/QUALITY.md` all pass. In this repository, run the validator as `uv run python skills\skill\_eval\scripts\validate_skill.py <path-to-skill> --level L1`. This is the hard gate because a skill that cannot be discovered or executed correctly should not move forward.
+Confirm the five Critical checks from `_foundation/QUALITY.md` all pass. In this repository, run the validator as `uv run python skills/skill/_eval/scripts/validate_skill.py <path-to-skill>/SKILL.md --level L1`. This is the hard gate because a skill that cannot be discovered or executed correctly should not move forward.
 
 ### Step 2 — Review Recommended Quality Signals
 

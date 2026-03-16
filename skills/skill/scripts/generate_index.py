@@ -13,12 +13,27 @@ def extract_frontmatter(path: Path) -> dict[str, str]:
     match = re.match(r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL)
     if not match:
         return {}
+    lines = match.group(1).splitlines()
     data: dict[str, str] = {}
-    for line in match.group(1).splitlines():
-        if ":" not in line:
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        plain = re.match(r"^([A-Za-z0-9_-]+):\s*(.*)$", line)
+        if not plain:
+            i += 1
             continue
-        key, _, value = line.partition(":")
-        data[key.strip()] = value.strip().strip('"\'')
+        key = plain.group(1)
+        value = plain.group(2).strip()
+        if value in {">", "|", ">-", "|-"}:
+            folded: list[str] = []
+            i += 1
+            while i < len(lines) and (lines[i].startswith(" ") or lines[i].startswith("\t")):
+                folded.append(lines[i].strip())
+                i += 1
+            data[key] = " ".join(part for part in folded if part).strip()
+            continue
+        data[key] = value.strip('"\'')
+        i += 1
     return data
 
 

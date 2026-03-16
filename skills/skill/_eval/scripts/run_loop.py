@@ -17,8 +17,9 @@ VALIDATOR_PATH = SCRIPT_DIR / "validate_skill.py"
 
 def load_validator():
     spec = importlib.util.spec_from_file_location("skill_validate_skill", VALIDATOR_PATH)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load validator module spec: {VALIDATOR_PATH}")
     module = importlib.util.module_from_spec(spec)
-    assert spec and spec.loader
     spec.loader.exec_module(module)
     return module
 
@@ -50,15 +51,19 @@ def generate_candidates(description: str) -> list[str]:
 
 
 def rewrite_description(skill_path: Path, description: str) -> None:
-    content = skill_path.read_text(encoding="utf-8")
-    new_content = re.sub(
-        r"(^description:\s*(?:>\s*\n(?:\s+.*\n)+|.*)$)",
-        f"description: >\n  {description}\n",
-        content,
-        count=1,
-        flags=re.MULTILINE,
-    )
-    skill_path.write_text(new_content, encoding="utf-8")
+    lines = skill_path.read_text(encoding="utf-8").splitlines(keepends=True)
+    for index, line in enumerate(lines):
+        if not line.startswith("description:"):
+            continue
+        end = index + 1
+        value = line.partition(":")[2].strip()
+        if value in {">", "|", ">-", "|-"}:
+            while end < len(lines) and (lines[end].startswith(" ") or lines[end].startswith("\t")):
+                end += 1
+        replacement = ["description: >\n", *(f"  {part}\n" if part else "  \n" for part in description.splitlines())]
+        skill_path.write_text("".join([*lines[:index], *replacement, *lines[end:]]), encoding="utf-8")
+        return
+    raise ValueError(f"description frontmatter not found: {skill_path}")
 
 
 def parse_args() -> argparse.Namespace:

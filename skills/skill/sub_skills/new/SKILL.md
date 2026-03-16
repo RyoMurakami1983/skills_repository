@@ -35,7 +35,7 @@ Start from `_foundation/TEMPLATE.md`. Write a pushy `description`, keep the hot 
 
 ### Step 4 — Run L1 Validation
 
-Use `uv run python skills\skill\_eval\scripts\validate_skill.py <path-to-skill> --level L1` in draft mode to confirm the Critical checks pass early. Fix naming, trigger language, and missing workflow structure before polishing details.
+Use `uv run python skills/skill/_eval/scripts/validate_skill.py <path-to-skill>/SKILL.md --level L1` in draft mode to confirm the Critical checks pass early. Fix naming, trigger language, and missing workflow structure before polishing details.
 
 ### Step 5 — Batch When the Domain Needs a Suite
 

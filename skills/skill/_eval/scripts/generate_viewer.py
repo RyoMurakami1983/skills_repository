@@ -3,7 +3,7 @@
 Generate a self-contained HTML eval viewer from benchmark_summary.json.
 
 Usage:
-    python skills/skill/_eval/scripts/generate_viewer.py \\
+    uv run python skills/skill/_eval/scripts/generate_viewer.py \\
         --skill-id skill \\
         [--evals-dir evals] \\
         [--out viewer/index.html]
