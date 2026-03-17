@@ -20,7 +20,7 @@ from pathlib import Path
 
 WINDOWS_PATH_RE = re.compile(r"[A-Za-z]:\\(?:[^\\/:*?\"<>|\r\n]+\\)*[^\\/:*?\"<>|\r\n]*")
 URL_RE = re.compile(r"https?://\S+")
-PERSONAL_GITHUB_OWNER = r"(?=[A-Za-z0-9-]*[A-Z0-9])[A-Za-z\d](?:[A-Za-z\d]|-(?=[A-Za-z\d])){0,38}"
+PERSONAL_GITHUB_OWNER = r"[A-Za-z\d](?:[A-Za-z\d]|-(?=[A-Za-z\d])){0,38}"
 GITHUB_REPO_RE = re.compile(rf"\b({PERSONAL_GITHUB_OWNER})/([A-Za-z0-9_.-]+)\b")
 PRIVATE_REPO_OWNER_RE = re.compile(rf"\b({PERSONAL_GITHUB_OWNER})(?=のprivateリポジトリ)")
 WHITESPACE_RE = re.compile(r"\s+")
