@@ -27,6 +27,7 @@
 - `skills/skill/` の generator と foundation templates を拡張し、Router スキルと `sub_skills/` の scaffolding を作成可能にした
 - `git-commit-practices` と `skills/SKILLS_README.md` を更新し、「コミットして」は atomic commit を前提に `git-commit-practices` へ流す標準導線を明文化
 - `skills/skill/_eval/scripts/` に real corpus 抽出用 `extract_prompt_corpus.py` と semi-automated run materialization 用 `materialize_manual_run.py` を追加し、`github` cluster の benchmark/viewer 生成まで通せるようにした
+- `git-commit-practices` を更新し、atomic commit は「変更意図単位」で分割し、session / wave 単位では束ねない方針を明文化した
 
 ### Docs
 
