@@ -23,6 +23,7 @@ Use this skill when:
 
 ## Related Skills
 
+- **`dotnet`** — Thin entry skill when the user starts from broad `.NET` intent and still needs routing
 - **`dotnet-modern-csharp-coding-standards`** — One of the foundation skills frequently deployed
 - **`dotnet-wpf-mvvm-patterns`** — WPF MVVM foundation skill
 - **`dotnet-project-structure`** — Project structure skill

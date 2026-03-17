@@ -1,0 +1,111 @@
+{
+  "cluster_id": "github-daily-operations",
+  "source": "evals/github/corpus_summary.json",
+  "generated_from_real_corpus": true,
+  "items": [
+    {
+      "prompt": "プルリクして",
+      "frequency": 6,
+      "best_skill_now": "github-pr-workflow",
+      "entry_skill": "github",
+      "competing_skills": [],
+      "canonical_downstream": "github-pr-review-response",
+      "risk": "low",
+      "note": "最頻出。薄い入口の主価値を測る代表ケース。"
+    },
+    {
+      "prompt": "プルリクしてレビュー対応待機してください。そのあとマージは私がします。",
+      "frequency": 1,
+      "best_skill_now": "github-pr-workflow",
+      "entry_skill": "github",
+      "competing_skills": [
+        "github-pr-review-response"
+      ],
+      "canonical_downstream": "github-pr-review-response",
+      "risk": "medium",
+      "note": "PR作成と review waiting と human merge gate を同時に含む。"
+    },
+    {
+      "prompt": "レビュー対応して",
+      "frequency": 2,
+      "best_skill_now": "github-pr-review-response",
+      "entry_skill": "github",
+      "competing_skills": [
+        "github-pr-workflow"
+      ],
+      "canonical_downstream": "human merge handoff",
+      "risk": "medium",
+      "note": "review signal 対応として route precision を測りやすい。"
+    },
+    {
+      "prompt": "レビュー見て指摘あれば対応してなければマージ",
+      "frequency": 4,
+      "best_skill_now": "github-pr-review-response",
+      "entry_skill": "github",
+      "competing_skills": [
+        "github-pr-workflow"
+      ],
+      "canonical_downstream": "human merge handoff",
+      "risk": "high",
+      "note": "review response と merge gate を混同しやすい competition case。"
+    },
+    {
+      "prompt": "Issueを対応しましょう。まずは把握から",
+      "frequency": 1,
+      "best_skill_now": "session-issue-autopilot",
+      "entry_skill": "github",
+      "competing_skills": [
+        "github-issue-intake"
+      ],
+      "canonical_downstream": "github-pr-workflow",
+      "risk": "high",
+      "note": "Issue起票ではなく Issue実行セッション。入口 skill が誤誘導しやすい。"
+    },
+    {
+      "prompt": "commitして",
+      "frequency": 3,
+      "best_skill_now": "git-commit-practices",
+      "entry_skill": "github",
+      "competing_skills": [],
+      "canonical_downstream": "github-pr-workflow",
+      "risk": "medium",
+      "note": "atomic commit 標準化の効果測定ケース。"
+    },
+    {
+      "prompt": "mainに戻ってね。プルしてね",
+      "frequency": 1,
+      "best_skill_now": "github-pr-workflow",
+      "entry_skill": "github",
+      "competing_skills": [
+        "session-issue-autopilot"
+      ],
+      "canonical_downstream": "none",
+      "risk": "high",
+      "note": "post-merge sync の edge case。thin entry が効かない可能性もある。"
+    },
+    {
+      "prompt": "Issue登録して",
+      "frequency": 0,
+      "best_skill_now": "github-issue-intake",
+      "entry_skill": "github",
+      "competing_skills": [
+        "session-issue-autopilot"
+      ],
+      "canonical_downstream": "backlog / owner handoff",
+      "risk": "medium",
+      "note": "real corpus に薄いので blind spot 補完用 synthetic case。"
+    },
+    {
+      "prompt": "commit message の規約だけ知りたい",
+      "frequency": 0,
+      "best_skill_now": "git-commit-practices",
+      "entry_skill": "github",
+      "competing_skills": [
+        "github"
+      ],
+      "canonical_downstream": "none",
+      "risk": "medium",
+      "note": "false-positive guard。repo/router 案内のしすぎを防ぐ。"
+    }
+  ]
+}

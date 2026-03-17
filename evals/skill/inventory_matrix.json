@@ -1,0 +1,123 @@
+{
+  "cluster_id": "skill-meta",
+  "source": "evals/skill/corpus_summary_real.json",
+  "generated_from_real_corpus": true,
+  "items": [
+    {
+      "prompt": "skillを実装して",
+      "frequency": 2,
+      "best_skill_now": "skills/skill/sub_skills/new",
+      "entry_skill": "skills/skill",
+      "competing_skills": [],
+      "canonical_downstream": "validate new draft",
+      "risk": "medium",
+      "note": "最小 create ask。route 自体より、要件確認を置けるかが重要。"
+    },
+    {
+      "prompt": "既存のskillsの品質アップを図る。管理・基盤系スキルファミリーを段階的にコスモス化したい。",
+      "frequency": 1,
+      "best_skill_now": "skills/skill/sub_skills/improve",
+      "entry_skill": "skills/skill",
+      "competing_skills": [
+        "skills/skill/sub_skills/new"
+      ],
+      "canonical_downstream": "validate revised family",
+      "risk": "high",
+      "note": "新規作成ではなく既存 family の構造改善。route を誤ると全体設計がずれる。"
+    },
+    {
+      "prompt": "@skills\\github-issue-intake\\ を修正したい。今回の方法を含めて改善したい。",
+      "frequency": 1,
+      "best_skill_now": "skills/skill/sub_skills/improve",
+      "entry_skill": "skills/skill",
+      "competing_skills": [
+        "github-issue-intake"
+      ],
+      "canonical_downstream": "re-validate revised skill",
+      "risk": "medium",
+      "note": "named skill 改修。meta 改善と対象 skill 実務の境界確認に使える。"
+    },
+    {
+      "prompt": "When to Use This Skill の構成や分割しすぎの問題を修正したい。",
+      "frequency": 1,
+      "best_skill_now": "skills/skill/sub_skills/improve",
+      "entry_skill": "skills/skill",
+      "competing_skills": [
+        "skills/skill/sub_skills/validate"
+      ],
+      "canonical_downstream": "validate structure after revision",
+      "risk": "high",
+      "note": "構造批評。品質 gate 前の設計改善として扱うのが自然。"
+    },
+    {
+      "prompt": "skillの品質評価をして公開可能か確認したい。500行超は references へ移したい。",
+      "frequency": 1,
+      "best_skill_now": "skills/skill/sub_skills/validate",
+      "entry_skill": "skills/skill",
+      "competing_skills": [
+        "skills/skill/sub_skills/improve"
+      ],
+      "canonical_downstream": "improve if blocked",
+      "risk": "high",
+      "note": "validate と improve の境界ケース。まず品質 gate を通すのが筋。"
+    },
+    {
+      "prompt": "skill_jp.md に日本語を集約する方針で既存skillを修正したい。",
+      "frequency": 1,
+      "best_skill_now": "skills/skill/sub_skills/improve",
+      "entry_skill": "skills/skill",
+      "competing_skills": [],
+      "canonical_downstream": "re-validate synchronized docs",
+      "risk": "medium",
+      "note": "JP/EN同期・references整理は実 corpus 上の明確な maintenance need。"
+    },
+    {
+      "prompt": "skillの命名規則を決めたい。skill- か dotnet-/python- か相談したい。",
+      "frequency": 1,
+      "best_skill_now": "none-in-current-router",
+      "entry_skill": "skills/skill",
+      "competing_skills": [
+        "skills-author-skill",
+        "skills-index-snippets"
+      ],
+      "canonical_downstream": "governance decision",
+      "risk": "high",
+      "note": "router の4 routeに無理に押し込むと over-trigger になる。"
+    },
+    {
+      "prompt": "GitHubにpushしたい。成功したらskillを作成したい。",
+      "frequency": 1,
+      "best_skill_now": "git-init-to-github",
+      "entry_skill": "skills/skill",
+      "competing_skills": [
+        "git-initial-setup",
+        "skills/skill/sub_skills/new"
+      ],
+      "canonical_downstream": "skill authoring later",
+      "risk": "high",
+      "note": "meta skill の false positive guard。本筋は operational workflow。"
+    },
+    {
+      "prompt": "pptxのパワーポイントでポスターセッション作成できますか？skill使って",
+      "frequency": 0,
+      "best_skill_now": "out-of-scope",
+      "entry_skill": "skills/skill",
+      "competing_skills": [],
+      "canonical_downstream": "domain-specific workflow",
+      "risk": "medium",
+      "note": "『skill』という語だけで meta router が起動しないかを測る synthetic guard。"
+    },
+    {
+      "prompt": "with-skill と baseline で benchmark_summary.json と viewer.html まで見たい。",
+      "frequency": 0,
+      "best_skill_now": "skills/skill/sub_skills/evaluate",
+      "entry_skill": "skills/skill",
+      "competing_skills": [
+        "skills/skill/sub_skills/validate"
+      ],
+      "canonical_downstream": "aggregate + viewer",
+      "risk": "medium",
+      "note": "real corpus では薄いが、evaluate route の存在価値を測る synthetic guard。"
+    }
+  ]
+}

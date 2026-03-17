@@ -1,0 +1,126 @@
+{
+  "skill_id": "github",
+  "version": "1.0.0",
+  "description": "github 薄い入口 skill の有効性評価。real corpus first で日常運用フレーズから既存 canonical workflow へ正しく到達できるかを確認する。",
+  "cases": [
+    {
+      "id": "tc-001",
+      "prompt": "プルリクして",
+      "source": "corpus",
+      "source_count": 6,
+      "tags": ["daily-ops", "pr-create", "thin-entry"],
+      "assertions": [
+        { "type": "contains", "value": "github-pr-workflow", "weight": 1.0 },
+        { "type": "contains", "value": "review waiting", "weight": 0.6 },
+        { "type": "not_contains", "value": "github-pr-review-response を先に開始", "weight": 0.6 },
+        { "type": "llm_grade", "value": "広いPR依頼を `github-pr-workflow` にルーティングし、PR作成から review waiting までが canonical flow だと説明できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-002",
+      "prompt": "プルリクしてレビュー対応待機してください。そのあとマージは私がします。",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["daily-ops", "pr-create", "review-wait", "human-merge", "thin-entry"],
+      "assertions": [
+        { "type": "contains", "value": "github-pr-workflow", "weight": 1.0 },
+        { "type": "contains", "value": "残します", "weight": 0.6 },
+        { "type": "contains", "value": "review waiting", "weight": 0.6 },
+        { "type": "not_contains", "value": "merge automatically", "weight": 0.8 },
+        { "type": "llm_grade", "value": "PR作成と review waiting を `github-pr-workflow` に載せつつ、merge は human handoff のまま維持できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-003",
+      "prompt": "レビュー対応して",
+      "source": "corpus",
+      "source_count": 2,
+      "tags": ["daily-ops", "review-response", "thin-entry"],
+      "assertions": [
+        { "type": "contains", "value": "github-pr-review-response", "weight": 1.0 },
+        { "type": "contains", "value": "レビュー", "weight": 0.8 },
+        { "type": "not_contains", "value": "create a new PR", "weight": 0.5 },
+        { "type": "llm_grade", "value": "PR review comment への応答を `github-pr-review-response` に正しくルーティングし、実際の review signal が前提だと説明できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-004",
+      "prompt": "レビュー見て指摘あれば対応してなければマージ",
+      "source": "corpus",
+      "source_count": 4,
+      "tags": ["daily-ops", "review-response", "merge-gate", "overlap"],
+      "assertions": [
+        { "type": "contains", "value": "github-pr-review-response", "weight": 1.0 },
+        { "type": "contains", "value": "人間", "weight": 0.6 },
+        { "type": "not_contains", "value": "merge automatically", "weight": 0.8 },
+        { "type": "llm_grade", "value": "review を見て必要なら `github-pr-review-response` に入り、問題がなければ merge 判断は人間に残す説明になっているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-005",
+      "prompt": "Issueを対応しましょう。まずは把握から",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["daily-ops", "issue-session", "thin-entry"],
+      "assertions": [
+        { "type": "contains", "value": "session-issue-autopilot", "weight": 1.0 },
+        { "type": "contains", "value": "issue", "weight": 0.5 },
+        { "type": "not_contains", "value": "github-issue-intake だけで完結", "weight": 0.5 },
+        { "type": "llm_grade", "value": "Issue を今この session で end-to-end に進める依頼として `session-issue-autopilot` に接続できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-006",
+      "prompt": "commitして",
+      "source": "corpus",
+      "source_count": 3,
+      "tags": ["daily-ops", "atomic-commit", "thin-entry"],
+      "assertions": [
+        { "type": "contains", "value": "git-commit-practices", "weight": 1.0 },
+        { "type": "contains", "value": "atomic", "weight": 0.8 },
+        { "type": "contains", "value": "Conventional Commits", "weight": 0.6 },
+        { "type": "not_contains", "value": "just run `git commit`", "weight": 0.8 },
+        { "type": "llm_grade", "value": "曖昧な『コミットして』を raw commit ではなく atomic commit 要求と解釈し、`git-commit-practices` へルーティングできているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-007",
+      "prompt": "mainに戻ってね。プルしてね",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["daily-ops", "post-merge-sync", "edge-case"],
+      "assertions": [
+        { "type": "contains", "value": "main", "weight": 0.6 },
+        { "type": "contains", "value": "pull", "weight": 0.6 },
+        { "type": "not_contains", "value": "open a new PR", "weight": 0.8 },
+        { "type": "llm_grade", "value": "post-merge sync または local main 更新として扱い、不要な PR / issue workflow に誤誘導していないか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-008",
+      "prompt": "Issue登録して",
+      "source": "synthetic-blind-spot",
+      "source_count": 0,
+      "tags": ["daily-ops", "issue-intake", "thin-entry"],
+      "assertions": [
+        { "type": "contains", "value": "github-issue-intake", "weight": 1.0 },
+        { "type": "contains", "value": "issue", "weight": 0.6 },
+        { "type": "not_contains", "value": "session-issue-autopilot から開始", "weight": 0.5 },
+        { "type": "llm_grade", "value": "Issue 起票依頼を `github-issue-intake` に正しくルーティングし、実行セッション開始とは区別できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-009",
+      "prompt": "commit message の規約だけ知りたい",
+      "source": "synthetic-false-positive-guard",
+      "source_count": 0,
+      "tags": ["false-positive-guard", "commit-guidance"],
+      "assertions": [
+        { "type": "contains", "value": "git-commit-practices", "weight": 1.0 },
+        { "type": "not_contains", "value": "github-pr-workflow", "weight": 0.7 },
+        { "type": "not_contains", "value": "github-issue-intake", "weight": 0.7 },
+        { "type": "llm_grade", "value": "commit message 規約の相談として `git-commit-practices` に絞って案内し、不要な GitHub workflow へ広げていないか", "weight": 1.0 }
+      ]
+    }
+  ]
+}

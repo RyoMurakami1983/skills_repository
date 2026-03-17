@@ -1,0 +1,55 @@
+{
+  "run_id": "run-20260317-002",
+  "responses": {
+    "with_skill": {
+      "tc-001": "Route: sub_skills/new. 承知しました。新しいskillの実装として扱うので、まず目的・トリガー・出力を整理してからドラフト化します。",
+      "tc-002": "Route: sub_skills/improve. これは既存skillsの改善案件として進めるのが適切です。@local_reference_skills\\ を根拠に、管理・基盤系スキルファミリーの段階的な再編と品質向上を進めます。",
+      "tc-003": "Route: sub_skills/improve. @skills\\github-issue-intake\\ の改善として対応します。今回有効だったやり方を一般化して取り込み、再利用できる guidance に更新します。",
+      "tc-004": "Route: sub_skills/improve. はい、これは既存skillの構成見直しとして改善ルートが適切です。section構成と文脈保持のバランスを見直し、分割しすぎによる読みにくさを修正します。",
+      "tc-005": "Route: sub_skills/validate. これは品質確認と公開可否の判断なので validate に進めるのが適切です。行数超過や references への退避方針も含めて、公開前チェックとして確認します。",
+      "tc-006": "Route: sub_skills/improve. 既存skill群の方針変更と日本語ドキュメント同期なので improve が適切です。skill_jp.md へ日本語を集約する方針で、関連ファイルを揃えて修正します。",
+      "tc-007": "Route: sub_skills/new. これは新規作成前の命名方針設計として扱うのが実務的です。skill- を共通接頭辞にするか、dotnet- や python- のように領域先頭にするかを、拡張性と検索性の観点で整理します。",
+      "tc-008": "Route: other-skill. 今はskill作成より先に、Git管理とGitHubリポジトリ作成を進めるのが適切です。まずは git-init-to-github や git-initial-setup 系のスキルで土台を整え、その後にskill化を検討しましょう。",
+      "tc-009": "Route: out-of-scope. これはskill自体の作成・改善・検証ではなく、PowerPointで成果物を作る実務依頼です。そのためこのメタskillルーターの対象外で、資料作成用の別スキルまたは通常作業として扱うのが適切です。",
+      "tc-010": "Route: sub_skills/evaluate. これは行動変化の測定なので evaluate に進めるのが適切です。with-skill と baseline を比較し、benchmark_summary.json と viewer.html まで生成して確認します。"
+    },
+    "baseline": {
+      "tc-001": "Route: sub_skills/new. 新しいskillの作成依頼として扱うのが適切です。まず目的・対象タスク・出力イメージを確認してから設計に入ります。",
+      "tc-002": "Route: sub_skills/improve. 既存skillsの段階的な再編・品質改善なので、改善ルートで進めるのが自然です。@local_reference_skills\\ を根拠に、既存資産の整理方針とファミリー構造を見直しましょう。",
+      "tc-003": "Route: sub_skills/improve. @skills\\github-issue-intake\\ の改修依頼なので、既存skillの改善として扱います。今回有効だったノウハウを再利用可能な形で反映する前提で見直します。",
+      "tc-004": "Route: sub_skills/improve. これはsection設計と分割方針への改善指摘として扱うのが適切です。文脈を失わない粒度に戻しつつ、構成を再設計しましょう。",
+      "tc-005": "Route: sub_skills/validate. 公開可否の確認と品質ゲートの話なので、まずは検証ルートが適切です。長すぎる本文の references 移管も含め、構造と公開基準をチェックしましょう。",
+      "tc-006": "Route: sub_skills/improve. 既存skillを日本語集約方針に合わせて直す話なので、改善ルートで進めます。skill_jp.md への集約に合わせて関連ファイルの整合も見直します。",
+      "tc-007": "Route: other-skill. これは新規作成や改修そのものではなく、命名規則や taxonomy の方針相談です。skill-、dotnet-、python- などの粒度を、運用ルールとして先に整理するのがよさそうです。",
+      "tc-008": "Route: other-skill. 先に必要なのはskill作成ではなく、Git/GitHubの初期化です。まずは git-init-to-github のような実務スキルで土台を整え、その後にskill化を検討するのが自然です。",
+      "tc-009": "Route: out-of-scope. これはskill作成・改善の依頼ではなく、PowerPointでポスターを作る実務依頼です。meta-skillルーターではなく、資料構成やpptx作成支援として扱うべき内容です。",
+      "tc-010": "Route: sub_skills/evaluate. これはskillの行動変化を測る評価依頼なので、評価ルートが適切です。with-skill と baseline を比較し、benchmark_summary.json と viewer.html まで確認する前提で進めます。"
+    }
+  },
+  "llm_grade": {
+    "with_skill": {
+      "tc-001": [{ "passed": true, "detail": "新規 skill 作成依頼を `sub_skills/new` にルーティングし、目的整理を先に置いている。" }],
+      "tc-002": [{ "passed": true, "detail": "既存 skill family の構造改善として `sub_skills/improve` に正しく接続している。" }],
+      "tc-003": [{ "passed": true, "detail": "named skill の evidence-driven revision として `sub_skills/improve` に接続している。" }],
+      "tc-004": [{ "passed": true, "detail": "section 構成と分割方針への設計批評を `sub_skills/improve` で扱えている。" }],
+      "tc-005": [{ "passed": true, "detail": "品質 gate / 公開可否として `sub_skills/validate` に接続している。" }],
+      "tc-006": [{ "passed": true, "detail": "JP/EN 同期と reference 整理を伴う既存 skill 修正として `sub_skills/improve` を選べている。" }],
+      "tc-007": [{ "passed": false, "detail": "命名・taxonomy の governance 相談を `sub_skills/new` に押し込み、router の外側だと明示できていない。" }],
+      "tc-008": [{ "passed": true, "detail": "まず operational skill を優先し、meta skill authoring を後段に回している。" }],
+      "tc-009": [{ "passed": true, "detail": "『skill』という語だけで meta router に誤誘導せず、対象外の実務依頼として扱えている。" }],
+      "tc-010": [{ "passed": true, "detail": "behavioral evaluation として `sub_skills/evaluate` に接続し、benchmark/viewer まで示している。" }]
+    },
+    "baseline": {
+      "tc-001": [{ "passed": true, "detail": "新規 skill 作成依頼を `sub_skills/new` に接続し、目的確認を置いている。" }],
+      "tc-002": [{ "passed": true, "detail": "既存 skill family の改善として `sub_skills/improve` を選択している。" }],
+      "tc-003": [{ "passed": true, "detail": "named skill の revision として `sub_skills/improve` に接続している。" }],
+      "tc-004": [{ "passed": true, "detail": "構造改善の相談として `sub_skills/improve` を選べている。" }],
+      "tc-005": [{ "passed": true, "detail": "品質 gate / 公開可否として `sub_skills/validate` に接続している。" }],
+      "tc-006": [{ "passed": true, "detail": "JP/EN 同期を含む既存 skill 修正として `sub_skills/improve` に接続している。" }],
+      "tc-007": [{ "passed": true, "detail": "命名・taxonomy・governance の相談として router 外だと整理できている。" }],
+      "tc-008": [{ "passed": true, "detail": "Git/GitHub 初期化を先に進めるべき operational overlap だと整理できている。" }],
+      "tc-009": [{ "passed": true, "detail": "meta router の false positive guard として対象外扱いできている。" }],
+      "tc-010": [{ "passed": true, "detail": "behavioral evaluation として `sub_skills/evaluate` に正しく接続している。" }]
+    }
+  }
+}

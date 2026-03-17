@@ -1,0 +1,496 @@
+{
+  "skill_id": "github",
+  "eval_version": "1.0.0",
+  "runs": {
+    "with_skill": {
+      "count": 9,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    },
+    "baseline": {
+      "count": 9,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    }
+  },
+  "summary": {
+    "delta": 0.0,
+    "improvement_pct": 0.0,
+    "verdict": "neutral"
+  },
+  "case_breakdown": [
+    {
+      "case_id": "tc-001",
+      "prompt": "プルリクして",
+      "tags": [
+        "daily-ops",
+        "pr-create",
+        "thin-entry"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "github-pr-workflow",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "review waiting",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "github-pr-review-response を先に開始",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "広いPR依頼を `github-pr-workflow` にルーティングし、PR作成から review waiting までが canonical flow だと説明できているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "PR作成から review waiting までを `github-pr-workflow` に載せ、merge 判断を人間に残している。"
+        }
+      ],
+      "with_skill_snippet": "了解です。これは `github-pr-workflow` で進めます。まずブランチ状態・未コミット差分・既存PR有無を確認し、必要なら履歴を整えてからPRを作成し、review waiting に入ります。マージ判断は人間に残します。",
+      "baseline_snippet": "`github-pr-workflow`で直接進めます。まずブランチ、未コミット、未push、既存PRを確認し、必要なら `git-commit-practices` を挟んでからPRを作成します。作成後はURLを共有して review waiting に入ります。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-002",
+      "prompt": "プルリクしてレビュー対応待機してください。そのあとマージは私がします。",
+      "tags": [
+        "daily-ops",
+        "pr-create",
+        "review-wait",
+        "human-merge",
+        "thin-entry"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "github-pr-workflow",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "残します",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "review waiting",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "merge automatically",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "PR作成と review waiting を `github-pr-workflow` に載せつつ、merge は human handoff のまま維持できているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "PR作成と review waiting を `github-pr-workflow` に載せつつ、レビュー対応と human merge gate を分離できている。"
+        }
+      ],
+      "with_skill_snippet": "了解です。これは直接 `github-pr-workflow` です。PRを作成し、signal-driven な review waiting まで進めます。その後のレビュー対応は必要になった時点で `github-pr-review-response` に渡します。マージはご指定どおり私ではなくあなたの判断に残します。",
+      "baseline_snippet": "`github-pr-workflow`で直接進めます。PRを作成してURLを共有し、その後は signal-driven の review waiting に入ります。レビュー信号が来たら `github-pr-review-response` に渡せます。マージはご指定どおり人間のあなたに残します。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-003",
+      "prompt": "レビュー対応して",
+      "tags": [
+        "daily-ops",
+        "review-response",
+        "thin-entry"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "github-pr-review-response",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "レビュー",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "create a new PR",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "PR review comment への応答を `github-pr-review-response` に正しくルーティングし、実際の review signal が前提だと説明できているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "review signal 前提で `github-pr-review-response` に接続し、新規PR作成へ戻っていない。"
+        }
+      ],
+      "with_skill_snippet": "了解です。これは直接 `github-pr-review-response` です。実際の review signal を確認して、指摘の分類、修正、返信、再レビュー依頼まで進めます。新規PR作成には戻らず、マージ判断は人間に残します。",
+      "baseline_snippet": "`github-pr-review-response`で直接進めます。新しいレビュー指摘を確認し、分類→修正→返信→再レビュー依頼まで対応します。レビュー信号がまだ無ければ待機のままにします。マージ判断は人に残します。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-004",
+      "prompt": "レビュー見て指摘あれば対応してなければマージ",
+      "tags": [
+        "daily-ops",
+        "review-response",
+        "merge-gate",
+        "overlap"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "github-pr-review-response",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "人間",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "merge automatically",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "review を見て必要なら `github-pr-review-response` に入り、問題がなければ merge 判断は人間に残す説明になっているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "レビュー対応は `github-pr-review-response`、マージ判断は人間という境界を保っている。"
+        }
+      ],
+      "with_skill_snippet": "これは router に留まらず `github-pr-review-response` を直接使います。レビューを確認し、指摘があれば修正・返信・再レビュー依頼まで対応します。指摘がなければマージ可否を整理して返しますが、実際のマージは人間の判断に残します。",
+      "baseline_snippet": "`github-pr-review-response`が最適です。まずレビューを確認し、指摘があれば対応して再レビュー依頼まで進めます。指摘が実質なければマージ可能そうと共有しますが、この repo の基準どおりマージ判断は人間に残します。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-005",
+      "prompt": "Issueを対応しましょう。まずは把握から",
+      "tags": [
+        "daily-ops",
+        "issue-session",
+        "thin-entry"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "session-issue-autopilot",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "issue",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "github-issue-intake だけで完結",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "Issue を今この session で end-to-end に進める依頼として `session-issue-autopilot` に接続できているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "Issue 起票ではなく Issue 実行セッションとして `session-issue-autopilot` に正しく接続している。"
+        }
+      ],
+      "with_skill_snippet": "これは `github-issue-intake` ではなく `session-issue-autopilot` が最適です。まず Issue の把握と棚卸しから入り、今回進める1件を選んで、実装・PR・レビュー対応までの session workflow に乗せます。",
+      "baseline_snippet": "`session-issue-autopilot`で直接進めるのが最適です。これは Issue 起票ではなく Issue 実行セッションです。まず open issue の棚卸しと現状把握を行い、今日進める1件を選んでから実装→PR の流れに入ります。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-006",
+      "prompt": "commitして",
+      "tags": [
+        "daily-ops",
+        "atomic-commit",
+        "thin-entry"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "git-commit-practices",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "atomic",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "Conventional Commits",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "just run `git commit`",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "曖昧な『コミットして』を raw commit ではなく atomic commit 要求と解釈し、`git-commit-practices` へルーティングできているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "raw commit ではなく atomic commit 要求として扱い、`git-commit-practices` に正しく接続している。"
+        }
+      ],
+      "with_skill_snippet": "了解です。これは `git-commit-practices` で進めます。単に raw `git commit` を打つのではなく、差分を見て atomic commit に分け、Conventional Commits で日本語件名を付ける前提で整理します。main 直コミットは避けます。",
+      "baseline_snippet": "`git-commit-practices`で直接進めます。単なる raw commit ではなく、まず diff を見て1論理変更ごとの atomic commit に分ける前提で扱います。メッセージは Conventional Commits を使い、必要なら本文に Why を残します。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-007",
+      "prompt": "mainに戻ってね。プルしてね",
+      "tags": [
+        "daily-ops",
+        "post-merge-sync",
+        "edge-case"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "main",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "pull",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "open a new PR",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "post-merge sync または local main 更新として扱い、不要な PR / issue workflow に誤誘導していないか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "post-merge sync / local main 更新として扱い、不要な PR や Issue workflow を開いていない。"
+        }
+      ],
+      "with_skill_snippet": "これは broad な `github` 入口より、`github-pr-workflow` の post-merge sync 相当として直接扱うのが自然です。main に戻して `git pull --ff-only` で最新化します。新しい PR や Issue workflow は開きません。未コミット変更があれば先に確認します。",
+      "baseline_snippet": "これは broad な `github` 入口より、`github-pr-workflow` の post-merge sync 部分として直接扱うのが近いです。マージ確認後なら main に戻って `git pull --ff-only` で同期します。作業ツリーが汚れていれば先に確認して止まります。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-008",
+      "prompt": "Issue登録して",
+      "tags": [
+        "daily-ops",
+        "issue-intake",
+        "thin-entry"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "github-issue-intake",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "issue",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "session-issue-autopilot から開始",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "Issue 起票依頼を `github-issue-intake` に正しくルーティングし、実行セッション開始とは区別できているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "Issue 起票依頼を `github-issue-intake` に正しくルーティングし、実行セッションと混同していない。"
+        }
+      ],
+      "with_skill_snippet": "了解です。これは直接 `github-issue-intake` です。`session-issue-autopilot` ではなく、まず actionable な GitHub Issue として起票します。タイトル、背景、問題、提案、DoD、優先度やラベルを整理して登録します。",
+      "baseline_snippet": "`github-issue-intake`で直接進めます。これは Issue を実行する依頼ではなく、Issue を起票・整理する依頼として扱います。タイトル、本文、ラベル、優先度を整えて、次の担当者がすぐ動ける actionable issue にします。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-009",
+      "prompt": "commit message の規約だけ知りたい",
+      "tags": [
+        "false-positive-guard",
+        "commit-guidance"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "git-commit-practices",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "github-pr-workflow",
+          "weight": 0.7,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "github-issue-intake",
+          "weight": 0.7,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "commit message 規約の相談として `git-commit-practices` に絞って案内し、不要な GitHub workflow へ広げていないか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "commit 規約相談として `git-commit-practices` に絞り、不要な GitHub workflow に広げていない。"
+        }
+      ],
+      "with_skill_snippet": "これは `git-commit-practices` に絞るのが最適です。規約は Conventional Commits の `type(scope): subject` です。例: `feat: 検索フィルタを追加`、`fix: 文字化けを修正`。件名は具体的にし、必要なら本文で Why を補足します。",
+      "baseline_snippet": "`git-commit-practices`です。規約だけならこれに絞るのが最適です。基本は Conventional Commits の `type(scope): subject`、件名は具体的な日本語、1コミット=1論理変更、必要なら本文で Why を補います。代表 type は feat / fix / docs / test / refactor です。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    }
+  ],
+  "generated_at": "2026-03-17T17:36:38.827844+00:00"
+}

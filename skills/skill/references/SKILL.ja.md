@@ -34,6 +34,8 @@ Use this skill when:
 ## Shared Resources
 
 - `_foundation/TEMPLATE.md`：最小テンプレート
+- `_foundation/ROUTER_TEMPLATE.md`：Router 親スキル用テンプレート
+- `_foundation/SUB_SKILL_TEMPLATE.md`：Router 内 sub-skill 用テンプレート
 - `_foundation/QUALITY.md`：品質基準
 - `_foundation/CONVENTIONS.md`：命名・frontmatter・書き方
 - `_eval/`：行動評価と validator
@@ -43,4 +45,5 @@ Use this skill when:
 
 - ユーザーの現在地点から最短で役立つ sub-skill に飛び込む。
 - 用語は相手に合わせて説明し、専門語を押し付けない。
+- Domain が単一路線なら flat workflow、top-level skill への委譲中心なら orchestrator、内部モード分岐が必要なら router + `sub_skills/` を選ぶ。
 - 実行ロジックは router に書かず、sub-skill や script に委譲する。

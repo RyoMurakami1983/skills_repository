@@ -1,0 +1,31 @@
+{
+  "skill_id": "dotnet",
+  "run_id": "run-20260317-003",
+  "judgment": "revise",
+  "benchmark_verdict": "neutral",
+  "delta": -0.0195,
+  "summary": "The thin dotnet entry remains defensible because the catalog is large and ambiguous broad asks exist, but on the current local real-corpus suite it was only neutral and slightly negative. The main weakness is failing to confidently route Oracle connection work into the concrete integration skill.",
+  "strengths": [
+    "WPF implementation, deploy, migration, and bootstrap routes remain coherent.",
+    "The router correctly treats dotnet naming/router discussions as meta-discussion instead of concrete app work.",
+    "WPF-heavy local corpus still justifies a thin .NET entry point."
+  ],
+  "weaknesses": [
+    "Oracle connection/integration prompts are not routed decisively enough.",
+    "The local corpus is useful but incomplete because private business prompts are underrepresented on this PC.",
+    "The router does not yet surface prerequisite pairings such as secure config consistently."
+  ],
+  "primary_failure_case": {
+    "case_id": "tc-004",
+    "prompt": "dotnetでOracleデータベース接続機能追加",
+    "baseline_route": "dotnet-oracle-wpf-integration",
+    "with_skill_route": "other-skill",
+    "why_it_matters": "This is a real concrete integration ask. If the router hesitates here, it reduces the value of the thin entry exactly where ambiguity should be helping."
+  },
+  "recommendations": [
+    "Revise the router wording so Oracle connection/integration phrases map more aggressively to dotnet-oracle-wpf-integration.",
+    "Keep deploy intent extremely strong for prompts that explicitly say skills should be introduced into a project.",
+    "Do not create a separate top-level wpf router yet; current evidence does not justify multiplying entry skills."
+  ],
+  "refactor_recommendation": "keep-but-revise"
+}

@@ -1,0 +1,105 @@
+{
+  "cluster_id": "dotnet-entry",
+  "source": "evals/dotnet/corpus_summary.json",
+  "generated_from_real_corpus": true,
+  "items": [
+    {
+      "prompt": "wpfでUIを実装したいです。おすすめのdotnet-skillをプロジェクトに導入したい",
+      "frequency": 1,
+      "best_skill_now": "dotnet-skill-deploy",
+      "entry_skill": "dotnet",
+      "competing_skills": [
+        "dotnet-wpf-mvvm-patterns"
+      ],
+      "canonical_downstream": "dotnet-wpf-mvvm-patterns",
+      "risk": "high",
+      "note": "WPF intent と deploy intent が同時にあり、導入要求を読めるかが勝負。"
+    },
+    {
+      "prompt": "基本のコア機能が完成したのでWPFなどのデスクトップアプリにしたい",
+      "frequency": 1,
+      "best_skill_now": "dotnet-wpf-mvvm-patterns",
+      "entry_skill": "dotnet",
+      "competing_skills": [
+        "dotnet-project-structure"
+      ],
+      "canonical_downstream": "adjacent WPF integration skills",
+      "risk": "medium",
+      "note": "実装・設計相談。router に留まらず WPF foundation へ早く降りるべき。"
+    },
+    {
+      "prompt": "accessのsqlからOracleで実装するsqlに変換して",
+      "frequency": 1,
+      "best_skill_now": "dotnet-access-to-oracle-migration",
+      "entry_skill": "dotnet",
+      "competing_skills": [
+        "dotnet-oracle-wpf-integration"
+      ],
+      "canonical_downstream": "Oracle implementation guidance",
+      "risk": "medium",
+      "note": "高 specificity の migration case。thin entry の精度を測りやすい。"
+    },
+    {
+      "prompt": "dotnetでOracleデータベース接続機能追加",
+      "frequency": 1,
+      "best_skill_now": "dotnet-oracle-wpf-integration",
+      "entry_skill": "dotnet",
+      "competing_skills": [
+        "dotnet-wpf-secure-config",
+        "dotnet-project-structure"
+      ],
+      "canonical_downstream": "dotnet-wpf-secure-config",
+      "risk": "high",
+      "note": "統合 skill と prerequisite skill を併記できるかが重要。"
+    },
+    {
+      "prompt": "dotnet（WPF）でDifyAPIとの連携を作成して",
+      "frequency": 1,
+      "best_skill_now": "dotnet-wpf-dify-api-integration",
+      "entry_skill": "dotnet",
+      "competing_skills": [
+        "dotnet-wpf-secure-config"
+      ],
+      "canonical_downstream": "dotnet-wpf-secure-config",
+      "risk": "high",
+      "note": "WPF + integration + secret handling の複合ケース。"
+    },
+    {
+      "prompt": "WPFの場合はCommunityToolkit.Mvvmを追加する予定です。単純なCRUD操作のみです。",
+      "frequency": 1,
+      "best_skill_now": "dotnet-wpf-mvvm-patterns",
+      "entry_skill": "dotnet",
+      "competing_skills": [
+        "dotnet-project-structure"
+      ],
+      "canonical_downstream": "specific WPF data or dialog skills",
+      "risk": "medium",
+      "note": "WPF foundation route を選べるかの代表ケース。"
+    },
+    {
+      "prompt": "C#で実装したいけど対応する計画を立てて。Visual Studioのプロジェクトで何を選べば良いの？",
+      "frequency": 1,
+      "best_skill_now": "dotnet-project-structure",
+      "entry_skill": "dotnet",
+      "competing_skills": [
+        "dotnet-extensions-dependency-injection",
+        "dotnet-skill-deploy"
+      ],
+      "canonical_downstream": "DI/config/testing as needed",
+      "risk": "medium",
+      "note": "広い bootstrap 相談。具体 feature skill へ急ぎすぎないかを見る。"
+    },
+    {
+      "prompt": "dotnet-routerではなく[dotnet]がルータースキルが良いこの方針はおべんちゃら無しでどうか？",
+      "frequency": 1,
+      "best_skill_now": "meta-discussion",
+      "entry_skill": "dotnet",
+      "competing_skills": [
+        "skills/skill"
+      ],
+      "canonical_downstream": "router design decision",
+      "risk": "high",
+      "note": "dotnet 実装相談ではなく router 設計相談。thin entry の false positive guard。"
+    }
+  ]
+}

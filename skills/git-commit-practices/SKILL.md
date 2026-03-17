@@ -7,6 +7,8 @@ description: "Commit practices with Conventional Commits, atomic changes, and Ja
 
 Practical patterns for consistent commit messages, atomic changes, and durable history.
 
+Default interpretation: when the user simply says "commit this" or `コミットして`, treat that as a request for an atomic commit by default, not just a raw `git commit` command.
+
 ## When to Use This Skill
 
 Use this skill when:
@@ -15,12 +17,15 @@ Use this skill when:
 - Splitting work into atomic commits for safe reviews and rollbacks
 - Documenting "why" in commit bodies for future maintainers
 - Preparing clean commit history before Pull Request (PR) review
+- Interpreting a vague "commit this" request as a need for atomic, reviewable history
 - Teaching new teammates a repeatable commit workflow
 
 ## Related Skills
 
-- **`github-pr-workflow`** - PR creation and merge flow
-- **`github-issue-intake`** - Issue capture and triage
+- **`github-pr-workflow`** - Typical downstream workflow once commits are review-ready
+- **`github-pr-review-response`** - Follow-up workflow when review feedback requires additional commits
+- **`git-init-to-github`** - First-commit context for new repositories
+- **`github`** - Thin entry skill that should route broad "コミットして" requests here before PR work
 
 ---
 
@@ -32,7 +37,7 @@ Use this skill when:
 
 ## Core Principles
 
-1. **Single Intent** - One commit equals one logical change (基礎と型)
+1. **Single Intent** - One commit equals one change intent that can be reviewed and reverted independently, not one session or one story-sized batch (基礎と型)
 2. **Explain Why** - Reasons outlive implementation details (成長の複利)
 3. **Consistent Format** - Predictable history for automation (ニュートラル)
 4. **Reviewable Chunks** - Small commits reduce risk (継続は力)
@@ -107,16 +112,32 @@ Use when Japanese is the primary team language or commit history will be used fo
 
 ### Step 5: Split Into Atomic Commits
 
-Each commit should address one concern so it can be reviewed and reverted independently.
+Each commit should represent one change intent so it can be reviewed and reverted independently. In this repository, that means you do **not** batch changes together just because they happened in the same session, the same issue, or the same implementation wave.
+
+When the request is only "commit this", use this step as the default interpretation: inspect the diff, separate concerns, and create the smallest useful atomic commit set instead of one catch-all commit.
 
 ```bash
-# ❌ WRONG - multiple concerns
+# ❌ WRONG - multiple concerns in one commit
 git commit -m "feat: 認証追加とUI改善とテスト追加"
 
 # ✅ CORRECT - split into focused commits
 git commit -m "feat: 認証機能を追加"
 git commit -m "refactor: UIレイアウトを改善"
 git commit -m "test: 認証フローのテストを追加"
+```
+
+```text
+# ❌ WRONG - one session / one wave is not a commit boundary
+- eval tooling
+- skill wording changes
+- router docs
+- changelog updates
+=> committed as one "evaluation wave" commit
+
+# ✅ CORRECT - split by change intent
+1. feat: extract prompt corpus script を追加
+2. docs: skill router 評価結果を記録
+3. fix: git-commit-practices に atomic commit の判断基準を明記
 ```
 
 Use when reviewers need to verify changes incrementally or you want safe rollbacks.
@@ -176,6 +197,7 @@ Use when a commit needs cleanup before PR or when you want to keep shared branch
 - Apply "Why" lines for non-obvious changes
 - Avoid mixing documentation with code changes
 - Consider splitting large changes into multiple commits
+- Split by change intent, not by session, branch lifetime, or implementation wave
 
 ---
 
@@ -185,7 +207,7 @@ Use when a commit needs cleanup before PR or when you want to keep shared branch
 Fix: Use specific nouns and actions in the subject.
 
 2. **Mixing unrelated changes**  
-Fix: Split work into atomic commits.
+Fix: Split by change intent until each commit has one reviewable purpose.
 
 3. **Skipping context**  
 Fix: Add a "Why" line for decisions.
@@ -197,6 +219,7 @@ Fix: Add a "Why" line for decisions.
 - Using TODO comments instead of commits
 - Rebasing shared branches after review
 - Hiding multiple changes in one commit
+- Bundling changes only because they happened in the same session or "wave"
 
 ---
 
@@ -206,7 +229,7 @@ Fix: Add a "Why" line for decisions.
 
 - [ ] Confirm on feature branch (not main)
 - [ ] Review `git diff`
-- [ ] Ensure one logical change per commit
+- [ ] Ensure one change intent per commit
 - [ ] Use Conventional Commits format
 - [ ] Add "Why" when needed
 
@@ -215,7 +238,9 @@ Fix: Add a "Why" line for decisions.
 | Situation | Action | Why |
 |----------|--------|-----|
 | Change <30 minutes | Commit directly | Keep momentum |
-| Multiple concerns | Split commits | Safer review |
+| Multiple concerns | Split by change intent | Safer review and rollback |
+| Same session but multiple intents | Still split commits | Session boundary is not a commit boundary |
+| User says "commit this" | Start with atomic split review | Default to reviewable history instead of one large commit |
 | Shared branch | Avoid rebase | Preserve history |
 
 ---
