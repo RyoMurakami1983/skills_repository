@@ -1,8 +1,8 @@
 {
-  "source_root": "C:\\Users\\murak\\.copilot\\session-state",
+  "source_root": "<COPILOT_SESSION_ROOT>",
   "filter_pattern": "(dotnet|\\.NET|C#|WPF|EF Core|Blazor|MVVM)",
   "sessions_scanned": 59,
-  "total_user_messages": 799,
+  "total_user_messages": 807,
   "matched_user_messages": 27,
   "unique_matched_prompts": 27,
   "top_prompts": [
@@ -10,7 +10,7 @@
       "prompt": "既存のskillsの品質アップを図ります。素材は @local_reference_skills\\ にあります。方針はこちらです。ソースの分析に基づくと、コスモス化（モダン化と構造整理）を優先的に進めるべきは、**「管理・基盤系スキルファミリー（skills-* および dotnet-*）」**です。 一括での移行（Big-Bang Migration）はアンチパターンとして避け、以下の順序で段階的に進めることが、カオスを最小限に抑えつつ確実にコスモスへ移行する最短ルートです 1。 第1優先：skills ファミリー（管理・メタスキル群） まず、「スキルの作り方・直し方」そのものを定義するスキルをコスモス化する必要があります。これらが整っていないと、他のスキルをモダン化する際の品質を担保できません。 対象: skills-author-skill 2, skills-refactor-skill-to-single-workflow 3, skills-revise-skill 4, dotnet-slopwatch 5 理由: 「1スキル = 1ワークフロー」の原則 3, 6 や「500行制限」 7, 8 といったコスモスの設計図自体を最新化するため。 dotnet-slopwatch を導入することで、LLMによる「その場しのぎの修正（Slop）」を自動的に排除するガードレールを早期に構築できるため 9, 10。 第2優先：dotnet / コーディング標準ファミリー（技術基盤群） 次に、全てのC#開発の基準となる技術的なガードレールをコスモス化します。 対象: modern-csharp-coding-standards 11, type-design-performance 12, dotnet-project-structure 13 理由: これらは他の全てのドメインスキル（EF Coreなど）を更新する際の**「技術的な正解（モダンなC#の型）」**を提供します 14。 レコード型、パターンマッチング、Span、.slnx 形式などの最新仕様をここで固めることで、全スキルのコード例に一貫性を持たせることができます 15, 16。 第3優先：ドメイン特化ファミリー（データ・通信・並列処理群） 基盤が整った後、具体的な開発テーマに踏み込みます。 対象: efcore-patterns 17, database-performance 18, csharp-concurrency-patterns 19, serialization 20 理由: これらは既存の「カオス（複数のパターンが混在した肥大化したファイル）」である可能性が高く、第1・2優先で確立した手法を用いて、「1ワークフロー1ファイル」への解体・接合を行う最大の対象となります 3, 21。 進め方のポイント：ルータースキルの活用 特定のファミリーを解体する際は、元のディレクトリを**「ルータースキル」**として残してください 22, 23。これにより、既存の参照を壊すことなく、内部構造を「カオス（肥大化した単一ファイル）」から「コスモス（整理された複数のワークフロー）」へと安全に移行できます 24, 25。 この優先順位に従い、まずは skills-refactor-skill-to-single-workflow 自体を最新のモダンC#基準でセルフ・リファクタリングすることから始めるのが、最も「成長の複利」が効くアプローチと言えます 26。",
       "count": 1,
       "sessions": [
-        "126897bc-41c9-4467-afbc-c65c12c755bb"
+        "session-001"
       ],
       "first_seen": "2026-02-21T22:10:58.271Z",
       "last_seen": "2026-02-21T22:10:58.271Z"
@@ -19,7 +19,7 @@
       "prompt": "ふりかえりしてから、クリーンアップしましょう。その後の既存WPFの改善を進めたい。一度プルリクしたけどmainにマージしたほうが良い？",
       "count": 1,
       "sessions": [
-        "126897bc-41c9-4467-afbc-c65c12c755bb"
+        "session-001"
       ],
       "first_seen": "2026-02-22T00:42:46.527Z",
       "last_seen": "2026-02-22T00:42:46.527Z"
@@ -28,7 +28,7 @@
       "prompt": "お願いします。そういう意味では、今回のskill道の求道者agent（守って、破って、離れて、進化させるagent）dotnet道の求道者agent、まだ具体的なskill無いですが、python道の求道者agentが欲しくなりますね。その人たちがskillを扱うという感じ、その憲法は @PHILOSOPHY.md となる感じ。どう思いますか？",
       "count": 1,
       "sessions": [
-        "126897bc-41c9-4467-afbc-c65c12c755bb"
+        "session-001"
       ],
       "first_seen": "2026-02-22T06:45:42.143Z",
       "last_seen": "2026-02-22T06:45:42.143Z"
@@ -37,7 +37,7 @@
       "prompt": "最初に固定でskill-が付くの？それはいやだ。DDD的にコンテキストとドメインとワークフロー（ここは動詞？）のような感じだと思っているけど、最初はdotnet- pythonー",
       "count": 1,
       "sessions": [
-        "1dc893af-f982-4786-91f5-0bfecc11e3a3"
+        "session-002"
       ],
       "first_seen": "2026-02-13T06:50:08.457Z",
       "last_seen": "2026-02-13T06:50:08.457Z"
@@ -46,7 +46,7 @@
       "prompt": "@dotnet\\dotnet-access-to-oracle-migration\\ skillを追加しました。中身が私のskill構成なのか確認したい。プラス「accessのsqlからOracleで実装するsqlに変換して」でこのskillが発動するか確認したい。",
       "count": 1,
       "sessions": [
-        "684e3189-4084-43c0-9806-003458605d10"
+        "session-003"
       ],
       "first_seen": "2026-02-15T04:29:38.360Z",
       "last_seen": "2026-02-15T04:29:38.360Z"
@@ -55,7 +55,7 @@
       "prompt": "wpfでUIを実装したいです。おすすめのdotnet-skillをプロジェクトに導入したい",
       "count": 1,
       "sessions": [
-        "6b90ac02-eb7a-4f5f-aefc-808c765f8e57"
+        "session-004"
       ],
       "first_seen": "2026-02-23T14:11:29.253Z",
       "last_seen": "2026-02-23T14:11:29.253Z"
@@ -64,7 +64,7 @@
       "prompt": "基本のコア機能が完成しましたので、これをWPFなどのデスクトップアプリにしたいと考えます。基本的にコア機能もdotnetにすることは可能でしょうか？ /agent skill-shihan より、dotnetskillでおすすめを教えてください。 dotnet-shihanに聞いたほうが良い？",
       "count": 1,
       "sessions": [
-        "70fa57ca-c9c0-4821-852f-da8ffc9e6fac"
+        "session-005"
       ],
       "first_seen": "2026-02-23T13:54:48.168Z",
       "last_seen": "2026-02-23T13:54:48.168Z"
@@ -73,7 +73,7 @@
       "prompt": "@dotnet-shihan",
       "count": 1,
       "sessions": [
-        "70fa57ca-c9c0-4821-852f-da8ffc9e6fac"
+        "session-005"
       ],
       "first_seen": "2026-02-23T14:00:17.627Z",
       "last_seen": "2026-02-23T14:00:17.627Z"
@@ -82,7 +82,7 @@
       "prompt": "以下の通りにAIと相談してC＃で実装したいけど対応する計画立ててみて propeller accessory / GitHubRepositoryの内容教えて GitHubで検索した結果、以下の主要リポジトリが見つかりました： 製造・検査システム CloverV2⁠ ⁠​ 目的: 48個ロット数量検査（AI判定） 技術: Raspberry Pi + Hailo AI + Picamera2 機能: 検査台上のトレー製品をAIで数量OK/NG判定、状態機械による検査フロー管理 最新PR: 検査フロー追加（撮影待ち管理、撮影忘れ検知、二重撮影防止） Clover（初期版）⁠ ⁠​ 目的: 静電容量センサによる製品配置検知 技術: Raspberry Pi + FDC1004 + TCA9548A 機能: 12×4マトリクス（48点）の測定・判定、キャリブレーション機能 AriesV2⁠ ⁠​ 目的: 製造業向け画像解析AIシステム 技術: Python + PyTorch + ソケット通信 機能: 切粉検知（Φ7、リング、巻き付き、カップ内）、黒皮検知（端面、側面） 特徴: C#クライアントとの連携、ResNet分類モデル使用 ドキュメント・データ処理 mill_scan_splitter⁠ ⁠​ 目的: ミルシートPDF自動分割・命名 技術: Python 3.11+ + CustomTkinter + Dify API 機能: 50〜200枚PDFをOCR処理、個別PDFに分割・自動命名、重複検出 最新状況: Excel出力機能追加（002-enhanced-naming-excel-export） mercury⁠ ⁠​ 目的: OCR抽出＋SOFマスタ検証 技術: Python 3.11+ + Dify API 機能: PDF注文書からOCR抽出、重複判定、SOFマッチング検証、JSON Lines出力 ai-ocr-integration-hub⁠ ⁠​ 目的: AI-OCR統合ハブ 技術: Python 3.12 + Streamlit + Dify API 機能: PDF→OCR抽出→SOFマッチング→Excel転記 最適化・ツール slit_optimizer⁠ ⁠​ 目的: スリット幅最適化 技術: Python + PuLP + DDD 機能: 製品マスタ管理、カッティングパターン生成、最小トリム仕様 thk_ai_toolkit⁠ ⁠​ 目的: 東北特殊鋼社内AIライブラリ 技術: Python 3.12 + PyTorch + OpenCV 機能: 画像処理、機械学習モジュール、汎用ユーティリティ tech-blog⁠ ⁠​ 目的: 技術ブログサイト 技術: MkDocs + GitHub Pages 注意: クリーンビルド必須（古いHTMLファイル残存対策） 全体として、製造現場のAI検査・OCR処理・最適化に特化したシステム群で構成されています。 slit_optimizerですがこれの最適化ソルバー部分はC＃で実装可能？ C#実装の可能性：実装可能 slit_optimizer の最適化ソルバー部分は C# で実装可能です。 必要な C# ライブラリ 線形計画法ソルバー（現在は PuLP + CBC を使用）： Google OR-Tools⁠ ⁠ - 推奨 C# バインディング標準提供 CBC、GLOP、SCIP などの複数ソルバー内蔵 辞書式最適化対応 COIN-OR CBC（C++、.NET ラッパー自作必要） Gurobi / CPLEX（商用、.NET API提供） 実装の対応表 Python実装 C#実装 pulp.LpProblem Google.OrTools.LinearSolver.Solver pulp.LpVariable Solver.MakeNumVar() pulp.lpSum() LINQ .Sum() + OR-Tools式 pulp.PULP_CBC_CMD Solver.CreateSolver(\"CBC\") アーキテクチャの移植性 現在の DDD 構造は C# に適合： ドメイン層：値オブジェクト、エンティティ → C# record/class アプリケーション層：ユースケース → C# サービスクラス インフラ層：PulpOptimizationService → OrToolsOptimizationService 実装例（抜粋） using Google.OrTools.LinearSolver; public class OrToolsOptimizationService : IOptimizationService { public OptimizationResult Optimize(Coil coil, List<Demand> demands) { var solver = Solver.CreateSolver(\"CBC\"); // 変数定義（各パターンの使用回数） var patternVars = patterns.Select(p => solver.MakeIntVar(0, double.PositiveInfinity, $\"pattern_{p.Id}\") ).ToList(); // 目的関数（スクラップ最小化） var objective = solver.Objective(); foreach (var (pattern, var) in patterns.Zip(patternVars)) { objective.SetCoefficient(var, pattern.ScrapWeight); } objective.SetMinimization(); // 制約（需要充足） // ... solver.Solve(); } } ​ 注意点 CBC バイナリ配布：OR-Tools は NuGet で CBC を同梱 性能要件（3秒以内）：OR-Tools の最適化性能は PuLP と同等 辞書式最適化：複数回のソルバー呼び出しで実装可能 C# 実装により、既存の AriesV2（C# WPF）との統合が容易になります。⁠ ⁠​ これをWebAPIとしてローカルPC内に常駐させてkintoneから呼び出すことは可能ですか？ WebAPI化＋kintone連携：実装可能 slit_optimizerをWebAPIとしてローカルPC常駐させ、kintoneから呼び出す構成は技術的に実現可能です。 アーキテクチャ構成 [kintone Web画面] ↓ REST API (HTTP POST) [ローカルPC: WebAPIサーバー (ASP.NET Core / FastAPI)] ↓ [最適化ソルバー (OR-Tools / PuLP)] ​ 実装方式の選択肢 1. C# + ASP.NET Core Web API（推奨） 利点：AriesV2との技術スタック統一、Windows Serviceで常駐可能 ソルバー：Google OR-Tools (NuGet) デプロイ：単一.exe (self-contained) // API エンドポイント例 [ApiController] [Route(\"api/optimize\")] public class OptimizationController : ControllerBase { [HttpPost] public ActionResult<OptimizationResultDto> Optimize([FromBody] OptimizationRequestDto request) { // 最適化実行 var result = _optimizationService.Execute(request.Coil, request.Demands); return Ok(result); } } ​ 2. Python + FastAPI 利点：既存のPythonコードをほぼそのまま流用 ソルバー：PuLP (現行) デプロイ：PyInstaller でバイナリ化可能 from fastapi import FastAPI app = FastAPI() @app.post(\"/api/optimize\") def optimize(request: OptimizationRequest): result = use_case.execute(request.coil, request.demands) return result ​ kintone側の実装 JavaScriptカスタマイズ（kintone標準機能）： (function() { 'use strict'; kintone.events.on('app.record.detail.show', function(event) { // ボタン配置 const button = document.createElement('button'); button.innerText = '最適化実行'; button.onclick = async function() { const response = await fetch('<URL> { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coil: { width: 800, thickness: 0.8, /* ... */ }, demands: [/* ... */] }) }); const result = await response.json(); // 結果をkintoneレコードに反映 }; }); })(); ​ ローカルPC常駐の実装 Windows Serviceとして登録（C#） # Windows Service登録 sc create SlitOptimizerAPI binPath=\"<WINDOWS_PATH>\" sc start SlitOptimizerAPI ​ systemd（Linux）またはタスクスケジューラ（Windows、Python） # systemd unit file [Unit] Description=Slit Optimizer API [Service] ExecStart=/usr/local/bin/slit_optimizer_api Restart=always [Install] WantedBy=multi-user.target ​ セキュリティ考慮事項 CORS設定：kintoneドメインのみ許可 builder.Services.AddCors(options => { options.AddPolicy(\"KintoneOnly\", policy => { policy.WithOrigins(\"<URL> .AllowAnyMethod() .AllowAnyHeader(); }); }); ​ 認証：APIキーまたはBasic認証 ローカルネットワーク制限：<URL> または <URL> のみバインド 性能要件との整合性 3秒以内の最適化完了（SC-001）：HTTP通信オーバーヘッドは数十ms程度、要件内に収まる kintoneタイムアウト：デフォルト60秒、十分な余裕あり 実装の優先順位 短期：Python FastAPI版（既存コード流用、検証容易） 長期：C# ASP.NET Core版（AriesV2統合、保守性向上） この構成により、kintone上でコイルデータ入力→ボタンクリック→最適化結果表示のワークフローが実現できます。⁠ ⁠​ AriesV2とは統合しない。できればpythonで作ってあるGUIの部分のC#のWebAPIの部分でHTMLとCSSとTypeScript？で実装してkintone→WebAPI(C#)GUI→結果をkintone転送かつkintoneの画面に移動は可能？ 実装可能です ご要望の構成は技術的に実現可能です。以下のアーキテクチャで実装できます。 システム構成 [kintone画面] ↓ ① ボタンクリック（新規ウィンドウでGUI起動） [HTML/CSS/TypeScript GUI] (ローカルPC: <URL> ↓ ② POST /api/optimize [C# WebAPI] (ASP.NET Core, ローカルPC常駐) ├─ OR-Tools（最適化ソルバー） └─ ③ 最適化結果を返却 [TypeScript GUI] ↓ ④ POST <URL> (kintone REST API) ↓ ⑤ window.close() または window.location.href で kintone へリダイレクト [kintone画面に戻る] ​ 実装の詳細 1. C# WebAPI（バックエンド） // ASP.NET Core Web API [ApiController] [Route(\"api\")] public class OptimizationController : ControllerBase { // 最適化エンドポイント [HttpPost(\"optimize\")] public ActionResult<OptimizationResult> Optimize([FromBody] OptimizationRequest request) { var solver = new OrToolsOptimizationService(); var result = solver.Execute(request.Coil, request.Demands); return Ok(result); } // 静的ファイル（HTML/JS）提供 // wwwroot/index.html を配置 } // Startup.cs で CORS 設定 builder.Services.AddCors(options => { options.AddPolicy(\"AllowKintone\", policy => { policy.WithOrigins(\"<URL> \"<URL> .AllowAnyMethod() .AllowAnyHeader(); }); }); ​ 2. フロントエンド（HTML + TypeScript） // index.ts interface OptimizationRequest { coil: { width: number; thickness: number; /* ... */ }; demands: Array<{ productWidth: number; requiredWeight: number; }>; } async function executeOptimization() { // kintone からクエリパラメータでデータ受け取り const urlParams = new URLSearchParams(window.location.search); const coilData = JSON.parse(urlParams.get('coilData') || '{}'); const demandsData = JSON.parse(urlParams.get('demands') || '[]'); // WebAPI 呼び出し const response = await fetch('<URL> { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ coil: coilData, demands: demandsData }) }); const result = await response.json(); // GUI に結果表示（テーブル等で可視化） displayResults(result); // kintone に結果送信 await sendToKintone(result); // kintone 画面に戻る window.location.href = urlParams.get('returnUrl') || '<URL> } async function sendToKintone(result: any) { const kintoneApiToken = sessionStorage.getItem('kintoneApiToken'); await fetch('<URL> { method: 'POST', headers: { 'X-Cybozu-API-Token': kintoneApiToken, 'Content-Type': 'application/json' }, body: JSON.stringify({ app: 123, // アプリID record: { '最適化結果': { value: JSON.stringify(result) }, 'パターン数': { value: result.patterns.length } } }) }); } ​ 3. kintone側の実装（JavaScriptカスタマイズ） (function() { 'use strict'; kintone.events.on('app.record.detail.show', function(event) { const record = event.record; // ボタン追加 const button = document.createElement('button'); button.innerText = '最適化実行'; button.onclick = function() { // コイルデータと需要データを取得 const coilData = { width: record['コイル幅'].value, thickness: record['板厚'].value, density: 7850, effectiveWeight: record['有効重量'].value }; const demands = JSON.parse(record['需要データ'].value); // GUI を新規ウィンドウで開く const params = new URLSearchParams({ coilData: JSON.stringify(coilData), demands: JSON.stringify(demands), returnUrl: window.location.href }); window.open(`{{<URL> '_blank'); }; kintone.app.record.getHeaderMenuSpaceElement().appendChild(button); }); })(); ​ 常駐サービス化 Windows Service として登録： # 自己完結型の.exe作成 dotnet publish -c Release -r win-x64 --self-contained # Windows Service登録 sc create SlitOptimizerAPI binPath=\"<WINDOWS_PATH>\" start=auto sc start SlitOptimizerAPI ​ メリット GUI の柔軟性：React/Vue.js に置き換え可能 デバッグ容易：ブラウザ開発者ツールで検証可能 kintone連携：REST APIで双方向通信 画面遷移：window.location.href で自然なUX 既存Pythonコードとの分離：バックエンドのみC#実装、フロントは完全独立 この構成により、kintone画面のシームレスな体験（データ入力→最適化GUI→結果反映→元画面に戻る）が実現できます。 C#実装を考えているが、Pythonを選択した場合のメリットデメリット何だろ？ Python vs C# 実装の比較分析 Python（FastAPI + PuLP）のメリット 開発速度 既存資産の流用：slit_optimizerの実装をほぼそのまま使用可能 コード行数：C#の約50〜60%で実装可能 プロトタイプ速度：数日で動作検証完了 数学最適化エコシステム PuLP：線形計画法の記述が直感的 # Python: 簡潔な記述 prob += lpSum([patterns[i].scrap * x[i] for i in range(n)]) ​ CBC統合：追加設定なしで使用可能 代替ソルバー切替：GLPK、Gurobi等への切り替えが容易 データ分析との親和性 Pandas/NumPy：最適化結果の集計・分析が容易 Matplotlib：結果の可視化（将来的な機能拡張） Python のデメリット 運用面の課題 バイナリ配布：PyInstallerでの.exe化がC#より複雑 サイズ：50〜100MB（C#は20〜30MB） 起動速度：初回2〜3秒（C#は瞬時） Windows Service化：追加ツール（NSSM等）が必要 型安全性 静的型検査の弱さ：TypeHintは実行時チェックされない def optimize(coil: Coil) -> Result: return \"error\" # 実行時まで検出されない ​ パフォーマンス 起動オーバーヘッド：Pythonインタプリタ起動に200〜300ms マルチスレッド：GILにより真の並列化が困難 C#（ASP.NET Core + OR-Tools）のメリット エンタープライズ対応 型安全性：コンパイル時にエラー検出 public OptimizationResult Optimize(Coil coil) { return \"error\"; // コンパイルエラー } ​ Windows Service統合：標準機能でサービス化 自己完結型配布：単一.exeに全依存を含む 既存システムとの統合 AriesV2との技術スタック統一（将来的な選択肢） 共通ライブラリ化：TohokuSteel.Infrastructure等の再利用可能性 パフォーマンス 起動速度：50ms以下 メモリ効率：約30%削減（同等処理比較） 真の並列処理：Task並列ライブラリで複数最適化の同時実行 C# のデメリット 開発コスト 実装工数：Python版の1.5〜2倍 ドメインロジックの移植：3〜5日 OR-Tools学習曲線：1〜2日 デバッグ環境：Visual Studio必須（Python版はVSCode可） 数学表現の冗長性 // C#: より冗長な記述 var objective = solver.Objective(); foreach (var i in Enumerable.Range(0, n)) { objective.SetCoefficient(x[i], patterns[i].Scrap); } ​ 実装判断のマトリクス 評価軸 Python C# 重要度 初期開発速度 ⭐⭐⭐⭐⭐​ ⭐⭐⭐​ 高 運用安定性 ⭐⭐⭐​ ⭐⭐⭐⭐⭐​ 高 パフォーマンス ⭐⭐⭐⭐​ ⭐⭐⭐⭐⭐​ 中（3秒要件は両方満たす） 保守性 ⭐⭐⭐​ ⭐⭐⭐⭐​ 高 拡張性 ⭐⭐⭐⭐​ ⭐⭐⭐⭐​ 中 推奨実装戦略 フェーズ1（検証）：Python FastAPI 目的：kintone連携の実現可能性検証 期間：1〜2週間 成果物：動作するプロトタイプ フェーズ2（本番）：C# ASP.NET Core 条件：検証成功後 目的：長期運用に耐える安定性確保 期間：3〜4週間 この2段階アプローチにより、初期リスクを抑えつつ、最終的に保守性の高いシステムを構築できます。⁠ ⁠​ VisualStudioのプロジェクトで何を選べば良いの？実は初めて、あとMVVMできるの？ Visual Studioプロジェクトの選択 推奨プロジェクトテンプレート 「ASP.NET Core Web API」を選択してください 作成手順 Visual Studio 2022を起動 「新しいプロジェクトの作成」 テンプレート検索で「ASP.NET Core Web API」を選択 プロジェクト設定： プロジェクト名：SlitOptimizerAPI フレームワーク：.NET 8.0（最新LTS） 認証の種類：なし HTTPS用の構成：チェック（推奨） OpenAPI（Swagger）サポート：チェック（デバッグ用） コントローラーを使用する：チェック これで以下の構成が自動生成されます： SlitOptimizerAPI/ ├── Controllers/ # APIエンドポイント │ └── WeatherForecastController.cs（サンプル、削除可） ├── Program.cs # アプリケーションエントリーポイント ├── appsettings.json # 設定ファイル └── wwwroot/ # 静的ファイル（HTML/CSS/JS）配置先 ​ MVVMは必要？代替パターン WebAPIではMVVMは使用しません 理由： MVVM：WPFやXamarin等のデスクトップ/モバイルUIフレームワーク用 WebAPI：バックエンドのため、UIバインディング不要 WebAPIで使用するパターン レイヤードアーキテクチャ（推奨） Controllers（プレゼンテーション層） ↓ UseCases / Services（アプリケーション層） ↓ Domain（ドメイン層：エンティティ、値オブジェクト） ↓ Infrastructure（インフラ層：OR-Tools、リポジトリ） ​ 実装例 // Controllers/OptimizationController.cs [ApiController] [Route(\"api/[controller]\")] public class OptimizationController : ControllerBase { private readonly IOptimizationService _service; public OptimizationController(IOptimizationService service) { _service = service; // 依存性注入 } [HttpPost] public ActionResult<OptimizationResultDto> Optimize( [FromBody] OptimizationRequestDto request) { var result = _service.Execute(request); return Ok(result); } } // Services/OptimizationService.cs public class OptimizationService : IOptimizationService { public OptimizationResultDto Execute(OptimizationRequestDto request) { // ドメインロジック呼び出し var coil = new Coil(request.Width, request.Thickness, ...); var demands = request.Demands.Select(d => new Demand(...)).ToList(); var solver = new OrToolsOptimizationService(); return solver.Optimize(coil, demands); } } ​ フロントエンドでMVVMが必要な場合 HTMLベースのGUIではTypeScript + 軽量フレームワークを使用： 選択肢1：Vue.js（MVVM風） // main.ts import { createApp } from 'vue'; const app = createApp({ data() { return { coilData: { width: 800, thickness: 0.8 }, result: null }; }, methods: { async optimize() { const response = await fetch('/api/optimization', { method: 'POST', body: JSON.stringify({ coil: this.coilData }) }); this.result = await response.json(); } } }); ​ 選択肢2：シンプルなTypeScript（MVC風） // controller.ts class OptimizationController { private model: OptimizationModel; private view: OptimizationView; async execute() { const result = await this.model.optimize(); this.view.displayResult(result); } } ​ 初心者向けの追加Tips NuGetパッケージのインストール ソリューションエクスプローラー → プロジェクト右クリック 「NuGetパッケージの管理」 以下をインストール： Google.OrTools（最適化ソルバー） Swashbuckle.AspNetCore（既定で含まれる、Swagger UI用） デバッグ実行 F5キー → ブラウザが自動起動 <URL> でAPI仕様を確認 「Try it out」でAPIテスト可能 静的ファイル（HTML）の配置 // Program.cs に追加 app.UseStaticFiles(); // wwwroot/ 内のファイルを公開 app.UseDefaultFiles(); // index.html を自動表示 ​ これで wwwroot/index.html が <URL> でアクセス可能になります。 WebAPIプロジェクトはMVVMより実装がシンプルで、初めてでも数日で習得できます。AriesV2のWPF（MVVM）⁠ ⁠より学習曲線は緩やかです。",
       "count": 1,
       "sessions": [
-        "8908925a-a72c-43d1-af52-3fc6b2516d75"
+        "session-006"
       ],
       "first_seen": "2026-01-24T06:23:53.532Z",
       "last_seen": "2026-01-24T06:23:53.532Z"
@@ -91,7 +91,7 @@
       "prompt": "こんにちは、本日は、新しいプロジェクトでDotnetを使って開発を行ったり、pythonを使って開発するときのベストなスタート方法をどうすれば良いかを一緒に考えたい。グローバルskillはいまのリポジトリからグローバルの.copilotにskillsを転送します。前回新しくagentsを作成しましたが、これも含めて、どのようにagentを読んで使って行くのが最適解なのか現状の、世の中のベストプラクティスなのかを知りたい。あなたの見解は？分からなければ調査して ultrathink",
       "count": 1,
       "sessions": [
-        "9065f74a-be55-44c2-9fcf-78115216ba39"
+        "session-007"
       ],
       "first_seen": "2026-02-22T08:39:24.215Z",
       "last_seen": "2026-02-22T08:39:24.215Z"
@@ -100,7 +100,7 @@
       "prompt": "グローバルのcopilot-instructions.mdもロボコピーしたほうが簡単だったりしませんか？基本的にはこのリポジトリが憲法とskillやagentをまとめているものなので、ここにcopilotフォルダを作成して、そこにcopilot-instructions.mdを置くのが良さそう（他のSkillsやdotnet、pythonフォルダと同じように、そういう意味では、 @.github\\agents\\ にagentを置かないでagents\\フォルダを作成してそこからコピーの方が適切に感じる。このリポジトリには.github\\は不要かも知れないと感じている。いかが？ ultrathink",
       "count": 1,
       "sessions": [
-        "9065f74a-be55-44c2-9fcf-78115216ba39"
+        "session-007"
       ],
       "first_seen": "2026-02-22T09:07:34.614Z",
       "last_seen": "2026-02-22T09:07:34.614Z"
@@ -109,7 +109,7 @@
       "prompt": "@dotnet\\dotnet-wpf-secure-config\\ でSKILL.mdなどのURLが繋がって以内問題が見つかりました。基本的な仕様は以下の通りですが、段階的に進めて良ければと思います。Isuueに登録についても既存のskillの通りカラーマークなどはつけて、基本は青色かもしれませんが、忘れずにつけた。まずは読んで 以下は、**RyoMurakami1983/skills_repository** に対して「参照URLの疎通確認を定期実行し、結果をIssueで通知（必要ならCopilotで修正支援）」までを運用可能にするための**基本仕様書（基本計画）**のドラフトです。現時点ではリポジトリ内部構成（どのファイルにURLが書かれているか）を確定できていないため、対象パスは“可変”として設計しています。 --- ### 1. 目的 - skills_repository 内の各 skill ドキュメントに含まれる **参照URLが常に有効であること**を継続的に保証する。 - リンク切れを **自動検知**し、作業が埋もれない形で **Issue化**して運用負荷を下げる。 - 修正は「人が最終判断」しつつ、**Copilot支援で調査・修正を高速化**する。 ### 2. 対象範囲 #### 2.1 対象リポジトリ - GitHub: `RyoMurakami1983/skills_repository` #### 2.2 チェック対象（URL） - 外部URL（`<URL> - 相対リンク（`./...`）はオプション（必要なら追加）。 #### 2.3 対象ファイル（暫定） - Markdown: `**/*.md` - 将来拡張: `**/*.yml`, `**/*.yaml`, `**/*.json`（URLを含む場合） - **除外**（原則）: `node_modules/`, `dist/`, `build/` 等の生成物 > 確定事項：参照URLが “どのパスに書かれているか” を確定したら、対象globを絞り、誤検知と実行時間を最小化する。 > --- ### 3. 運用要件（いつ・どう通知するか） #### 3.1 実行タイミング - 定期実行（例） - 毎週月曜 09:00 JST（cron換算で設定） - 手動実行 - `workflow_dispatch` を有効化し、必要時に手動起動できること。 #### 3.2 通知方式 - リンク異常があった場合のみ、GitHub Issue を自動作成する。 - Issueには最低限以下を含める - どのファイルのどのリンクが失敗したか - 失敗理由（HTTP status、timeout、DNSなど） - 可能なら再現手順（ローカルでの実行コマンド） --- ### 4. 機能要件 #### 4.1 リンクチェック（Link Check） - GitHub Actions 上でリンクチェッカーを実行する。 - 代表ツール（採用候補） - `lycheeverse/lychee-action`（Markdown等を対象にリンク切れ検出、レポート出力に向く）[[1]](<URL> 期待動作： - リポジトリをcheckout後、指定対象パスに対してリンクチェックを実行する。 - 失敗があればレポート（例: `lychee/out.md`）を生成する。 - ワークフロー自体は「失敗で止めない」運用も可能（ただしIssue作成で検知できることが前提）。 #### 4.2 Issue自動作成（Create Issue） - リンクチェック結果がNGの場合のみ、レポートを本文として Issue を作成する。[[1]](<URL> - Issueには以下を付与する - タイトル: `Link Checker Report`（など） - ラベル: `report`, `automated`, `broken-link`（案） - 必要権限 - `permissions: issues: write`（ワークフローに明示） #### 4.3（オプション）Copilotによる修正支援 目的： - Issueをトリガに、リンク更新の候補提示、または修正PR作成を支援する。 方式案（安全順）： 1. **支援のみ（推奨の初期）** - Issue内容を元に、人がCopilotへ「候補調査」「修正案作成」を依頼し、PRを作る。 2. **自動PR（Draft）** - Actions上でCopilot CLIを起動し、修正案をDraft PRとして作成。 - 人が最終レビューしてマージする。 - Copilot CLI は Actions からの自動化パターンが整理されている。[[2]](<URL> 制約・注意： - 403（botブロック）やリダイレクト、移転等で「正しいリンク」が一意に決まらない場合がある。 - 自動置換は誤修正が起きやすいので、初期は “Issue化まで” を確実に回す。 --- ### 5. 非機能要件 #### 5.1 信頼性 - 一時的なネットワーク障害で誤検知しないよう、リトライ・タイムアウトの方針を定める（ツール設定で吸収）。 - 毎回新規Issueを乱立させない運用が必要なら「既存Issueを更新」方針も検討（初期は新規でも可）。 #### 5.2 セキュリティ - 原則として追加のシークレット不要で動く構成を優先（`GITHUB_TOKEN` を使用）。 - 外部アクセスを伴うため、実行頻度と対象を絞り、無駄な外向き通信を避ける。 #### 5.3 保守性 - 対象パス（リンクが書かれる場所）が変わっても追随できるよう、設定をワークフロー内で一元管理する。 --- ### 6. 成果物（Deliverables） - `.github/workflows/links.yml`（仮名） - schedule + workflow_dispatch - checkout - lychee 実行 - 失敗時にIssue作成 - `lychee.toml`（必要なら） - 除外ドメイン、User-Agent、タイムアウト、再試行等の設定 --- ### 7. 受入条件（Acceptance Criteria） - スケジュール実行でリンクチェックが走り、成功時は何も起きない。 - 1つ以上のリンク異常を意図的に作ると、次回実行で Issue が作成される。 - Issue本文に、該当URLと失敗理由が含まれる。 - 手動実行（workflow_dispatch）で同様に動く。 --- ### 8. リスクと対策 - **403が多発**（自動チェック対策で弾かれる） - 対策: User-Agent設定、除外リスト、許容ステータスの見直し - **一時的なネット障害で誤検知** - 対策: リトライ、タイムアウトの調整、週次実行（過剰にしない） - **Issue乱立** - 対策: 既存Issue更新方式へ移行（運用が固まってから） --- ### 9. 次に確定すべき事項（最小） 基本仕様を“実装仕様”に落とすため、以下だけ教えてください。 1. skills_repository で参照URLが書かれている場所はどこですか？ - 例: `README.md`、各 `SKILL.md`、`references/*.md`、frontmatter（YAML）など 2. チェック対象は「外部URLのみ」で良いですか？相対リンクも含めますか？ 3. Issueの運用はどちらが良いですか？ - 毎回新規Issue - 既存Issueを1つ更新（“Link Check Report” を1つに集約） この3点が決まれば、ワークフロー（YAML）を確定形で起こせます。",
       "count": 1,
       "sessions": [
-        "9c0e8c79-0fd0-49c9-bc22-2afbe2161bdc"
+        "session-008"
       ],
       "first_seen": "2026-03-01T01:02:08.481Z",
       "last_seen": "2026-03-01T01:02:08.481Z"
@@ -118,7 +118,7 @@
       "prompt": "超絶シンプルな日本語のためのマークダウンライターを作成したい。＃ でH1、 ＃＃ でH2、これをH5までーで箇条書き、 １． で番号箇条書き、ーーーで下線、＊＊文字＊＊で太文字。まずはこんなところからできると良いな。書く部分はA４縦と普通のブログのような下にずっと書けるスタイルを変えられる感じが良い。保存はCtr＋Sで保存先はダイアログで選択する感じで、保存形式は単純に.mdファイルになります。ちなみに作成するときはtypescriptとdotnetでどっちが良いのかなWindowsのみで利用を考えています。少しづつ分からないところあれば聞いてください。基本的に日本語ベースです。英語圏のことはまったく考えなくてよい。ちなみに上の見出しと箇条書きと番号箇条書きは半角スペースをすると変化する感じで表示もマークダウンのプレビュー表示が良いけどそもそも可能なの？ビジュアルが世の中にフリーで存在する？",
       "count": 1,
       "sessions": [
-        "b0b891fc-26c7-42f0-a642-81a935f73078"
+        "session-009"
       ],
       "first_seen": "2026-03-11T14:08:12.046Z",
       "last_seen": "2026-03-11T14:08:12.046Z"
@@ -127,7 +127,7 @@
       "prompt": "Dify APIをdotnetで利用するためのskillを作成したい。「dotnet（WPF）でDifyAPIとの連携を作成して」で発動すると良い 参考文献は @local_docs\\ のDifyのmdファイル",
       "count": 1,
       "sessions": [
-        "c7bf982b-655f-48f6-9f85-4b849bd49f46"
+        "session-010"
       ],
       "first_seen": "2026-02-15T04:39:31.679Z",
       "last_seen": "2026-02-15T04:39:31.679Z"
@@ -136,7 +136,7 @@
       "prompt": "リファクタリングに関するskillを作成したいです。リファクタリングに関しては @dev_docs\\ の中のdocumentと次の内容を参考にしてください。`skills_repository` のURLは、こちら側のツール制約で直接ロードできませんでした（connector検索でしか追えないタイプのため）。その前提で、「Copilot Agent / Codex Agent で使う skill を集約・管理するためのリポジトリ」に実装する *リファクタ用skillの分け方* を、**リポジトリ運用に耐える形**で提案します。 --- ### 結論：skills_repository では「リファクタ対象」ではなく「skillの型」で分けるのが適切 skills_repository は “いろいろな対象（.NET、Python、DB、インフラ…）に適用される skill を保管する倉庫” なので、**言語別に切るより**、次の4カテゴリで切ると破綻しにくいです。 1. **Refactor-Transform（変換）** 2. **Refactor-Safety（安全網）** 3. **Refactor-Review（説明・レビュー補助）** 4. **Refactor-Scaffold（共通テンプレ・規約・チェックリスト）** この4つは重複しにくく、追加skillが増えても置き場所がぶれません。 --- ### 推奨ディレクトリ設計（.github/skills 配下のMECE） （例として、skill名を規約化します） #### A. Refactor-Transform（実際にコードを変える） - `refactor-extract-method` - `refactor-extract-class` - `refactor-move-method-field` - `refactor-replace-conditional-with-polymorphism` - `refactor-split-module-boundary`（モジュール境界の分割、Strangler寄り） **ポイント** - “リファクタリングコア”をここに入れる。 - 1 skill = 1〜3パターン程度に絞る（万能skillは劣化しやすい）。 #### B. Refactor-Safety（壊していないことの保証） - `refactor-characterization-tests`（レガシーの振る舞い固定） - `refactor-contract-preservation`（公開API/データ契約維持の検証） - `refactor-regression-checklist`（手動確認を含めた最終ゲート） - `refactor-performance-sanity`（性能の“悪化検知”に限定） **ポイント** - Transformと混ぜない。混ぜると「変更」と「検証」が絡んで再利用性が落ちます。 #### C. Refactor-Review（PRで通すための言語化） - `refactor-pr-description-writer` - `refactor-risk-assessment` - `refactor-rollback-plan-writer` **ポイント** - Copilot/Codex運用では、最終的に人間がPRを読むので、ここが地味に効きます。 #### D. Refactor-Scaffold（skillを量産・品質維持するための共通基盤） - `skill-writing-guide`（書き方の型） - `skill-quality-validation`（品質チェックの型） - `refactor-scope-guard`（変更禁止領域、対象フォルダ、ファイル種別などを宣言させる） **ポイント** - skills_repository の価値は「skillの品質を揃えること」なので、ここは最優先で整備すると後が楽です。 - SofDump の skill でも「Related Skills」に quality validation / writing guide が出てくる形が見えており、この構造は汎用的に機能します。[[1]]({{<URL> --- ### さらに“現場で迷わない”ための命名規則（おすすめ） - `refactor-<operation>-<language?>-<scope?>` - operation: `extract-method` / `move-method` / `rename` / `split-module` - language は *必要なときだけ*（例: C#のpartialやusing整理など、言語依存が強い場合） - scope は *必要なときだけ*（例: `monolith-to-modular`） --- ### 次に必要な情報（1つだけ） `skills_repository` の中で、今あなたが増やしたい「リファクタ用skill」はどれに近いですか？ - 1) **コード変換系**（Extract/Move/Rename 等） - 2) **設計分割系**（境界整理、依存逆転、レイヤ化） - 3) **レガシー安全網**（characterization test、契約維持） - 4) **レビュー文章生成**（PR説明、リスク、ロールバック） 番号で答えてください。そこから先は、そのカテゴリに合わせて「skillの粒度」「入力テンプレ」「成功条件（Doneの定義）」まで、skills_repository向けに具体化します。 質問ありますか？",
       "count": 1,
       "sessions": [
-        "ea485096-4acd-4e0b-9524-5ee002f2f399"
+        "session-011"
       ],
       "first_seen": "2026-02-13T05:51:13.812Z",
       "last_seen": "2026-02-13T05:51:13.812Z"
@@ -145,7 +145,7 @@
       "prompt": "@local_docs\\ のOracleのdotnet実装用のskillを作成したい。「dotnetでOracleデータベース接続機能追加」で動くようにしたい。 参考として @dotnet\\dotnet-wpf-dify-api-integration\\ です olacleで使うSQLは @dotnet\\dotnet-access-to-oracle-migration\\ で取得して使う予定です。計画を考えましょう。不足ある？",
       "count": 1,
       "sessions": [
-        "ebcbd45a-8683-4ba8-976d-41fed264b6eb"
+        "session-012"
       ],
       "first_seen": "2026-02-15T06:29:58.168Z",
       "last_seen": "2026-02-15T06:29:58.168Z"
@@ -154,7 +154,7 @@
       "prompt": "基本的にはWPFの場合はCommunityToolkit.Mvvmを追加する予定です。簡単な説明があると、良いです。単純なCRUD操作のみを考えています。先にSQLで必要なテーブルと情報を連結している前提です。なお、構造は @dotnet\\dotnet-wpf-dify-api-integration\\ も参考にしてほしいですが、リポジトリパターンはこのAPIとはそこまで合わせないほうが良いですか？私の知識では同じようなものだと思っていました。実際のところ一緒に使うことが多いです。",
       "count": 1,
       "sessions": [
-        "ebcbd45a-8683-4ba8-976d-41fed264b6eb"
+        "session-012"
       ],
       "first_seen": "2026-02-15T06:38:00.798Z",
       "last_seen": "2026-02-15T06:38:00.798Z"
@@ -163,7 +163,7 @@
       "prompt": "求道者モードでお願いします。今回は新skill導入とagentの深化になると思います。 まずはこちらを確認してください。 # ふりかえり: Presentation層へのドメインロジック漏洩 **日付**: 2026-02-24 **プロジェクト**: MillScanSplitter **対象PR**: #20 (feat: UI cleanup, security guards, Excel export) --- ## 1. 事実の記録（何が起きたか） ### 発生した不具合 Excel出力機能の追加時、Presentation層（`MainWindowViewModel`）に `ParseOcrValueParts` メソッドを作成。 `OcrValue` 文字列（例: `25_10_29-394R072-9#SUH3-AIS-X578D`）を `-` で分割し、 大同製番・鋼種名・溶解番号を抽出しようとした。 ### 誤動作の例 | 入力 (OcrValue) | 期待値 | 実際の出力 | |---|---|---| | `25_10_29-394R072-9#SUH3-AIS-X578D` | 鋼種名=`9#SUH3-AIS`, 溶解番号=`X578D` | 鋼種名=`9#SUH3`, 溶解番号=`AIS` | **原因**: 鋼種名にハイフンを含む値（`9#SUH3-AIS`）が存在し、単純な `-` 分割では正しく分離できない。 ### 修正内容 - `ProcessDocumentComparisonRow`（Application層）に `ManufacturingNumber`, `SteelType`, `HeatNo` フィールドを追加 - `BuildComparisonRows` で `ExtractedItem`（Domain層エンティティ）から直接セット - Presentation層の `ParseOcrValueParts` を完全削除 - Excel出力はViewModel上の構造化フィールドを直接使用 --- ## 2. 5 Whys 分析（なぜ起きたか） | # | Why | Answer | |---|-----|--------| | 1 | なぜPresentation層でドメイン値をパースした？ | Excel出力に大同製番・鋼種名・溶解番号が個別に必要だったが、Application層のレスポンスに無かった | | 2 | なぜApplication層のレスポンスに無かった？ | 元の `ProcessDocumentComparisonRow` はUI表示用の結合文字列（`OcrValue`）だけを返す設計だった | | 3 | なぜ結合文字列だけだった？ | 初期設計時はExcel出力が想定外で、表示用文字列だけで十分だった | | 4 | なぜ新機能追加時にApplication層を拡張しなかった？ | LLMが「手元にあるデータから最短距離で解決」するSlop傾向 + レビュー不足 | | 5 | なぜレビューで気づけなかった？ | 動作確認が「ビルド通る＋テスト通る」に偏り、層の責務違反を検出する仕組みが無い | ### 根本原因（まとめ） 1. **Application層レスポンスの設計不足**: 下流が必要とする構造化データを考慮する習慣が無い 2. **LLM Slop**: 「足りないデータは手元で作る」という最短距離の誘惑 3. **ガードレールの不在**: 層の責務違反を検出する仕組みが存在しない --- ## 3. 違反パターンの一般化 ### Anti-Pattern: Layer Boundary Violation（層境界違反） **定義**: 上位層が下位層から受け取ったデータを文字列操作（Split, Substring, Regex等）で再解釈し、ドメイン値を再構築すること。 **なぜ危険か**: - 文字列フォーマットの暗黙的な前提に依存する（区切り文字、順序、エスケープ） - ドメイン知識（「鋼種名にハイフンが含まれうる」）がPresentation層に漏洩する - 変更に脆い：フォーマット変更時にPresentation層も壊れる **検出の手がかり**: - Presentation層（`.Presentation.*` namespace）での `string.Split`, `Substring`, `Regex` - Application層レスポンスから受け取った文字列の再パース - ViewModelで「ドメインの構造」を知っている必要があるコード ### 正しいパターン ``` ❌ Presentation層で文字列を分割してドメイン値を取り出す var parts = ocrValue.Split('-'); var steelType = parts[2]; // ドメイン知識がPresentation層に漏洩 ✅ Application層のレスポンスに構造化フィールドを追加する record ProcessDocumentComparisonRow( ..., string ManufacturingNumber, // ExtractedItemから直接セット string SteelType, string HeatNo ); ``` **原則**: データが足りないなら、**下位層（Application/Domain）のレスポンスを拡張**せよ。上位層（Presentation）で加工するな。 --- ## 4. 対策案 ### 予防層: dotnet-slopwatch スキル（優先） LLMがコード生成段階で参照するアンチパターンカタログとして `dotnet-slopwatch` スキルを作成する。 **設計方針**: ``` dotnet-slopwatch ├── SKILL.md # Anti-Pattern Catalog │ ├── SLOP-001: Layer Boundary Violation（層境界違反）← 今回の事例 │ ├── SLOP-002: (将来追加) │ └── ... └── references/ └── SKILL.ja.md # 日本語版（Why を詳細に） ``` **dotnet-shihan との連携**: ``` dotnet-shihan (Agent) └── 守(Shu)段階 └── dotnet-slopwatch 参照 └── SLOP-001 チェック: 「Presentation層でドメインデータをパースしていないか？」 「Application層レスポンスに必要フィールドがあるか？」 ``` ### SLOP-001 の内容案 ```markdown ## SLOP-001: Layer Boundary Violation（層境界違反） ### 症状 - Presentation層で string.Split / Regex / Substring を使ってドメイン値を再構築 ### 処方 - Application層のレスポンス record に必要フィールドを追加 - Domain層の Entity / ValueObject から直接マッピング ### 実例 - MillScanSplitter PR#20: ParseOcrValueParts 事件 - 鋼種名 `9#SUH3-AIS` がハイフン分割で破壊された ### チェックポイント - [ ] 新機能で必要なデータがApplication層レスポンスに構造化されているか？ - [ ] Presentation層で受け取った文字列を再解釈していないか？ ``` ### 検出層（将来・後回し） 以下は予防層が整った後、必要に応じて検討する。ガチガチにしすぎず、余白を守る。 | 手段 | 内容 | 優先度 | |------|------|--------| | PowerShellスクリプト | Presentation層の.csで `Split/Substring/Regex` を検出。`// layer-ok` で例外許可 | 低（必要時） | | ArchUnitNET | アーキテクチャテストで層依存を宣言的に検証 | 低（プロジェクト成熟後） | | Roslyn Analyzer | コンパイル時警告。開発コスト高 | 最低（単独プロジェクトには過剰） | --- ## 5. 余白の設計 **やらないこと**（意図的に残す余白）: - Presentation層での全 `string.Split` を禁止はしない（UIフォーマット用の正当な用途がある） - 検出の自動化は急がない（まずLLM予防で効果を測る） - ルールの厳格化より、「なぜダメか」の理解を優先する **判断基準**: 「その Split は、ドメインの構造を知らないと書けないか？」 → Yes なら SLOP-001 違反。No なら正当な UI 処理。 --- ## 6. Next Actions | # | アクション | 対象 | 時期 | |---|-----------|------|------| | 1 | `dotnet-slopwatch` スキル作成（SLOP-001 から開始） | skills_repository | 後日 | | 2 | `dotnet-shihan` Agent Instructionsで slopwatch 参照を強化 | copilot agents | スキル作成後 | | 3 | 検出スクリプトの検討（必要に応じて） | プロジェクト CI | 十分な事例が蓄積してから | --- ## 7. 学び（Values との紐付け） | Value | この事例での学び | |-------|----------------| | **基礎と型の追求** | DDD層構造は「型」。型を破ると一見動くが、ドメイン知識の漏洩で脆くなる | | **余白の設計** | 検出を自動化しすぎると開発の自由度を奪う。まず予防（理解）、次に検出（仕組み） | | **成長の複利** | 今回の失敗を dotnet-slopwatch に昇華すれば、全プロジェクトで再利用可能 | | **温故知新** | 「Presentation層にロジックを置くな」は古くからの原則。LLM時代にも変わらない |",
       "count": 1,
       "sessions": [
-        "f3bf7495-248c-4565-9cbc-61af161c4def"
+        "session-013"
       ],
       "first_seen": "2026-02-24T12:59:57.080Z",
       "last_seen": "2026-02-24T12:59:57.080Z"
@@ -172,7 +172,7 @@
       "prompt": "了解しました。dotnet-shihanは呼ばれたときは最初にこのslopwatchのバージョン更新をしてもらえると良いかも",
       "count": 1,
       "sessions": [
-        "f3bf7495-248c-4565-9cbc-61af161c4def"
+        "session-013"
       ],
       "first_seen": "2026-02-24T20:23:40.889Z",
       "last_seen": "2026-02-24T20:23:40.889Z"
@@ -181,7 +181,7 @@
       "prompt": "今回の固有名詞問題は結構重大なので、入口と出口でチェックが必要だと思います。そのため、基本的なdocument作成方法をdotnet、pythonともにもつかグローバルskillとしてdocument作成skillを作成するかだと思いますが、グローバルで良いと思うけどどのようなskill名がいいかな？あとは、documentチェックもそのskillが持つほうが良いか分けるべきかもあるけど作成して、チェックしてで中身もそこまで大きくならないと思うので一緒が良いかな？",
       "count": 1,
       "sessions": [
-        "f3bf7495-248c-4565-9cbc-61af161c4def"
+        "session-013"
       ],
       "first_seen": "2026-02-24T21:06:06.215Z",
       "last_seen": "2026-02-24T21:06:06.215Z"
@@ -190,7 +190,7 @@
       "prompt": "7個でOKです。MVVMです。DDDはおそらくすでに @.github\\skills\\ の高品質ので似たものがあるので、不足があれば入れたいところ、そういう意味では競合するのは良くないので競合しているものが何か確認したい。競合はAI開発エージェントが何を適用すべきか迷います。",
       "count": 1,
       "sessions": [
-        "fa3b61ac-7617-4db3-abd5-dc7c27138ae6"
+        "session-014"
       ],
       "first_seen": "2026-02-07T07:18:42.149Z",
       "last_seen": "2026-02-07T07:18:42.149Z"
@@ -199,7 +199,7 @@
       "prompt": "[[PLAN]] 参考ドキュメントはこのWPFアプリを参考に抽出してますので参考にして良い",
       "count": 1,
       "sessions": [
-        "fa3b61ac-7617-4db3-abd5-dc7c27138ae6"
+        "session-014"
       ],
       "first_seen": "2026-02-07T07:27:40.622Z",
       "last_seen": "2026-02-07T07:27:40.622Z"
@@ -208,7 +208,7 @@
       "prompt": "文字数が多すぎるのは６パターンでも多いということですか？イメージとしてWpfMvvm, WpfSecurity,WpfOlacle敵にフォルダを分けたほうが良いとかある？",
       "count": 1,
       "sessions": [
-        "fa3b61ac-7617-4db3-abd5-dc7c27138ae6"
+        "session-014"
       ],
       "first_seen": "2026-02-07T07:43:04.410Z",
       "last_seen": "2026-02-07T07:43:04.410Z"
@@ -217,7 +217,7 @@
       "prompt": "いまだとdotnetのskillをプロジェクト側に持っていくときはコピペしか無いのだけれど系統立ててコピーすることはできないかな？",
       "count": 1,
       "sessions": [
-        "fe32bb9a-9a2d-4388-ac44-a83f623ffbc5"
+        "session-015"
       ],
       "first_seen": "2026-02-22T21:11:33.094Z",
       "last_seen": "2026-02-22T21:11:33.094Z"
@@ -226,7 +226,7 @@
       "prompt": "@dotnet\\ や @python\\ @typescript\\ の場合はルーター化のメリットは存在するか？",
       "count": 1,
       "sessions": [
-        "fe4528bd-d756-48cc-8b96-f98837a57d3e"
+        "session-016"
       ],
       "first_seen": "2026-03-17T16:24:57.702Z",
       "last_seen": "2026-03-17T16:24:57.702Z"
@@ -235,7 +235,7 @@
       "prompt": "dotnetの場合はdotnet wpf などの複数ルーターも検討に入る",
       "count": 1,
       "sessions": [
-        "fe4528bd-d756-48cc-8b96-f98837a57d3e"
+        "session-016"
       ],
       "first_seen": "2026-03-17T16:28:02.395Z",
       "last_seen": "2026-03-17T16:28:02.395Z"
@@ -244,7 +244,7 @@
       "prompt": "名前は[wpf]で良い。そういう意味ではdotnet-routerではなく[dotnet]がルータースキルが良いこの方針はおべんちゃら無しでどうか？先日のgitやgithubも[git] [github]というスキルにすることを考えていた。ほぼツール名からスキルの入口として段階的にスキルを見る方法でした。",
       "count": 1,
       "sessions": [
-        "fe4528bd-d756-48cc-8b96-f98837a57d3e"
+        "session-016"
       ],
       "first_seen": "2026-03-17T16:33:26.926Z",
       "last_seen": "2026-03-17T16:33:26.926Z"
