@@ -20,6 +20,9 @@ from pathlib import Path
 
 WINDOWS_PATH_RE = re.compile(r"[A-Za-z]:\\(?:[^\\/:*?\"<>|\r\n]+\\)*[^\\/:*?\"<>|\r\n]*")
 URL_RE = re.compile(r"https?://\S+")
+PERSONAL_GITHUB_OWNER = r"(?=[A-Za-z0-9-]*[A-Z0-9])[A-Za-z\d](?:[A-Za-z\d]|-(?=[A-Za-z\d])){0,38}"
+GITHUB_REPO_RE = re.compile(rf"\b({PERSONAL_GITHUB_OWNER})/([A-Za-z0-9_.-]+)\b")
+PRIVATE_REPO_OWNER_RE = re.compile(rf"\b({PERSONAL_GITHUB_OWNER})(?=のprivateリポジトリ)")
 WHITESPACE_RE = re.compile(r"\s+")
 
 
@@ -35,6 +38,8 @@ class PromptHit:
 def anonymize_prompt(text: str) -> str:
     text = URL_RE.sub("<URL>", text)
     text = WINDOWS_PATH_RE.sub("<WINDOWS_PATH>", text)
+    text = GITHUB_REPO_RE.sub("<GITHUB_OWNER>/<GITHUB_REPO>", text)
+    text = PRIVATE_REPO_OWNER_RE.sub("<GITHUB_OWNER>", text)
     text = WHITESPACE_RE.sub(" ", text).strip()
     return text
 

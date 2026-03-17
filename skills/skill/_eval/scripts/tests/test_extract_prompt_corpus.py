@@ -28,6 +28,17 @@ def test_anonymize_prompt_replaces_paths_and_urls():
     assert "https://example.com/abc" not in result
 
 
+def test_anonymize_prompt_redacts_github_identity_markers():
+    mod = load_module()
+
+    text = "RyoMurakami1983のprivateリポジトリと RyoMurakami1983/skills_repository を確認して"
+    result = mod.anonymize_prompt(text)
+
+    assert "<GITHUB_OWNER>のprivateリポジトリ" in result
+    assert "<GITHUB_OWNER>/<GITHUB_REPO>" in result
+    assert "RyoMurakami1983" not in result
+
+
 def test_build_summary_counts_matching_user_messages(tmp_path: Path):
     mod = load_module()
     session_dir = tmp_path / "session-a"
