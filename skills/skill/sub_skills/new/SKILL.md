@@ -47,7 +47,7 @@ Decide whether the domain is best modeled as a flat workflow, a peer-skill orche
 
 ### Step 7 — Scaffold Router Structure When Needed
 
-When the domain needs internal routing, scaffold it with `uv run python skills\skill\scripts\create_skill.py --name <router-name> --description "<description>" --type router --sub-skills <route-a>,<route-b>`. Keep the parent `SKILL.md` focused on the Decision Table and move the real execution logic into each generated sub-skill.
+When the domain needs internal routing, scaffold it with `uv run python skills/skill/scripts/create_skill.py --name <router-name> --description "<description>" --type router --sub-skills <route-a>,<route-b>`. Keep the parent `SKILL.md` focused on the Decision Table and move the real execution logic into each generated sub-skill.
 
 ## Pitfalls
 
