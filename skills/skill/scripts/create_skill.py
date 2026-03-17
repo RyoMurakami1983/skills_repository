@@ -47,10 +47,19 @@ def default_title(name: str) -> str:
     return name.replace("-", " ").title()
 
 
+def quote_yaml_scalar(value: str) -> str:
+    return json.dumps(value, ensure_ascii=False)
+
+
 def build_frontmatter(name: str, description: str, compatibility: str = "") -> str:
-    lines = ["---", f"name: {name}", f"description: {description}"]
+    description_lines = [line.rstrip() for line in description.strip().splitlines() if line.strip()]
+    if not description_lines:
+        description_lines = ["Replace this description before publishing."]
+
+    lines = ["---", f"name: {name}", "description: >"]
+    lines.extend(f"  {line}" for line in description_lines)
     if compatibility:
-        lines.append(f"compatibility: {compatibility}")
+        lines.append(f"compatibility: {quote_yaml_scalar(compatibility)}")
     lines.extend(["---", ""])
     return "\n".join(lines)
 
@@ -92,10 +101,15 @@ def render_workflow_template(
     compatibility: str,
 ) -> str:
     rendered = template
+    compatibility_line = (
+        f"compatibility: {quote_yaml_scalar(compatibility)}\n"
+        if compatibility
+        else ""
+    )
     replacements = {
         "<context>-<verb>-<object>": name,
-        "<What this skill does>. Use when <scenario 1>, <scenario 2>, or <scenario 3>, even if the user describes the workflow without saying \"skill\".": description,
-        "<optional tools, runtime, or platform constraints>": compatibility or "",
+        "<What this skill does>": description,
+        "compatibility: <optional tools, runtime, or platform constraints>\n": compatibility_line,
         "<Skill Title>": title,
         "<Explain why this skill exists in 1-2 sentences.>": "Explain why this skill exists and trim placeholders before publishing.",
         "<Verb-led scenario 1>": "Replace this placeholder with a real trigger",
@@ -122,7 +136,7 @@ def render_router_template(
     rendered = template
     replacements = {
         "<context>-<object>": name,
-        "<What this router does>. Use when <scenario 1>, <scenario 2>, or <scenario 3>, even if the user describes the workflow without saying the exact skill name.": description,
+        "<What this router does>": description,
         "<Router Title>": title,
         "<Explain what this router unifies and why a single entry point helps.>": "Explain what this router unifies and trim placeholders before publishing.",
         "<Verb-led scenario 1>": "Replace this placeholder with a real router trigger",
@@ -144,10 +158,15 @@ def render_sub_skill_template(
     compatibility: str,
 ) -> str:
     rendered = template
+    compatibility_line = (
+        f"compatibility: {quote_yaml_scalar(compatibility)}\n"
+        if compatibility
+        else ""
+    )
     replacements = {
         "<sub-skill-name>": name,
-        "<What this sub-skill does>. Use when <scenario 1>, <scenario 2>, or <scenario 3>.": description,
-        "compatibility: <optional shared resources or constraints>\n": f"compatibility: {compatibility}\n" if compatibility else "",
+        "<What this sub-skill does>": description,
+        "compatibility: <optional shared resources or constraints>\n": compatibility_line,
         "<Sub-skill Title>": title,
         "<Explain why this sub-skill exists in 1-2 sentences.>": "Explain why this sub-skill exists and trim placeholders before publishing.",
         "<Verb-led scenario 1>": "Replace this placeholder with a real trigger",
