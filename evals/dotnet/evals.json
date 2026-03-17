@@ -1,0 +1,111 @@
+{
+  "skill_id": "dotnet",
+  "version": "1.0.0",
+  "description": "dotnet 薄い入口 skill の有効性評価。real corpus first で WPF / deploy / Oracle / Dify / bootstrap の route precision と meta false positive を測る。",
+  "cases": [
+    {
+      "id": "tc-001",
+      "prompt": "wpfでUIを実装したいです。おすすめのdotnet-skillをプロジェクトに導入したい",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["dotnet", "wpf", "deploy", "thin-entry"],
+      "assertions": [
+        { "type": "contains", "value": "dotnet-skill-deploy", "weight": 1.0 },
+        { "type": "contains", "value": "wpf", "weight": 0.5 },
+        { "type": "not_contains", "value": "dotnet-project-structure", "weight": 0.5 },
+        { "type": "llm_grade", "value": "実装詳細ではなく『プロジェクトに導入したい』という deploy intent を読み取り、`dotnet-skill-deploy` に優先接続できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-002",
+      "prompt": "基本のコア機能が完成しましたので、これをWPFなどのデスクトップアプリにしたいと考えます。",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["dotnet", "wpf", "desktop", "implementation"],
+      "assertions": [
+        { "type": "contains", "value": "dotnet-wpf-mvvm-patterns", "weight": 1.0 },
+        { "type": "contains", "value": "WPF", "weight": 0.5 },
+        { "type": "not_contains", "value": "dotnet-skill-deploy", "weight": 0.5 },
+        { "type": "llm_grade", "value": "導入ではなく WPF 実装・設計相談として `dotnet-wpf-mvvm-patterns` に優先接続できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-003",
+      "prompt": "accessのsqlからOracleで実装するsqlに変換して",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["dotnet", "oracle", "migration", "specific-route"],
+      "assertions": [
+        { "type": "contains", "value": "dotnet-access-to-oracle-migration", "weight": 1.0 },
+        { "type": "contains", "value": "Oracle", "weight": 0.5 },
+        { "type": "not_contains", "value": "dotnet-wpf-mvvm-patterns", "weight": 0.5 },
+        { "type": "llm_grade", "value": "高 specificity の Access→Oracle 変換相談を `dotnet-access-to-oracle-migration` に誤りなく接続できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-004",
+      "prompt": "dotnetでOracleデータベース接続機能追加",
+      "source": "corpus-derived",
+      "source_count": 1,
+      "tags": ["dotnet", "oracle", "wpf-integration", "secure-config"],
+      "assertions": [
+        { "type": "contains", "value": "dotnet-oracle-wpf-integration", "weight": 1.0 },
+        { "type": "contains", "value": "dotnet-wpf-secure-config", "weight": 0.6 },
+        { "type": "contains", "value": "Oracle", "weight": 0.5 },
+        { "type": "llm_grade", "value": "Oracle 連携を WPF 統合 route に乗せつつ、secure-config を前提または併記できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-005",
+      "prompt": "dotnet（WPF）でDifyAPIとの連携を作成して",
+      "source": "corpus-derived",
+      "source_count": 1,
+      "tags": ["dotnet", "wpf", "dify", "integration"],
+      "assertions": [
+        { "type": "contains", "value": "dotnet-wpf-dify-api-integration", "weight": 1.0 },
+        { "type": "contains", "value": "dotnet-wpf-secure-config", "weight": 0.6 },
+        { "type": "contains", "value": "Dify", "weight": 0.5 },
+        { "type": "llm_grade", "value": "WPF + Dify integration を `dotnet-wpf-dify-api-integration` に接続し、secure config も視野に入れられているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-006",
+      "prompt": "WPFの場合はCommunityToolkit.Mvvmを追加する予定です。単純なCRUD操作のみです。",
+      "source": "corpus-derived",
+      "source_count": 1,
+      "tags": ["dotnet", "wpf", "mvvm", "crud"],
+      "assertions": [
+        { "type": "contains", "value": "dotnet-wpf-mvvm-patterns", "weight": 1.0 },
+        { "type": "contains", "value": "MVVM", "weight": 0.5 },
+        { "type": "not_contains", "value": "dotnet-skill-deploy", "weight": 0.5 },
+        { "type": "llm_grade", "value": "CommunityToolkit.Mvvm 前提の WPF CRUD 相談を基礎 MVVM route に戻せているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-007",
+      "prompt": "C#で実装したいけど対応する計画を立てて。Visual Studioのプロジェクトで何を選べば良いの？",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["dotnet", "bootstrap", "project-template", "broad"],
+      "assertions": [
+        { "type": "contains", "value": "dotnet-project-structure", "weight": 1.0 },
+        { "type": "contains", "value": "Visual Studio", "weight": 0.5 },
+        { "type": "not_contains", "value": "dotnet-skill-deploy", "weight": 0.5 },
+        { "type": "llm_grade", "value": "広い C# / Visual Studio bootstrap 相談として `dotnet-project-structure` を最初の着地点にできているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-008",
+      "prompt": "dotnet-routerではなく[dotnet]がルータースキルが良いこの方針はおべんちゃら無しでどうか？",
+      "source": "corpus-derived-guard",
+      "source_count": 1,
+      "tags": ["dotnet", "meta", "router-design", "false-positive-guard"],
+      "assertions": [
+        { "type": "contains", "value": "meta-discussion", "weight": 0.8 },
+        { "type": "not_contains", "value": "dotnet-wpf-mvvm-patterns", "weight": 0.8 },
+        { "type": "not_contains", "value": "dotnet-skill-deploy", "weight": 0.8 },
+        { "type": "llm_grade", "value": "dotnet 実装相談ではなく router 設計相談として扱い、具体 skill へ誤誘導していないか", "weight": 1.0 }
+      ]
+    }
+  ]
+}

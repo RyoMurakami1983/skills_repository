@@ -7,6 +7,8 @@ description: "Commit practices with Conventional Commits, atomic changes, and Ja
 
 Practical patterns for consistent commit messages, atomic changes, and durable history.
 
+Default interpretation: when the user simply says "commit this" or `コミットして`, treat that as a request for an atomic commit by default, not just a raw `git commit` command.
+
 ## When to Use This Skill
 
 Use this skill when:
@@ -15,12 +17,15 @@ Use this skill when:
 - Splitting work into atomic commits for safe reviews and rollbacks
 - Documenting "why" in commit bodies for future maintainers
 - Preparing clean commit history before Pull Request (PR) review
+- Interpreting a vague "commit this" request as a need for atomic, reviewable history
 - Teaching new teammates a repeatable commit workflow
 
 ## Related Skills
 
-- **`github-pr-workflow`** - PR creation and merge flow
-- **`github-issue-intake`** - Issue capture and triage
+- **`github-pr-workflow`** - Typical downstream workflow once commits are review-ready
+- **`github-pr-review-response`** - Follow-up workflow when review feedback requires additional commits
+- **`git-init-to-github`** - First-commit context for new repositories
+- **`github`** - Thin entry skill that should route broad "コミットして" requests here before PR work
 
 ---
 
@@ -108,6 +113,8 @@ Use when Japanese is the primary team language or commit history will be used fo
 ### Step 5: Split Into Atomic Commits
 
 Each commit should address one concern so it can be reviewed and reverted independently.
+
+When the request is only "commit this", use this step as the default interpretation: inspect the diff, separate concerns, and create the smallest useful atomic commit set instead of one catch-all commit.
 
 ```bash
 # ❌ WRONG - multiple concerns
@@ -216,6 +223,7 @@ Fix: Add a "Why" line for decisions.
 |----------|--------|-----|
 | Change <30 minutes | Commit directly | Keep momentum |
 | Multiple concerns | Split commits | Safer review |
+| User says "commit this" | Start with atomic split review | Default to reviewable history instead of one large commit |
 | Shared branch | Avoid rebase | Preserve history |
 
 ---

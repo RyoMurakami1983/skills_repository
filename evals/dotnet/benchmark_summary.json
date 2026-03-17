@@ -1,0 +1,442 @@
+{
+  "skill_id": "dotnet",
+  "eval_version": "1.0.0",
+  "runs": {
+    "with_skill": {
+      "count": 8,
+      "mean": 0.9113,
+      "stddev": 0.1735,
+      "min": 0.4839,
+      "max": 1.0
+    },
+    "baseline": {
+      "count": 8,
+      "mean": 0.9308,
+      "stddev": 0.0897,
+      "min": 0.8065,
+      "max": 1.0
+    }
+  },
+  "summary": {
+    "delta": -0.0195,
+    "improvement_pct": -2.09,
+    "verdict": "neutral"
+  },
+  "case_breakdown": [
+    {
+      "case_id": "tc-001",
+      "prompt": "wpfでUIを実装したいです。おすすめのdotnet-skillをプロジェクトに導入したい",
+      "tags": [
+        "dotnet",
+        "wpf",
+        "deploy",
+        "thin-entry"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 0.8333,
+      "delta": 0.1667,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "dotnet-skill-deploy",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "wpf",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "dotnet-project-structure",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "実装詳細ではなく『プロジェクトに導入したい』という deploy intent を読み取り、`dotnet-skill-deploy` に優先接続できているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "導入 intent を読み取り、`dotnet-skill-deploy` に正しく接続している。"
+        }
+      ],
+      "with_skill_snippet": "Route: dotnet-skill-deploy. WPF の UI 実装を前提に、おすすめの dotnet skill をプロジェクトへ導入するなら `dotnet-skill-deploy` が最適です。まずは `wpf-app` か `wpf` 系の配備を案内し、その後の実装は `dotnet-wpf-mvvm-patterns` を土台に進めるのが実用的です。",
+      "baseline_snippet": "Route: dotnet-skill-deploy. WPF向けのおすすめスキルをまとめて導入する進め方が適切です。まずはWPF系のカテゴリを選んで、必要な土台をプロジェクトに配備するのが実用的です。",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「wpf」が回答に現れない）"
+      ],
+      "recommendation": "スキル固有の専門知識（wpf）をスキルに明示することで発火率が上がります。"
+    },
+    {
+      "case_id": "tc-002",
+      "prompt": "基本のコア機能が完成しましたので、これをWPFなどのデスクトップアプリにしたいと考えます。",
+      "tags": [
+        "dotnet",
+        "wpf",
+        "desktop",
+        "implementation"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "dotnet-wpf-mvvm-patterns",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "WPF",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "dotnet-skill-deploy",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "導入ではなく WPF 実装・設計相談として `dotnet-wpf-mvvm-patterns` に優先接続できているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "WPF 実装・設計相談として `dotnet-wpf-mvvm-patterns` に正しく接続している。"
+        }
+      ],
+      "with_skill_snippet": "Route: dotnet-wpf-mvvm-patterns. 既存のコア機能を WPF デスクトップアプリ化したいなら、まず `dotnet-wpf-mvvm-patterns` に進むのが最適です。MVVM を土台にして、View・ViewModel・DI の分離方針から組み立てましょう。",
+      "baseline_snippet": "Route: dotnet-wpf-mvvm-patterns. コア機能をデスクトップ化するなら、まずWPFのMVVM構成を土台にするのがよいです。画面・ViewModel・サービス分離の形で載せ替える方針が合っています。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-003",
+      "prompt": "accessのsqlからOracleで実装するsqlに変換して",
+      "tags": [
+        "dotnet",
+        "oracle",
+        "migration",
+        "specific-route"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "dotnet-access-to-oracle-migration",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "Oracle",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "dotnet-wpf-mvvm-patterns",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "高 specificity の Access→Oracle 変換相談を `dotnet-access-to-oracle-migration` に誤りなく接続できているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "Access→Oracle migration の specificity を保って `dotnet-access-to-oracle-migration` に接続している。"
+        }
+      ],
+      "with_skill_snippet": "Route: dotnet-access-to-oracle-migration. Access の SQL を Oracle 向けに変換する相談は、`dotnet-access-to-oracle-migration` が最も具体的です。方言差分、関数置換、DDL/DML の書き換え方針までこの系統で進めるのがよいです。",
+      "baseline_snippet": "Route: dotnet-access-to-oracle-migration. AccessのSQLをOracle向けに移す相談として扱うのが最適です。構文差分だけでなく、関数置換やNULL処理、日付式の違いも含めて進めます。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-004",
+      "prompt": "dotnetでOracleデータベース接続機能追加",
+      "tags": [
+        "dotnet",
+        "oracle",
+        "wpf-integration",
+        "secure-config"
+      ],
+      "with_skill_mean": 0.4839,
+      "baseline_mean": 0.8065,
+      "delta": -0.3226,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "dotnet-oracle-wpf-integration",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "dotnet-wpf-secure-config",
+          "weight": 0.6,
+          "with_skill_passed": false,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "Oracle",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "Oracle 連携を WPF 統合 route に乗せつつ、secure-config を前提または併記できているか",
+          "weight": 1.0,
+          "with_skill_passed": false,
+          "baseline_passed": true,
+          "detail": "Oracle 接続追加を concrete integration skill に落とし切れず、other-skill に逃がしている。"
+        }
+      ],
+      "with_skill_snippet": "Route: other-skill. Oracle データベース接続の追加は、WPF 固有というよりデータ接続・設定管理の論点が中心です。まずは .NET のデータ/インフラ系 skill に振るのが自然で、WPF 画面連携まで含む場合だけ `dotnet-oracle-wpf-integration` を検討します。",
+      "baseline_snippet": "Route: dotnet-oracle-wpf-integration. Oracle接続機能の追加として進めるのが最も近いです。接続設定、ドライバ選定、データ取得の実装方針まで具体化できます。",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「dotnet-wpf-secure-config」が回答に現れない）"
+      ],
+      "recommendation": "スキル固有の専門知識（dotnet-wpf-secure-config）をスキルに明示することで発火率が上がります。"
+    },
+    {
+      "case_id": "tc-005",
+      "prompt": "dotnet（WPF）でDifyAPIとの連携を作成して",
+      "tags": [
+        "dotnet",
+        "wpf",
+        "dify",
+        "integration"
+      ],
+      "with_skill_mean": 0.8065,
+      "baseline_mean": 0.8065,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "dotnet-wpf-dify-api-integration",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "dotnet-wpf-secure-config",
+          "weight": 0.6,
+          "with_skill_passed": false,
+          "baseline_passed": false,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "Dify",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "WPF + Dify integration を `dotnet-wpf-dify-api-integration` に接続し、secure config も視野に入れられているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "WPF + Dify integration を `dotnet-wpf-dify-api-integration` に正しく接続している。"
+        }
+      ],
+      "with_skill_snippet": "Route: dotnet-wpf-dify-api-integration. WPF で Dify API 連携を作るなら、`dotnet-wpf-dify-api-integration` が最短です。API クライアント、非同期処理、UI バインディングまで一貫して扱いやすいです。",
+      "baseline_snippet": "Route: dotnet-wpf-dify-api-integration. WPFからDify APIを呼ぶ連携実装として進めるのが最適です。HTTPクライアント設計、設定管理、画面側とのつなぎ込みを整理して進めます。",
+      "gap_summary": [
+        "スキル固有のキーワード・コマンド名の知識が不足（「dotnet-wpf-secure-config」が回答に現れない）"
+      ],
+      "recommendation": "スキル固有の専門知識（dotnet-wpf-secure-config）をスキルに明示することで発火率が上がります。"
+    },
+    {
+      "case_id": "tc-006",
+      "prompt": "WPFの場合はCommunityToolkit.Mvvmを追加する予定です。単純なCRUD操作のみです。",
+      "tags": [
+        "dotnet",
+        "wpf",
+        "mvvm",
+        "crud"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "dotnet-wpf-mvvm-patterns",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "MVVM",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "dotnet-skill-deploy",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "CommunityToolkit.Mvvm 前提の WPF CRUD 相談を基礎 MVVM route に戻せているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "CommunityToolkit.Mvvm 前提の WPF CRUD を `dotnet-wpf-mvvm-patterns` に戻せている。"
+        }
+      ],
+      "with_skill_snippet": "Route: dotnet-wpf-mvvm-patterns. CommunityToolkit.Mvvm を使う WPF の単純 CRUD なら、`dotnet-wpf-mvvm-patterns` が第一候補です。`ObservableProperty` と `RelayCommand` を軸に、素直な MVVM 構成で進めるのがよいです。",
+      "baseline_snippet": "Route: dotnet-wpf-mvvm-patterns. その条件ならWPFのMVVMパターンで進めるのが最適です。CommunityToolkit.Mvvmを前提に、シンプルなCRUD画面構成へ落とし込みやすいです。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-007",
+      "prompt": "C#で実装したいけど対応する計画を立てて。Visual Studioのプロジェクトで何を選べば良いの？",
+      "tags": [
+        "dotnet",
+        "bootstrap",
+        "project-template",
+        "broad"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "dotnet-project-structure",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "Visual Studio",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "dotnet-skill-deploy",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "広い C# / Visual Studio bootstrap 相談として `dotnet-project-structure` を最初の着地点にできているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "広い C# / Visual Studio bootstrap を `dotnet-project-structure` に接続している。"
+        }
+      ],
+      "with_skill_snippet": "Route: dotnet-project-structure. C# で実装計画を立てたい、Visual Studio で何を選ぶべきか整理したい、という相談は `dotnet-project-structure` が適切です。新規構成なら用途に応じて WPF アプリ、クラス ライブラリ、コンソールなどのテンプレート選定から決めていきましょう。",
+      "baseline_snippet": "Route: dotnet-project-structure. まずはC#プロジェクトの構成と作り始め方を整理するルートが適切です。Visual Studioで何を選ぶか、ソリューション構成をどう切るかまで計画できます。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-008",
+      "prompt": "dotnet-routerではなく[dotnet]がルータースキルが良いこの方針はおべんちゃら無しでどうか？",
+      "tags": [
+        "dotnet",
+        "meta",
+        "router-design",
+        "false-positive-guard"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "meta-discussion",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "dotnet-wpf-mvvm-patterns",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "dotnet-skill-deploy",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "dotnet 実装相談ではなく router 設計相談として扱い、具体 skill へ誤誘導していないか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "router 設計相談として meta-discussion 扱いできている。"
+        }
+      ],
+      "with_skill_snippet": "Route: meta-discussion. 率直に言うと、`[dotnet]` を薄いルータースキルにする方針はかなり妥当です。.NET は広すぎる一方で WPF は強い下位領域なので、まず `dotnet` で受けて意図が見えたら具体 skill にすぐ委譲する形が実務的です。",
+      "baseline_snippet": "Route: meta-discussion. これは実装相談ではなく、ルーター方針そのものの評価なのでメタ議論として扱うのが適切です。命名の自然さ、誤誘導の少なさ、具体スキルへの着地しやすさで率直に評価します。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    }
+  ],
+  "generated_at": "2026-03-17T18:10:00.930622+00:00"
+}

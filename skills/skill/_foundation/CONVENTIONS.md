@@ -30,6 +30,30 @@ skill-name/
 - `scripts/` holds deterministic helpers that the agent would otherwise rewrite repeatedly.
 - `assets/` stores files consumed by outputs, not explanatory prose.
 
+## Router Skills
+
+Use a router when one entry point must split into clearly different sub-workflows.
+
+```text
+router-name/
+├── SKILL.md
+├── sub_skills/
+│   ├── route-a/
+│   │   └── SKILL.md
+│   └── route-b/
+│       └── SKILL.md
+├── _foundation/
+├── scripts/
+├── references/
+└── assets/
+```
+
+- Parent routers should expose a `## Decision Table` with `Your intent`, `Route`, and `What to do` columns.
+- Route paths should point at `sub_skills/<name>/`.
+- Use short verb or verb-object names for sub-skills when the router context already supplies the domain.
+- Put shared templates, conventions, and reference snippets in the router's `_foundation/`.
+- Keep detailed execution logic in each sub-skill, not in the parent router.
+
 ## Progressive Disclosure
 
 | Level | Content | Rule |

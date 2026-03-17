@@ -20,11 +20,10 @@ Use this skill when:
 
 ## Related Skills
 
-- **`git-commit-practices`** - Commit workflow and conventions
-- **`github-pr-workflow`** - PR workflow and merge policies
-- **`git-initial-setup`** - Default repo protections for new repos
-- **`skill`** - Revision and change log practices
-- **`skill`** - Validate documentation quality
+- **`github`** - Thin entry skill for broad GitHub requests before the exact issue / PR / repo workflow is obvious
+- **`github-pr-review-response`** - Typical upstream flow when review feedback reveals follow-up work that should be deferred instead of fixed in the current PR
+- **`github-pr-workflow`** - Delivery workflow that often precedes issue capture when scope expands during PR work
+- **`github-repo-label-setup`** - Label taxonomy this skill can apply during issue creation and triage
 - **`knowledge-capture`** - Anonymization gate for public-repo content
 
 ---

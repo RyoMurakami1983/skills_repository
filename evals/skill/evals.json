@@ -1,49 +1,143 @@
 {
   "skill_id": "skill",
   "version": "1.0.0",
-  "description": "Unified skill router evaluation suite",
+  "description": "skill meta router の有効性評価。real corpus first で create/improve/validate/evaluate の route precision と over-trigger を測る。",
   "cases": [
     {
       "id": "tc-001",
-      "prompt": "新しいスキル 'git-commit-practices' を作成したい。テンプレートからSKILL.mdとreferencesを生成する手順を教えてください。",
-      "tags": ["author","create"],
+      "prompt": "skillを実装して",
+      "source": "corpus",
+      "source_count": 2,
+      "tags": ["meta", "create", "underspecified", "router"],
       "assertions": [
-        { "type": "contains", "value": "SKILL.md", "weight": 1.0 },
-        { "type": "contains", "value": "_foundation/TEMPLATE.md", "weight": 0.8 },
-        { "type": "contains", "value": "create_skill.py", "weight": 1.0 },
-        { "type": "llm_grade", "value": "テンプレートとcreate_skill.pyを使い、必要ファイルと作成手順を具体例で示しているか", "weight": 1.0 }
+        { "type": "contains", "value": "sub_skills/new", "weight": 1.0 },
+        { "type": "contains", "value": "目的", "weight": 0.5 },
+        { "type": "not_contains", "value": "sub_skills/evaluate", "weight": 0.6 },
+        { "type": "llm_grade", "value": "曖昧な新規 skill 作成依頼を `sub_skills/new` にルーティングし、いきなり作り切る前に目的や要件の確認を置けているか", "weight": 1.0 }
       ]
     },
     {
       "id": "tc-002",
-      "prompt": "SKILL.md を検証して公開可能か確認したい。どのコマンドでどのレベルの検証を実行すれば良い？",
-      "tags": ["validate","quality"],
+      "prompt": "既存のskillsの品質アップを図ります。素材は @local_reference_skills\\ にあります。管理・基盤系スキルファミリーを段階的にコスモス化したいです。",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["meta", "improve", "refactor", "skill-family"],
       "assertions": [
-        { "type": "contains", "value": "validate_skill.py", "weight": 1.0 },
-        { "type": "contains", "value": "--level", "weight": 0.8 },
-        { "type": "contains", "value": "When to Use This Skill", "weight": 0.8 },
-        { "type": "llm_grade", "value": "検証コマンドとレベル(L1/L2)の説明、期待されるCriticalチェックの内容を示しているか", "weight": 1.0 }
+        { "type": "contains", "value": "sub_skills/improve", "weight": 1.0 },
+        { "type": "contains", "value": "既存", "weight": 0.5 },
+        { "type": "contains", "value": "再編", "weight": 0.5 },
+        { "type": "not_contains", "value": "sub_skills/new", "weight": 0.7 },
+        { "type": "llm_grade", "value": "既存 skill 群の構造整理・段階的改善として扱い、`sub_skills/improve` を主 route にできているか", "weight": 1.0 }
       ]
     },
     {
       "id": "tc-003",
-      "prompt": "あるスキルを .skill ファイルとして配布したい。パッケージ化手順を教えてください。",
-      "tags": ["package"],
+      "prompt": "@skills\\github-issue-intake\\ を修正したいです。今回の方法を非常に有効なのでこのノウハウを含めて改善したいです。",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["meta", "improve", "named-skill", "evidence-driven"],
       "assertions": [
-        { "type": "contains", "value": "package_skill.py", "weight": 1.0 },
-        { "type": "contains", "value": ".skill", "weight": 1.0 },
-        { "type": "llm_grade", "value": "package_skill.py を使った具体的なコマンド例と出力アーティファクト(.skill)を示しているか", "weight": 1.0 }
+        { "type": "contains", "value": "sub_skills/improve", "weight": 1.0 },
+        { "type": "contains", "value": "github-issue-intake", "weight": 0.6 },
+        { "type": "contains", "value": "再利用", "weight": 0.5 },
+        { "type": "not_contains", "value": "sub_skills/new", "weight": 0.7 },
+        { "type": "llm_grade", "value": "既存の named skill を recent evidence で改修するケースとして `sub_skills/improve` に自然に接続できているか", "weight": 1.0 }
       ]
     },
     {
       "id": "tc-004",
-      "prompt": "skill の評価パイプラインを回して評価レポートを生成したい。どのスクリプトを使い、どのファイルが出力されるか教えてください。",
-      "tags": ["evaluate","pipeline"],
+      "prompt": "When to Use This Skill が一つのskillっぽくなっているのですが、section構成を忘れていませんか？分割しすぎて文脈がなくなるように感じます。",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["meta", "improve", "structure", "section-shape"],
       "assertions": [
-        { "type": "contains", "value": "aggregate_benchmark.py", "weight": 1.0 },
-        { "type": "contains", "value": "benchmark_summary.json", "weight": 1.0 },
+        { "type": "contains", "value": "sub_skills/improve", "weight": 1.0 },
+        { "type": "contains", "value": "section", "weight": 0.5 },
+        { "type": "contains", "value": "構成", "weight": 0.5 },
+        { "type": "not_contains", "value": "sub_skills/evaluate", "weight": 0.6 },
+        { "type": "llm_grade", "value": "section 構成や分割方針への設計批評として捉え、構造改善の route を返せているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-005",
+      "prompt": "skillの品質評価してませんよ。500〜550行オーバーの内容は references に移動するなど、公開可能か確認したいです。",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["meta", "validate", "quality-gate", "release"],
+      "assertions": [
+        { "type": "contains", "value": "sub_skills/validate", "weight": 1.0 },
+        { "type": "contains", "value": "公開", "weight": 0.6 },
+        { "type": "contains", "value": "references", "weight": 0.5 },
+        { "type": "not_contains", "value": "sub_skills/new", "weight": 0.7 },
+        { "type": "llm_grade", "value": "公開可否の品質ゲートとして `sub_skills/validate` にルーティングし、最低限の validator 実行イメージを示せているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-006",
+      "prompt": "skill_jp.mdを作ってもらうが、日本語は skill_jp.md にすべて集約して良いので、既存skillをその方針で修正したいです。",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["meta", "improve", "jp-sync", "references"],
+      "assertions": [
+        { "type": "contains", "value": "sub_skills/improve", "weight": 1.0 },
+        { "type": "contains", "value": "skill_jp.md", "weight": 0.8 },
+        { "type": "contains", "value": "集約", "weight": 0.5 },
+        { "type": "not_contains", "value": "sub_skills/validate", "weight": 0.5 },
+        { "type": "llm_grade", "value": "JP/EN guidance の同期と reference 整理を伴う既存 skill 修正として扱えているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-007",
+      "prompt": "skillの命名規則も決めていかないとと思っています。skill- で良いか、dotnet- や python- から入るべきか意見を聞きたいです。",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["meta", "governance", "naming", "near-miss"],
+      "assertions": [
+        { "type": "contains", "value": "命名", "weight": 0.6 },
+        { "type": "contains", "value": "taxonomy", "weight": 0.6 },
+        { "type": "not_contains", "value": "sub_skills/new", "weight": 0.9 },
+        { "type": "not_contains", "value": "sub_skills/improve", "weight": 0.7 },
+        { "type": "llm_grade", "value": "この router の4 route に無理に押し込まず、命名・taxonomy・governance の相談だと明示できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-008",
+      "prompt": "現在のディレクトリはgitで管理しておらず、GitHubにもリポジトリがありません。うまく成功したらskillを作成したいです。",
+      "source": "corpus",
+      "source_count": 1,
+      "tags": ["meta", "operational-overlap", "false-positive-guard", "git-github"],
+      "assertions": [
+        { "type": "contains", "value": "git-init-to-github", "weight": 1.0 },
+        { "type": "contains", "value": "その後", "weight": 0.5 },
+        { "type": "not_contains", "value": "sub_skills/new", "weight": 0.9 },
+        { "type": "llm_grade", "value": "まず Git/GitHub 初期化の実務 skill を優先し、skill 作成は後段だと整理できているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-009",
+      "prompt": "pptxのパワーポイントでポスターセッション作成できますか？skill使って",
+      "source": "synthetic-guard",
+      "source_count": 0,
+      "tags": ["meta", "false-positive-guard", "out-of-scope"],
+      "assertions": [
+        { "type": "contains", "value": "out-of-scope", "weight": 0.8 },
+        { "type": "not_contains", "value": "sub_skills/new", "weight": 0.9 },
+        { "type": "not_contains", "value": "sub_skills/improve", "weight": 0.7 },
+        { "type": "llm_grade", "value": "『skill』という語だけで meta skill router に誤誘導せず、別ドメイン依頼として扱えているか", "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "tc-010",
+      "prompt": "このスキルが trigger quality を改善するか、with-skill と baseline で測りたいです。benchmark_summary.json と viewer.html まで見たいです。",
+      "source": "synthetic-guard",
+      "source_count": 0,
+      "tags": ["meta", "evaluate", "benchmark", "behavior"],
+      "assertions": [
+        { "type": "contains", "value": "sub_skills/evaluate", "weight": 1.0 },
+        { "type": "contains", "value": "benchmark_summary.json", "weight": 0.8 },
         { "type": "contains", "value": "viewer.html", "weight": 0.8 },
-        { "type": "llm_grade", "value": "評価スクリプトと生成されるレポート(viewer.html)の説明を具体的に示しているか", "weight": 1.0 }
+        { "type": "not_contains", "value": "sub_skills/validate", "weight": 0.5 },
+        { "type": "llm_grade", "value": "behavioral evaluation として `sub_skills/evaluate` に接続し、benchmark/viewer 生成の道筋を示せているか", "weight": 1.0 }
       ]
     }
   ]

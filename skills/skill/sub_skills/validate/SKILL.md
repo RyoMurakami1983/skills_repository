@@ -5,7 +5,7 @@ description: >
   enterprise readiness, and behavioral evaluation routing. Use when checking a
   draft before merge, reviewing a rollout candidate, or deciding what blocks
   release.
-compatibility: `_foundation/QUALITY.md`, `_eval/scripts/validate_skill.py`
+compatibility: "_foundation/QUALITY.md, _eval/scripts/validate_skill.py"
 ---
 
 # Validate a Skill

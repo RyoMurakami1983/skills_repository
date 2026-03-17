@@ -47,6 +47,7 @@ Re-review request rule: request re-review only after new commits or substantive 
 
 ## Related Skills
 
+- **`github`** — Thin entry skill for broad GitHub requests before the exact delivery phase is clear
 - **`github-pr-workflow`** — PR creation, issue linking, and signal-driven review waiting (upstream workflow)
 - **`session-issue-autopilot`** — Session-level wrapper that delegates PR creation/waiting to `github-pr-workflow` and review handling to this skill
 - **`git-commit-practices`** — Commit formatting and atomic changes (delegated from Step 5)

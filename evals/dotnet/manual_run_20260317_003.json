@@ -1,0 +1,47 @@
+{
+  "run_id": "run-20260317-003",
+  "responses": {
+    "with_skill": {
+      "tc-001": "Route: dotnet-skill-deploy. WPF の UI 実装を前提に、おすすめの dotnet skill をプロジェクトへ導入するなら `dotnet-skill-deploy` が最適です。まずは `wpf-app` か `wpf` 系の配備を案内し、その後の実装は `dotnet-wpf-mvvm-patterns` を土台に進めるのが実用的です。",
+      "tc-002": "Route: dotnet-wpf-mvvm-patterns. 既存のコア機能を WPF デスクトップアプリ化したいなら、まず `dotnet-wpf-mvvm-patterns` に進むのが最適です。MVVM を土台にして、View・ViewModel・DI の分離方針から組み立てましょう。",
+      "tc-003": "Route: dotnet-access-to-oracle-migration. Access の SQL を Oracle 向けに変換する相談は、`dotnet-access-to-oracle-migration` が最も具体的です。方言差分、関数置換、DDL/DML の書き換え方針までこの系統で進めるのがよいです。",
+      "tc-004": "Route: other-skill. Oracle データベース接続の追加は、WPF 固有というよりデータ接続・設定管理の論点が中心です。まずは .NET のデータ/インフラ系 skill に振るのが自然で、WPF 画面連携まで含む場合だけ `dotnet-oracle-wpf-integration` を検討します。",
+      "tc-005": "Route: dotnet-wpf-dify-api-integration. WPF で Dify API 連携を作るなら、`dotnet-wpf-dify-api-integration` が最短です。API クライアント、非同期処理、UI バインディングまで一貫して扱いやすいです。",
+      "tc-006": "Route: dotnet-wpf-mvvm-patterns. CommunityToolkit.Mvvm を使う WPF の単純 CRUD なら、`dotnet-wpf-mvvm-patterns` が第一候補です。`ObservableProperty` と `RelayCommand` を軸に、素直な MVVM 構成で進めるのがよいです。",
+      "tc-007": "Route: dotnet-project-structure. C# で実装計画を立てたい、Visual Studio で何を選ぶべきか整理したい、という相談は `dotnet-project-structure` が適切です。新規構成なら用途に応じて WPF アプリ、クラス ライブラリ、コンソールなどのテンプレート選定から決めていきましょう。",
+      "tc-008": "Route: meta-discussion. 率直に言うと、`[dotnet]` を薄いルータースキルにする方針はかなり妥当です。.NET は広すぎる一方で WPF は強い下位領域なので、まず `dotnet` で受けて意図が見えたら具体 skill にすぐ委譲する形が実務的です。"
+    },
+    "baseline": {
+      "tc-001": "Route: dotnet-skill-deploy. WPF向けのおすすめスキルをまとめて導入する進め方が適切です。まずはWPF系のカテゴリを選んで、必要な土台をプロジェクトに配備するのが実用的です。",
+      "tc-002": "Route: dotnet-wpf-mvvm-patterns. コア機能をデスクトップ化するなら、まずWPFのMVVM構成を土台にするのがよいです。画面・ViewModel・サービス分離の形で載せ替える方針が合っています。",
+      "tc-003": "Route: dotnet-access-to-oracle-migration. AccessのSQLをOracle向けに移す相談として扱うのが最適です。構文差分だけでなく、関数置換やNULL処理、日付式の違いも含めて進めます。",
+      "tc-004": "Route: dotnet-oracle-wpf-integration. Oracle接続機能の追加として進めるのが最も近いです。接続設定、ドライバ選定、データ取得の実装方針まで具体化できます。",
+      "tc-005": "Route: dotnet-wpf-dify-api-integration. WPFからDify APIを呼ぶ連携実装として進めるのが最適です。HTTPクライアント設計、設定管理、画面側とのつなぎ込みを整理して進めます。",
+      "tc-006": "Route: dotnet-wpf-mvvm-patterns. その条件ならWPFのMVVMパターンで進めるのが最適です。CommunityToolkit.Mvvmを前提に、シンプルなCRUD画面構成へ落とし込みやすいです。",
+      "tc-007": "Route: dotnet-project-structure. まずはC#プロジェクトの構成と作り始め方を整理するルートが適切です。Visual Studioで何を選ぶか、ソリューション構成をどう切るかまで計画できます。",
+      "tc-008": "Route: meta-discussion. これは実装相談ではなく、ルーター方針そのものの評価なのでメタ議論として扱うのが適切です。命名の自然さ、誤誘導の少なさ、具体スキルへの着地しやすさで率直に評価します。"
+    }
+  },
+  "llm_grade": {
+    "with_skill": {
+      "tc-001": [{ "passed": true, "detail": "導入 intent を読み取り、`dotnet-skill-deploy` に正しく接続している。" }],
+      "tc-002": [{ "passed": true, "detail": "WPF 実装・設計相談として `dotnet-wpf-mvvm-patterns` に正しく接続している。" }],
+      "tc-003": [{ "passed": true, "detail": "Access→Oracle migration の specificity を保って `dotnet-access-to-oracle-migration` に接続している。" }],
+      "tc-004": [{ "passed": false, "detail": "Oracle 接続追加を concrete integration skill に落とし切れず、other-skill に逃がしている。" }],
+      "tc-005": [{ "passed": true, "detail": "WPF + Dify integration を `dotnet-wpf-dify-api-integration` に正しく接続している。" }],
+      "tc-006": [{ "passed": true, "detail": "CommunityToolkit.Mvvm 前提の WPF CRUD を `dotnet-wpf-mvvm-patterns` に戻せている。" }],
+      "tc-007": [{ "passed": true, "detail": "広い C# / Visual Studio bootstrap を `dotnet-project-structure` に接続している。" }],
+      "tc-008": [{ "passed": true, "detail": "router 設計相談として meta-discussion 扱いできている。" }]
+    },
+    "baseline": {
+      "tc-001": [{ "passed": true, "detail": "導入 intent を読み取り、`dotnet-skill-deploy` に正しく接続している。" }],
+      "tc-002": [{ "passed": true, "detail": "WPF 実装・設計相談として `dotnet-wpf-mvvm-patterns` に接続している。" }],
+      "tc-003": [{ "passed": true, "detail": "Access→Oracle migration を `dotnet-access-to-oracle-migration` に正しく接続している。" }],
+      "tc-004": [{ "passed": true, "detail": "Oracle 接続追加を `dotnet-oracle-wpf-integration` に正しく接続している。" }],
+      "tc-005": [{ "passed": true, "detail": "WPF + Dify integration を `dotnet-wpf-dify-api-integration` に正しく接続している。" }],
+      "tc-006": [{ "passed": true, "detail": "CommunityToolkit.Mvvm 前提の WPF CRUD を `dotnet-wpf-mvvm-patterns` に接続している。" }],
+      "tc-007": [{ "passed": true, "detail": "広い bootstrap 相談を `dotnet-project-structure` に接続している。" }],
+      "tc-008": [{ "passed": true, "detail": "router 設計相談として concrete skill に誤誘導していない。" }]
+    }
+  }
+}

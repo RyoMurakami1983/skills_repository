@@ -1,0 +1,31 @@
+{
+  "skill_id": "skill",
+  "run_id": "run-20260317-002",
+  "judgment": "revise",
+  "benchmark_verdict": "degraded",
+  "delta": -0.0658,
+  "summary": "The meta skill router is justified by real demand, but on the current real-corpus suite it degraded because the injected router guidance over-routed naming/taxonomy governance prompts into sub_skills/new instead of treating them as outside the current four-route surface.",
+  "strengths": [
+    "Real-corpus create/improve/validate/evaluate requests still route correctly.",
+    "Operational false-positive guard worked for Git/GitHub overlap and out-of-scope domain work.",
+    "The cluster is not dead weight; it clearly maps to recurrent repo work."
+  ],
+  "weaknesses": [
+    "Naming, taxonomy, and governance prompts are common enough to matter but are not represented as a first-class route.",
+    "The current router wording is cleaner than the real corpus and can over-trigger on broad meta architecture conversations.",
+    "Behavioral benchmark/evaluate language is overrepresented in docs relative to the actual prompt distribution."
+  ],
+  "primary_failure_case": {
+    "case_id": "tc-007",
+    "prompt": "skillの命名規則も決めていかないとと思っています。skill- で良いか、dotnet- や python- から入るべきか意見を聞きたいです。",
+    "baseline_route": "other-skill",
+    "with_skill_route": "sub_skills/new",
+    "why_it_matters": "This is a real-corpus governance question, not a direct create/improve/validate/evaluate request. Forcing it into new increases trigger competition and makes the router feel more chaotic than helpful."
+  },
+  "recommendations": [
+    "Revise the router to explicitly mention naming/taxonomy/governance as a non-router or separate route decision.",
+    "Add more real-corpus near-miss examples to the parent router so broad meta discussions do not default to sub_skills/new.",
+    "Keep evaluate, but do not let benchmark vocabulary dominate the router narrative until real usage grows."
+  ],
+  "refactor_recommendation": "keep-but-revise"
+}

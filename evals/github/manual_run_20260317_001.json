@@ -1,0 +1,51 @@
+{
+  "run_id": "run-20260317-001",
+  "responses": {
+    "with_skill": {
+      "tc-001": "了解です。これは `github-pr-workflow` で進めます。まずブランチ状態・未コミット差分・既存PR有無を確認し、必要なら履歴を整えてからPRを作成し、review waiting に入ります。マージ判断は人間に残します。",
+      "tc-002": "了解です。これは直接 `github-pr-workflow` です。PRを作成し、signal-driven な review waiting まで進めます。その後のレビュー対応は必要になった時点で `github-pr-review-response` に渡します。マージはご指定どおり私ではなくあなたの判断に残します。",
+      "tc-003": "了解です。これは直接 `github-pr-review-response` です。実際の review signal を確認して、指摘の分類、修正、返信、再レビュー依頼まで進めます。新規PR作成には戻らず、マージ判断は人間に残します。",
+      "tc-004": "これは router に留まらず `github-pr-review-response` を直接使います。レビューを確認し、指摘があれば修正・返信・再レビュー依頼まで対応します。指摘がなければマージ可否を整理して返しますが、実際のマージは人間の判断に残します。",
+      "tc-005": "これは `github-issue-intake` ではなく `session-issue-autopilot` が最適です。まず Issue の把握と棚卸しから入り、今回進める1件を選んで、実装・PR・レビュー対応までの session workflow に乗せます。",
+      "tc-006": "了解です。これは `git-commit-practices` で進めます。単に raw `git commit` を打つのではなく、差分を見て atomic commit に分け、Conventional Commits で日本語件名を付ける前提で整理します。main 直コミットは避けます。",
+      "tc-007": "これは broad な `github` 入口より、`github-pr-workflow` の post-merge sync 相当として直接扱うのが自然です。main に戻して `git pull --ff-only` で最新化します。新しい PR や Issue workflow は開きません。未コミット変更があれば先に確認します。",
+      "tc-008": "了解です。これは直接 `github-issue-intake` です。`session-issue-autopilot` ではなく、まず actionable な GitHub Issue として起票します。タイトル、背景、問題、提案、DoD、優先度やラベルを整理して登録します。",
+      "tc-009": "これは `git-commit-practices` に絞るのが最適です。規約は Conventional Commits の `type(scope): subject` です。例: `feat: 検索フィルタを追加`、`fix: 文字化けを修正`。件名は具体的にし、必要なら本文で Why を補足します。"
+    },
+    "baseline": {
+      "tc-001": "`github-pr-workflow`で直接進めます。まずブランチ、未コミット、未push、既存PRを確認し、必要なら `git-commit-practices` を挟んでからPRを作成します。作成後はURLを共有して review waiting に入ります。",
+      "tc-002": "`github-pr-workflow`で直接進めます。PRを作成してURLを共有し、その後は signal-driven の review waiting に入ります。レビュー信号が来たら `github-pr-review-response` に渡せます。マージはご指定どおり人間のあなたに残します。",
+      "tc-003": "`github-pr-review-response`で直接進めます。新しいレビュー指摘を確認し、分類→修正→返信→再レビュー依頼まで対応します。レビュー信号がまだ無ければ待機のままにします。マージ判断は人に残します。",
+      "tc-004": "`github-pr-review-response`が最適です。まずレビューを確認し、指摘があれば対応して再レビュー依頼まで進めます。指摘が実質なければマージ可能そうと共有しますが、この repo の基準どおりマージ判断は人間に残します。",
+      "tc-005": "`session-issue-autopilot`で直接進めるのが最適です。これは Issue 起票ではなく Issue 実行セッションです。まず open issue の棚卸しと現状把握を行い、今日進める1件を選んでから実装→PR の流れに入ります。",
+      "tc-006": "`git-commit-practices`で直接進めます。単なる raw commit ではなく、まず diff を見て1論理変更ごとの atomic commit に分ける前提で扱います。メッセージは Conventional Commits を使い、必要なら本文に Why を残します。",
+      "tc-007": "これは broad な `github` 入口より、`github-pr-workflow` の post-merge sync 部分として直接扱うのが近いです。マージ確認後なら main に戻って `git pull --ff-only` で同期します。作業ツリーが汚れていれば先に確認して止まります。",
+      "tc-008": "`github-issue-intake`で直接進めます。これは Issue を実行する依頼ではなく、Issue を起票・整理する依頼として扱います。タイトル、本文、ラベル、優先度を整えて、次の担当者がすぐ動ける actionable issue にします。",
+      "tc-009": "`git-commit-practices`です。規約だけならこれに絞るのが最適です。基本は Conventional Commits の `type(scope): subject`、件名は具体的な日本語、1コミット=1論理変更、必要なら本文で Why を補います。代表 type は feat / fix / docs / test / refactor です。"
+    }
+  },
+  "llm_grade": {
+    "with_skill": {
+      "tc-001": [{ "passed": true, "detail": "PR作成から review waiting までを `github-pr-workflow` に載せ、merge 判断を人間に残している。" }],
+      "tc-002": [{ "passed": true, "detail": "PR作成と review waiting を `github-pr-workflow` に載せつつ、レビュー対応と human merge gate を分離できている。" }],
+      "tc-003": [{ "passed": true, "detail": "review signal 前提で `github-pr-review-response` に接続し、新規PR作成へ戻っていない。" }],
+      "tc-004": [{ "passed": true, "detail": "レビュー対応は `github-pr-review-response`、マージ判断は人間という境界を保っている。" }],
+      "tc-005": [{ "passed": true, "detail": "Issue 起票ではなく Issue 実行セッションとして `session-issue-autopilot` に正しく接続している。" }],
+      "tc-006": [{ "passed": true, "detail": "raw commit ではなく atomic commit 要求として扱い、`git-commit-practices` に正しく接続している。" }],
+      "tc-007": [{ "passed": true, "detail": "post-merge sync / local main 更新として扱い、不要な PR や Issue workflow を開いていない。" }],
+      "tc-008": [{ "passed": true, "detail": "Issue 起票依頼を `github-issue-intake` に正しくルーティングし、実行セッションと混同していない。" }],
+      "tc-009": [{ "passed": true, "detail": "commit 規約相談として `git-commit-practices` に絞り、不要な GitHub workflow に広げていない。" }]
+    },
+    "baseline": {
+      "tc-001": [{ "passed": true, "detail": "PR作成から review waiting までを `github-pr-workflow` に載せ、merge 判断へ踏み込んでいない。" }],
+      "tc-002": [{ "passed": true, "detail": "PR作成と review waiting を `github-pr-workflow` に載せ、レビュー信号時のみ downstream へ渡す説明になっている。" }],
+      "tc-003": [{ "passed": true, "detail": "review 対応を `github-pr-review-response` に接続し、信号が無ければ待機する境界を維持している。" }],
+      "tc-004": [{ "passed": true, "detail": "レビュー確認と修正対応は `github-pr-review-response`、マージ判断は人間という責務分離ができている。" }],
+      "tc-005": [{ "passed": true, "detail": "Issue 起票ではなく Issue 実行セッションとして `session-issue-autopilot` に接続している。" }],
+      "tc-006": [{ "passed": true, "detail": "commit 依頼を atomic commit 前提で扱い、`git-commit-practices` へ接続している。" }],
+      "tc-007": [{ "passed": true, "detail": "post-merge sync として扱い、不要な PR 作成へ誤誘導していない。" }],
+      "tc-008": [{ "passed": true, "detail": "Issue 起票依頼を `github-issue-intake` に正しくルーティングし、Issue 実行と混同していない。" }],
+      "tc-009": [{ "passed": true, "detail": "commit message 規約相談を `git-commit-practices` に限定し、不要な GitHub workflow へ広げていない。" }]
+    }
+  }
+}

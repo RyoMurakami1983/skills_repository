@@ -23,7 +23,9 @@ Use this skill when:
 
 ## Related Skills
 
-- **`git-initial-setup`** — Branch protection and `.gitattributes`/`.editorconfig` setup (prerequisite)
+- **`git-init-to-github`** — Common upstream bootstrap when a repository is being published for the first time
+- **`git-initial-setup`** — Branch protection and `.gitattributes`/`.editorconfig` setup that usually lands before or alongside CI hardening
+- **`github-repo-label-setup`** — Adjacent repo-standardization work often done in the same bootstrap window
 - **`knowledge-capture`** — Anonymization gate before committing documents
 - **`github-issue-intake`** — Issue intake with anonymization check
 

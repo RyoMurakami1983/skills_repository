@@ -13,6 +13,8 @@ All Critical checks must pass before a skill is treated as shippable.
 | C3 | `description` includes `Use when` triggers | Discovery fails when the trigger surface is vague. |
 | C4 | `## When to Use This Skill` exists | Readers need fast relevance judgment after activation. |
 | C5 | A workflow or router section exists with explicit steps or routes | The skill must tell the agent what to do next. |
+| C6 | Router skills include a `## Decision Table` | Routers need an explicit map from user intent to sub-skill route. |
+| C7 | Router decision routes map to real `sub_skills/` directories | Routing text and filesystem structure must stay aligned. |
 
 ## Recommended Checks
 
@@ -30,6 +32,8 @@ Recommended checks improve clarity, reuse, and long-term maintainability.
 | R8 | Quick reference or decision table exists when operations are multi-step | Operators need a fast execution view. |
 | R9 | Code or command examples are syntactically valid | Broken examples erode trust immediately. |
 | R10 | `references/SKILL.ja.md` exists when the skill is intended for bilingual use | Japanese guidance helps team adoption without forcing every skill to duplicate effort. |
+| R11 | Router skills keep 2-7 sub-skills | Too few routes do not justify a router; too many make routing noisy. |
+| R12 | Each sub-skill has its own "When to Use" section | Local triggers keep sibling routes distinct. |
 
 ## Validation Levels
 
@@ -39,3 +43,5 @@ Recommended checks improve clarity, reuse, and long-term maintainability.
 | L2 | Critical + Recommended | Review gate before broad use |
 | L3 | Governance and enterprise review | Team or organization rollout |
 | L4 | Behavioral eval pipeline | Important skills where trigger quality must be measured |
+
+Router-specific checks are defined here first even when validator support lands later. Keep the written standard ahead of automation so authors can follow one source of truth.
