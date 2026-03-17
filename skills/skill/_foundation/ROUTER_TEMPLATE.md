@@ -1,9 +1,7 @@
 ---
 name: <context>-<object>
 description: >
-  <What this router does>. Use when <scenario 1>, <scenario 2>, or
-  <scenario 3>, even if the user describes the workflow without saying
-  the exact skill name.
+  <What this router does>
 ---
 
 # <Router Title>

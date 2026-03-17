@@ -1,9 +1,7 @@
 ---
 name: <context>-<verb>-<object>
 description: >
-  <What this skill does>. Use when <scenario 1>, <scenario 2>, or
-  <scenario 3>, even if the user describes the workflow without saying
-  "skill".
+  <What this skill does>
 compatibility: <optional tools, runtime, or platform constraints>
 ---
 

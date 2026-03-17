@@ -39,6 +39,7 @@ def test_create_skill_creates_expected_structure(tmp_path: Path):
     skill_md = (created / "SKILL.md").read_text(encoding="utf-8")
     ja_md = (created / "references" / "SKILL.ja.md").read_text(encoding="utf-8")
     assert "<What this skill does>" not in skill_md
+    assert "<scenario 1>" not in skill_md
     assert "Create a sample. Use when testing template generation." in skill_md
     assert 'compatibility: "pytest"' in skill_md
     assert "description: >" in ja_md
@@ -75,6 +76,7 @@ def test_create_router_creates_expected_structure(tmp_path: Path):
     assert (created / "sub_skills").is_dir()
     skill_md = (created / "SKILL.md").read_text(encoding="utf-8")
     assert "<What this router does>" not in skill_md
+    assert "<scenario 1>" not in skill_md
     assert "Route sample flows. Use when choosing between sample modes." in skill_md
 
 
@@ -121,6 +123,7 @@ def test_create_router_with_sub_skills(tmp_path: Path):
     assert "Draft a sample route" in router_skill
     draft_skill = (created / "sub_skills" / "draft" / "SKILL.md").read_text(encoding="utf-8")
     assert "<What this sub-skill does>" not in draft_skill
+    assert "<scenario 1>" not in draft_skill
     assert "Draft sample content. Use when starting a draft route." in draft_skill
     assert 'compatibility: "_foundation/"' in draft_skill
 
