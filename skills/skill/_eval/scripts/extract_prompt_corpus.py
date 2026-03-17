@@ -1,11 +1,11 @@
 r"""Extract and summarize user prompts from Copilot session events.jsonl files.
 
 Usage:
-    uv run python skills\skill\_eval\scripts\extract_prompt_corpus.py ^
-        --root C:\Users\murak\.copilot\session-state ^
+    uv run python skills/skill/_eval/scripts/extract_prompt_corpus.py ^
+        --root "%USERPROFILE%\.copilot\session-state" ^
         --pattern "(PR|プルリク|レビュー|Issue|issue|コミット|commit|main|pull|git初期化|GitHub)" ^
         --limit 50 ^
-        --out evals\github\corpus_summary.json
+        --out evals/github/corpus_summary.json
 """
 
 from __future__ import annotations
@@ -20,6 +20,9 @@ from pathlib import Path
 
 WINDOWS_PATH_RE = re.compile(r"[A-Za-z]:\\(?:[^\\/:*?\"<>|\r\n]+\\)*[^\\/:*?\"<>|\r\n]*")
 URL_RE = re.compile(r"https?://\S+")
+PERSONAL_GITHUB_OWNER = r"[A-Za-z\d](?:[A-Za-z\d]|-(?=[A-Za-z\d])){0,38}"
+GITHUB_REPO_RE = re.compile(rf"\b({PERSONAL_GITHUB_OWNER})/([A-Za-z0-9_.-]+)\b")
+PRIVATE_REPO_OWNER_RE = re.compile(rf"\b({PERSONAL_GITHUB_OWNER})(?=のprivateリポジトリ)")
 WHITESPACE_RE = re.compile(r"\s+")
 
 
@@ -35,6 +38,8 @@ class PromptHit:
 def anonymize_prompt(text: str) -> str:
     text = URL_RE.sub("<URL>", text)
     text = WINDOWS_PATH_RE.sub("<WINDOWS_PATH>", text)
+    text = GITHUB_REPO_RE.sub("<GITHUB_OWNER>/<GITHUB_REPO>", text)
+    text = PRIVATE_REPO_OWNER_RE.sub("<GITHUB_OWNER>", text)
     text = WHITESPACE_RE.sub(" ", text).strip()
     return text
 
@@ -64,9 +69,15 @@ def build_summary(root: Path, pattern: re.Pattern[str] | None, limit: int) -> di
     sessions_by_prompt: dict[str, set[str]] = {}
     first_seen: dict[str, str] = {}
     last_seen: dict[str, str] = {}
+    session_aliases: dict[str, str] = {}
     total_user_messages = 0
     matched_messages = 0
     sessions_scanned = 0
+
+    def alias_session(session_id: str) -> str:
+        if session_id not in session_aliases:
+            session_aliases[session_id] = f"session-{len(session_aliases) + 1:03d}"
+        return session_aliases[session_id]
 
     for events_path in sorted(root.rglob("events.jsonl")):
         sessions_scanned += 1
@@ -77,9 +88,15 @@ def build_summary(root: Path, pattern: re.Pattern[str] | None, limit: int) -> di
                 continue
             matched_messages += 1
             counts[normalized] += 1
-            sessions_by_prompt.setdefault(normalized, set()).add(item["session_id"])
-            first_seen.setdefault(normalized, item["timestamp"])
-            last_seen[normalized] = item["timestamp"]
+            sessions_by_prompt.setdefault(normalized, set()).add(alias_session(item["session_id"]))
+            timestamp = item["timestamp"]
+            if timestamp:
+                previous_first = first_seen.get(normalized)
+                if previous_first is None or timestamp < previous_first:
+                    first_seen[normalized] = timestamp
+                previous_last = last_seen.get(normalized)
+                if previous_last is None or timestamp > previous_last:
+                    last_seen[normalized] = timestamp
 
     top_hits = [
         PromptHit(
@@ -93,7 +110,7 @@ def build_summary(root: Path, pattern: re.Pattern[str] | None, limit: int) -> di
     ]
 
     return {
-        "source_root": str(root),
+        "source_root": "<COPILOT_SESSION_ROOT>",
         "filter_pattern": pattern.pattern if pattern else None,
         "sessions_scanned": sessions_scanned,
         "total_user_messages": total_user_messages,

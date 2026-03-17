@@ -1,8 +1,7 @@
 ---
 name: <sub-skill-name>
 description: >
-  <What this sub-skill does>. Use when <scenario 1>, <scenario 2>, or
-  <scenario 3>.
+  <What this sub-skill does>
 compatibility: <optional shared resources or constraints>
 ---
 

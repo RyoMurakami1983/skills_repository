@@ -30,7 +30,6 @@
 
 | Skill | 説明 |
 | --- | --- |
-| [github](github/) | GitHub 日常運用の薄い入口 |
 | [git-commit-practices](git-commit-practices/) | Conventional Commits + アトミックコミット |
 | [git-init-to-github](git-init-to-github/) | ローカル初期化 → GitHub push（新規プロジェクト） |
 | [git-initial-setup](git-initial-setup/) | init/clone 後の main 保護設定 |
