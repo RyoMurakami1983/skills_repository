@@ -13,6 +13,7 @@
 - `python-skill-deploy` の workflow と Bash entrypoint を追加
 - `github-quality-gate-setup`、`skills-eval-pipeline`、関連 viewer / optimizer を追加
 - `skills/skill/` を追加し、sub_skills / `_foundation` / `_eval` / `scripts` を含む統合メタスキル構造を導入
+- 汎用 `skills/debug/` を追加し、コンパクトなコア workflow と実戦で育てる薄いドメイン modules 構成を導入
 
 ### Changed
 
@@ -22,6 +23,7 @@
 - `README.md` を入口中心に簡素化し、詳細手順を `docs/INSTALL.md` へ分離
 - repo 固有の documentation maintenance ルールを `.github/copilot-instructions.md` に追加
 - `skills-author-skill` などの旧メタスキル群を `skill` へ集約し、validator / generator / eval assets も新配置へ移行
+- `skills/debug/` に module 選択用の短い decision table を追加し、hardware / nondeterminism の境界と intermittent 現象の扱いを強化
 
 ### Docs
 
