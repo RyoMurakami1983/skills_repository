@@ -4,7 +4,7 @@ description: >
   Improve an existing skill by trimming weak guidance, updating metadata,
   synchronizing related resources, and re-validating the result. Use when a
   published skill feels noisy, under-triggers, or needs coordinated revision.
-compatibility: `_foundation/CONVENTIONS.md`, `_eval/scripts/validate_skill.py`
+compatibility: "_foundation/CONVENTIONS.md, _eval/scripts/validate_skill.py"
 ---
 
 # Improve a Skill

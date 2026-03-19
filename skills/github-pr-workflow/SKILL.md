@@ -26,6 +26,7 @@ Use this skill when:
 
 ## Related Skills
 
+- **`github`** - Thin entry skill for broad GitHub delivery requests before the exact concrete workflow is obvious
 - **`github-pr-review-response`** - Review comment triage, fixes, replies, and re-review request after a real review signal
 - **`git-commit-practices`** - Commit formatting and atomic changes (delegated from Step 1)
 - **`git-initial-setup`** - Branch protection defaults

@@ -19,10 +19,10 @@ Use this skill when:
 
 ## Related Skills
 
-- **`github-issue-intake`** - Issue creation and triage using labels
-- **`github-pr-workflow`** - PR creation and merge flow
-- **`git-initial-setup`** - Repository bootstrap and protection
-- **`skill`** - Skill documentation standards
+- **`github-issue-intake`** - Downstream workflow that applies the label taxonomy during issue triage
+- **`git-init-to-github`** - Common upstream bootstrap when the repository is first created
+- **`git-initial-setup`** - Repository protection baseline that often precedes label standardization
+- **`github-quality-gate-setup`** - Adjacent bootstrap step for CI hardening
 
 ---
 

@@ -36,6 +36,8 @@ Use this skill when:
 ## Shared Resources
 
 - `_foundation/TEMPLATE.md` for the minimum hot-path template
+- `_foundation/ROUTER_TEMPLATE.md` for parent router scaffolding
+- `_foundation/SUB_SKILL_TEMPLATE.md` for nested sub-skill scaffolding
 - `_foundation/QUALITY.md` for Critical and Recommended checks
 - `_foundation/CONVENTIONS.md` for naming, frontmatter, and writing style
 - `_eval/` for behavioral evaluation assets and validation scripts

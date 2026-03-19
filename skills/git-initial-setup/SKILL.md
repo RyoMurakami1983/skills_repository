@@ -21,9 +21,10 @@ Use this skill when:
 ## Related Skills
 
 - **`git-commit-practices`** - Commit workflow and conventions
-- **`github-pr-workflow`** - PR creation and merge flow
-- **`skill`** - Skill documentation standards
-- **`skill`** - Validate skill quality
+- **`git-init-to-github`** - Typical upstream workflow when a repository is being published for the first time
+- **`github-pr-workflow`** - Delivery workflow protected by the branch rules configured here
+- **`github-quality-gate-setup`** - Follow-up hardening after basic protections are in place
+- **`github-repo-label-setup`** - Optional repo-standardization step after initial protection
 
 ---
 

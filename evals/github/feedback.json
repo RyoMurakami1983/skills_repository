@@ -1,0 +1,46 @@
+{
+  "skill_id": "github",
+  "eval_version": "1.0.0",
+  "summary": {
+    "verdict": "neutral",
+    "delta": 0.0,
+    "judgment": "do-not-expand",
+    "refactor_recommendation": "keep-as-thin-index-or-downgrade"
+  },
+  "items": [
+    {
+      "type": "keep",
+      "case_id": "tc-002",
+      "priority": 2,
+      "content": "`github` 経由でも human merge gate は維持され、PR作成と review waiting の canonical flow を壊していない。"
+    },
+    {
+      "type": "keep",
+      "case_id": "tc-006",
+      "priority": 2,
+      "content": "`コミットして` を `git-commit-practices` に流し、atomic commit 前提を壊していない。"
+    },
+    {
+      "type": "problem",
+      "priority": 1,
+      "content": "real corpus 9ケースでは with-skill が baseline を上回らず、薄い入口 `github` の追加価値が測定できなかった。"
+    },
+    {
+      "type": "problem",
+      "priority": 1,
+      "content": "主要ケースの多くで baseline がすでに concrete skill (`github-pr-workflow`, `github-pr-review-response`, `github-issue-intake`, `session-issue-autopilot`) を正しく選べており、`github` は discoverability 改善より index 的役割に留まっている。"
+    },
+    {
+      "type": "improve",
+      "priority": 2,
+      "content": "`github` を残すなら、真に曖昧な broad prompt（例: GitHub周りを整理したい / 何から入るべきか分からない）へ用途を絞り、明確ケースでは direct skill を推奨する wording をさらに強める。"
+    },
+    {
+      "type": "improve",
+      "priority": 2,
+      "content": "入口 skill の横展開は止め、次は `dotnet` と `skill` cluster に同じ real-corpus 評価を当てて、増やすより削る候補を探す。"
+    }
+  ],
+  "next_action": "revise_skill",
+  "created_at": "2026-03-17T17:40:00Z"
+}

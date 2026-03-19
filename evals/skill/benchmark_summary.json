@@ -3,231 +3,591 @@
   "eval_version": "1.0.0",
   "runs": {
     "with_skill": {
-      "count": 4,
-      "mean": 0.9125,
-      "stddev": 0.0259,
-      "min": 0.88,
-      "max": 0.95
+      "count": 10,
+      "mean": 0.9342,
+      "stddev": 0.1974,
+      "min": 0.3421,
+      "max": 1.0
     },
     "baseline": {
-      "count": 4,
-      "mean": 0.3675,
-      "stddev": 0.0466,
-      "min": 0.3,
-      "max": 0.42
+      "count": 10,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "min": 1.0,
+      "max": 1.0
     }
   },
   "summary": {
-    "delta": 0.545,
-    "improvement_pct": 148.3,
-    "verdict": "improved"
+    "delta": -0.0658,
+    "improvement_pct": -6.58,
+    "verdict": "degraded"
   },
   "case_breakdown": [
     {
       "case_id": "tc-001",
-      "prompt": "新しいスキル 'git-commit-practices' を作成したい。テンプレートからSKILL.mdとreferencesを生成する手順を教えてください。",
+      "prompt": "skillを実装して",
       "tags": [
-        "author",
-        "create"
+        "meta",
+        "create",
+        "underspecified",
+        "router"
       ],
-      "with_skill_mean": 0.95,
-      "baseline_mean": 0.42,
-      "delta": 0.53,
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
-          "value": "SKILL.md",
+          "value": "sub_skills/new",
           "weight": 1.0,
           "with_skill_passed": true,
           "baseline_passed": true,
-          "detail": "SKILL.md mentioned"
+          "detail": ""
         },
         {
           "type": "contains",
-          "value": "_foundation/TEMPLATE.md",
-          "weight": 0.8,
+          "value": "目的",
+          "weight": 0.5,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "TEMPLATE referenced"
+          "baseline_passed": true,
+          "detail": ""
         },
         {
-          "type": "contains",
-          "value": "create_skill.py",
-          "weight": 1.0,
+          "type": "not_contains",
+          "value": "sub_skills/evaluate",
+          "weight": 0.6,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "create_skill.py usage shown"
+          "baseline_passed": true,
+          "detail": ""
         },
         {
           "type": "llm_grade",
-          "value": "テンプレートとcreate_skill.pyを使い、必要ファイルと作成手順を具体例で示しているか",
+          "value": "曖昧な新規 skill 作成依頼を `sub_skills/new` にルーティングし、いきなり作り切る前に目的や要件の確認を置けているか",
           "weight": 1.0,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "LLM grade: concrete step-by-step example"
+          "baseline_passed": true,
+          "detail": "新規 skill 作成依頼を `sub_skills/new` にルーティングし、目的整理を先に置いている。"
         }
       ],
-      "with_skill_snippet": "Generated SKILL.md with sections: name, description, When to Use This Skill. Used _foundation/TEMPLATE.md and create_skill.py invocation example.",
-      "baseline_snippet": "Generic instructions about creating docs; missing concrete create_skill.py example and TEMPLATE reference.",
-      "gap_summary": [
-        "スキル固有のキーワード・コマンド名の知識が不足（「_foundation/TEMPLATE.md」が回答に現れない）",
-        "スキル固有のキーワード・コマンド名の知識が不足（「create_skill.py」が回答に現れない）",
-        "推論・判断力が不足（テンプレートとcreate_skill.pyを使い、必要ファイルと作成手順を具体例で示しているか）"
-      ],
-      "recommendation": "スキル固有の専門知識（_foundation/TEMPLATE.md, create_skill.py）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+      "with_skill_snippet": "Route: sub_skills/new. 承知しました。新しいskillの実装として扱うので、まず目的・トリガー・出力を整理してからドラフト化します。",
+      "baseline_snippet": "Route: sub_skills/new. 新しいskillの作成依頼として扱うのが適切です。まず目的・対象タスク・出力イメージを確認してから設計に入ります。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
     },
     {
       "case_id": "tc-002",
-      "prompt": "SKILL.md を検証して公開可能か確認したい。どのコマンドでどのレベルの検証を実行すれば良い？",
+      "prompt": "既存のskillsの品質アップを図ります。素材は @local_reference_skills\\ にあります。管理・基盤系スキルファミリーを段階的にコスモス化したいです。",
       "tags": [
-        "validate",
-        "quality"
+        "meta",
+        "improve",
+        "refactor",
+        "skill-family"
       ],
-      "with_skill_mean": 0.9,
-      "baseline_mean": 0.35,
-      "delta": 0.55,
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
-          "value": "validate_skill.py",
+          "value": "sub_skills/improve",
           "weight": 1.0,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "validate_skill.py mentioned"
+          "baseline_passed": true,
+          "detail": ""
         },
         {
           "type": "contains",
-          "value": "--level",
-          "weight": 0.8,
+          "value": "既存",
+          "weight": 0.5,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "--level explained"
+          "baseline_passed": true,
+          "detail": ""
         },
         {
           "type": "contains",
-          "value": "When to Use This Skill",
-          "weight": 0.8,
+          "value": "再編",
+          "weight": 0.5,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "When to Use This Skill present"
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/new",
+          "weight": 0.7,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
         },
         {
           "type": "llm_grade",
-          "value": "検証コマンドとレベル(L1/L2)の説明、期待されるCriticalチェックの内容を示しているか",
+          "value": "既存 skill 群の構造整理・段階的改善として扱い、`sub_skills/improve` を主 route にできているか",
           "weight": 1.0,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "LLM grade: explains critical checks"
+          "baseline_passed": true,
+          "detail": "既存 skill family の構造改善として `sub_skills/improve` に正しく接続している。"
         }
       ],
-      "with_skill_snippet": "Run: python skills/skill/_eval/scripts/validate_skill.py --level L1 SKILL.md; explains Critical checks and --level semantics.",
-      "baseline_snippet": "Mentions a generic validator but not validate_skill.py or level flags; lacks specifics about Critical checks.",
-      "gap_summary": [
-        "スキル固有のキーワード・コマンド名の知識が不足（「validate_skill.py」が回答に現れない）",
-        "スキル固有のキーワード・コマンド名の知識が不足（「--level」が回答に現れない）",
-        "スキル固有のキーワード・コマンド名の知識が不足（「When to Use This Skill」が回答に現れない）",
-        "推論・判断力が不足（検証コマンドとレベル(L1/L2)の説明、期待されるCriticalチェックの内容を示しているか）"
-      ],
-      "recommendation": "スキル固有の専門知識（validate_skill.py, --level, When to Use This Skill）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+      "with_skill_snippet": "Route: sub_skills/improve. これは既存skillsの改善案件として進めるのが適切です。@local_reference_skills\\ を根拠に、管理・基盤系スキルファミリーの段階的な再編と品質向上を進めます。",
+      "baseline_snippet": "Route: sub_skills/improve. 既存skillsの段階的な再編・品質改善なので、改善ルートで進めるのが自然です。@local_reference_skills\\ を根拠に、既存資産の整理方針とファミリー構造を見直しましょう。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
     },
     {
       "case_id": "tc-003",
-      "prompt": "あるスキルを .skill ファイルとして配布したい。パッケージ化手順を教えてください。",
+      "prompt": "@skills\\github-issue-intake\\ を修正したいです。今回の方法を非常に有効なのでこのノウハウを含めて改善したいです。",
       "tags": [
-        "package"
+        "meta",
+        "improve",
+        "named-skill",
+        "evidence-driven"
       ],
-      "with_skill_mean": 0.88,
-      "baseline_mean": 0.3,
-      "delta": 0.58,
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
-          "value": "package_skill.py",
+          "value": "sub_skills/improve",
           "weight": 1.0,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "package_skill.py usage shown"
+          "baseline_passed": true,
+          "detail": ""
         },
         {
           "type": "contains",
-          "value": ".skill",
-          "weight": 1.0,
+          "value": "github-issue-intake",
+          "weight": 0.6,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": ".skill artifact described"
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "再利用",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/new",
+          "weight": 0.7,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
         },
         {
           "type": "llm_grade",
-          "value": "package_skill.py を使った具体的なコマンド例と出力アーティファクト(.skill)を示しているか",
+          "value": "既存の named skill を recent evidence で改修するケースとして `sub_skills/improve` に自然に接続できているか",
           "weight": 1.0,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "LLM grade: concrete command example"
+          "baseline_passed": true,
+          "detail": "named skill の evidence-driven revision として `sub_skills/improve` に接続している。"
         }
       ],
-      "with_skill_snippet": "Describes package_skill.py usage and .skill artifact generation; includes command example and outputs.",
-      "baseline_snippet": "High-level packaging notes; no concrete script or .skill example.",
-      "gap_summary": [
-        "スキル固有のキーワード・コマンド名の知識が不足（「package_skill.py」が回答に現れない）",
-        "スキル固有のキーワード・コマンド名の知識が不足（「.skill」が回答に現れない）",
-        "推論・判断力が不足（package_skill.py を使った具体的なコマンド例と出力アーティファクト(.skill)を示しているか）"
-      ],
-      "recommendation": "スキル固有の専門知識（package_skill.py, .skill）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+      "with_skill_snippet": "Route: sub_skills/improve. @skills\\github-issue-intake\\ の改善として対応します。今回有効だったやり方を一般化して取り込み、再利用できる guidance に更新します。",
+      "baseline_snippet": "Route: sub_skills/improve. @skills\\github-issue-intake\\ の改修依頼なので、既存skillの改善として扱います。今回有効だったノウハウを再利用可能な形で反映する前提で見直します。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
     },
     {
       "case_id": "tc-004",
-      "prompt": "skill の評価パイプラインを回して評価レポートを生成したい。どのスクリプトを使い、どのファイルが出力されるか教えてください。",
+      "prompt": "When to Use This Skill が一つのskillっぽくなっているのですが、section構成を忘れていませんか？分割しすぎて文脈がなくなるように感じます。",
       "tags": [
-        "evaluate",
-        "pipeline"
+        "meta",
+        "improve",
+        "structure",
+        "section-shape"
       ],
-      "with_skill_mean": 0.92,
-      "baseline_mean": 0.4,
-      "delta": 0.52,
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
-          "value": "aggregate_benchmark.py",
+          "value": "sub_skills/improve",
           "weight": 1.0,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "aggregate_benchmark.py usage"
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "section",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "構成",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/evaluate",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "section 構成や分割方針への設計批評として捉え、構造改善の route を返せているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "section 構成と分割方針への設計批評を `sub_skills/improve` で扱えている。"
+        }
+      ],
+      "with_skill_snippet": "Route: sub_skills/improve. はい、これは既存skillの構成見直しとして改善ルートが適切です。section構成と文脈保持のバランスを見直し、分割しすぎによる読みにくさを修正します。",
+      "baseline_snippet": "Route: sub_skills/improve. これはsection設計と分割方針への改善指摘として扱うのが適切です。文脈を失わない粒度に戻しつつ、構成を再設計しましょう。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-005",
+      "prompt": "skillの品質評価してませんよ。500〜550行オーバーの内容は references に移動するなど、公開可能か確認したいです。",
+      "tags": [
+        "meta",
+        "validate",
+        "quality-gate",
+        "release"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "sub_skills/validate",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "公開",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "references",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/new",
+          "weight": 0.7,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "公開可否の品質ゲートとして `sub_skills/validate` にルーティングし、最低限の validator 実行イメージを示せているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "品質 gate / 公開可否として `sub_skills/validate` に接続している。"
+        }
+      ],
+      "with_skill_snippet": "Route: sub_skills/validate. これは品質確認と公開可否の判断なので validate に進めるのが適切です。行数超過や references への退避方針も含めて、公開前チェックとして確認します。",
+      "baseline_snippet": "Route: sub_skills/validate. 公開可否の確認と品質ゲートの話なので、まずは検証ルートが適切です。長すぎる本文の references 移管も含め、構造と公開基準をチェックしましょう。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-006",
+      "prompt": "skill_jp.mdを作ってもらうが、日本語は skill_jp.md にすべて集約して良いので、既存skillをその方針で修正したいです。",
+      "tags": [
+        "meta",
+        "improve",
+        "jp-sync",
+        "references"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "sub_skills/improve",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "skill_jp.md",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "集約",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/validate",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "JP/EN guidance の同期と reference 整理を伴う既存 skill 修正として扱えているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "JP/EN 同期と reference 整理を伴う既存 skill 修正として `sub_skills/improve` を選べている。"
+        }
+      ],
+      "with_skill_snippet": "Route: sub_skills/improve. 既存skill群の方針変更と日本語ドキュメント同期なので improve が適切です。skill_jp.md へ日本語を集約する方針で、関連ファイルを揃えて修正します。",
+      "baseline_snippet": "Route: sub_skills/improve. 既存skillを日本語集約方針に合わせて直す話なので、改善ルートで進めます。skill_jp.md への集約に合わせて関連ファイルの整合も見直します。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-007",
+      "prompt": "skillの命名規則も決めていかないとと思っています。skill- で良いか、dotnet- や python- から入るべきか意見を聞きたいです。",
+      "tags": [
+        "meta",
+        "governance",
+        "naming",
+        "near-miss"
+      ],
+      "with_skill_mean": 0.3421,
+      "baseline_mean": 1.0,
+      "delta": -0.6579,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "命名",
+          "weight": 0.6,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "taxonomy",
+          "weight": 0.6,
+          "with_skill_passed": false,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/new",
+          "weight": 0.9,
+          "with_skill_passed": false,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/improve",
+          "weight": 0.7,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "この router の4 route に無理に押し込まず、命名・taxonomy・governance の相談だと明示できているか",
+          "weight": 1.0,
+          "with_skill_passed": false,
+          "baseline_passed": true,
+          "detail": "命名・taxonomy の governance 相談を `sub_skills/new` に押し込み、router の外側だと明示できていない。"
+        }
+      ],
+      "with_skill_snippet": "Route: sub_skills/new. これは新規作成前の命名方針設計として扱うのが実務的です。skill- を共通接頭辞にするか、dotnet- や python- のように領域先頭にするかを、拡張性と検索性の観点で整理します。",
+      "baseline_snippet": "Route: other-skill. これは新規作成や改修そのものではなく、命名規則や taxonomy の方針相談です。skill-、dotnet-、python- などの粒度を、運用ルールとして先に整理するのがよさそうです。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-008",
+      "prompt": "現在のディレクトリはgitで管理しておらず、GitHubにもリポジトリがありません。うまく成功したらskillを作成したいです。",
+      "tags": [
+        "meta",
+        "operational-overlap",
+        "false-positive-guard",
+        "git-github"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "git-init-to-github",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "contains",
+          "value": "その後",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/new",
+          "weight": 0.9,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "まず Git/GitHub 初期化の実務 skill を優先し、skill 作成は後段だと整理できているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "まず operational skill を優先し、meta skill authoring を後段に回している。"
+        }
+      ],
+      "with_skill_snippet": "Route: other-skill. 今はskill作成より先に、Git管理とGitHubリポジトリ作成を進めるのが適切です。まずは git-init-to-github や git-initial-setup 系のスキルで土台を整え、その後にskill化を検討しましょう。",
+      "baseline_snippet": "Route: other-skill. 先に必要なのはskill作成ではなく、Git/GitHubの初期化です。まずは git-init-to-github のような実務スキルで土台を整え、その後にskill化を検討するのが自然です。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-009",
+      "prompt": "pptxのパワーポイントでポスターセッション作成できますか？skill使って",
+      "tags": [
+        "meta",
+        "false-positive-guard",
+        "out-of-scope"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "out-of-scope",
+          "weight": 0.8,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/new",
+          "weight": 0.9,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/improve",
+          "weight": 0.7,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "llm_grade",
+          "value": "『skill』という語だけで meta skill router に誤誘導せず、別ドメイン依頼として扱えているか",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": "『skill』という語だけで meta router に誤誘導せず、対象外の実務依頼として扱えている。"
+        }
+      ],
+      "with_skill_snippet": "Route: out-of-scope. これはskill自体の作成・改善・検証ではなく、PowerPointで成果物を作る実務依頼です。そのためこのメタskillルーターの対象外で、資料作成用の別スキルまたは通常作業として扱うのが適切です。",
+      "baseline_snippet": "Route: out-of-scope. これはskill作成・改善の依頼ではなく、PowerPointでポスターを作る実務依頼です。meta-skillルーターではなく、資料構成やpptx作成支援として扱うべき内容です。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+    },
+    {
+      "case_id": "tc-010",
+      "prompt": "このスキルが trigger quality を改善するか、with-skill と baseline で測りたいです。benchmark_summary.json と viewer.html まで見たいです。",
+      "tags": [
+        "meta",
+        "evaluate",
+        "benchmark",
+        "behavior"
+      ],
+      "with_skill_mean": 1.0,
+      "baseline_mean": 1.0,
+      "delta": 0.0,
+      "assertion_detail": [
+        {
+          "type": "contains",
+          "value": "sub_skills/evaluate",
+          "weight": 1.0,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
         },
         {
           "type": "contains",
           "value": "benchmark_summary.json",
-          "weight": 1.0,
+          "weight": 0.8,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "benchmark_summary.json output referenced"
+          "baseline_passed": true,
+          "detail": ""
         },
         {
           "type": "contains",
           "value": "viewer.html",
           "weight": 0.8,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "viewer.html generation mentioned"
+          "baseline_passed": true,
+          "detail": ""
+        },
+        {
+          "type": "not_contains",
+          "value": "sub_skills/validate",
+          "weight": 0.5,
+          "with_skill_passed": true,
+          "baseline_passed": true,
+          "detail": ""
         },
         {
           "type": "llm_grade",
-          "value": "評価スクリプトと生成されるレポート(viewer.html)の説明を具体的に示しているか",
+          "value": "behavioral evaluation として `sub_skills/evaluate` に接続し、benchmark/viewer 生成の道筋を示せているか",
           "weight": 1.0,
           "with_skill_passed": true,
-          "baseline_passed": false,
-          "detail": "LLM grade: concrete pipeline steps"
+          "baseline_passed": true,
+          "detail": "behavioral evaluation として `sub_skills/evaluate` に接続し、benchmark/viewer まで示している。"
         }
       ],
-      "with_skill_snippet": "Explains running aggregate_benchmark.py with --run-id and generating benchmark_summary.json and viewer.html; includes example commands.",
-      "baseline_snippet": "Generic mention of evaluation and reports; missing specific scripts and viewer generation steps.",
-      "gap_summary": [
-        "スキル固有のキーワード・コマンド名の知識が不足（「aggregate_benchmark.py」が回答に現れない）",
-        "スキル固有のキーワード・コマンド名の知識が不足（「benchmark_summary.json」が回答に現れない）",
-        "スキル固有のキーワード・コマンド名の知識が不足（「viewer.html」が回答に現れない）",
-        "推論・判断力が不足（評価スクリプトと生成されるレポート(viewer.html)の説明を具体的に示しているか）"
-      ],
-      "recommendation": "スキル固有の専門知識（aggregate_benchmark.py, benchmark_summary.json, viewer.html）をスキルに明示することで発火率が上がります。　Decision Table やステップ説明を充実させると、AIの推論精度が向上します。"
+      "with_skill_snippet": "Route: sub_skills/evaluate. これは行動変化の測定なので evaluate に進めるのが適切です。with-skill と baseline を比較し、benchmark_summary.json と viewer.html まで生成して確認します。",
+      "baseline_snippet": "Route: sub_skills/evaluate. これはskillの行動変化を測る評価依頼なので、評価ルートが適切です。with-skill と baseline を比較し、benchmark_summary.json と viewer.html まで確認する前提で進めます。",
+      "gap_summary": [],
+      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
     }
   ],
-  "generated_at": "2026-03-15T21:35:43.393087+00:00"
+  "generated_at": "2026-03-17T17:57:17.518808+00:00"
 }

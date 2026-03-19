@@ -1,6 +1,6 @@
 # Skills ディレクトリ
 
-GitHub Copilot Agent Skills — 19スキル
+ GitHub Copilot Agent Skills — 21スキル
 
 ## 📋 概要
 
@@ -13,6 +13,18 @@ GitHub Copilot Agent Skills — 19スキル
 | Skill | 説明 |
 | --- | --- |
 | [skill](skill/) | スキルの作成・改善・検証・評価を統合管理するルーター。`sub_skills/`、`_foundation/`、`_eval/`、`scripts/` を内包 |
+
+### 言語別入口
+
+| Skill | 説明 |
+| --- | --- |
+| [dotnet](dotnet/) | 広い `.NET` / `C#` / `WPF` 相談を既存 dotnet skill や deploy workflow へ案内する薄い入口 skill |
+
+### 日常運用入口
+
+| Skill | 説明 |
+| --- | --- |
+| [github](github/) | 「プルリクして」「レビュー対応して」「Issue登録して」などの広い GitHub 依頼を既存 workflow skill へ案内する薄い入口 skill |
 
 ### Git / GitHub ワークフロー
 
@@ -65,10 +77,69 @@ GitHub Copilot Agent Skills — 19スキル
 
 | フェーズ | スキル | 役割 |
 | --- | --- | --- |
+| 入口 | `github` | 広い GitHub 依頼を PR / review / issue workflow に振り分ける |
+| コミット整形 | `git-commit-practices` | 「コミットして」を atomic commit 標準として解釈 |
 | PR作成 + 待機 | `github-pr-workflow` | ブランチ状態確認、PR作成、シグナル駆動待機 |
 | レビュー応答 | `github-pr-review-response` | コメント分類、修正、再レビュー依頼 |
 | マージ判断 | Human handoff | 人間が判断 |
 | セッション包み | `session-issue-autopilot` | 上位オーケストレーター |
+
+### Daily operations quick map
+
+| ユーザーの言い方 | 第一入口 | 標準解釈 |
+| --- | --- | --- |
+| 「コミットして」 | `git-commit-practices` | 原則として atomic commit を作る依頼 |
+| 「プルリクして」 | `github` または `github-pr-workflow` | PR 作成 + review waiting |
+| 「PRレビュー待機して」 | `github` または `github-pr-workflow` | signal-driven waiting |
+| 「レビュー対応して」 | `github` または `github-pr-review-response` | review signal 対応 |
+| 「Issue登録して」 | `github` または `github-issue-intake` | actionable issue 起票 |
+| 「Issueタスクを進めましょう」 | `session-issue-autopilot` | issue 実行セッション開始 |
+
+### Git / GitHub skill topology
+
+router 化を検討する前に、まず既存の flat skill がどの入口を持つかを明示する。
+
+| Skill | Primary trigger | Lifecycle stage | Upstream / wrapper | Typical next step | Current judgment |
+| --- | --- | --- | --- | --- | --- |
+| `git-init-to-github` | 新規ローカルディレクトリを GitHub に公開したい | repo bootstrap | なし | `git-initial-setup` / `github-quality-gate-setup` / `github-repo-label-setup` | flat 維持 |
+| `git-initial-setup` | main 保護や hook を標準化したい | repo protection | `git-init-to-github` 後に呼ばれやすい | `github-quality-gate-setup` / `github-repo-label-setup` | flat 維持 |
+| `git-ops-folder-init` | 業務フォルダを allowlist 方式で git 管理したい | local ops bootstrap | なし | 必要なら `git-init-to-github` | flat 維持 |
+| `github` | GitHub 周りを広く頼みたい | thin entry | なし | `github-pr-workflow` / `github-pr-review-response` / `github-issue-intake` | thin entry として追加 |
+| `git-commit-practices` | コミット規約・粒度を整えたい / 「コミットして」と頼みたい | local delivery hygiene | 多くの skill から補助的に参照 | `github-pr-workflow` | flat 維持 |
+| `github-pr-workflow` | 実装済みの変更を PR にしたい | delivery | `session-issue-autopilot` から委譲されうる | `github-pr-review-response` | flat 維持 |
+| `github-pr-review-response` | review signal に応答したい | review response | `github-pr-workflow` の downstream | Human merge handoff / `github-issue-intake` | flat 維持 |
+| `github-issue-intake` | スコープ外や後続対応を issue 化したい | deferral / triage | `github-pr-review-response` や通常作業から派生 | backlog / owner handoff | flat 維持 |
+| `github-quality-gate-setup` | gitleaks / textlint CI を入れたい | repo hardening | `git-init-to-github` / `git-initial-setup` 後に呼ばれやすい | `github-repo-label-setup` は任意 | flat 維持 |
+| `github-repo-label-setup` | label taxonomy を標準化したい | repo triage bootstrap | `git-init-to-github` / `git-initial-setup` 後に呼ばれやすい | `github-issue-intake` 運用へ接続 | flat 維持 |
+| `session-issue-autopilot` | issue を 1 セッションで end-to-end 進めたい | session orchestrator | greeting trigger | `github-pr-workflow` -> `github-pr-review-response` | orchestrator 維持 |
+
+### Routerization gate criteria
+
+現状の git / github skill 群は top-level 直呼びの利点が大きいため、`github` のような薄い入口は追加しても、次の条件を満たすまで物理 router 化はしない。
+
+| Gate | Question | Evidence needed |
+| --- | --- | --- |
+| Shared entry point | 複数 skill が同じ曖昧 prompt から頻繁に競合するか | 実例または eval で competing prompts が繰り返し観測される |
+| Discoverability failure | flat 名称だけでは正しい skill に到達しづらいか | near-miss で誤起動率や迷いが高い |
+| Shared logic density | 3 skill 以上で同種の decision table や glossary が重複しているか | 重複セクションの棚卸し |
+| Eval benefit | 仮想 router のほうが routing 精度や到達手数で勝つか | flat vs router 比較 eval |
+
+### Pre-router eval sketch
+
+router 化を議論するときは、少なくとも次の prompt 群で flat 現行構成と仮想 router 構成を比較する。
+
+| Case type | Example prompt | What to measure |
+| --- | --- | --- |
+| should-trigger | 「PR を作ってレビュー待ちにしたい」 | 正しい skill 到達率 |
+| should-trigger | 「レビューコメントに応答したい」 | downstream skill の選択精度 |
+| near-miss | 「GitHub 周りを整理したい」 | 不要な router 分岐の有無 |
+| near-miss | 「repo をちゃんと整えたい」 | bootstrap 系の案内精度 |
+| mixed-intent | 「新規 repo を公開して quality gate と labels も入れたい」 | 分割案内の明快さ |
+| false-positive guard | 「commit message の規約だけ知りたい」 | 不要な repo/router 案内抑制 |
+
+評価観点は `route precision`、`false positive rate`、`first useful action`、`explanation overhead` を基本とする。
+
+`github` 薄い入口の初期評価ケースは `evals/github/evals.json` に追加し、日常運用フレーズ（「プルリクして」「レビュー対応して」「Issue登録して」「コミットして」など）を直接比較できるようにした。
 
 ## 📊 品質基準
 

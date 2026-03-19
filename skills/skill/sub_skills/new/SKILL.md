@@ -4,7 +4,7 @@ description: >
   Create a new skill or skill suite from requirements, conversation context,
   or an existing workflow. Use when drafting a new skill, converting a manual
   process into a skill, or generating multiple related skills at once.
-compatibility: `_foundation/TEMPLATE.md`, `_eval/scripts/validate_skill.py`
+compatibility: "_foundation/TEMPLATE.md, _eval/scripts/validate_skill.py"
 ---
 
 # Create a New Skill
@@ -41,8 +41,17 @@ Use `uv run python skills/skill/_eval/scripts/validate_skill.py <path-to-skill>/
 
 If the user is splitting one domain into several workflows, plan the suite first, generate all skeletons together, then fill them individually. This preserves naming and routing consistency.
 
+### Step 6 — Choose the Right Pattern
+
+Decide whether the domain is best modeled as a flat workflow, a peer-skill orchestrator, or a router with nested `sub_skills/`. Use a flat workflow when one ordered path is enough, an orchestrator when the skill mainly delegates to other top-level skills, and a router when one entry point must branch into distinct internal modes.
+
+### Step 7 — Scaffold Router Structure When Needed
+
+When the domain needs internal routing, scaffold it with `uv run python skills/skill/scripts/create_skill.py --name <router-name> --description "<description>" --type router --sub-skills <route-a>,<route-b>`. Keep the parent `SKILL.md` focused on the Decision Table and move the real execution logic into each generated sub-skill.
+
 ## Pitfalls
 
 - **Writing before researching**: Missing constraints usually force major rewrites later.
 - **Making the template verbose**: Keep essentials in `SKILL.md`; push details into `references/`.
 - **Generating a suite without a shared naming plan**: Inconsistent names make routing brittle.
+- **Using a router for one linear workflow**: Nested structure adds cost without helping discovery.

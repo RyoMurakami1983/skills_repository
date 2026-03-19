@@ -23,6 +23,7 @@ allowed-tools:
 
 ## Related Skills
 
+- **`dotnet`** — `.NET` という広い相談から適切な具体 skill や deploy workflow へ振り分ける入口 skill
 - **`dotnet-modern-csharp-coding-standards`** — 頻繁にデプロイされる基盤スキル
 - **`dotnet-wpf-mvvm-patterns`** — WPF MVVM基盤スキル
 - **`dotnet-project-structure`** — プロジェクト構造スキル

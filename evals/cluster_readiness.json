@@ -1,0 +1,40 @@
+{
+  "generated_at": "2026-03-17T17:45:00Z",
+  "clusters": [
+    {
+      "cluster_id": "github-daily-operations",
+      "status": "evaluated",
+      "corpus_source": "evals/github/corpus_summary.json",
+      "matched_user_messages": 209,
+      "unique_matched_prompts": 196,
+      "artifacts": [
+        "evals/github/evals.json",
+        "evals/github/inventory_matrix.json",
+        "evals/github/manual_run_20260317_001.json",
+        "evals/github/benchmark_summary.json",
+        "evals/github/viewer.html",
+        "evals/github/feedback.json"
+      ],
+      "judgment": "neutral",
+      "recommendation": "Do not expand thin entry skills from this result alone. `github` is not harmful, but on the current real corpus it does not outperform direct concrete-skill routing."
+    },
+    {
+      "cluster_id": "skill-meta",
+      "status": "evaluated",
+      "corpus_source": "evals/skill/corpus_summary_real.json",
+      "matched_user_messages": 95,
+      "unique_matched_prompts": 94,
+      "judgment": "revise",
+      "recommendation": "Real-corpus benchmark finished. The router is justified, but current wording over-routes naming/taxonomy governance prompts into sub_skills/new and degraded versus baseline on the current suite."
+    },
+    {
+      "cluster_id": "dotnet-entry",
+      "status": "evaluated",
+      "corpus_source": "evals/dotnet/corpus_summary.json",
+      "matched_user_messages": 27,
+      "unique_matched_prompts": 27,
+      "judgment": "revise",
+      "recommendation": "Real-corpus benchmark finished. The thin entry is still defensible, but Oracle integration routing was weaker than baseline and private business prompts remain underrepresented on this PC."
+    }
+  ]
+}

@@ -4,7 +4,7 @@ description: >
   Evaluate whether a skill changes agent behavior by running with-skill versus
   baseline cases, aggregating results, and deciding the next action. Use when
   trigger quality, output quality, or regression risk must be measured.
-compatibility: `_eval/agents/`, `_eval/scripts/`, `_eval/schemas/`
+compatibility: "_eval/agents/, _eval/scripts/, _eval/schemas/"
 ---
 
 # Evaluate a Skill
