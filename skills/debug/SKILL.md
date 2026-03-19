@@ -55,7 +55,8 @@ Use this table to choose the first module to load. Start with the best fit, then
 | HTTP, auth, service, transaction, or cache mismatch | `api-backend.md` | Request and state boundaries usually own the defect |
 | Data drift, schema break, join issue, null handling, or wrong aggregates | `data-etl.md` | Snapshot and distribution comparisons matter most |
 | Correct result but bad latency, throughput, or memory behavior | `performance.md` | Measured bottlenecks matter more than functional diffs |
-| Race, retry, ordering, flaky AI output, or timing-dependent behavior without a strong physical signal | `nondeterminism.md` | Time and control variables are usually the fastest way in |
+| Ordering, retry, race, state sync, or cross-worker timing issues | `distributed-concurrency.md` | Shared-ordering and coordination bugs need their own cut |
+| Flaky AI output, seed variation, timing-dependent behavior, or retry noise when shared ordering/state sync is not the main culprit | `nondeterminism.md` | Time and control variables are usually the fastest way in |
 | Pass or fail depends on unit, fixture, power, environment, time, location, nearby equipment, or spec compliance | `embedded-hardware.md` | Physical conditions and measurement quality may own the result |
 | Unsure what to capture or how to compare before and after | `evidence-manifest.md` | Standardize the evidence package before going deeper |
 

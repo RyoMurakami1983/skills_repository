@@ -9,7 +9,7 @@
 
 コア workflow はできるだけ不変に保ち、`modules/` 配下のドメイン別モジュールは薄く始めて、実際のデバッグセッションから学んだことだけを追記して育てます。
 
-## When to Use This Skill
+## このスキルを使うとき
 
 次のような場面で使います。
 
@@ -19,13 +19,13 @@
 - 修正後に同じシナリオで再検証したいとき
 - PR、レビュー、インシデント共有へ証拠付きで引き継ぎたいとき
 
-## Related Skills
+## 関連スキル
 
 - **`github-pr-workflow`** - 修正と検証が終わった後に、証拠付きで PR へつなぐ
 - **`github-pr-review-response`** - レビューで追加説明が必要になったときに、before/after の根拠で返す
 - **`knowledge-capture`** - デバッグで学んだ再利用可能な知見を整理する
 
-## Core Principles
+## コア原則
 
 1. **失敗ケースを先に固定する** - 的が定まるほど、デバッグは速くなる
 2. **説明より先に証拠を集める** - スクリーンショット、ログ、トレース、差分が推測より強い
@@ -34,7 +34,7 @@
 5. **根本原因に対する最小修正を選ぶ** - 小さい修正ほど検証しやすく安全
 6. **再利用できる痕跡を残す** - 一回のデバッグを次回の資産にする
 
-## Preflight
+## 事前確認
 
 - 観測された挙動、期待挙動、最小再現刺激を書き出す
 - どのドメインモジュールを読むべきか `modules/` から決める
@@ -42,7 +42,7 @@
 - 固定すべき環境、モード、入力、時刻条件を洗い出す
 - 修正後に再実行すべき既存 gate を確認する
 
-## Module Decision Table
+## モジュール選択表
 
 最初に読む module を決めるための短い決定表です。どれから証拠を取るべきか曖昧なときは、最も近いものから始め、必要なら `evidence-manifest.md` を併用します。
 
@@ -52,11 +52,11 @@
 | HTTP、認証、service、transaction、cache のずれ | `api-backend.md` | request と状態境界の切り分けが主になるため |
 | data drift、schema 破壊、join、null、aggregate の不具合 | `data-etl.md` | snapshot と分布比較が重要になるため |
 | 機能は正しいが latency、throughput、memory が悪い | `performance.md` | 機能差分より計測結果が主役になるため |
-| race、retry、ordering、AI 出力の揺らぎ、時刻依存だが強い物理要因が見えない | `nondeterminism.md` | time と制御変数を握るのが最短だから |
+| AI 出力の揺らぎ、seed 変化、時刻依存、retry ノイズ、共有順序や state sync が主因ではない揺らぎ | `nondeterminism.md` | time と制御変数を握るのが最短だから |
 | 個体差、fixture、電源、環境、発生時間、場所、周辺設備、仕様外使用で出たり出なかったりする | `embedded-hardware.md` | 物理条件や測定品質が owner かもしれないため |
 | 何を記録し、どう比較するか自体が曖昧 | `evidence-manifest.md` | まず証拠パッケージの型を固定するため |
 
-## Workflow: Debug with Evidence
+## ワークフロー: 証拠でデバッグする
 
 ### Step 1 — 不具合の定義を固める
 
@@ -115,7 +115,7 @@ debug/<session>/
 
 > **Values**: 継続は力 / 成長の複利
 
-## Modules
+## モジュール
 
 `modules/` 配下は、コア workflow を置き換えるものではなく付録です。最初は薄く置き、実際のデバッグセッションで役立った内容だけを追記します。
 
@@ -132,26 +132,26 @@ debug/<session>/
 
 現象が intermittent だからといって、最初から hardware と決めつけないでください。最初の手掛かりに最も合う evidence shape の module から入り、最初の比較結果を見てから広げます。
 
-## Pitfalls
+## 落とし穴
 
 - **baseline を取る前にコードを変える**: before/after の一番強い証拠を失います
 - **比較のたびに刺激を変える**: 見かけほど強い比較になりません
 - **境界ではなく症状を直す**: 次のシナリオで再発しがちです
 - **コア skill にドメイン詳細を詰め込む**: hot path がノイジーになり再利用しにくくなります
 
-## Anti-Patterns
+## アンチパターン
 
 - **証拠パッケージなしの exploratory fix**: 先に編集して、あとで説明が付くことを期待する
 - **1 モードだけ成功したら完了扱い**: 影響したモードや環境を十分に見ない
 - **実戦前に module を肥大化させる**: 実際に役立つと分かる前に長文化する
 
-## Troubleshooting
+## トラブルシューティング
 
 - **ローカルで再現しない**: 環境差、feature flag、時刻条件を先に洗い出します
 - **証拠がノイジー**: 刺激を狭め、可能なら clock や seed を固定し、高信号の artifact に絞ります
 - **怪しい境界が多すぎる**: 一度に一境界ずつ比較し、最初のずれを記録します
 
-## Self-Review
+## 自己レビュー
 
 - 安定した failing scenario を一つ示せるか
 - before/after で同じ刺激を維持できたか
@@ -159,7 +159,7 @@ debug/<session>/
 - 症状だけでなく所有境界を言語化したか
 - 影響する gate を再実行し、証拠 path を引き継いだか
 
-## Quick Reference
+## クイックリファレンス
 
 1. 不具合を定義する
 2. baseline 証拠を取る
