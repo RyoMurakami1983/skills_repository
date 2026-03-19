@@ -13,6 +13,7 @@
 - `python-skill-deploy` の workflow と Bash entrypoint を追加
 - `github-quality-gate-setup`、`skills-eval-pipeline`、関連 viewer / optimizer を追加
 - `skills/skill/` を追加し、sub_skills / `_foundation` / `_eval` / `scripts` を含む統合メタスキル構造を導入
+- 汎用 `skills/debug/` を追加し、コンパクトなコア workflow と実戦で育てる薄いドメイン modules 構成を導入
 - `skills/dotnet/` を追加し、広い `.NET` / `C#` / `WPF` 相談を既存 dotnet skill へ振り分ける薄い入口 skill を導入
 - `skills/github/` を追加し、PR / review / issue 系の広い GitHub 依頼を既存 workflow skill へ案内する薄い入口 skill を導入
 
@@ -24,6 +25,7 @@
 - `README.md` を入口中心に簡素化し、詳細手順を `docs/INSTALL.md` へ分離
 - repo 固有の documentation maintenance ルールを `.github/copilot-instructions.md` に追加
 - `skills-author-skill` などの旧メタスキル群を `skill` へ集約し、validator / generator / eval assets も新配置へ移行
+- `skills/debug/` に module 選択用の短い decision table を追加し、hardware / nondeterminism の境界と intermittent 現象の扱いを強化
 - `skills/skill/` の generator と foundation templates を拡張し、Router スキルと `sub_skills/` の scaffolding を作成可能にした
 - `git-commit-practices` と `skills/SKILLS_README.md` を更新し、「コミットして」は atomic commit を前提に `git-commit-practices` へ流す標準導線を明文化
 - `skills/skill/_eval/scripts/` に real corpus 抽出用 `extract_prompt_corpus.py` と semi-automated run materialization 用 `materialize_manual_run.py` を追加し、`github` cluster の benchmark/viewer 生成まで通せるようにした
