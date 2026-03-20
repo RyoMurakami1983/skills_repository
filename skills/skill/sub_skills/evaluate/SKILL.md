@@ -25,15 +25,15 @@ should-trigger と should-not-trigger を、実際の user request に近い形�
 
 ### ステップ 2 — 両モードを同条件で実行する
 
-`_eval\agents\runner.md` を使い、各ケースを with-skill と baseline の両方で実行します。条件が揃っていない比較は信用できません。
+`_eval/agents/runner.md` を使い、各ケースを with-skill と baseline の両方で実行します。条件が揃っていない比較は信用できません。
 
 ### ステップ 3 — 結果を集計する
 
-`uv run python skills\skill\_eval\scripts\aggregate_benchmark.py --skill-id <skill-id> --run-id <run-id>` で pass rate と summary delta を集計します。単発ケースでは見えない傾向を、集計で可視化します。
+`uv run python skills/skill/_eval/scripts/aggregate_benchmark.py --skill-id <skill-id> --run-id <run-id>` で pass rate と summary delta を集計します。単発ケースでは見えない傾向を、集計で可視化します。
 
 ### ステップ 4 — review artifact を作る
 
-`uv run python skills\skill\_eval\scripts\generate_viewer.py --skill-id <skill-id>` と `assets\eval_review.html` を使い、人がすばやく結果を見られる形にします。iteration を回すには、review の速さが重要です。
+`uv run python skills/skill/_eval/scripts/generate_viewer.py --skill-id <skill-id>` と `assets/eval_review.html` を使い、人がすばやく結果を見られる形にします。iteration を回すには、review の速さが重要です。
 
 ### ステップ 5 — 次のアクションを決める
 
@@ -51,10 +51,10 @@ skill が明確に効いていれば accept、悪化していれば revise、evi
 
 ## 共通リソース
 
-- `_eval\agents\runner.md` — with-skill / baseline 実行
-- `_eval\scripts\aggregate_benchmark.py` — 集計
-- `_eval\scripts\generate_viewer.py` — viewer 生成
-- `..\validate\` — static 検証へ戻る導線
+- `_eval/agents/runner.md` — with-skill / baseline 実行
+- `_eval/scripts/aggregate_benchmark.py` — 集計
+- `_eval/scripts/generate_viewer.py` — viewer 生成
+- `../validate/` — static 検証へ戻る導線
 
 ## 注意点
 

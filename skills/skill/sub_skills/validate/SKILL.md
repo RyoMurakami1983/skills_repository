@@ -21,7 +21,7 @@ compatibility: "_foundation/QUALITY.md, _eval/scripts/validate_skill.py"
 
 ### ステップ 1 — L1 Critical を通す
 
-まず `_foundation/QUALITY.md` の Critical を通します。この repo では `uv run python skills\skill\_eval\scripts\validate_skill.py <path-to-skill>\SKILL.md --level L1` を実行します。発見できない skill、実行指針が欠けた skill は先へ進めません。
+まず `_foundation/QUALITY.md` の Critical を通します。この repo では `uv run python skills/skill/_eval/scripts/validate_skill.py <path-to-skill>/SKILL.md --level L1` を実行します。発見できない skill、実行指針が欠けた skill は先へ進めません。
 
 ### ステップ 2 — Recommended シグナルを見る
 
@@ -33,7 +33,7 @@ team-wide に使う skill なら、governance、security、ownership、operation
 
 ### ステップ 4 — behavior が焦点のときだけ L4 へ回す
 
-問いが「形として正しいか」ではなく「本当に結果を改善するか」なら `..\evaluate\` へ回します。static check と behavioral check は別の問いに答えるものです。
+問いが「形として正しいか」ではなく「本当に結果を改善するか」なら `../evaluate/` へ回します。static check と behavioral check は別の問いに答えるものです。
 
 ## 早見表
 
@@ -47,9 +47,9 @@ team-wide に使う skill なら、governance、security、ownership、operation
 ## 共通リソース
 
 - `_foundation/QUALITY.md` — Critical / Recommended の基準
-- `..\..\_eval\scripts\validate_skill.py` — validator 本体
-- `..\evaluate\` — behavior を測る次ルート
-- `..\improve\` — 指摘を反映して戻る改善ルート
+- `../../_eval/scripts/validate_skill.py` — validator 本体
+- `../evaluate/` — behavior を測る次ルート
+- `../improve/` — 指摘を反映して戻る改善ルート
 
 ## 注意点
 

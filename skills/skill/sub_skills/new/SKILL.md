@@ -34,7 +34,7 @@ skill が何をするか、いつ trigger するか、どんな出力を返す�
 
 ### ステップ 4 — L1 validation を早めに通す
 
-`uv run python skills\skill\_eval\scripts\validate_skill.py <path-to-skill>\SKILL.md --level L1` を早い段階で実行し、Critical が崩れていないか確認します。命名、trigger 文、workflow 構造の不足は、細部を磨く前に直します。
+`uv run python skills/skill/_eval/scripts/validate_skill.py <path-to-skill>/SKILL.md --level L1` を早い段階で実行し、Critical が崩れていないか確認します。命名、trigger 文、workflow 構造の不足は、細部を磨く前に直します。
 
 ### ステップ 5 — suite が必要なら先に全体像を切る
 
@@ -46,7 +46,7 @@ domain を flat workflow、peer-skill orchestrator、nested `sub_skills/` を持
 
 ### ステップ 7 — 必要なら router 構造を scaffold する
 
-internal routing が必要なら、`uv run python skills\skill\scripts\create_skill.py --name <router-name> --description "<description>" --type router --sub-skills <route-a>,<route-b>` で skeleton を作ります。親 `SKILL.md` は判断表に集中させ、実行ロジックは生成された sub-skill 側へ移します。
+internal routing が必要なら、`uv run python skills/skill/scripts/create_skill.py --name <router-name> --description "<description>" --type router --sub-skills <route-a>,<route-b>` で skeleton を作ります。親 `SKILL.md` は判断表に集中させ、実行ロジックは生成された sub-skill 側へ移します。
 
 ## 早見表
 
@@ -63,8 +63,8 @@ internal routing が必要なら、`uv run python skills\skill\scripts\create_sk
 - `_foundation/TEMPLATE.md` — workflow skill の最小 template
 - `_foundation/ROUTER_TEMPLATE.md` — router 親 skill の template
 - `_foundation/SUB_SKILL_TEMPLATE.md` — nested sub-skill の template
-- `..\..\scripts\create_skill.py` — skill / router / sub-skill scaffold 生成
-- `..\..\_eval\scripts\validate_skill.py` — L1/L2 validation
+- `../../scripts/create_skill.py` — skill / router / sub-skill scaffold 生成
+- `../../_eval/scripts/validate_skill.py` — L1/L2 validation
 
 ## 注意点
 

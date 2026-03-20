@@ -42,7 +42,7 @@ def parse_args() -> argparse.Namespace:
 def validate_name(name: str) -> None:
     """skill 名が kebab-case かどうか検証する。"""
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name):
-        raise ValueError(f"Invalid skill name '{name}'. Use kebab-case.")
+        raise ValueError(f"無効な skill 名です: '{name}'。kebab-case で指定してください。")
 
 
 def default_title(name: str) -> str:
@@ -220,7 +220,7 @@ def parse_sub_skill_names(raw_names: str) -> list[dict[str, str]]:
     """カンマ区切りの sub-skill 名から正規化済み定義一覧を作る。"""
     names = [name.strip() for name in raw_names.split(",") if name.strip()]
     if not names:
-        raise ValueError("--sub-skills must contain at least one non-empty name.")
+        raise ValueError("--sub-skills には少なくとも 1 つ以上の名前を指定してください。")
     return [normalize_sub_skill_item(name) for name in names]
 
 
@@ -229,16 +229,17 @@ def update_router_decision_table(router_skill_path: Path, sub_skill: dict[str, s
     route = f"`sub_skills/{sub_skill['name']}/`"
     content = router_skill_path.read_text(encoding="utf-8")
     if route in content:
-        raise FileExistsError(f"Route already exists in router SKILL.md: {route}")
+        raise FileExistsError(f"router SKILL.md に同じ route が既に存在します: {route}")
 
-    marker = next((candidate for candidate in ("\n## 共通リソース", "\n## Shared Resources") if candidate in content), None)
+    marker = re.search(r"^##\s+(共通リソース|Shared Resources)\s*$", content, re.MULTILINE)
     if marker is None:
-        raise ValueError(f"Router SKILL.md is missing the Shared Resources section: {router_skill_path}")
+        raise ValueError(f"Router SKILL.md に共通リソース見出しが見つかりません: {router_skill_path}")
 
-    before, after = content.split(marker, maxsplit=1)
+    before = content[:marker.start()]
+    after = content[marker.start():]
     row = build_decision_rows([sub_skill])
     before = before.rstrip() + "\n" + row + "\n"
-    router_skill_path.write_text(before + marker + after, encoding="utf-8")
+    router_skill_path.write_text(before + after, encoding="utf-8")
 
 
 def create_sub_skill(router_dir: Path, template: str, item: dict[str, str], *, update_router: bool = False) -> Path:
@@ -251,7 +252,7 @@ def create_sub_skill(router_dir: Path, template: str, item: dict[str, str], *, u
 
     sub_skill_dir = router_dir / "sub_skills" / name
     if sub_skill_dir.exists():
-        raise FileExistsError(f"Destination already exists: {sub_skill_dir}")
+        raise FileExistsError(f"出力先が既に存在します: {sub_skill_dir}")
 
     sub_skill_dir.mkdir(parents=True, exist_ok=False)
     (sub_skill_dir / "references").mkdir()
@@ -280,7 +281,7 @@ def create_workflow_skill(output_root: Path, template: str, item: dict[str, Any]
 
     skill_dir = output_root / name
     if skill_dir.exists():
-        raise FileExistsError(f"Destination already exists: {skill_dir}")
+        raise FileExistsError(f"出力先が既に存在します: {skill_dir}")
 
     (skill_dir / "references").mkdir(parents=True, exist_ok=False)
     (skill_dir / "scripts").mkdir()
@@ -315,7 +316,7 @@ def create_router_skill(
 
     skill_dir = output_root / name
     if skill_dir.exists():
-        raise FileExistsError(f"Destination already exists: {skill_dir}")
+        raise FileExistsError(f"出力先が既に存在します: {skill_dir}")
 
     (skill_dir / "references").mkdir(parents=True, exist_ok=False)
     (skill_dir / "scripts").mkdir()
@@ -352,15 +353,15 @@ def create_skill(
         return create_workflow_skill(output_root, template, item)
     if skill_type == "router":
         if router_template is None or sub_skill_template is None:
-            raise ValueError("Router creation requires router_template and sub_skill_template.")
+            raise ValueError("router を作成するには router_template と sub_skill_template が必要です。")
         return create_router_skill(output_root, router_template, sub_skill_template, item)
-    raise ValueError(f"Unsupported skill type: {skill_type}")
+    raise ValueError(f"未対応の skill 種別です: {skill_type}")
 
 
 def add_sub_skill(router_dir: Path, template: str, item: dict[str, Any]) -> Path:
     """既存 router に sub-skill を追加する。"""
     if not (router_dir / "SKILL.md").exists():
-        raise FileNotFoundError(f"Router SKILL.md not found: {router_dir}")
+        raise FileNotFoundError(f"Router の SKILL.md が見つかりません: {router_dir}")
     (router_dir / "sub_skills").mkdir(exist_ok=True)
     return create_sub_skill(router_dir, template, normalize_sub_skill_item(item), update_router=True)
 
@@ -373,11 +374,11 @@ def load_suite(path: Path) -> list[dict[str, Any]]:
     else:
         items = data
     if not isinstance(items, list) or not items:
-        raise ValueError("Suite JSON must be a non-empty array or an object with a 'skills' array.")
+        raise ValueError("suite JSON は空でない配列、または 'skills' 配列を持つ object である必要があります。")
     normalized: list[dict[str, Any]] = []
     for item in items:
         if not isinstance(item, dict) or "name" not in item or "description" not in item:
-            raise ValueError("Each suite item must contain 'name' and 'description'.")
+            raise ValueError("suite の各 item には 'name' と 'description' が必要です。")
         normalized_item: dict[str, Any] = {
             "name": str(item["name"]),
             "description": str(item["description"]),
@@ -388,7 +389,7 @@ def load_suite(path: Path) -> list[dict[str, Any]]:
                 normalized_item[key] = str(item[key])
         if "sub_skills" in item:
             if not isinstance(item["sub_skills"], list):
-                raise ValueError("'sub_skills' must be a list when provided.")
+                raise ValueError("'sub_skills' を指定する場合は list で渡してください。")
             normalized_item["sub_skills"] = [normalize_sub_skill_item(sub_skill) for sub_skill in item["sub_skills"]]
         normalized.append(normalized_item)
     return normalized
@@ -405,7 +406,7 @@ def main() -> int:
 
     if args.add_sub_skill:
         if not args.router_dir:
-            print("ERROR: --router-dir is required when --add-sub-skill is used.", file=sys.stderr)
+            print("ERROR: --add-sub-skill を使うときは --router-dir が必要です。", file=sys.stderr)
             return 1
         created = add_sub_skill(
             Path(args.router_dir),
@@ -425,7 +426,7 @@ def main() -> int:
         items = load_suite(Path(args.suite))
     else:
         if not args.name or not args.description:
-            print("ERROR: --name and --description are required unless --suite is used.", file=sys.stderr)
+            print("ERROR: --suite を使わない場合は --name と --description が必要です。", file=sys.stderr)
             return 1
         item: dict[str, Any] = {
             "name": args.name,

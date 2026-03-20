@@ -37,7 +37,7 @@ review comment、transcript、validation 出力、eval summary を読みます�
 
 ### ステップ 5 — 再検証する
 
-変更後は `uv run python skills\skill\_eval\scripts\validate_skill.py <path-to-skill>\SKILL.md --level L2` を再実行します。構造が崩れていないことを確認して初めて、改善が完了したと言えます。
+変更後は `uv run python skills/skill/_eval/scripts/validate_skill.py <path-to-skill>/SKILL.md --level L2` を再実行します。構造が崩れていないことを確認して初めて、改善が完了したと言えます。
 
 ## 早見表
 
@@ -52,9 +52,9 @@ review comment、transcript、validation 出力、eval summary を読みます�
 ## 共通リソース
 
 - `_foundation/CONVENTIONS.md` — naming / frontmatter / writing style
-- `..\..\_eval\scripts\validate_skill.py` — L1/L2 validation
-- `..\validate\` — 改善後の構造チェックへ戻る導線
-- `..\evaluate\` — behavior change を測りたい場合の次ルート
+- `../../_eval/scripts/validate_skill.py` — L1/L2 validation
+- `../validate/` — 改善後の構造チェックへ戻る導線
+- `../evaluate/` — behavior change を測りたい場合の次ルート
 
 ## 注意点
 

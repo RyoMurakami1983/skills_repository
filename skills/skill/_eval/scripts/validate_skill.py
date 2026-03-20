@@ -135,7 +135,7 @@ def is_action_led(text: str) -> bool:
 
 def has_trigger_phrase(text: str) -> bool:
     """description に trigger phrase が含まれるか判定する。"""
-    return any(re.search(pattern, text) for pattern in TRIGGER_PATTERNS)
+    return any(re.search(pattern, text, re.IGNORECASE) for pattern in TRIGGER_PATTERNS)
 
 
 def has_code_blocks(content: str) -> bool:
