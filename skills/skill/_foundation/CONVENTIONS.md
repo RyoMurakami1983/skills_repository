@@ -13,6 +13,7 @@
 - 必須: `name`, `description`
 - 任意: `compatibility`
 - `description` は trigger-oriented に書き、`こんなときに使う` 相当の表現を入れる
+- `description: >` を使う場合、折り返しは句点や読点など意味の切れ目に寄せる。`こんなときに` と `使う` のように意味のまとまりを不自然に分断しない
 - `compatibility` には、本当に必要なツールや runtime 制約だけを書く
 
 ## Directory Rules
@@ -68,6 +69,12 @@ router-name/
 - 次の行動がすぐわかる命令形の prose を使う
 - 有能なチームメイトに教えるように書く
 - 大きい reference には table of contents を付ける
+
+## Anti-Patterns
+
+- formatter や手作業で frontmatter を機械的に折り返し、意味のまとまりを壊す
+- `こんなときに使う` の trigger 句を行途中で分断し、読み手に不要な復元コストをかける
+- 「短くしたい」だけを理由に、句点や意味境界より前で説明文を不自然に改行する
 
 ## Safety
 

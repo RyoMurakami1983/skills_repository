@@ -1,8 +1,12 @@
 # Eval and Validation Schemas
 
-Paths below are relative to `skills/skill/`.
+以下の path は `skills/skill/` からの相対表記です。
+
+この文書は eval 関連 artifact の**説明用リファレンス**です。見出しや説明文は日本語化してよい一方で、JSON の key 名、file 名、enum 値、path 断片は互換性のため英語のまま扱います。
 
 ## `evals.json`
+
+評価対象の skill、version、test case 一覧を定義します。
 
 ```json
 {
@@ -24,6 +28,8 @@ Paths below are relative to `skills/skill/`.
 
 ## `grading_result.json`
 
+1 回の採点結果を保存します。各 assertion の pass/fail と score、応答抜粋を含みます。
+
 ```json
 {
   "case_id": "tc-001",
@@ -40,6 +46,8 @@ Paths below are relative to `skills/skill/`.
 
 ## `benchmark_summary.json`
 
+複数 run の集計結果を表します。with-skill と baseline の比較に使います。
+
 ```json
 {
   "skill_id": "skill-name",
@@ -54,6 +62,8 @@ Paths below are relative to `skills/skill/`.
 
 ## `timing.json`
 
+token 使用量と処理時間を記録します。
+
 ```json
 {
   "total_tokens": 12345,
@@ -63,6 +73,8 @@ Paths below are relative to `skills/skill/`.
 ```
 
 ## `feedback.json`
+
+benchmark を読んだ結果として、改善提案と次アクションをまとめます。
 
 ```json
 {
@@ -77,6 +89,8 @@ Paths below are relative to `skills/skill/`.
 ```
 
 ## Workspace Layout
+
+想定する artifact 配置は次のとおりです。
 
 ```text
 <skill-name>-workspace/

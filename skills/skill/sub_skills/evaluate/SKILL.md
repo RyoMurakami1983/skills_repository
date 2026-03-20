@@ -1,8 +1,8 @@
 ---
 name: evaluate
 description: >
-  with-skill と baseline を比較し、skill の行動変化を測定する。こんな
-  ときに使う: trigger 精度、出力品質、回帰リスクを実証的に確認したいとき。
+  with-skill と baseline を比較し、skill の行動変化を測定する。こんなときに使う:
+  trigger 精度、出力品質、回帰リスクを実証的に確認したいとき。
 compatibility: "_eval/agents/, _eval/scripts/, _eval/schemas/"
 ---
 

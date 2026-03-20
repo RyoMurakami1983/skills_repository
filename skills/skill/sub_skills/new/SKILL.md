@@ -1,9 +1,8 @@
 ---
 name: new
 description: >
-  新しいスキルやスキル群を要件から作る。こんなときに使う: 新規スキルを
-  草案化したいとき、手作業を skill 化したいとき、router と sub-skill を
-  まとめて作りたいとき。
+  新しいスキルやスキル群を要件から作る。こんなときに使う: 新規スキルを草案化したいとき、
+  手作業を skill 化したいとき、router と sub-skill をまとめて作りたいとき。
 compatibility: "_foundation/TEMPLATE.md, _eval/scripts/validate_skill.py"
 ---
 
