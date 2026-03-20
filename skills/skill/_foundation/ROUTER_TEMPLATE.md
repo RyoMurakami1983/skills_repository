@@ -8,27 +8,27 @@ description: >
 
 <Explain what this router unifies and why a single entry point helps.>
 
-## When to Use This Skill
+## こんなときに使う
 
-Use this skill when:
+このスキルは次のようなときに使います:
 - <Verb-led scenario 1>
 - <Verb-led scenario 2>
 - <Verb-led scenario 3>
 
-## Decision Table
+## 判断表
 
-| Your intent | Route | What to do |
+| やりたいこと | ルート | 次にやること |
 | --- | --- | --- |
 <Decision Rows>
 
-## Shared Resources
+## 共通リソース
 
-- `_foundation/` for templates, conventions, and quality definitions shared across sub-skills
-- `scripts/` for deterministic helpers that sub-skills invoke
-- `references/` for overflow documentation and localized variants
+- `_foundation/` は sub-skill 間で共有する template / convention / quality definition を置く
+- `scripts/` は sub-skill から呼ぶ deterministic helper を置く
+- `references/` は overflow documentation や必要時の補助資料を置く
 
-## Routing Notes
+## ルーティングメモ
 
-- Jump directly to the sub-skill that matches the user's current state.
-- Keep execution logic in the sub-skill or script, not in this router.
-- Adapt terminology to the user's literacy level; explain specialized terms when needed.
+- ユーザーの現在地点に最も合う sub-skill へ直接案内する。
+- 実行ロジックは router ではなく sub-skill や script に置く。
+- 用語は相手の literacy に合わせ、必要なら専門語を説明する。

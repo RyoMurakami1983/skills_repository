@@ -57,15 +57,16 @@
 
 **構造**:
 - YAMLフロントマター最小構成（name, description のみ — 余白の設計）
-- "When to Use This Skill"を最初のH2セクションに
+- 「こんなときに使う」を最初のH2セクションに置く（移行期間中は "When to Use This Skill" 互換も許容）
 - "Core Principles"でValuesとの整合性を明示
 - パターン形式で段階的学習（Basic → Intermediate → Advanced）
 - "Best Practices"と"Anti-Patterns"を明記
 - FAQ/Quick Referenceで実用性を確保
 
 **言語**:
-- 英語版（SKILL.md）+ 日本語版（references/SKILL.ja.md）の両方作成
-- 日本語版でWhyを詳細に説明
+- `SKILL.md` を正本とし、既定は日本語で作成
+- `references/` は overflow docs や補助資料の置き場として使い、`references/SKILL.ja.md` を常設前提にしない
+- 外部共有や明確な要件がある場合のみ、翻訳や別言語版を追加する
 
 **Values反映**:
 - 各パターンに対応するValuesを明記

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run a lightweight description-improvement loop for skill metadata."""
+"""skill metadata の description を軽量ループで改善する。"""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ VALIDATOR_PATH = SCRIPT_DIR / "validate_skill.py"
 
 
 def load_validator():
+    """validator モジュールを動的に読み込む。"""
     spec = importlib.util.spec_from_file_location("skill_validate_skill", VALIDATOR_PATH)
     if spec is None or spec.loader is None:
         raise ImportError(f"Could not load validator module spec: {VALIDATOR_PATH}")
@@ -31,6 +32,7 @@ class CandidateScore:
 
 
 def count_trigger_hits(description: str, prompts: list[str]) -> int:
+    """description と prompt 群の語彙重なり数を簡易スコアとして数える。"""
     tokens = {token for token in re.findall(r"[A-Za-z][A-Za-z-]+", description.lower()) if len(token) > 3}
     score = 0
     for prompt in prompts:
@@ -41,6 +43,7 @@ def count_trigger_hits(description: str, prompts: list[str]) -> int:
 
 
 def generate_candidates(description: str) -> list[str]:
+    """現在の description から比較用の候補文を作る。"""
     if "even if" in description:
         return [description]
     return [
@@ -51,6 +54,7 @@ def generate_candidates(description: str) -> list[str]:
 
 
 def rewrite_description(skill_path: Path, description: str) -> None:
+    """frontmatter 内の description を新しい文に書き換える。"""
     lines = skill_path.read_text(encoding="utf-8").splitlines(keepends=True)
     for index, line in enumerate(lines):
         if not line.startswith("description:"):
@@ -67,14 +71,16 @@ def rewrite_description(skill_path: Path, description: str) -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Optimize skill descriptions with a simple loop")
-    parser.add_argument("--skill", required=True, help="Path to SKILL.md")
-    parser.add_argument("--prompts", required=True, help="JSON file with trigger prompts")
-    parser.add_argument("--apply", action="store_true", help="Write the best candidate back to the file")
+    """CLI 引数を定義して返す。"""
+    parser = argparse.ArgumentParser(description="簡易ループで skill description を最適化する")
+    parser.add_argument("--skill", required=True, help="SKILL.md のパス")
+    parser.add_argument("--prompts", required=True, help="trigger prompt を含む JSON ファイル")
+    parser.add_argument("--apply", action="store_true", help="最良候補をファイルへ反映する")
     return parser.parse_args()
 
 
 def main() -> int:
+    """候補文を比較し、必要なら最良の description を反映する。"""
     args = parse_args()
     skill_path = Path(args.skill)
     prompts = json.loads(Path(args.prompts).read_text(encoding="utf-8"))

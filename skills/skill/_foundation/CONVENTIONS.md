@@ -1,19 +1,20 @@
 # Skill Conventions
 
-Use these conventions to keep `skills/skill/` coherent and predictable.
+`skills/skill/` を一貫した型で保つための約束です。
 
 ## Naming
 
-- Use kebab-case.
-- Prefer `<context>-<verb>-<object>` for top-level skills.
-- Internal sub-skills may use short names when the directory is nested under a router.
+- kebab-case を使う
+- top-level skill は `<context>-<verb>-<object>` を優先する
+- router 配下の sub-skill は、文脈が親で補えるなら短い名前でもよい
 
 ## Frontmatter
 
-- Required: `name`, `description`
-- Optional: `compatibility`
-- `description` should be trigger-oriented and include `Use when`
-- `compatibility` should only describe real constraints such as required tools or platform assumptions
+- 必須: `name`, `description`
+- 任意: `compatibility`
+- `description` は trigger-oriented に書き、`こんなときに使う` 相当の表現を入れる
+- `description: >` を使う場合、折り返しは句点や読点など意味の切れ目に寄せる。`こんなときに` と `使う` のように意味のまとまりを不自然に分断しない
+- `compatibility` には、本当に必要なツールや runtime 制約だけを書く
 
 ## Directory Rules
 
@@ -25,14 +26,14 @@ skill-name/
 └── assets/
 ```
 
-- `SKILL.md` is the primary execution guide.
-- `references/` stores overflow docs or localized variants.
-- `scripts/` holds deterministic helpers that the agent would otherwise rewrite repeatedly.
-- `assets/` stores files consumed by outputs, not explanatory prose.
+- `SKILL.md` を正本の実行ガイドとして扱う
+- `references/` には overflow docs や必要時の補助資料を置く
+- `scripts/` には agent が毎回書き直すべきでない deterministic helper を置く
+- `assets/` には出力に埋め込むファイルを置き、説明文書は置かない
 
 ## Router Skills
 
-Use a router when one entry point must split into clearly different sub-workflows.
+1 つの入口から、明確に異なる sub-workflow へ分岐する必要があるときだけ router を使います。
 
 ```text
 router-name/
@@ -48,28 +49,34 @@ router-name/
 └── assets/
 ```
 
-- Parent routers should expose a `## Decision Table` with `Your intent`, `Route`, and `What to do` columns.
-- Route paths should point at `sub_skills/<name>/`.
-- Use short verb or verb-object names for sub-skills when the router context already supplies the domain.
-- Put shared templates, conventions, and reference snippets in the router's `_foundation/`.
-- Keep detailed execution logic in each sub-skill, not in the parent router.
+- 親 router は `## 判断表` 互換セクションを持ち、`やりたいこと`、`ルート`、`次にやること` を明示する
+- route path は `sub_skills/<name>/` を指す
+- router が domain を供給できるなら、sub-skill 名は短い verb / verb-object でよい
+- 共有テンプレート、規約、補助断片は router の `_foundation/` に置く
+- 詳細な実行ロジックは親 router ではなく各 sub-skill に置く
 
 ## Progressive Disclosure
 
 | Level | Content | Rule |
 | --- | --- | --- |
-| L1 | frontmatter | Keep it short and trigger-rich. |
-| L2 | `SKILL.md` body | Keep the hot path compact and readable. |
-| L3 | bundled resources | Load only when needed. |
+| L1 | frontmatter | 短く、trigger-rich に保つ |
+| L2 | `SKILL.md` body | hot path を短く読みやすく保つ |
+| L3 | bundled resources | 必要になったときだけ読む |
 
 ## Writing Style
 
-- Explain why the step exists instead of shouting MUST/NEVER repeatedly.
-- Use imperative prose so the next action is obvious.
-- Write like you are teaching a capable teammate.
-- Add a table of contents to large reference files.
+- MUST / NEVER を並べるより、なぜその手順が効くかを説明する
+- 次の行動がすぐわかる命令形の prose を使う
+- 有能なチームメイトに教えるように書く
+- 大きい reference には table of contents を付ける
+
+## Anti-Patterns
+
+- formatter や手作業で frontmatter を機械的に折り返し、意味のまとまりを壊す
+- `こんなときに使う` の trigger 句を行途中で分断し、読み手に不要な復元コストをかける
+- 「短くしたい」だけを理由に、句点や意味境界より前で説明文を不自然に改行する
 
 ## Safety
 
-- Do not package malware, exploit instructions, or security-bypass guidance as reusable skills.
-- Prefer least-surprise workflows that surface risks before destructive actions.
+- malware、exploit instructions、security bypass guidance を reusable skill として梱包しない
+- 破壊的操作の前には、least surprise でリスクが見える workflow を優先する

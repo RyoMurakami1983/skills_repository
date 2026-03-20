@@ -1,47 +1,47 @@
 # Skill Quality Levels
 
-Use this file as the single source of truth for validation.
+このファイルは validation の single source of truth として使います。
 
 ## Critical Checks
 
-All Critical checks must pass before a skill is treated as shippable.
+skill を出荷可能とみなす前に、Critical はすべて通過させます。
 
 | ID | Check | Why it matters |
 | --- | --- | --- |
-| C1 | Frontmatter includes `name` and `description` | Activation depends on metadata being present and parseable. |
-| C2 | `name` matches the directory name | Stable lookup depends on `name` and directory staying aligned. |
-| C3 | `description` includes `Use when` triggers | Discovery fails when the trigger surface is vague. |
-| C4 | `## When to Use This Skill` exists | Readers need fast relevance judgment after activation. |
-| C5 | A workflow or router section exists with explicit steps or routes | The skill must tell the agent what to do next. |
-| C6 | Router skills include a `## Decision Table` | Routers need an explicit map from user intent to sub-skill route. |
-| C7 | Router decision routes map to real `sub_skills/` directories | Routing text and filesystem structure must stay aligned. |
+| C1 | Frontmatter に `name` と `description` がある | 起動条件は parse できる metadata が前提になる。 |
+| C2 | `name` がディレクトリ名と一致する | 安定した lookup には `name` と配置の整合が必要。 |
+| C3 | `description` に trigger-oriented な表現（例: `こんなときに使う` / `Use when`）がある | trigger surface が曖昧だと発見性が落ちる。 |
+| C4 | `## こんなときに使う` 互換のセクションがある | 起動後すぐに relevance を判断できる必要がある。 |
+| C5 | 明示的な手順または route を持つ workflow / router セクションがある | 次に何をする skill なのかを agent に示す必要がある。 |
+| C6 | Router skill は `## 判断表` 互換セクションを持つ | router には意図から route への明示マップが必要。 |
+| C7 | Router の route が実在する `sub_skills/` ディレクトリを指す | routing 文言と filesystem 構造は一致しているべき。 |
 
 ## Recommended Checks
 
-Recommended checks improve clarity, reuse, and long-term maintainability.
+Recommended は、わかりやすさ・再利用性・保守性を高めるためのシグナルです。
 
 | ID | Check | Why it matters |
 | --- | --- | --- |
-| R1 | "When to Use" contains 3-8 bullets | Too few misses intent space; too many diffuses focus. |
-| R2 | Each scenario starts with an action verb | Verb-led bullets are easier to match to user intent. |
-| R3 | The skill explains why, not only what | WHY-oriented guidance generalizes better than rigid rules. |
-| R4 | `## Pitfalls` exists | Failure modes should be explicit, not tribal knowledge. |
-| R5 | Main `SKILL.md` stays compact | Keep hot-path context small and push overflow to `references/`. |
-| R6 | Overflow detail moves to `references/` when needed | Large bodies should be loaded on demand. |
-| R7 | Related resources or sibling skills are linked | Cross-navigation reduces duplicated explanation. |
-| R8 | Quick reference or decision table exists when operations are multi-step | Operators need a fast execution view. |
-| R9 | Code or command examples are syntactically valid | Broken examples erode trust immediately. |
-| R10 | `references/SKILL.ja.md` exists when the skill is intended for bilingual use | Japanese guidance helps team adoption without forcing every skill to duplicate effort. |
-| R11 | Router skills keep 2-7 sub-skills | Too few routes do not justify a router; too many make routing noisy. |
-| R12 | Each sub-skill has its own "When to Use" section | Local triggers keep sibling routes distinct. |
+| R1 | 「こんなときに使う」が 3-8 個の bullet で書かれている | 少なすぎると意図空間を取り逃がし、多すぎると焦点がぼける。 |
+| R2 | 各 scenario が行動ベースで書かれている | 行動ベースの bullet はユーザー意図に対応づけやすい。 |
+| R3 | skill が「何を」だけでなく「なぜ」を説明している | WHY を説明する guidance のほうが応用しやすい。 |
+| R4 | `## 注意点` 互換セクションがある | 失敗パターンは暗黙知にせず明示したほうが強い。 |
+| R5 | main `SKILL.md` がコンパクトに保たれている | hot path は短く保ち、必要時だけ `references/` を読む形がよい。 |
+| R6 | overflow detail は必要時に `references/` へ逃がす | 本文が十分コンパクトなら必須ではないが、長文化し始めたら `references/` へ分離する。 |
+| R7 | 関連リソースや sibling skill への導線がある | cross-navigation は重複説明を減らす。 |
+| R8 | multi-step な操作では早見表または判断表がある | 実行者には短い execution view が必要。 |
+| R9 | コードやコマンド例が空でない / 壊れていない | 壊れた例は信頼をすぐ失わせる。 |
+| R10 | H1 タイトルがある | 起動後に「何の skill か」を一目で掴める。 |
+| R11 | Router skill は 2-7 個の sub-skill に保つ | 少なすぎる route は router 化の価値が薄く、多すぎるとノイズになる。 |
+| R12 | 各 sub-skill が独自の「こんなときに使う」を持つ | sibling route の違いを局所的に判断しやすくなる。 |
 
 ## Validation Levels
 
 | Level | Scope | Expected use |
 | --- | --- | --- |
-| L1 | Critical checks only | Draft gate after initial authoring |
-| L2 | Critical + Recommended | Review gate before broad use |
-| L3 | Governance and enterprise review | Team or organization rollout |
-| L4 | Behavioral eval pipeline | Important skills where trigger quality must be measured |
+| L1 | Critical checks only | 初稿の draft gate |
+| L2 | Critical + Recommended | 広く使う前の review gate |
+| L3 | Governance and enterprise review | team / organization rollout |
+| L4 | Behavioral eval pipeline | trigger quality を測る重要 skill |
 
-Router-specific checks are defined here first even when validator support lands later. Keep the written standard ahead of automation so authors can follow one source of truth.
+router 固有の check は、automation 実装が後から追いつく場合でも、まずこの文書側に定義しておきます。著者が 1 つの基準を見れば済むようにするためです。
