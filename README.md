@@ -97,6 +97,14 @@ WSL 側の `~/.copilot/` への同期、クロス環境パス設定、Linux/macO
 
 ADR は「なぜその設計判断を採ったのか」を後から追えるように残すための記録です。
 
+## SKILL の言語方針
+
+この repo では、skill の正本を **`SKILL.md` 1つ** に寄せる方向へ切り替えています。
+
+まずは `skills/skill/` を pilot にして、従来の「英語 `SKILL.md` + `references/SKILL.ja.md`」運用から、**日本語 `SKILL.md` を正本とする段階移行**を進めます。目的は英語を排除することではなく、二重管理コストを減らし、validator / template / generator を含む skill の型を repo 実態に合わせて簡素化することです。
+
+判断理由と移行原則は [`docs/adr/ADR-003-skill-japanese-primary-language-policy.md`](docs/adr/ADR-003-skill-japanese-primary-language-policy.md) を参照してください。
+
 ## 最近の主要変更
 
 **2026-03**

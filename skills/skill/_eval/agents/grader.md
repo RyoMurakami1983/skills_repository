@@ -57,7 +57,7 @@ Return a valid JSON object matching the `grading_result.json` schema:
       "type": "llm_grade",
       "passed": false,
       "weight": 1.0,
-      "detail": "フロントマターの description フィールドが 'Use when' を含んでいないため不合格"
+      "detail": "フロントマターの description に trigger-oriented な表現が含まれていないため不合格"
     }
   ],
   "response_snippet": "...(first 500 chars)...",

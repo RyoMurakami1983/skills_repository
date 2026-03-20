@@ -6,6 +6,8 @@
 
 **設計方針**: 「1 Skill = 1 Workflow」— 各スキルは単一ワークフローに特化し、詳細は `references/` へ逃がします。
 
+**言語運用**: 既定は **日本語 `SKILL.md` を正本** とします。`references/` は補助資料や overflow docs の置き場として使い、`references/SKILL.ja.md` の常設は前提にしません。
+
 ## 📦 スキル一覧
 
 ### スキルメタ系（単一入口）
@@ -147,7 +149,7 @@ router 化を議論するときは、少なくとも次の prompt 群で flat �
 - ✅ **Critical 5項目**: `skill/_foundation/QUALITY.md` の必須項目を全PASS
 - ✅ **Recommended 10項目**: readability と reuse の改善シグナルとして確認
 - ✅ **コンパクトな hot path**: 詳細は `references/` へ分離
-- ✅ **国際化は必要に応じて**: `references/SKILL.ja.md` を追加
+- ✅ **単一正本を優先**: 既定は日本語 `SKILL.md`、翻訳は必要時のみ追加
 
 ---
 

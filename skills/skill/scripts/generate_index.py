@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a compact skills index snippet from top-level skills."""
+"""top-level skill からコンパクトな index 断片を生成する。"""
 
 from __future__ import annotations
 
@@ -9,6 +9,7 @@ from pathlib import Path
 
 
 def extract_frontmatter(path: Path) -> dict[str, str]:
+    """SKILL.md の frontmatter を抽出する。"""
     content = path.read_text(encoding="utf-8")
     match = re.match(r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL)
     if not match:
@@ -38,6 +39,7 @@ def extract_frontmatter(path: Path) -> dict[str, str]:
 
 
 def build_index(skills_root: Path) -> str:
+    """skills ディレクトリ配下の一覧を Markdown 断片として組み立てる。"""
     rows: list[str] = [
         "<!-- BEGIN SKILL-INDEX -->",
         "# Agent Guidance: skills_repository",
@@ -54,9 +56,10 @@ def build_index(skills_root: Path) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate a markdown skills index snippet")
-    parser.add_argument("--skills-root", default="skills", help="Directory containing top-level skills")
-    parser.add_argument("--output", help="Write the snippet to this file instead of stdout")
+    """CLI 引数を受け取り、skill index を stdout またはファイルへ出力する。"""
+    parser = argparse.ArgumentParser(description="Markdown の skill index 断片を生成する")
+    parser.add_argument("--skills-root", default="skills", help="top-level skill を含むディレクトリ")
+    parser.add_argument("--output", help="stdout の代わりにこのファイルへ書き出す")
     args = parser.parse_args()
 
     rendered = build_index(Path(args.skills_root))

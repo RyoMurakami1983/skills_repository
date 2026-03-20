@@ -1,8 +1,6 @@
-"""generate_viewer.py
+"""`benchmark_summary.json` から自己完結型の HTML viewer を生成する。
 
-Generate a self-contained HTML eval viewer from benchmark_summary.json.
-
-Usage:
+使い方:
     uv run python skills/skill/_eval/scripts/generate_viewer.py \\
         --skill-id skill \\
         [--evals-dir evals] \\
@@ -22,6 +20,7 @@ TEMPLATE_PATH = Path(__file__).resolve().parents[1].parent / "assets" / "eval_re
 
 
 def load_benchmark(evals_dir: Path, skill_id: str) -> dict:
+    """指定 skill の `benchmark_summary.json` を読み込む。"""
     path = evals_dir / skill_id / "benchmark_summary.json"
     if not path.exists():
         raise FileNotFoundError(f"benchmark_summary.json not found: {path}")
@@ -30,20 +29,19 @@ def load_benchmark(evals_dir: Path, skill_id: str) -> dict:
 
 
 def render(template: str, data: dict) -> str:
-    """Inject benchmark JSON into the HTML template's data placeholder.
+    """HTML template の data placeholder へ benchmark JSON を埋め込む。
 
-    Replaces the sentinel token (including the trailing null literal) so the
-    resulting JavaScript is valid.  Also escapes '</script>' inside the JSON
-    payload to prevent script-block injection.
+    trailing の `null` まで含めて sentinel token を置換し、生成後の
+    JavaScript が壊れないようにする。さらに JSON payload 内の
+    `</script>` を escape し、script block injection を防ぐ。
     """
     json_str = json.dumps(data, ensure_ascii=False, indent=2)
-    # Escape </script> (case-insensitive) to prevent script-block breakout.
-    # HTML end tags are case-insensitive, so </SCRIPT> would also terminate the block.
+    # `</script>` は大文字小文字を問わず script 終端になるため、先に escape する。
     json_str = re.sub(r'</script', r'<\\/script', json_str, flags=re.IGNORECASE)
-    # Escape U+2028/U+2029 (JS line/paragraph separators) which terminate string literals.
+    # U+2028/U+2029 は JS の文字列リテラルを壊すので escape しておく。
     json_str = json_str.replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
-    # The template contains: const DATA = /* __BENCHMARK_DATA__ */null;
-    # Replace the sentinel + the trailing 'null' literal as one atomic token.
+    # template には `const DATA = /* __BENCHMARK_DATA__ */null;` が入っている。
+    # sentinel と trailing の `null` を一体で置換する。
     placeholder = "/* __BENCHMARK_DATA__ */null"
     if placeholder not in template:
         raise ValueError(f"Template is missing the placeholder: {placeholder!r}")
@@ -51,20 +49,22 @@ def render(template: str, data: dict) -> str:
 
 
 def parse_args() -> argparse.Namespace:
+    """CLI 引数を定義して返す。"""
     parser = argparse.ArgumentParser(
-        description="Generate self-contained HTML eval viewer"
+        description="自己完結型の HTML eval viewer を生成する"
     )
-    parser.add_argument("--skill-id", required=True, help="Skill directory name")
-    parser.add_argument("--evals-dir", default="evals", help="Base evals directory")
+    parser.add_argument("--skill-id", required=True, help="skill ディレクトリ名")
+    parser.add_argument("--evals-dir", default="evals", help="evals 基底ディレクトリ")
     parser.add_argument(
         "--out",
         default=None,
-        help="Output HTML path (default: evals/<skill_id>/viewer.html)",
+        help="出力 HTML パス（既定: evals/<skill_id>/viewer.html）",
     )
     return parser.parse_args()
 
 
 def main() -> int:
+    """viewer を生成して HTML ファイルへ書き出す。"""
     args = parse_args()
     evals_dir = Path(args.evals_dir)
 

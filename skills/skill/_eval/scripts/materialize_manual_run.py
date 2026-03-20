@@ -1,8 +1,7 @@
-"""Materialize manual eval responses into grading_result.json run files.
+"""手動収集した eval 応答を `grading_result.json` 形式の run file へ変換する。
 
-This is a bridge for semi-automated evaluations when responses were gathered
-manually or via external agents, but aggregation/viewer generation should still
-use the standard evals/<skill_id>/runs/ layout.
+manual 実行や外部 agent で集めた response を、集計・viewer 生成が扱える
+標準の `evals/<skill_id>/runs/` レイアウトへ橋渡しするためのスクリプト。
 """
 
 from __future__ import annotations
@@ -14,11 +13,13 @@ from pathlib import Path
 
 
 def load_json(path: Path) -> dict:
+    """UTF-8 JSON ファイルを読み込む。"""
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
 
 
 def evaluate_assertions(case: dict, response: str, llm_overrides: list[dict]) -> list[dict]:
+    """1 ケース分の assertion を response に対して評価する。"""
     details: list[dict] = []
     llm_index = 0
     for assertion in case.get("assertions", []):
@@ -62,6 +63,7 @@ def evaluate_assertions(case: dict, response: str, llm_overrides: list[dict]) ->
 
 
 def score_assertions(assertions: list[dict]) -> float:
+    """assertion 群から重み付き score を計算する。"""
     total = sum(item["weight"] for item in assertions)
     passed = sum(item["weight"] for item in assertions if item["passed"])
     if total == 0:
@@ -70,6 +72,7 @@ def score_assertions(assertions: list[dict]) -> float:
 
 
 def materialize_run(evals_path: Path, manual_path: Path, skill_id: str, evals_dir: Path) -> list[Path]:
+    """手動 run データを標準 run file 群へ変換して書き出す。"""
     evals = load_json(evals_path)
     manual = load_json(manual_path)
     run_id = manual["run_id"]
@@ -104,15 +107,17 @@ def materialize_run(evals_path: Path, manual_path: Path, skill_id: str, evals_di
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Materialize manual eval responses into run result files")
-    parser.add_argument("--skill-id", required=True, help="Skill directory name under evals/")
-    parser.add_argument("--evals", required=True, help="Path to evals.json")
-    parser.add_argument("--manual", required=True, help="Path to manual response JSON")
-    parser.add_argument("--evals-dir", default="evals", help="Base evals directory")
+    """CLI 引数を定義して返す。"""
+    parser = argparse.ArgumentParser(description="手動 eval 応答を run result file へ変換する")
+    parser.add_argument("--skill-id", required=True, help="evals/ 配下の skill ディレクトリ名")
+    parser.add_argument("--evals", required=True, help="evals.json のパス")
+    parser.add_argument("--manual", required=True, help="手動 response JSON のパス")
+    parser.add_argument("--evals-dir", default="evals", help="evals 基底ディレクトリ")
     return parser.parse_args()
 
 
 def main() -> int:
+    """CLI から materialize 処理を実行する。"""
     args = parse_args()
     created = materialize_run(
         evals_path=Path(args.evals),

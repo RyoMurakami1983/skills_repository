@@ -15,15 +15,16 @@ def load_module():
     return module
 
 
-def write_skill(tmp_path: Path, folder: str, content: str) -> Path:
+def write_skill(tmp_path: Path, folder: str, content: str, *, with_legacy_reference: bool = False) -> Path:
     skill_dir = tmp_path / folder
     (skill_dir / "references").mkdir(parents=True, exist_ok=True)
     (skill_dir / "SKILL.md").write_text(content, encoding="utf-8")
-    (skill_dir / "references" / "SKILL.ja.md").write_text("# ja\n", encoding="utf-8")
+    if with_legacy_reference:
+        (skill_dir / "references" / "SKILL.ja.md").write_text("# ja\n", encoding="utf-8")
     return skill_dir / "SKILL.md"
 
 
-def test_l1_passes_for_router_style_skill(tmp_path: Path):
+def test_l1_passes_for_japanese_router_style_skill(tmp_path: Path):
     mod = load_module()
     skill_path = write_skill(
         tmp_path,
@@ -31,9 +32,42 @@ def test_l1_passes_for_router_style_skill(tmp_path: Path):
         """---
 name: router-skill
 description: >
+  スキル運用を整理するルーター。こんなときに使う: 新しいスキルを
+  作るとき、品質を確認するとき、既存 guidance を改善するとき。
+compatibility: test
+---
+
+# スキルルーター
+
+## こんなときに使う
+
+- 新しいスキルの流れを整理したいとき
+- 品質チェックの入口を決めたいとき
+- 既存 guidance を evidence ベースで改善したいとき
+
+## 判断表
+
+| やりたいこと | ルート |
+| --- | --- |
+| 作成 | new |
+| 改善 | improve |
+""",
+    )
+    report = mod.validate(skill_path, "L1")
+    assert report.critical_passed is True
+    assert len(report.critical) == 5
+
+
+def test_l1_passes_for_legacy_english_router_style_skill(tmp_path: Path):
+    mod = load_module()
+    skill_path = write_skill(
+        tmp_path,
+        "legacy-router-skill",
+        """---
+name: legacy-router-skill
+description: >
   Route skill operations. Use when creating skills, validating drafts, or
   improving published guidance.
-compatibility: test
 ---
 
 # Router Skill
@@ -52,35 +86,34 @@ Use this skill when:
 | Create | new |
 | Improve | improve |
 """,
+        with_legacy_reference=True,
     )
     report = mod.validate(skill_path, "L1")
     assert report.critical_passed is True
-    assert len(report.critical) == 5
 
 
-def test_l1_fails_without_use_when_trigger(tmp_path: Path):
+def test_l1_fails_without_trigger_phrase(tmp_path: Path):
     mod = load_module()
     skill_path = write_skill(
         tmp_path,
         "bad-skill",
         """---
 name: bad-skill
-description: Missing trigger phrase.
+description: トリガー表現がない説明。
 ---
 
 # Bad Skill
 
-## When to Use This Skill
+## こんなときに使う
 
-Use this skill when:
-- Creating a document
-- Updating a document
-- Reviewing a document
+- 文書を作りたいとき
+- 文書を更新したいとき
+- 文書を見直したいとき
 
-## Workflow: Minimal
+## ワークフロー: Minimal
 
-### Step 1 — Do the thing
-Because the workflow needs a step.
+### ステップ 1 — 進める
+なぜ必要かを書く。
 """,
     )
     report = mod.validate(skill_path, "L1")

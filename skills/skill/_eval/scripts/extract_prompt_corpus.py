@@ -1,6 +1,6 @@
-r"""Extract and summarize user prompts from Copilot session events.jsonl files.
+r"""Copilot session の events.jsonl から user prompt を抽出・要約する。
 
-Usage:
+使い方:
     uv run python skills/skill/_eval/scripts/extract_prompt_corpus.py ^
         --root "%USERPROFILE%\.copilot\session-state" ^
         --pattern "(PR|プルリク|レビュー|Issue|issue|コミット|commit|main|pull|git初期化|GitHub)" ^
@@ -36,6 +36,7 @@ class PromptHit:
 
 
 def anonymize_prompt(text: str) -> str:
+    """URL・Windows path・GitHub 所有者/リポジトリ名を匿名化する。"""
     text = URL_RE.sub("<URL>", text)
     text = WINDOWS_PATH_RE.sub("<WINDOWS_PATH>", text)
     text = GITHUB_REPO_RE.sub("<GITHUB_OWNER>/<GITHUB_REPO>", text)
@@ -45,6 +46,7 @@ def anonymize_prompt(text: str) -> str:
 
 
 def iter_user_messages(events_path: Path):
+    """1 つの events.jsonl から user.message だけを順に取り出す。"""
     with events_path.open(encoding="utf-8") as handle:
         for line in handle:
             try:
@@ -65,6 +67,7 @@ def iter_user_messages(events_path: Path):
 
 
 def build_summary(root: Path, pattern: re.Pattern[str] | None, limit: int) -> dict:
+    """session-state 配下を走査して prompt corpus の集計結果を作る。"""
     counts: Counter[str] = Counter()
     sessions_by_prompt: dict[str, set[str]] = {}
     first_seen: dict[str, str] = {}
@@ -75,6 +78,7 @@ def build_summary(root: Path, pattern: re.Pattern[str] | None, limit: int) -> di
     sessions_scanned = 0
 
     def alias_session(session_id: str) -> str:
+        """実 session ID を連番 alias に置き換える。"""
         if session_id not in session_aliases:
             session_aliases[session_id] = f"session-{len(session_aliases) + 1:03d}"
         return session_aliases[session_id]
@@ -121,15 +125,17 @@ def build_summary(root: Path, pattern: re.Pattern[str] | None, limit: int) -> di
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Extract user prompt corpus from Copilot session logs")
-    parser.add_argument("--root", required=True, help="Root directory containing session-state/**/events.jsonl")
-    parser.add_argument("--pattern", default=None, help="Regex filter for prompts (applied after anonymization)")
-    parser.add_argument("--limit", type=int, default=50, help="Number of top prompts to keep")
-    parser.add_argument("--out", required=True, help="Output JSON path")
+    """CLI 引数を定義して返す。"""
+    parser = argparse.ArgumentParser(description="Copilot session log から user prompt corpus を抽出する")
+    parser.add_argument("--root", required=True, help="session-state/**/events.jsonl を含む root ディレクトリ")
+    parser.add_argument("--pattern", default=None, help="匿名化後の prompt に適用する正規表現フィルタ")
+    parser.add_argument("--limit", type=int, default=50, help="保持する上位 prompt 数")
+    parser.add_argument("--out", required=True, help="出力 JSON パス")
     return parser.parse_args()
 
 
 def main() -> int:
+    """prompt corpus を集計して JSON に書き出す。"""
     args = parse_args()
     root = Path(args.root)
     out_path = Path(args.out)

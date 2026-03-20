@@ -1,14 +1,12 @@
-"""aggregate_benchmark.py
+"""`grading_result.json` 群を `benchmark_summary.json` へ集計する。
 
-Aggregate grading_result.json files into benchmark_summary.json.
-
-Usage:
+使い方:
     uv run python skills/skill/_eval/scripts/aggregate_benchmark.py \\
         --skill-id skill \\
         --run-id run-20260310-001 \\
         [--evals-dir evals]
 
-Output:
+出力:
     evals/<skill_id>/benchmark_summary.json
 """
 
@@ -22,7 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Gap analysis helpers
+# ギャップ分析ヘルパー
 # ---------------------------------------------------------------------------
 
 _FAILURE_MESSAGES = {
@@ -38,7 +36,7 @@ def _format_gap_message(assertion_type: str, value: str) -> str:
 
 
 def _generate_recommendation(failures: list[dict]) -> str:
-    """Rule-based recommendation text from baseline assertion failures."""
+    """baseline 側の assertion failure からルールベースで推奨文を作る。"""
     if not failures:
         return "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
 
@@ -65,11 +63,11 @@ def _generate_recommendation(failures: list[dict]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Data loading
+# データ読み込み
 # ---------------------------------------------------------------------------
 
 def load_run_results(evals_dir: Path, skill_id: str, run_id: str) -> tuple[list[dict], list[dict]]:
-    """Load all grading results for one run, split by mode."""
+    """1 回の run に属する grading result を mode 別に読み込む。"""
     run_dir = evals_dir / skill_id / "runs"
     if not run_dir.exists():
         raise FileNotFoundError(f"Runs directory not found: {run_dir}")
@@ -102,7 +100,7 @@ def load_run_results(evals_dir: Path, skill_id: str, run_id: str) -> tuple[list[
 
 
 def load_evals_json(evals_dir: Path, skill_id: str) -> dict[str, dict]:
-    """Load evals.json keyed by case_id. Returns empty dict if not found."""
+    """`evals.json` を case_id キーの辞書として読み込む。なければ空辞書を返す。"""
     path = evals_dir / skill_id / "evals.json"
     if not path.exists():
         return {}
@@ -112,11 +110,11 @@ def load_evals_json(evals_dir: Path, skill_id: str) -> dict[str, dict]:
 
 
 # ---------------------------------------------------------------------------
-# Statistics
+# 統計計算
 # ---------------------------------------------------------------------------
 
 def _scores(results: list[dict]) -> list[float]:
-    """Extract valid (non-null) scores."""
+    """null でない score だけを取り出す。"""
     return [r["score"] for r in results if r.get("score") is not None]
 
 
@@ -148,7 +146,7 @@ def compute_verdict(delta: float) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Case breakdown
+# ケース別 breakdown
 # ---------------------------------------------------------------------------
 
 def build_case_breakdown(
@@ -156,7 +154,7 @@ def build_case_breakdown(
     baseline: list[dict],
     evals_meta: dict[str, dict],
 ) -> list[dict]:
-    """Per-case score comparison keyed by case_id, enriched with prompts and assertion detail."""
+    """case_id ごとの比較結果に prompt と assertion 詳細を付与して返す。"""
     ws_map = {r["case_id"]: r for r in with_skill if r.get("score") is not None}
     bl_map = {r["case_id"]: r for r in baseline if r.get("score") is not None}
 
@@ -171,7 +169,7 @@ def build_case_breakdown(
         if ws_score is not None and bl_score is not None:
             delta = round(ws_score - bl_score, 4)
 
-        # Merge assertion details from run files + expected values from evals.json
+        # run result 側の assertion 詳細と evals.json 側の期待値を突き合わせる。
         meta = evals_meta.get(cid, {})
         eval_assertions = meta.get("assertions", [])
         ws_assertions = ws.get("assertions", [])
@@ -190,7 +188,7 @@ def build_case_breakdown(
                 "detail": ws_a.get("detail") or bl_a.get("detail") or "",
             })
 
-        # Gap analysis: baseline failures
+        # baseline failure をもとに、足りない知識や改善方向を要約する。
         baseline_failures = [
             {"type": a["type"], "value": a["value"]}
             for a in assertion_detail
@@ -219,7 +217,7 @@ def build_case_breakdown(
 
 
 # ---------------------------------------------------------------------------
-# Main aggregation
+# メイン集計
 # ---------------------------------------------------------------------------
 
 def aggregate(
@@ -267,25 +265,27 @@ def aggregate(
 # ---------------------------------------------------------------------------
 
 def parse_args() -> argparse.Namespace:
+    """CLI 引数を定義して返す。"""
     parser = argparse.ArgumentParser(
-        description="Aggregate grading_result.json files into benchmark_summary.json"
+        description="grading_result.json を benchmark_summary.json へ集計する"
     )
-    parser.add_argument("--skill-id", required=True, help="Skill directory name")
-    parser.add_argument("--run-id", required=True, help="Run identifier prefix")
+    parser.add_argument("--skill-id", required=True, help="skill ディレクトリ名")
+    parser.add_argument("--run-id", required=True, help="run ID の接頭辞")
     parser.add_argument(
         "--evals-dir",
         default="evals",
-        help="Base directory for eval files (default: evals/)",
+        help="eval ファイル群の基底ディレクトリ（既定: evals/）",
     )
     parser.add_argument(
         "--eval-version",
         default="1.0.0",
-        help="Eval suite version to embed in output (default: 1.0.0)",
+        help="出力に埋め込む eval suite version（既定: 1.0.0）",
     )
     return parser.parse_args()
 
 
 def main() -> int:
+    """CLI から benchmark 集計を実行する。"""
     args = parse_args()
     evals_dir = Path(args.evals_dir)
 

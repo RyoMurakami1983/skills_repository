@@ -1,48 +1,63 @@
 ---
 name: evaluate
 description: >
-  Evaluate whether a skill changes agent behavior by running with-skill versus
-  baseline cases, aggregating results, and deciding the next action. Use when
-  trigger quality, output quality, or regression risk must be measured.
+  with-skill と baseline を比較し、skill の行動変化を測定する。こんな
+  ときに使う: trigger 精度、出力品質、回帰リスクを実証的に確認したいとき。
 compatibility: "_eval/agents/, _eval/scripts/, _eval/schemas/"
 ---
 
-# Evaluate a Skill
+# スキルを評価する
 
-Use this sub-skill when you need evidence about behavioral impact, not only confidence from static review.
+静的レビューだけでは足りないときに、skill が本当に挙動改善を生むかを比較評価する sub-skill です。比較で見る理由は、単発の好例ではなく、with-skill と baseline の差分として改善を確かめるためです。
 
-## When to Use This Skill
+## こんなときに使う
 
-Use this skill when:
-- Designing realistic should-trigger and near-miss eval cases
-- Comparing with-skill versus baseline behavior on the same prompts
-- Generating benchmark summaries and reviewer-friendly HTML output
-- Deciding whether to accept, revise, or expand eval coverage
+- should-trigger / near-miss ケースを実運用に近い形で設計したいとき
+- 同じ prompt で with-skill と baseline を比較したいとき
+- benchmark summary や reviewer 向け artifact を生成したいとき
+- 採用、改訂、ケース追加の次アクションを決めたいとき
 
-## Workflow: Evaluate a Skill
+## ワークフロー: スキルを評価する
 
-### Step 1 — Design Good Cases
+### ステップ 1 — 良い eval ケースを設計する
 
-Create should-trigger and should-not-trigger cases that look like real user requests. Near-miss cases are critical because they reveal false positives better than obviously unrelated prompts.
+should-trigger と should-not-trigger を、実際の user request に近い形で作ります。near-miss case は false positive を見つけやすいので、明らかに無関係な prompt より重要です。
 
-### Step 2 — Run Both Modes
+### ステップ 2 — 両モードを同条件で実行する
 
-Use `_eval/agents/runner.md` to execute each case with the skill injected and without it. Matching conditions is what makes the comparison trustworthy.
+`_eval\agents\runner.md` を使い、各ケースを with-skill と baseline の両方で実行します。条件が揃っていない比較は信用できません。
 
-### Step 3 — Aggregate the Results
+### ステップ 3 — 結果を集計する
 
-Use `uv run python skills\skill\_eval\scripts\aggregate_benchmark.py --skill-id <skill-id> --run-id <run-id>` to compute pass rates and summary deltas. Aggregation makes patterns visible that single-case wins or losses can hide.
+`uv run python skills\skill\_eval\scripts\aggregate_benchmark.py --skill-id <skill-id> --run-id <run-id>` で pass rate と summary delta を集計します。単発ケースでは見えない傾向を、集計で可視化します。
 
-### Step 4 — Generate a Review Artifact
+### ステップ 4 — review artifact を作る
 
-Use `uv run python skills\skill\_eval\scripts\generate_viewer.py --skill-id <skill-id>` with `assets/eval_review.html` so humans can inspect the outcome quickly. Fast review matters when you are iterating.
+`uv run python skills\skill\_eval\scripts\generate_viewer.py --skill-id <skill-id>` と `assets\eval_review.html` を使い、人がすばやく結果を見られる形にします。iteration を回すには、review の速さが重要です。
 
-### Step 5 — Decide the Next Action
+### ステップ 5 — 次のアクションを決める
 
-Accept when the skill clearly helps, revise when it hurts, add cases when evidence is thin, and escalate only when the regression is severe or high-risk.
+skill が明確に効いていれば accept、悪化していれば revise、evidence が薄ければケース追加、回帰が大きければ escalation を選びます。
 
-## Pitfalls
+## 早見表
 
-- **Testing only happy paths**: without near-miss cases you cannot judge trigger precision.
-- **Changing prompts between modes**: the comparison loses meaning immediately.
-- **Treating one good run as proof**: consistent evidence matters more than anecdotal wins.
+| 段階 | 見るもの |
+| --- | --- |
+| ケース設計 | should-trigger、near-miss、false-positive guard |
+| 実行 | with-skill / baseline の条件一致 |
+| 集計 | pass rate、summary delta、傾向 |
+| artifact | reviewer が追える形か |
+| 判断 | accept / revise / add cases / escalate |
+
+## 共通リソース
+
+- `_eval\agents\runner.md` — with-skill / baseline 実行
+- `_eval\scripts\aggregate_benchmark.py` — 集計
+- `_eval\scripts\generate_viewer.py` — viewer 生成
+- `..\validate\` — static 検証へ戻る導線
+
+## 注意点
+
+- **happy path だけで評価しない**: near-miss がないと trigger precision を判断できません。
+- **モード間で prompt を変えない**: 条件がずれた時点で比較の意味が壊れます。
+- **1 回の好結果を証拠にしない**: anecdotal win より、繰り返し観測される evidence を重視します。

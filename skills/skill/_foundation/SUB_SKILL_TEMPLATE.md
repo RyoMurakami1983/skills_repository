@@ -9,21 +9,21 @@ compatibility: <optional shared resources or constraints>
 
 <Explain why this sub-skill exists in 1-2 sentences.>
 
-## When to Use This Skill
+## こんなときに使う
 
-Use this skill when:
+このスキルは次のようなときに使います:
 - <Verb-led scenario 1>
 - <Verb-led scenario 2>
 - <Verb-led scenario 3>
 
-## Workflow: <Workflow Name>
+## ワークフロー: <Workflow Name>
 
-### Step 1 — <Action>
-Explain what to do, why it matters, and show one short example.
+### ステップ 1 — <Action>
+何をするか、なぜ必要か、短い例と合わせて説明する。
 
-### Step 2 — <Action>
-Explain what to do next, why it matters, and what can go wrong.
+### ステップ 2 — <Action>
+次に何をするか、なぜ必要か、どこで失敗しやすいかを書く。
 
-## Pitfalls
+## 注意点
 
 - **<Pitfall>**: <How to avoid it and why the safer choice works better.>
