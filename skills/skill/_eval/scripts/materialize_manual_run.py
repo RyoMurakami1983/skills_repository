@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -16,6 +17,27 @@ def load_json(path: Path) -> dict:
     """UTF-8 JSON ファイルを読み込む。"""
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
+
+
+def canonical_variant_id(variant_id: str) -> str:
+    """旧 mode 名を含めて variant 名を標準化する。"""
+    return {"with_skill": "current"}.get(variant_id, variant_id)
+
+
+def legacy_filename(run_id: str, case_id: str, variant_id: str) -> str:
+    """旧 layout の run file 名を返す。"""
+    suffix = "with_skill" if canonical_variant_id(variant_id) == "current" else variant_id
+    return f"{run_id}_{case_id}_{suffix}.json"
+
+
+def variant_filename(run_id: str, case_id: str, variant_id: str) -> str:
+    """variant aware layout の run file 名を返す。"""
+    return f"{run_id}__{variant_id}__{case_id}.json"
+
+
+def is_compat_mode(variants: set[str]) -> bool:
+    """旧 with_skill / baseline だけの入力かを判定する。"""
+    return variants <= {"with_skill", "baseline"}
 
 
 def evaluate_assertions(case: dict, response: str, llm_overrides: list[dict]) -> list[dict]:
@@ -40,6 +62,33 @@ def evaluate_assertions(case: dict, response: str, llm_overrides: list[dict]) ->
             details.append({
                 "type": assertion_type,
                 "passed": value not in response,
+                "weight": weight,
+                "detail": "",
+            })
+            continue
+
+        if assertion_type == "starts_with":
+            details.append({
+                "type": assertion_type,
+                "passed": response.lstrip().startswith(value),
+                "weight": weight,
+                "detail": "",
+            })
+            continue
+
+        if assertion_type == "ends_with":
+            details.append({
+                "type": assertion_type,
+                "passed": response.rstrip().endswith(value),
+                "weight": weight,
+                "detail": "",
+            })
+            continue
+
+        if assertion_type == "regex":
+            details.append({
+                "type": assertion_type,
+                "passed": re.search(value, response) is not None,
                 "weight": weight,
                 "detail": "",
             })
@@ -82,24 +131,31 @@ def materialize_run(evals_path: Path, manual_path: Path, skill_id: str, evals_di
 
     responses = manual["responses"]
     llm = manual["llm_grade"]
+    compat_mode = is_compat_mode({str(key) for key in responses})
 
-    for mode in ("with_skill", "baseline"):
-        mode_responses = responses[mode]
-        mode_llm = llm[mode]
+    for raw_variant_id, variant_responses in responses.items():
+        variant_id = canonical_variant_id(str(raw_variant_id))
+        variant_llm = llm.get(raw_variant_id) or llm.get(variant_id)
+        if variant_llm is None:
+            raise ValueError(f"Missing llm_grade overrides for variant '{raw_variant_id}'")
         for case in evals.get("cases", []):
             case_id = case["id"]
-            response = mode_responses[case_id]
-            assertions = evaluate_assertions(case, response, mode_llm.get(case_id, []))
+            response = variant_responses[case_id]
+            assertions = evaluate_assertions(case, response, variant_llm.get(case_id, []))
             result = {
                 "case_id": case_id,
                 "run_id": run_id,
-                "mode": mode,
+                "variant_id": variant_id,
+                "mode": variant_id,
                 "score": score_assertions(assertions),
                 "assertions": assertions,
                 "response_snippet": response[:500],
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
-            out_path = runs_dir / f"{run_id}_{case_id}_{mode}.json"
+            if compat_mode:
+                out_path = runs_dir / legacy_filename(run_id, case_id, raw_variant_id)
+            else:
+                out_path = runs_dir / variant_filename(run_id, case_id, variant_id)
             out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
             created.append(out_path)
 

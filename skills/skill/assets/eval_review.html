@@ -434,7 +434,48 @@ const DATA = /* __BENCHMARK_DATA__ */null;
     detailsContainer.appendChild(card);
   });
 
-    document.getElementById("footer").textContent =
+  const history = d.history || [];
+  if (history.length) {
+    const historyCard = document.createElement("div");
+    historyCard.className = "card";
+    historyCard.innerHTML = `
+      <h2>履歴</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Campaign</th>
+            <th>Run</th>
+            <th>Primary comparison</th>
+            <th>Δ</th>
+            <th>Verdict</th>
+            <th>Generated</th>
+          </tr>
+        </thead>
+        <tbody id="history-table"></tbody>
+      </table>
+    `;
+    const historyBody = historyCard.querySelector("#history-table");
+    history.slice().reverse().forEach(h => {
+      const tr = document.createElement("tr");
+      const cmp = h.summary?.primary_comparison || "—";
+      const delta = h.summary?.delta;
+      const verdict = h.summary?.verdict || "—";
+      const generated = h.generated_at ? new Date(h.generated_at).toLocaleString("ja-JP") : "—";
+      const deltaText = delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta.toFixed(4)}`;
+      [h.campaign_id || "—", h.run_id || "—", cmp, deltaText, verdict, generated].forEach((val, i) => {
+        const td = document.createElement("td");
+        td.textContent = val;
+        if (i === 3 && delta != null) {
+          td.className = delta > 0.05 ? "delta-positive" : delta < -0.05 ? "delta-negative" : "";
+        }
+        tr.appendChild(td);
+      });
+      historyBody.appendChild(tr);
+    });
+    detailsContainer.appendChild(historyCard);
+  }
+
+  document.getElementById("footer").textContent =
     `skill/_eval  |  ${d.skill_id}  |  ${d.eval_version}`;
 })(DATA);
 

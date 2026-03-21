@@ -1,13 +1,16 @@
 # Runner Agent
 
-役割: skill evaluation run を実行し、skill 注入あり・なしの両条件で sub-agent を起動します。
+役割: skill evaluation run を実行し、`baseline / legacy / current` の 3 役を含む比較を行います。
 
 ## 責務
 
-あなたは **Runner** です。test suite（`evals.json`）を受け取り、各 case を 2 回ずつ実行します。
+あなたは **Runner** です。test suite（`evals.json`）を受け取り、各 case を variant ごとに実行します。
 
-1. **`with_skill` mode** — 対象の `SKILL.md` 内容を agent prompt に注入する
-2. **`baseline` mode** — skill 注入なしで同じ prompt を実行する
+1. **`baseline`** — skill 注入なしで同じ prompt を実行する
+2. **`legacy`** — 直前に採用していた版を注入する
+3. **`current`** — 今回の改善候補を注入する
+
+旧 `with_skill` は互換名として `current` に正規化します。
 
 生成する grading result は `../schemas/schemas.md` に従う必要があります。
 
@@ -21,10 +24,11 @@
 
 ## Outputs
 
-各 test case について、次の 2 ファイルを生成します。
+各 test case について、次の 3 種の run file を生成します。
 
-- `<evals-dir>/<skill_id>/runs/<run_id>_<case_id>_with_skill.json`
-- `<evals-dir>/<skill_id>/runs/<run_id>_<case_id>_baseline.json`
+- 互換 layout: `<evals-dir>/<skill_id>/runs/<run_id>_<case_id>_baseline.json`
+- 互換 layout: `<evals-dir>/<skill_id>/runs/<run_id>_<case_id>_with_skill.json`
+- 標準 layout: `<evals-dir>/<skill_id>/runs/<run_id>__<variant_id>__<case_id>.json`
 
 ---
 
@@ -42,9 +46,9 @@ Read SKILL.md from the target skill directory
 
 ### Step 2: 各 Case を実行する（Parallel）
 
-`cases` の各 case について、**2 つの sub-agent を並列で起動**します。
+`cases` の各 case について、**variant ごとに sub-agent を起動**します。
 
-**with_skill sub-agent prompt template**:
+**current / legacy sub-agent prompt template**:
 ```
 You are an AI assistant. Use the following skill definition to guide your response.
 
@@ -78,8 +82,10 @@ User request: {case.prompt}
 
 各結果を次の path へ保存します。
 
-- `<evals-dir>/<skill_id>/runs/<run_id>_<case_id>_with_skill.json`
-- `<evals-dir>/<skill_id>/runs/<run_id>_<case_id>_baseline.json`
+- `<evals-dir>/<skill_id>/runs/<run_id>__<variant_id>__<case_id>.json`
+- 互換性のため `baseline` / `current` は旧 layout でも書き出せるようにする
+
+variant 名は `baseline / legacy / current` を標準とし、旧 `with_skill` は `current` として扱います。
 
 最後に `{N} cases completed, {M} failed assertion checks` を報告します。
 

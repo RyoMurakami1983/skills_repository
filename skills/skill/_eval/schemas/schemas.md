@@ -3,6 +3,7 @@
 以下の path は `skills/skill/` からの相対表記です。
 
 この文書は eval 関連 artifact の**説明用リファレンス**です。見出しや説明文は日本語化してよい一方で、JSON の key 名、file 名、enum 値、path 断片は互換性のため英語のまま扱います。
+標準の variant 名は `baseline / legacy / current` です。旧 `with_skill` は `current` の互換名として扱います。
 
 ## `evals.json`
 
@@ -28,13 +29,14 @@
 
 ## `grading_result.json`
 
-1 回の採点結果を保存します。各 assertion の pass/fail と score、応答抜粋を含みます。
+1 回の採点結果を保存します。各 assertion の pass/fail と score、応答抜粋、variant 情報を含みます。
 
 ```json
 {
   "case_id": "tc-001",
   "run_id": "run-001",
-  "mode": "with_skill",
+  "mode": "current",
+  "variant_id": "current",
   "score": 1.0,
   "assertions": [
     { "type": "contains", "passed": true, "weight": 1.0, "detail": "" }
@@ -46,17 +48,23 @@
 
 ## `benchmark_summary.json`
 
-複数 run の集計結果を表します。with-skill と baseline の比較に使います。
+複数 run の集計結果を表します。`baseline / legacy / current` の比較に使います。
 
 ```json
 {
   "skill_id": "skill-name",
   "eval_version": "1.0.0",
-  "runs": {
-    "with_skill": { "count": 8, "mean": 0.92, "stddev": 0.04, "min": 0.85, "max": 1.0 },
-    "baseline": { "count": 8, "mean": 0.71, "stddev": 0.12, "min": 0.45, "max": 0.9 }
+  "variants": {
+    "baseline": { "count": 8, "mean": 0.71, "stddev": 0.12, "min": 0.45, "max": 0.9 },
+    "legacy": { "count": 8, "mean": 0.80, "stddev": 0.08, "min": 0.60, "max": 0.95 },
+    "current": { "count": 8, "mean": 0.92, "stddev": 0.04, "min": 0.85, "max": 1.0 }
   },
-  "summary": { "delta": 0.21, "improvement_pct": 29.58, "verdict": "improved" }
+  "comparisons": {
+    "current_vs_legacy": { "lhs": "current", "rhs": "legacy", "delta": 0.12, "improvement_pct": 15.0, "verdict": "improved" },
+    "current_vs_baseline": { "lhs": "current", "rhs": "baseline", "delta": 0.21, "improvement_pct": 29.58, "verdict": "improved" },
+    "legacy_vs_baseline": { "lhs": "legacy", "rhs": "baseline", "delta": 0.09, "improvement_pct": 12.68, "verdict": "improved" }
+  },
+  "summary": { "delta": 0.12, "improvement_pct": 15.0, "verdict": "improved", "primary_comparison": "current_vs_legacy" }
 }
 ```
 
@@ -86,6 +94,14 @@ benchmark を読んだ結果として、改善提案と次アクションをま�
   "next_action": "revise_skill",
   "created_at": "2026-03-15T00:00:00Z"
 }
+```
+
+## `benchmark_history.jsonl`
+
+append-only の履歴 ledger です。各行に 1 campaign の集計結果を記録します。
+
+```json
+{"skill_id":"skill-name","campaign_id":"campaign-001","run_id":"run-001","eval_version":"1.0.0","generated_at":"2026-03-15T00:00:00Z","summary":{"delta":0.12,"improvement_pct":15.0,"verdict":"improved","primary_comparison":"current_vs_legacy"},"variants":{"baseline":{"count":8,"mean":0.71},"legacy":{"count":8,"mean":0.80},"current":{"count":8,"mean":0.92}},"comparisons":{"current_vs_legacy":{"lhs":"current","rhs":"legacy","delta":0.12,"improvement_pct":15.0,"verdict":"improved"}}}
 ```
 
 ## Workspace Layout
