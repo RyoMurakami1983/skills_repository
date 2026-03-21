@@ -3,7 +3,7 @@ name: dotnet-slopwatch
 description: >
   Two-layer slop prevention for .NET: code-level detection via Slopwatch CLI (SW-xxx)
   and architectural anti-pattern catalog (SLOP-xxx).
-  Use when validating LLM-generated C# code, checking for layer boundary violations,
+  Use when: validating LLM-generated C# code, checking for layer boundary violations,
   or integrating anti-slop quality gates into CI/CD.
 metadata:
   author: RyoMurakami1983

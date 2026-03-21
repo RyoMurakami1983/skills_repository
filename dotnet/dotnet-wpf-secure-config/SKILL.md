@@ -2,7 +2,7 @@
 name: dotnet-wpf-secure-config
 description: >
   Add DPAPI-encrypted config management to WPF apps with secure credential storage.
-  Use when setting up encrypted configuration for WPF applications.
+  Use when: setting up encrypted configuration for WPF applications.
 license: MIT
 metadata:
   author: RyoMurakami1983

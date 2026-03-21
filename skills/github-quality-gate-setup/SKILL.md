@@ -1,79 +1,75 @@
 ---
 name: github-quality-gate-setup
-description: "Add gitleaks + textlint quality gate CI to any GitHub repository. Use when setting up a new repo or hardening an existing one against secret leaks and Markdown issues."
+description: >
+  gitleaks と textlint の品質ゲート CI を GitHub リポジトリへ導入する。Use when: 新しいリポジトリに品質ゲートを入れたいとき、既存リポジトリのシークレット漏洩対策や Markdown チェックを強化したいとき。
 ---
+# GitHub 品質ゲートのセットアップ
 
-# GitHub Quality Gate Setup
+gitleaks（シークレット検出）とオプションの textlint（Markdown チェック）を
+任意の GitHub リポジトリに追加するワークフロー。
 
-Workflow for adding a quality gate CI pipeline — secret detection (gitleaks) and optional Markdown linting (textlint) — to any GitHub repository.
+**品質ゲート**: PRのたびに自動実行されるチェック。マージ前にセキュリティ問題・
+コンテンツ問題を検出する。
 
-**Quality Gate**: Automated checks that run on every PR to catch security issues and content problems before merge.
+## こんなときに使う
+このスキルを使うのは：
+- 既存リポジトリへの品質ゲートCI追加
+- テンプレートリポジトリから作成したリポジトリのカスタマイズ
+- `github-repo-template` が提供する内容の確認・変更
+- 品質ゲートルールの更新・拡張
 
-## When to Use This Skill
-
-Use this skill when:
-- Adding quality gate CI to an existing repository for the first time
-- Customizing the quality gate received from a template repository
-- Reviewing what the `github-repo-template` pre-configures out of the box
-- Updating or extending quality gate rules as the project evolves
-- Investigating a gitleaks false positive and tuning the allowlist
-- Deciding whether to add textlint based on Markdown content volume
-
-> **Tip**: For brand-new repositories, start from [`github-repo-template`](https://github.com/RyoMurakami1983/github-repo-template) instead — it pre-configures everything.
+> **Tip**: 新規リポジトリの場合は [`github-repo-template`](https://github.com/RyoMurakami1983/github-repo-template) から作成する方が速い。すべてが最初から設定済みで届く。
 
 ## Related Skills
 
-- **`git-init-to-github`** — Common upstream bootstrap when a repository is being published for the first time
-- **`git-initial-setup`** — Branch protection and `.gitattributes`/`.editorconfig` setup that usually lands before or alongside CI hardening
-- **`github-repo-label-setup`** — Adjacent repo-standardization work often done in the same bootstrap window
-- **`knowledge-capture`** — Anonymization gate before committing documents
-- **`github-issue-intake`** — Issue intake with anonymization check
+- **`git-initial-setup`** — ブランチ保護と `.gitattributes`/`.editorconfig` の設定（事前前提）
+- **`knowledge-capture`** — ドキュメントコミット前の匿名化ゲート
+- **`github-issue-intake`** — 匿名化チェック付き Issue 起票
 
 ---
 
 ## Dependencies
 
 - Git 2.30+
-- GitHub CLI (`gh`) — verify with `gh auth status`
-- For textlint: Node.js 18+
+- GitHub CLI (`gh`) — `gh auth status` で確認
+- textlint 使用時: Node.js 18+
 
 ---
 
 ## Core Principles
 
-1. **Defense in Depth** (基礎と型) — Multiple layers: secret detection + content lint
-2. **Fail Fast on PR** (継続は力) — Gate every PR; never let issues reach main
-3. **Low Noise** (余白の設計) — Allowlists prevent false positives from doc examples
-4. **Language Agnostic Core** (ニュートラル) — gitleaks works for any repo type; textlint is opt-in
-5. **Grow the Allowlist** (温故知新) — Tuning `.gitleaks.toml` over time makes the gate smarter
+1. **多層防御** (基礎と型) — シークレット検出 + コンテンツ lint の2層で守る。なぜ？ 1つのツールでは検出できない問題を補完できる。
+2. **PRでフェールファースト** (継続は力) — すべての PRをゲートする。問題を main に届けない。なぜ？ main へ入ってしまったら修正コストが格段に上がる。
+3. **ノイズを最小化** (余白の設計) — Allowlist で誤検知を防ぐ。なぜ？ 誤検知が多いとエンジニアがアラートを無視し始め、ゲートが形骸化する。
+4. **言語非依存のコア** (ニュートラル) — gitleaks は任意のリポジトリに適用可能。textlint は Markdown があるときだけ追加。なぜ？ 不要なジョブは CI 時間とメンテコストを増やすだけ。
+5. **Allowlist を育てる** (温故知新) — `.gitleaks.toml` を徐々に育てることでゲートが賢くなる。なぜ？ 最初から完璧なルールはない。実運用でのフィードバックが品質を作る。
 
 ---
 
-## Workflow: Add Quality Gate CI
+## Workflow: 品質ゲートCIの追加
 
-### Step 1: Determine Scope
+### Step 1: スコープを確認する
 
-Decide which jobs to add based on the repository content.
+リポジトリの内容に応じて、追加するジョブを決める。
 
-| Job | When to add |
-|-----|-------------|
-| **gitleaks** | Always — every repository |
-| **textlint** | When the repo has significant Markdown (docs, skills, README-heavy) |
+| ジョブ | 追加する条件 |
+|--------|------------|
+| **gitleaks** | 常に追加 — すべてのリポジトリ |
+| **textlint** | Markdownが多いとき（ドキュメント・スキル集・README重視のリポジトリ） |
 
 ```bash
-# Quick check: does the repo have Markdown files beyond README?
+# Markdownファイルの量を確認する
 find . -name "*.md" | grep -v "^./README.md" | head -5
 ```
 
-If more than a few `.md` files exist, add textlint. For pure code repositories (dotnet, Python with no docs), gitleaks only is sufficient.
-
-**Why?** Adding textlint to a repo with no Markdown increases CI time and maintenance cost with zero benefit. Keeping the gate lean means engineers respect it.
+README 以外の `.md` ファイルが複数あれば textlint を追加する。
+純粋なコードリポジトリ（dotnet / Python でドキュメントなし）なら gitleaks のみで十分。
 
 > **Values**: 基礎と型
 
-### Step 2: Add Gitleaks
+### Step 2: Gitleaks を追加する
 
-Copy the workflow template and customize the allowlist.
+ワークフローテンプレートをコピーし、allowlist をカスタマイズする。
 
 ```bash
 mkdir -p .github/workflows
@@ -83,26 +79,24 @@ cp /path/to/skills/github-quality-gate-setup/scripts/.gitleaks.toml \
    .gitleaks.toml
 ```
 
-Open `.gitleaks.toml` and add project-specific allowlist entries:
+`.gitleaks.toml` を開き、プロジェクト固有の allowlist エントリを追加する：
 
 ```toml
 [[allowlists]]
-description = "Project-specific placeholders"
+description = "プロジェクト固有のプレースホルダー"
 regexes = [
-  # Add patterns that appear in your docs/examples but are not real secrets
+  # ドキュメント例示に使っているが本物のシークレットではないパターンを追加
   '''YOUR[_-]?API[_-]?KEY''',
 ]
 ```
 
-**Why tune the allowlist early?** False positives that aren't addressed quickly cause developers to distrust the gate. Tuning upfront builds confidence in the signal.
-
-> **Note**: gitleaks scans only the PR diff when triggered by `pull_request` — no extra config needed.
+> **Note**: `pull_request` トリガーで実行すると、gitleaks は自動的に PR 差分のみをスキャンする。追加設定は不要。
 
 > **Values**: 基礎と型 / 余白の設計
 
-### Step 3: Add Textlint (Optional)
+### Step 3: Textlint を追加する（省略可）
 
-Skip this step if the repository has no significant Markdown content.
+リポジトリに Markdown コンテンツが少ない場合はスキップする。
 
 ```bash
 cp /path/to/skills/github-quality-gate-setup/scripts/.textlintrc.json .
@@ -110,16 +104,16 @@ cp /path/to/skills/github-quality-gate-setup/scripts/package.json .
 npm install
 ```
 
-Then **uncomment the textlint job** in `.github/workflows/quality.yml`:
+次に、`.github/workflows/quality.yml` の **textlint ジョブのコメントを外す**：
 
 ```yaml
-# Remove the comment markers around the textlint job
+# コメントマーカーを外して textlint ジョブを有効化
   textlint:
     name: textlint
     ...
 ```
 
-Verify locally (optional — CI is the authoritative check):
+ローカルで確認（省略可 — CI が正式なチェック）：
 
 ```bash
 npx textlint "**/*.md" --ignore-path .gitignore
@@ -127,15 +121,15 @@ npx textlint "**/*.md" --ignore-path .gitignore
 
 > **Values**: ニュートラル
 
-### Step 4: Commit and Push
+### Step 4: コミット & プッシュ → PR
 
 ```bash
-# Add files to a feature branch
+# フィーチャーブランチを作成
 git switch -c feature/add-quality-gate
 
 git add .github/workflows/quality.yml .gitleaks.toml
 
-# If textlint was added:
+# textlint を追加した場合:
 git add .textlintrc.json package.json package-lock.json
 
 git commit -m "feat: gitleaks + textlint 品質ゲートCIを追加
@@ -147,19 +141,19 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
 git push -u origin feature/add-quality-gate
 ```
 
-Then create a PR via `github-pr-workflow`.
+その後、`github-pr-workflow` スキルで PR を作成する。
 
 > **Values**: 継続は力
 
-### Step 5: Configure Branch Protection
+### Step 5: Branch Protection を設定する（手動）
 
-After the CI workflow is merged to main, manually configure branch protection to require the status checks:
+CI ワークフローが main にマージされた後、手動でブランチ保護を設定する：
 
-1. Go to GitHub → Settings → Branches → Edit rule for `main`
-2. Enable **Require status checks to pass before merging**
-3. Search and add: `gitleaks`
-4. If textlint was added, also add: `textlint`
-5. Save
+1. GitHub → Settings → Branches → `main` ルールを編集
+2. **Require status checks to pass before merging** を有効化
+3. `gitleaks` を検索して追加
+4. textlint を追加した場合は `textlint` も追加
+5. 保存
 
 > **Values**: 基礎と型
 
@@ -167,67 +161,67 @@ After the CI workflow is merged to main, manually configure branch protection to
 
 ## Best Practices
 
-- Always start with gitleaks; add textlint only when there is Markdown to lint
-- Grow the `.gitleaks.toml` allowlist incrementally — add entries when you encounter false positives
-- Use `YOUR_API_KEY_HERE`-style placeholders in doc examples to avoid false positives
-- Commit `package-lock.json` when using textlint — required for `npm ci` in CI
-- For non-Markdown repos, keep only the gitleaks job to minimize CI overhead
+- まず gitleaks のみで始め、Markdown が多ければ textlint を追加する
+- `.gitleaks.toml` の allowlist は段階的に育てる — 誤検知が出たタイミングで追加
+- ドキュメント例示には `YOUR_API_KEY_HERE` スタイルのプレースホルダーを使い誤検知を防ぐ
+- textlint を使う場合は `package-lock.json` をコミットする — `npm ci` に必要
+- Markdown がないリポジトリは gitleaks のみにして CI オーバーヘッドを最小化
 
 ### Preflight Checklist
 
-- [ ] `gh auth status` succeeds (workflow scope required for `.github/workflows/` push)
-- [ ] Feature branch created (not on main)
-- [ ] `.gitleaks.toml` allowlist tuned for this repo's doc examples
-- [ ] textlint: decided whether to include based on Markdown volume
+- [ ] `gh auth status` が成功している（workflow スコープが必要）
+- [ ] フィーチャーブランチを作成済み（main ではない）
+- [ ] `.gitleaks.toml` の allowlist をリポジトリのドキュメント例示に合わせてチューニング済み
+- [ ] textlint: Markdownの量に応じて追加するか判断済み
 
 ### Self-Review Checklist
 
-- [ ] `.github/workflows/quality.yml` triggers on `pull_request`
-- [ ] gitleaks job uses `gitleaks-action@v2` with `GITHUB_TOKEN`
-- [ ] If textlint: `package-lock.json` committed; textlint rules pass on existing files
-- [ ] Branch protection updated after merge
+- [ ] `.github/workflows/quality.yml` が `pull_request` トリガーで動作する
+- [ ] gitleaks ジョブが `gitleaks-action@v2` + `GITHUB_TOKEN` を使用している
+- [ ] textlint を追加した場合: `package-lock.json` がコミット済み、既存ファイルでルールが通る
+- [ ] マージ後に Branch Protection を更新した
 
 ---
 
 ## Common Pitfalls
 
-1. **Push rejected for `.github/workflows/*`**
-   ❌ Token lacks `workflow` scope — push is rejected with a remote error.
-   ✅ Fix: `gh auth refresh -h github.com -s workflow`
+1. **`.github/workflows/*` へのプッシュが拒否される**
+   原因: トークンに `workflow` スコープがない。
+   対処: `gh auth refresh -h github.com -s workflow`
 
-2. **textlint "No rules found"**
-   ❌ A filter rule (e.g., `filters.comments`) references an uninstalled package — textlint exits with error.
-   ✅ Fix: Remove or install the missing filter package.
+2. **textlint「No rules found」エラー**
+   原因: `filters.comments` など、未インストールのフィルタパッケージを参照している。
+   対処: 該当のフィルタエントリを削除するか、パッケージをインストールする。
 
-3. **gitleaks false positives on doc examples**
-   ❌ Example API keys/tokens in Markdown match gitleaks patterns — every PR fails.
-   ✅ Fix: Add patterns to `[[allowlists]]` in `.gitleaks.toml`.
+3. **gitleaks がドキュメント例示で誤検知する**
+   原因: Markdown 内の例示 API キー / トークンが gitleaks パターンにマッチ。
+   対処: `.gitleaks.toml` の `[[allowlists]]` にパターンを追加。
 
-4. **textlint `no-empty-section` error on existing files**
-   ❌ A heading exists with no content before the next heading — CI fails on unrelated files.
-   ✅ Fix: Remove the empty heading or add placeholder content.
+4. **textlint `no-empty-section` エラー**
+   原因: 見出しの後、次の見出しまでにコンテンツがない（空セクション）。
+   対処: 空の見出しを削除するかコンテンツを追加。
 
 ---
 
 ## Anti-Patterns
 
-- Merging `.github/workflows/` changes without requiring status checks in branch protection
-- Leaving the allowlist empty and suppressing all gitleaks findings with global ignores
-- Running textlint on repos with no meaningful Markdown (unnecessary CI overhead)
+- `.github/workflows/` の変更をマージしたのに Branch Protection の必須チェックを設定しない
+- allowlist を空にして、全 gitleaks 検知をグローバル ignore で抑制する
+- Markdown がほとんどないリポジトリに textlint を追加して不要な CI オーバーヘッドを作る
 
 ---
 
 ## Quick Reference
 
-### Decision Table: gitleaks only vs. gitleaks + textlint
+### 判断テーブル（Decision Table）: gitleaks のみ vs. gitleaks + textlint
 
 ```
-repo has many .md files?
+リポジトリに README 以外の .md ファイルが多い？
   ├── YES → gitleaks + textlint
-  └── NO  → gitleaks only
+  └── NO  → gitleaks のみ
 ```
 
-### Minimal gitleaks-only workflow
+### gitleaks のみの最小ワークフロー
 
 ```yaml
 name: Quality Gate
@@ -250,37 +244,37 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-### Template files location
+### テンプレートファイルの場所
 
 ```
 skills/github-quality-gate-setup/scripts/
-├── quality.yml         # Full workflow (textlint job commented out)
-├── .gitleaks.toml      # Base allowlist
-├── .textlintrc.json    # Textlint rules
-└── package.json        # Textlint npm deps
+├── quality.yml         # フルワークフロー（textlintジョブはコメントアウト）
+├── .gitleaks.toml      # 基本 allowlist
+├── .textlintrc.json    # textlint ルール
+└── package.json        # textlint npm 依存関係
 ```
 
 ---
 
 ## FAQ
 
-**Q: Does gitleaks need a paid license?**
-A: No. For public repositories, `gitleaks-action@v2` works with just `GITHUB_TOKEN`.
+**Q: gitleaks に有料ライセンスは必要？**
+A: 不要。公開リポジトリでは `gitleaks-action@v2` は `GITHUB_TOKEN` だけで動作する。
 
-**Q: How do I add a prohibited terms dictionary to textlint?**
-A: Install `textlint-rule-no-restricted-syntax` or create a custom wordlist file and reference it in `.textlintrc.json`.
+**Q: textlint に禁止語辞書を追加するには？**
+A: `textlint-rule-no-restricted-syntax` をインストールするか、カスタムワードリストファイルを作成して `.textlintrc.json` で参照する。
 
-**Q: What if gitleaks finds a real secret already in history?**
-A: Rotate the secret immediately. Then use `git filter-repo` or BFG to remove it from history, and force-push.
+**Q: gitleaks が履歴に含まれる本物のシークレットを見つけた場合は？**
+A: 即座にシークレットをローテーション（無効化）する。その後 `git filter-repo` または BFG で履歴から削除し、force-push する。
 
-**Q: Can I use detect-secrets instead of gitleaks?**
-A: Yes, but gitleaks is simpler to start with. detect-secrets adds a baseline file (`detect-secrets scan > .secrets.baseline`) which is useful for managing known false positives over time.
+**Q: detect-secrets との使い分けは？**
+A: gitleaks が導入が軽くて始めやすい。detect-secrets はベースラインファイル（`.secrets.baseline`）で「許容済み」のものを管理できるため、誤検知の多い環境では有効。
 
 ---
 
 ## Resources
 
 - [gitleaks-action](https://github.com/gitleaks/gitleaks-action)
-- [gitleaks configuration](https://github.com/gitleaks/gitleaks#configuration)
-- [textlint rules](https://github.com/textlint/textlint/wiki/Collection-of-textlint-rule)
+- [gitleaks 設定ガイド](https://github.com/gitleaks/gitleaks#configuration)
+- [textlint ルール一覧](https://github.com/textlint/textlint/wiki/Collection-of-textlint-rule)
 - [github-repo-template](https://github.com/RyoMurakami1983/github-repo-template)

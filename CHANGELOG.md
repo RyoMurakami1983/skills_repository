@@ -23,6 +23,7 @@
 - `business/pdf` を復旧し、`business/` カテゴリを `.copilot` 同期対象へ追加
 - frontmatter 最小構成方針に合わせて、validation / instructions / skills 周辺の規約を整理
 - `skills/skill/` を pilot に、`SKILL.md` の日本語正本化と `references/SKILL.ja.md` 前提の段階的廃止を進める方針へ切り替え
+- `skills/skill/` で確立した型を `skills/` の残り skill へ横展開し、`references/SKILL.ja.md` を root `SKILL.md` へ統合したうえで frontmatter を最小構成へ正規化した
 - `skills/skill/_eval` を `baseline / legacy / current` 標準へ整理し、trend viewer・append-only history・reproducibility metadata を持つ評価運用へ拡張
 - `README.md` を入口中心に簡素化し、詳細手順を `docs/INSTALL.md` へ分離
 - repo 固有の documentation maintenance ルールを `.github/copilot-instructions.md` に追加
@@ -38,6 +39,7 @@
 - README の同期手順、WSL 運用、ランタイム選定、レビュー待機ルールなどの説明を継続改善
 - ADR-002 と品質ゲート運用の背景を整理
 - ADR-003 を追加し、`SKILL.md` の日本語正本化と pilot ベース移行の判断理由を明文化
+- ADR-003 に pilot 後の rollout 補足を追記し、README の言語方針を `skills/` 全体適用に更新
 - `skills/SKILLS_README.md` と git / github 系 skill の Related Skills を更新し、router 化せずに topology と入口導線が追えるよう整理
 - `evals/github/evals.json` を追加し、`github` 薄い入口 skill の flat vs thin-entry 比較に使う日常運用フレーズ評価ケースを整備
 - `evals/github/corpus_summary.json`、`inventory_matrix.json`、`benchmark_summary.json`、`feedback.json` を追加し、`events.jsonl` の実 prompt corpus に基づく比較評価を残した

@@ -4,7 +4,7 @@ description: >
   Organize DI registrations using IServiceCollection extension methods.
   Group related services into composable Add* methods for clean Program.cs,
   reusable test configuration, and proper lifetime management.
-  Use when structuring dependency injection in ASP.NET Core or .NET applications.
+  Use when: structuring dependency injection in ASP.NET Core or .NET applications.
 metadata:
   author: RyoMurakami1983
   tags: [dependency-injection, di, dotnet, aspnetcore, iservicecollection, testing]

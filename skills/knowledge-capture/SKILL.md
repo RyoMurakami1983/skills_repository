@@ -1,193 +1,173 @@
 ---
 name: knowledge-capture
 description: >
-  Structured knowledge capture with anonymization gate for documents that may
-  become public skills or references.
-  Use when creating furikaeri, ADR, incident reports, or any document that
-  could flow into a public repository.
+  公開されうる skill や reference に流用される文書を、匿名化ゲート付きで構造化して残す。Use when: ふりかえり、ADR、インシデント記録、学習メモなどを再利用可能な知識資産として整理したいとき。
 ---
+# Knowledge Capture（知識の捕捉）
 
-# Knowledge Capture
+セッション、インシデント、意思決定から得た知識を構造化文書に変換するための横断的ユーティリティ。匿名化ゲートにより、固有データが公開スキルやリファレンスに漏洩するのを防ぐ。
 
-A cross-cutting utility for capturing knowledge from sessions, incidents, and decisions into structured documents — with an anonymization gate that prevents proprietary data from leaking into public skills and references.
-
-## When to Use This Skill
-
-Use this skill when:
-- Creating documents that may later become skill examples (furikaeri, incident reports)
-- Converting real project experiences into reusable skill patterns
-- Writing ADRs (Architecture Decision Records), learning notes, or post-mortems that reference proprietary systems
-- Reviewing existing skill examples for proprietary data leakage
-- Any document workflow needs an anonymization quality gate
+## こんなときに使う
+次のような場面で使います。
+- ふりかえり・インシデントレポート等、後にスキルの実例になりうる文書を作成する時
+- 実プロジェクトの経験を再利用可能なスキルパターンに変換する時
+- 固有システムを参照するADR・学習ノート・ポストモーテムを書く時
+- 既存スキルの実例に固有データが残っていないかレビューする時
+- 文書ワークフローに匿名化品質ゲートが必要な時
 
 ## Related Skills
 
-- **`furikaeri-practice`** — Retrospective workflow (references this skill's anonymization gate)
-- **`skill`** — Skill creation and improvement workflow (references this skill's anonymization checklist)
-- **`github-issue-intake`** — Capture improvement items as tracked issues
+- **`furikaeri-practice`** — ふりかえりワークフロー（本スキルの匿名化ゲートを参照）
+- **`skill`** — スキル作成・改善ワークフロー（本スキルの匿名化チェックリストを参照）
+- **`github-issue-intake`** — 改善項目をIssueとして捕捉
 
 ---
 
 ## Dependencies
 
-- None required (conversation-only workflow)
-- Optional: GitHub CLI (`gh`) for creating improvement issues
+- なし（会話ベースのワークフロー）
+- オプション: GitHub CLI (`gh`) — 改善issueの作成用
 
 ## Core Principles
 
-1. **Knowledge Flows Outward** — Write every document as if it will be read outside the project. Internal-only assumptions create leakage risk (ニュートラルな視点)
-2. **Anonymize at the Source** — Replace proprietary data during document creation, not after. Retrofitting anonymization is error-prone and costly (基礎と型)
-3. **Structured Over Narrative** — Structured documents (tables, checklists, code blocks) are easier to anonymize and reuse than free-form prose (成長の複利)
-4. **Preserve Teaching Value** — Anonymization must not destroy the educational point. Choose dummy data that demonstrates the same concept (温故知新)
+1. **知識は外へ流れる** — すべての文書はプロジェクト外で読まれる前提で書く。内部限定の前提は漏洩リスクを生む（ニュートラルな視点）。**なぜ？** — 内部ふりかえりがスキルの実例になり、内部ADRが公開リファレンスになる。「誰も見ない」という前提は一時的なものに過ぎない
+2. **入口で匿名化** — 文書作成時に固有データを置換する。後からの修正は漏れやすくコストが高い（基礎と型）。**なぜ？** — SLOP-001 事件で実証済み。ふりかえり文書の固有データがそのままスキルに流入した。入口で防げば出口での事故はゼロになる
+3. **構造化 > 散文** — 構造化文書（テーブル、チェックリスト、コードブロック）は匿名化と再利用が容易（成長の複利）。**なぜ？** — 散文に埋もれた固有名詞は見落としやすい。テーブルの1セルなら一目で判別できる
+4. **教育的価値を守る** — 匿名化で教訓が消えてはならない。同じ概念を示すダミーデータを選ぶ（温故知新）。**なぜ？** — 「ハイフンを含む値がSplitで壊れる」を教えるなら、ダミーデータもハイフンを含まなければ意味がない
 
 ---
 
-## Workflow: Capture & Gate
+## ワークフロー: 捕捉とゲート
 
-### Step 1 — Identify Knowledge Type
+### Step 1 — 知識タイプの特定
 
-Determine the document type and its downstream destination. Use this table to decide whether anonymization is required:
+文書タイプとその下流の行き先を決定する：
 
-| Type | Primary Skill | Destination | Anonymization Required |
-|------|--------------|-------------|----------------------|
-| Retrospective | `furikaeri-practice` | `docs/furikaeri/` | Yes (if skill-bound) |
-| Architecture Decision | (ADR workflow) | `docs/adr/` | Yes (if public repo) |
-| Incident Report | (incident workflow) | `docs/incidents/` | Yes |
-| Learning Note | (standalone) | project docs | Context-dependent |
-| GitHub Issue | `github-issue-intake` | Public repo issues | Yes |
+| タイプ | 主要スキル | 保存先 | 匿名化 |
+|--------|----------|--------|--------|
+| ふりかえり | `furikaeri-practice` | `docs/furikaeri/` | 要（スキル化候補） |
+| アーキテクチャ決定 | ADRワークフロー | `docs/adr/` | 要（公開リポジトリ） |
+| インシデントレポート | インシデントワークフロー | `docs/incidents/` | 要 |
+| 学習ノート | 単独 | プロジェクトdocs | 状況依存 |
+| GitHub Issue | `github-issue-intake` | 公開リポジトリのIssue | 要 |
 
-**Decision Rule**: "Could this document's content end up in a public repository?" → Yes = anonymization required.
+**判断基準**: 「この文書の内容が公開リポジトリに届く可能性があるか？」 → Yes = 匿名化必須。
 
 > **Values**: ニュートラルな視点（前提を明確にし、判断基準を形式知化）
 
-### Step 2 — Write with Structure
+### Step 2 — 構造化して記述
 
-Use structured formats that separate facts from proprietary details. Apply tables and code blocks instead of free-form prose:
+事実と固有詳細を分離する構造化フォーマットを使用する：
 
 ```markdown
-## Good: Structured (easy to anonymize)
+## ✅ 構造化（匿名化しやすい）
 
-| Input | Expected | Actual |
-|-------|----------|--------|
+| 入力 | 期待値 | 実際 |
+|------|--------|------|
 | `20240101-MFG001-AL-6XN-H12345` | ProductType=`AL-6XN` | ProductType=`AL` |
 
-## Bad: Narrative (hard to anonymize)
+## ❌ 散文（匿名化しにくい）
 
-When we processed the OrderProcessor output for order ORD-394072,
-the product type X-200-B was incorrectly parsed because...
+OrderProcessorの出力で注文ORD-394072を処理した際、
+製品型番X-200-Bが誤ってパースされた。なぜなら...
 ```
-
-Structured formats make proprietary data visible and replaceable. Narrative buries it in context.
 
 > **Values**: 基礎と型（構造が品質を生む）
 
-### Step 3 — Apply Anonymization Gate
+### Step 3 — 匿名化ゲートの適用
 
-Before outputting the document, apply the **Anonymization Checklist** (AC: Anonymization Check items, see below). This is the critical quality gate.
+文書を出力する前に、**匿名化チェックリスト**（下記参照）を通す。これが重要な品質ゲート。
 
-If the document will be used as a skill example:
-1. Apply every item in the Anonymization Checklist
-2. Verify the anonymized version still teaches the intended lesson
-3. Have a second reader (human or AI) check for residual proprietary data
+スキルの実例として使用する場合：
+1. 匿名化チェックリストの全項目を適用
+2. 匿名化後も意図した教訓が伝わるか検証
+3. 第二の読者（人間またはAI）に残存する固有データがないかチェックを依頼
 
 > **Values**: 基礎と型（ゲートを通さなければ出力しない）
 
-### Step 4 — Route Output
+### Step 4 — 出力のルーティング
 
-Deliver the document to its destination and link to next actions. Check the routing table and confirm the output path:
+文書を適切な保存先に届け、次のアクションに繋げる：
 
-| Destination | Action |
-|------------|--------|
-| `docs/furikaeri/` | Commit, PR, link to improvement issues |
-| Skill example | Feed into `skill` for creation or improvement |
-| ADR | Commit to `docs/adr/`, update ADR index |
-| GitHub Issue | Apply AC-1 through AC-4 before writing; create via `github-issue-intake` |
+| 保存先 | アクション |
+|--------|----------|
+| `docs/furikaeri/` | コミット、PR、改善issueにリンク |
+| スキルの実例 | 作成または改善のため `skill` に連携 |
+| ADR | `docs/adr/` にコミット、ADRインデックスを更新 |
+| GitHub Issue | 書く前に AC-1〜AC-4 を適用；`github-issue-intake` で作成 |
 
 > **Values**: 継続は力（知識を正しい場所に届け、次のアクションに繋げる）
 
 ---
 
-## Anonymization Checklist
+## 匿名化チェックリスト
 
-This section is designed to be referenced directly by other skills. Apply each check to any content that may appear in a public repository.
+このセクションは他スキルから直接参照されるよう設計されている。公開リポジトリに掲載される可能性のあるすべてのコンテンツに各チェックを適用する。
 
-### AC-1: Project and Company Names
+### AC-1: プロジェクト名・会社名
 
-**Check**: Does the document contain real project names, company names, or product names?
+**チェック**: 実プロジェクト名、会社名、製品名が含まれていないか？
 
-**Action**: Remove or replace with generic names.
+**アクション**: 削除するか、汎用名に置換する。
 
 ```
 ❌ "InvoiceParser PR#15"
-✅ (remove project reference entirely, or use "Example:")
-
-❌ "Contoso Steel Division"
-✅ "manufacturing division"
+✅ （プロジェクト参照を削除、または "Example:" のみ）
 ```
 
-### AC-2: Data Formats and Identifiers
+### AC-2: データフォーマット・識別子
 
-**Check**: Does the document contain real data values, ID formats, or record structures?
+**チェック**: 実データ値、IDフォーマット、レコード構造が含まれていないか？
 
-**Action**: Replace with dummy values that preserve the same structural characteristics.
+**アクション**: 同じ構造特性を持つダミー値に置換する。
 
 ```
 ❌ "2024_03_15-WO7890-TYP-A-B-SN45678"
 ✅ "20240101-MFG001-AL-6XN-H12345"
-    (preserves: date prefix, hyphen-delimited, embedded hyphens in values)
+    （保持: 日付接頭辞、ハイフン区切り、値内のハイフン）
 ```
 
-**Key principle**: Dummy data must demonstrate the same edge case. If the real data broke because a value contained a hyphen, the dummy data must also contain a hyphen.
+**核心原則**: ダミーデータは同じエッジケースを示す必要がある。
 
-### AC-3: Domain-Specific Terminology
+### AC-3: ドメイン固有用語
 
-**Check**: Does the document use terminology that reveals the specific industry, client, or internal system?
+**チェック**: 特定の業界・顧客・内部システムを示す用語が使われていないか？
 
-**Action**: Generalize to industry-neutral terms.
-
-```
-❌ "基板型番" (board model number), "ロット管理番号" (lot control number)
-✅ "製品型番" (product type code), "ロット番号" (lot number)
-
-❌ "BoardModel", "BatchId"
-✅ "ProductType", "LotNumber"
-```
-
-### AC-4: Numeric Values and Thresholds
-
-**Check**: Does the document contain real measurements, thresholds, or business-specific numbers?
-
-**Action**: Replace with representative dummy values.
+**アクション**: 業界中立の用語に一般化する。
 
 ```
-❌ "Tolerance: ±0.003mm for X-200 grade"
-✅ "Tolerance: ±0.01mm for this product grade"
+❌ "基板型番"、"ロット管理番号"
+✅ "製品型番"、"ロット番号"
 ```
 
-### Decision Rule
+### AC-4: 数値・閾値
 
-> "Could someone reconstruct the original project, client, or proprietary system from this content?"
->
-> → **Yes** = Apply AC-1 through AC-4
-> → **No** = Content is safe for public use
+**チェック**: 実測値、閾値、ビジネス固有の数値が含まれていないか？
+
+**アクション**: 代表的なダミー値に置換する。
+
+### 判断基準
+
+> 「このコンテンツから元のプロジェクト、顧客、固有システムを特定できるか？」
+> → **Yes** = AC-1〜AC-4 を適用 / **No** = 公開可
 
 ---
 
 ## Good Practices
 
-### 1. Anonymize During Writing, Not After
+### 1. 書きながら匿名化する
 
-**What**: Apply anonymization as you write, not as a separate review pass.
+**What**: 別のレビューパスではなく、書く過程で匿名化を適用する。
 
-**Why**: Retrofitting is error-prone. Writers forget which details are proprietary after the document is complete.
+**Why**: 後付けは漏れやすい。文書完成後、どの詳細が固有かを書き手は忘れがち。
 
 **Values**: 基礎と型（入口で品質を確保する）
 
-### 2. Keep a Dummy Data Palette
+### 2. ダミーデータのパレットを持つ
 
-**What**: Maintain a small set of reusable dummy values for common patterns (dates, IDs, product codes).
+**What**: よく使うパターン（日付、ID、製品コード）のダミー値セットを維持する。
 
-**Why**: Consistent dummy data across skills improves readability and reduces cognitive load.
+**Why**: スキル間で一貫したダミーデータは可読性を高め、認知負荷を減らす。
 
 **Values**: 継続は力（再利用可能な素材を積み上げる）
 
@@ -195,86 +175,85 @@ This section is designed to be referenced directly by other skills. Apply each c
 
 ## Common Pitfalls
 
-### 1. Anonymizing Away the Teaching Point
+### 1. 教訓を匿名化で消す
 
-**Problem**: Replacing data so aggressively that the example no longer demonstrates the intended concept.
+**Problem**: データを過剰に置換し、例が意図した概念を示さなくなる。
 
-**Fix**: Choose dummy data that preserves the structural characteristic being taught. If the lesson is "hyphens in values break naive splitting," the dummy value must contain hyphens.
+**Fix**: 教えたい構造特性を保持するダミーデータを選ぶ。「ハイフンを含む値がSplitで壊れる」を教えるなら、ダミー値もハイフンを含むこと。
 
-### 2. Partial Anonymization
+### 2. 部分的な匿名化
 
-**Problem**: Replacing the project name but leaving identifiable data formats, class names, or domain terms.
+**Problem**: プロジェクト名は置換したが、データフォーマット・クラス名・ドメイン用語は残っている。
 
-**Fix**: Run through all four AC checks systematically. Proprietary data leaks through combinations, not individual fields.
+**Fix**: AC-1〜AC-4を体系的に通す。固有データは組み合わせで漏洩する。
 
-### 3. Skipping Internal Documents
+### 3. 内部文書をスキップ
 
-**Problem**: Assuming internal documents do not need anonymization because "they won't be published."
+**Problem**: 「公開されない」前提で内部文書の匿名化を省略する。
 
-**Fix**: Apply the decision rule: "Could this content end up in a public repository?" Documents frequently flow from internal records to public skills.
+**Fix**: 判断基準を適用：「このコンテンツが公開リポジトリに届く可能性は？」文書は内部記録からスキルへ頻繁に流れる。
 
 ---
 
 ## Anti-Patterns
 
-### "Nobody Will See This"
+### 「誰も見ない」
 
-**What**: Skipping anonymization for documents in internal repositories.
+**What**: 内部リポジトリの文書だから匿名化不要と判断する。
 
-**Why It's Wrong**: Knowledge flows outward. Internal furikaeri become skill examples. Internal ADRs become public references. The assumption of privacy is temporary.
+**Why It's Wrong**: 知識は外へ流れる。内部ふりかえりがスキルの実例になる。プライバシーの前提は一時的。
 
-**Better Approach**: Anonymize at the source. The cost is minimal; the risk of leakage is permanent.
+**Better Approach**: 入口で匿名化する。コストは最小限、漏洩リスクは永続的。
 
-### Copy-Paste from Production
+### 本番データのコピペ
 
-**What**: Copying real error messages, log outputs, or data samples directly into documentation.
+**What**: 実エラーメッセージ、ログ出力、データサンプルをそのまま文書にコピーする。
 
-**Why It's Wrong**: Production data contains customer information, internal system names, and proprietary formats.
+**Why It's Wrong**: 本番データには顧客情報、内部システム名、固有フォーマットが含まれる。
 
-**Better Approach**: Create synthetic examples that reproduce the same error pattern with dummy data.
+**Better Approach**: 同じエラーパターンを再現する合成例をダミーデータで作成する。
 
 ---
 
 ## Quick Reference
 
-### Anonymization Checklist (Summary)
+### 匿名化チェックリスト（サマリー）
 
-| # | Check | Action |
-|---|-------|--------|
-| AC-1 | Project/company names | Remove or use generic names |
-| AC-2 | Data formats/IDs | Replace with structurally equivalent dummies |
-| AC-3 | Domain terminology | Generalize to industry-neutral terms |
-| AC-4 | Numeric values | Use representative dummy values |
+| # | チェック | アクション |
+|---|---------|----------|
+| AC-1 | プロジェクト/会社名 | 削除または汎用名 |
+| AC-2 | データフォーマット/ID | 構造等価なダミーに置換 |
+| AC-3 | ドメイン用語 | 業界中立の用語に一般化 |
+| AC-4 | 数値 | 代表的なダミー値 |
 
-### Decision Flow
+### 判断フロー
 
 ```
-Document created
+文書作成
     │
-    ├─ Could content reach a public repo?
+    ├─ 公開リポジトリに届く可能性は？
     │     │
-    │     ├─ Yes → Apply AC-1 through AC-4
+    │     ├─ Yes → AC-1〜AC-4 を適用
     │     │         │
-    │     │         └─ Does anonymized version still teach the lesson?
+    │     │         └─ 匿名化後も教訓が伝わるか？
     │     │               │
-    │     │               ├─ Yes → ✅ Output
-    │     │               └─ No  → Revise dummy data
+    │     │               ├─ Yes → ✅ 出力
+    │     │               └─ No  → ダミーデータを見直す
     │     │
-    │     └─ No  → ✅ Output (but consider future flow)
+    │     └─ No  → ✅ 出力（ただし将来の流れを考慮）
     │
-    └─ Feeding into a skill?
+    └─ スキルに組み込む？
           │
-          ├─ Yes → MANDATORY: Apply full checklist
-          └─ No  → Apply decision rule above
+          ├─ Yes → 必須: 全チェックリスト適用
+          └─ No  → 上記の判断基準を適用
 ```
 
 ---
 
 ## Resources
 
-- [PHILOSOPHY.md](../../PHILOSOPHY.md) — Development constitution and Values
-- [furikaeri-practice](../furikaeri-practice/SKILL.md) — Retrospective workflow
-- [skill](../skill/SKILL.md) — Skill creation workflow
+- [PHILOSOPHY.md](../../PHILOSOPHY.md) — 開発憲法とValues
+- [furikaeri-practice](../furikaeri-practice/SKILL.md) — ふりかえりワークフロー
+- [skill](../skill/SKILL.md) — スキル作成ワークフロー
 
 ---
-

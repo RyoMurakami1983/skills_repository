@@ -4,7 +4,7 @@ description: >
   Cache Playwright browser binaries in CI/CD pipelines (GitHub Actions, Azure DevOps)
   to eliminate 1-2 minute download overhead on every build. Uses version-based cache keys
   derived from Central Package Management (CPM) for automatic invalidation.
-  Use when setting up or optimizing CI/CD for .NET projects with Playwright E2E tests.
+  Use when: setting up or optimizing CI/CD for .NET projects with Playwright E2E tests.
 metadata:
   author: RyoMurakami1983
   tags: [playwright, ci-cd, caching, github-actions, azure-devops, dotnet, performance]

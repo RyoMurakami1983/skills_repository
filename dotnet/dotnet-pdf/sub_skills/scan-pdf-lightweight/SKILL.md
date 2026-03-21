@@ -1,6 +1,6 @@
 ---
 name: scan-pdf-lightweight
-description: Use when you need to reduce scanned PDF size in a .NET app for OCR upload stability, token reduction, or network resilience, especially by rasterizing scan pages and rebuilding an OCR-friendly PDF with a safe fallback path.
+description: Use when: you need to reduce scanned PDF size in a .NET app for OCR upload stability, token reduction, or network resilience, especially by rasterizing scan pages and rebuilding an OCR-friendly PDF with a safe fallback path.
 ---
 
 # Lightweight Scanned PDFs for OCR in .NET

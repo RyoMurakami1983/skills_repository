@@ -1,6 +1,6 @@
 ---
 name: pdf
-description: Use when extracting PDF text, running Optical Character Recognition (OCR), splitting/merging files, and processing forms with reproducible uv-based commands.
+description: Use when: extracting PDF text, running Optical Character Recognition (OCR), splitting/merging files, and processing forms with reproducible uv-based commands.
 ---
 
 ## When to Use This Skill

@@ -1,54 +1,52 @@
 ---
 name: git-initial-setup
-description: Default git setup to protect main after git init/clone. Use when standardizing repo bootstrap and absorbing environment differences.
+description: >
+  git init / clone 後の main 保護と基本設定を標準化する。Use when: リポジトリ初期セットアップでブランチ保護や共通設定を早めに整えたいとき。
 ---
+# Git初期セットアップ（main保護）
 
-# Git Initial Setup for Main Protection
+git init/clone後のmain保護をデフォルト化するため、GitHubブランチ保護（Option A）とグローバルなフック設定、ローカルpre-commit/pre-push（Option B）を組み合わせます。さらに `.gitattributes` と `.editorconfig` でクロスプラットフォームの環境差異を吸収します。
 
-Standardize main-branch protection for repositories created by git init/clone. Combine GitHub branch protection (Option A) with global hook defaults and local pre-commit/pre-push hooks (Option B) for defense in depth. Absorb cross-platform environment differences with `.gitattributes` and `.editorconfig`.
+## こんなときに使う
+以下の状況で活用してください：
+- git init/cloneの初期段階で保護をデフォルト化したい
+- グローバルフック設定をチームに展開したい
+- mainへのPull Request (PR)マージだけを強制したい
+- リリース前の誤コミット/誤プッシュを防止したい
+- チームのOS・エディタ・AIエージェントの違いによる環境差異を吸収したい
+- privateリポジトリでローカル保護を補完したい
+- 大型リリース前に保護状況を監査したい
 
-## When to Use This Skill
+## 関連スキル
 
-Use this skill when:
-- Defining default protections for new repos created by git init/clone
-- Rolling out global hook defaults across developer machines
-- Enforcing Pull Request (PR)-only merges for main in team repositories
-- Preventing accidental commits/pushes during release preparation
-- Absorbing cross-platform line-ending and encoding differences in team repositories
-- Adding local safeguards for private repos without protection rules
-- Auditing protection coverage before a major release
-
-## Related Skills
-
-- **`git-commit-practices`** - Commit workflow and conventions
-- **`git-init-to-github`** - Typical upstream workflow when a repository is being published for the first time
-- **`github-pr-workflow`** - Delivery workflow protected by the branch rules configured here
-- **`github-quality-gate-setup`** - Follow-up hardening after basic protections are in place
-- **`github-repo-label-setup`** - Optional repo-standardization step after initial protection
-
----
-
-## Dependencies
-
-- Git 2.30+ (required)
-- Bash or PowerShell (for hook scripts)
-- GitHub account with repo admin access (for branch protection rules)
-
-## Core Principles
-
-1. **Defense in Depth** - Combine server-side and local protections (基礎と型)
-2. **Least Privilege** - Minimize who can push to main
-3. **Clear Workflow** - Make PR-only flow explicit (成長の複利)
-4. **Transparent Exceptions** - Document emergency paths (ニュートラル)
-5. **Automation First** - Reduce human error with repeatable scripts (継続は力)
+- **`git-commit-practices`** - コミット運用と規約
+- **`github-pr-workflow`** - PR作成とマージフロー
+- **`skill`** - Skill執筆の標準
+- **`skill`** - Skill品質の検証
 
 ---
 
-## Workflow: Protect Main Branch
+## 依存関係
 
-### Step 1: Set Branch Protection Rule
+- Git 2.30+（必須）
+- BashまたはPowerShell（フックスクリプト用）
+- GitHubの管理権限（ブランチ保護設定用）
 
-Create a minimal branch protection rule for main that requires pull requests. This is the foundation — without it, anyone can push directly to main.
+## コア原則
+
+1. **多層防御** - サーバー側とローカル保護を組み合わせる（基礎と型）
+2. **最小権限** - mainへ直接プッシュできる人を最小化
+3. **明確なワークフロー** - PR運用を明文化（成長の複利）
+4. **例外の透明性** - 緊急時の手順を明記（ニュートラル）
+5. **自動化優先** - 反復スクリプトでヒューマンエラー低減（継続は力）
+
+---
+
+## ワークフロー: メインブランチを保護する
+
+### Step 1: ブランチ保護ルールの設定
+
+mainに対する最小限の保護ルールを作成し、PRを必須化します。これが基盤です — この設定がなければ、誰でもmainに直接プッシュできます。
 
 ```txt
 Settings > Branches > Add rule
@@ -56,15 +54,15 @@ Branch name pattern: main
 Enable: Require a pull request before merging
 ```
 
-Use when setting up any new repository or adding protection to an existing one.
+新規リポジトリのセットアップや、既存リポジトリへの保護追加時に使います。
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 2: Generate Repository Environment Files
+### Step 2: リポジトリ環境ファイルの生成
 
-Add `.gitattributes` and `.editorconfig` to absorb cross-platform differences. Without these files, team members on different OSes or AI agent sandboxes may see all files as modified after clone.
+`.gitattributes` と `.editorconfig` を追加し、クロスプラットフォームの差異を吸収します。これらがないと、異なるOSやAIエージェントのサンドボックスからcloneしたメンバーが全ファイルmodifiedになる問題が発生します。
 
-**.gitattributes** (line-ending normalization):
+**.gitattributes**（改行コード正規化）:
 
 ```
 * text=auto eol=lf
@@ -77,7 +75,7 @@ Add `.gitattributes` and `.editorconfig` to absorb cross-platform differences. W
 *.ico binary
 ```
 
-**.editorconfig** (editor settings normalization):
+**.editorconfig**（エディタ設定正規化）:
 
 ```ini
 root = true
@@ -100,15 +98,15 @@ trim_trailing_whitespace = false
 indent_style = tab
 ```
 
-For existing repositories, run `git add --renormalize .` after adding `.gitattributes` to re-normalize tracked files.
+既存リポジトリに導入する場合は、`.gitattributes` 追加後に `git add --renormalize .` で追跡ファイルを再正規化してください。
 
-Use when creating a new repository or onboarding team members with different OSes, editors, or AI agents.
+新規リポジトリ作成時、または異なるOS・エディタ・AIエージェントを使うメンバーのオンボーディング時に使います。
 
 > **Values**: 基礎と型 / 余白の設計
 
-### Step 3: Configure Review Requirements
+### Step 3: レビュー要件の設定
 
-Define review requirements so main merges are intentional and traceable. Enable Code Owners and dismiss stale approvals on new commits to maintain accountability.
+mainへのマージを意図的かつ追跡可能にするため、レビュー要件を定義します。Code Ownersを有効化し、新コミット時に既存の承認を無効化して責任を明確にします。
 
 ```txt
 Require a pull request before merging:
@@ -117,13 +115,13 @@ Require a pull request before merging:
   ✅ Require review from Code Owners
 ```
 
-Use when you need accountability for every main merge and consistent review quality.
+mainマージの責任を明確化し、レビュー品質を統一したいときに使います。
 
 > **Values**: 成長の複利 / ニュートラル
 
-### Step 4: Require Status Checks
+### Step 4: 必須ステータスチェックの設定
 
-Gate merges on CI checks so broken builds never land in main. Required checks keep main green and reduce rollback risk.
+CIチェックでマージをゲートし、壊れたビルドをmainに入れません。必須チェックでmainをグリーンに保ち、ロールバックリスクを低減します。
 
 ```yaml
 required_status_checks:
@@ -131,13 +129,13 @@ required_status_checks:
   - ci/test
 ```
 
-Use when your repository has CI pipelines and you want to prevent regressions.
+CIパイプラインがあり、リグレッションを防ぎたいときに使います。
 
 > **Values**: 継続は力 / 基礎と型
 
-### Step 5: Restrict Push Access
+### Step 5: プッシュ権限の制限
 
-Limit direct push access and ensure protections apply to administrators. Enable "Include administrators" and restrict who can push to matching branches.
+直接プッシュ権限を制限し、管理者にも保護を適用します。"Include administrators"を有効化し、プッシュ可能なユーザーを制限します。
 
 ```txt
 ✅ Include administrators
@@ -145,169 +143,167 @@ Limit direct push access and ensure protections apply to administrators. Enable 
    Allowed: release-bot only
 ```
 
-Use in regulated or audited environments where strong guarantees are needed.
+規制環境や監査対象の運用で強い統制が必要なときに使います。
 
 > **Values**: ニュートラル / 基礎と型
 
-### Step 6: Install Local Hooks
+### Step 6: ローカルフックの導入
 
-Install local pre-commit and pre-push hooks to block commits and pushes to main before changes reach the remote.
+pre-commitとpre-pushフックを導入し、変更がリモートに届く前にmainへのコミット・プッシュをブロックします。
 
 ```bash
-# Install hooks for this repo
+# このリポジトリにフックを導入
 ./scripts/setup.sh
 ```
 
-Use for private repos without branch protection rules, as a local safety net, or during release windows.
+privateリポジトリの保護代替、ローカル安全策、またはリリースウィンドウ中に使います。
 
-> **Note**: As an alternative to copying hooks into `.git/hooks/`, you can use a repository-level hooks directory with `git config core.hooksPath .githooks`. This keeps hooks version-controlled and automatically applied after clone — no setup script required.
+> **Note**: `.git/hooks/` にコピーする代わりに、リポジトリレベルのフックディレクトリを `git config core.hooksPath .githooks` で指定できます。フックがバージョン管理され、clone後にセットアップスクリプト不要で自動適用されます。
 
-> **Troubleshooting (Windows)**: If `setup.ps1` fails with a security error, your PowerShell execution policy may be set to `Restricted`. Run `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` to allow local scripts, then retry.
+> **トラブルシューティング（Windows）**: `setup.ps1` がセキュリティエラーで失敗する場合、PowerShellの実行ポリシーが `Restricted` になっている可能性があります。`Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` を実行してローカルスクリプトを許可してから再試行してください。
 
 > **Values**: 継続は力 / 基礎と型
 
-### Step 7: Set Global Hook Defaults
+### Step 7: グローバルフックのデフォルト設定
 
-Configure global hook defaults so new repositories inherit protections automatically via `core.hooksPath`.
+`core.hooksPath`でグローバルフックを設定し、新規リポジトリに保護を自動継承させます。
 
 ```bash
 git config --global core.hooksPath "~/.githooks"
 ```
 
-Use when you manage multiple repositories on the same workstation and want automatic protection.
+同一端末で複数リポジトリを管理し、自動保護を適用したいときに使います。
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 8: Roll Out to Team
+### Step 8: チームへの展開
 
-Roll out protections with clear communication: announce the PR-only policy, share setup scripts, and update onboarding docs.
+明確なコミュニケーションで保護を展開します：PR運用ポリシーの告知、セットアップスクリプトの共有、オンボーディング資料の更新を行います。
 
 ```markdown
-## Onboarding Checklist
-- [ ] Run `./scripts/setup.sh` to install hooks
-- [ ] Confirm branch protection is enabled on main
-- [ ] Review PR workflow in github-pr-workflow
+## オンボーディングチェックリスト
+- [ ] `./scripts/setup.sh` を実行してフックを導入
+- [ ] mainのブランチ保護が有効か確認
+- [ ] github-pr-workflowでPR運用を確認
 ```
 
-Use when you manage multiple repositories or need consistent protections across teams.
+複数リポジトリの管理や、チーム間で統一した保護が必要なときに使います。
 
 > **Values**: 成長の複利 / 継続は力
 
-### Step 9: Handle Emergencies
+### Step 9: 緊急対応
 
-Handle common failures without disabling protections permanently. For emergency hotfixes, use a documented admin bypass with post-incident review.
+保護を恒久的に無効化せずに問題を解消します。緊急ホットフィックスでは、管理者バイパスと事後レビューを組み合わせます。
 
 ```bash
-# Emergency hotfix: bypass hook with explicit approval only
+# 緊急ホットフィックス: 明示的な承認のみでバイパス
 git push --no-verify origin hotfix/critical-fix
-# Post-incident: review and document the bypass
+# 事後: バイパスのレビューと記録
 ```
 
-Use when protections block an urgent fix or hook behavior differs across environments.
+保護が緊急修正をブロックしたとき、または環境間でフックの動作が異なるときに使います。
 
 > **Values**: ニュートラル / 温故知新
 
 ---
 
-## Best Practices
+## ベストプラクティス
 
-- Add `.gitattributes` and `.editorconfig` at repository creation time
-- Set global hook defaults before creating new repos
-- Use Pull Request (PR) reviews for all main merges
-- Set branch protection after the remote exists
-- Require at least one approval for main merges
-- Keep a written record of protection settings
-- Review protections after org or team changes
-- Document emergency bypass steps in a runbook
+- リポジトリ作成時に `.gitattributes` と `.editorconfig` を追加する
+- 先にグローバルフックを設定してから新規リポジトリを作成
+- リモート作成後にGitHub保護を有効化
+- mainマージに最低1承認を必須化
+- 保護設定を運用ドキュメントに記録
+- 組織変更後に保護設定を再確認
+- 緊急バイパス手順を運用書に明記
 
-Use core.hooksPath for all repos.  
-Set init.templateDir for new repos.  
-Avoid direct pushes to main.
-
----
-
-## Common Pitfalls
-
-- Forgetting to include administrators in protection rules
-- Allowing direct pushes for convenience and never removing it
-- Relying only on local hooks for team-wide enforcement
-
-Fix: Enable "Include administrators" and document who can push.  
-Fix: Remove direct push permissions from main once PR flow is stable.  
-Fix: Add GitHub branch protection to enforce team-wide rules.
+core.hooksPath を全リポジトリに適用する。  
+init.templateDir を新規リポジトリに適用する。  
+mainへの直接プッシュを避ける。
 
 ---
 
-## Anti-Patterns
+## よくある落とし穴
 
-- Assuming all team members use the same OS and editor settings (Implicit Environment Assumption)
-- Disabling branch protection to make a quick change
-- Using `--no-verify` as a default workflow
-- Allowing unrestricted direct pushes to main
+- 管理者保護のチェック漏れ
+- 便利だからと直接プッシュを残し続ける
+- ローカルフックだけで全体保護を期待する
+
+Fix: "Include administrators" を必ず有効化し、権限を記録する。  
+Fix: mainの直接プッシュ権限を段階的に撤廃する。  
+Fix: GitHubの保護ルールでチーム全体を強制する。
+
+---
+
+## アンチパターン
+
+- チーム全員が同じOS・エディタ設定であると暗黙に仮定する（暗黙の環境前提）
+- 早く直したいから保護を一時解除する
+- `--no-verify`を常用フローにする
+- mainへの直接プッシュを自由化する
 
 ---
 
 ## FAQ
 
-**Q: Can I protect private repositories on the free plan?**  
-A: GitHub branch protection for private repos requires a paid plan. Use local hooks as a fallback.
+**Q: 無料プランのprivateリポジトリでも保護できますか？**  
+A: GitHubのブランチ保護は有料プランが必要です。ローカルフックで代替してください。
 
-**Q: Will the PowerShell hook run automatically on Windows?**  
-A: Git for Windows runs hooks via Bash by default. Use the Bash hook or copy it into a shared hook path.
+**Q: WindowsでPowerShellフックは自動実行されますか？**  
+A: Git for WindowsはBashでフックを実行します。Bash版を使うか共有フックパスに配置してください。
 
-**Q: Does git init automatically install these hooks?**  
-A: Only if you set core.hooksPath or init.templateDir globally. Otherwise, hooks are not installed by default.
+**Q: git initで自動的にフックは入りますか？**  
+A: core.hooksPath または init.templateDir をグローバル設定した場合のみ自動適用されます。
 
-**Q: Does this block admins?**  
-A: Only if "Include administrators" is enabled in the branch protection rule.
+**Q: 管理者もブロックされますか？**  
+A: ルールで"Include administrators"を有効化した場合のみ対象になります。
 
 ---
 
-## Quick Reference
+## クイックリファレンス
 
-### Step Summary
+### ステップ要約
 
-| Step | Focus | Use When |
-|------|-------|----------|
-| 1 | Branch protection rule | You need PR-only merges |
-| 2 | Environment files | You need cross-platform consistency |
-| 4 | Required status checks | You need build/test gates |
-| 6 | Local hooks | You need local safety nets |
-| 7 | Global defaults | You want git init/clone defaults |
+| ステップ | 目的 | 使うとき |
+|----------|------|----------|
+| 1 | ブランチ保護ルール | PR運用を徹底したい |
+| 2 | 環境ファイル | クロスプラットフォーム統一 |
+| 4 | 必須ステータスチェック | ビルド/テストを必須化 |
+| 6 | ローカルフック | ローカル安全策が必要 |
+| 7 | グローバルデフォルト | git init/cloneを標準化 |
 
-### Decision Table
+### 判断テーブル
 
-| Situation | Recommendation | Why |
-|-----------|----------------|-----|
-| New repo setup | Add .gitattributes + .editorconfig | Absorb environment differences from day one |
-| Multi-OS team | Set core.hooksPath | Default protection everywhere |
-| Only new repos | Set init.templateDir | Avoid touching existing repos |
-| Private repo on free plan | Use local hooks | Server rules unavailable |
-| Team workflow | Enable PR-only merges | Traceable changes |
+| 状況 | 推奨 | 理由 |
+|------|------|------|
+| 新規リポジトリ | .gitattributes + .editorconfig追加 | 初日から環境差異を吸収 |
+| マルチOSチーム | core.hooksPath設定 | 全体デフォルト化 |
+| 新規のみ適用 | init.templateDir設定 | 既存に影響なし |
+| private/無料プラン | ローカルフック | サーバー保護不可 |
+| チーム運用 | PR必須化 | 変更の追跡性向上 |
 
 ```bash
-# Install hooks (pre-commit + pre-push) (macOS/Linux/Git Bash)
+# フック導入（pre-commit + pre-push）（macOS/Linux/Git Bash）
 ./scripts/setup.sh
 
-# Install hooks (PowerShell)
+# フック導入（PowerShell）
 .\scripts\setup.ps1
 
-# Set global hooks path (all repos)
+# グローバルフック設定（全リポジトリ）
 git config --global core.hooksPath "~/.githooks"
 
-# Set init template (new repos only)
+# initテンプレート設定（新規のみ）
 git config --global init.templateDir "~/.git-template"
 
-# Verify current branch
+# 現在のブランチ確認
 git branch --show-current
 ```
 
 ---
 
-## Resources
+## リソース
 
 - [GitHub Protected Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
 - [Git Hooks Documentation](https://git-scm.com/docs/githooks)
 
 ---
-

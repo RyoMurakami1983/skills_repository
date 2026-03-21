@@ -1,6 +1,6 @@
 ---
 name: python-debug-tdd
-description: Diagnose and fix Python bugs with a TDD-style workflow (Red → investigation → Green → side-effect checks) while preserving regression coverage. Use when a bug is reported and you need a minimal, verifiable fix.
+description: Diagnose and fix Python bugs with a TDD-style workflow (Red → investigation → Green → side-effect checks) while preserving regression coverage. Use when: a bug is reported and you need a minimal, verifiable fix.
 metadata:
   author: RyoMurakami1983
   tags: [python, tdd, debugging, pytest, regression]

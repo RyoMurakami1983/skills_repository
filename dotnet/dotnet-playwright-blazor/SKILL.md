@@ -4,7 +4,7 @@ description: >
   Write end-to-end UI tests for Blazor Server and WebAssembly applications
   using Playwright. Covers setup, navigation, selectors, authentication, error
   handling, and CI integration.
-  Use when testing Blazor components, forms, or user workflows with Playwright.
+  Use when: testing Blazor components, forms, or user workflows with Playwright.
 metadata:
   author: RyoMurakami1983
   tags: [playwright, blazor, testing, e2e, dotnet, ui-testing]

@@ -3,7 +3,7 @@ name: dotnet-efcore-patterns
 description: >
   Apply Entity Framework Core best practices including NoTracking by default,
   query splitting, migration management, and dedicated migration services.
-  Use when setting up EF Core, optimizing queries, or managing database migrations.
+  Use when: setting up EF Core, optimizing queries, or managing database migrations.
 metadata:
   author: RyoMurakami1983
   tags: [efcore, entity-framework, dotnet, database, migrations, aspire]

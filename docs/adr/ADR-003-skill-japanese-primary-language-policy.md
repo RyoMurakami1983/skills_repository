@@ -105,6 +105,8 @@ Accepted
 
 README と ADR に理由を明文化したうえで、上記 pilot を実施する。
 
+**補足（2026-03 rollout）**: pilot で validator / generator / template の型を確認した後、同じ原則を `skills/skill/` を除く `skills/` 配下の skill へ横展開する。
+
 ## 移行原則
 
 1. 文書だけ先に変えず、validator / generator / template を先に追従させる

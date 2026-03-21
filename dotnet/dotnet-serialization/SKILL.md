@@ -2,7 +2,7 @@
 name: dotnet-serialization
 description: >
   Choose the right serialization format for .NET applications and implement it safely.
-  Use when selecting serialization for APIs, messaging, or persistence, migrating from
+  Use when: selecting serialization for APIs, messaging, or persistence, migrating from
   Newtonsoft.Json, or implementing AOT-compatible serialization with source generators.
 metadata:
   author: RyoMurakami1983

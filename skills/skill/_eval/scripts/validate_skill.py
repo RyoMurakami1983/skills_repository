@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Iterable
 
 TRIGGER_PATTERNS = (
-    r"Use\s+when",
+    r"Use\s+when:?",
     r"こんな\s*ときに\s*使う",
     r"次のような\s*ときに\s*使います",
     r"次のような\s*ときに\s*使用します",

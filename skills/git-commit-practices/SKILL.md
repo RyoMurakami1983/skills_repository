@@ -1,71 +1,69 @@
 ---
 name: git-commit-practices
-description: "Commit practices with Conventional Commits, atomic changes, and Japanese commit subjects. Use when standardizing commit messages across a team, splitting work into atomic commits for safe reviews, or teaching new teammates a repeatable commit workflow."
+description: >
+  Conventional Commits と原子的コミットで、学習可能で安全な履歴を作る。Use when: チームでコミット形式を揃えたいとき、「コミットして」を atomic commit の依頼として扱いたいとき、変更を意図単位で分けたいとき。
+---
+# Gitコミット実践
+
+一貫したコミットメッセージ、原子的コミット、学習可能な履歴を作るための実践パターンです。
+
+既定解釈として、ユーザーが単に「コミットして」と言った場合は、単発の `git commit` ではなく **原子的コミットを作る依頼** として扱います。
+
+## こんなときに使う
+以下の状況で活用してください：
+- 複数人のリポジトリでコミット形式を統一したい
+- 日本語コミットを履歴で読みやすく保ちたい
+- 原子的コミットでレビューとリバートを安全にしたい
+- コミット本文にWhyを残して判断理由を共有したい
+- Pull Request (PR)前に履歴を整えたい
+- 曖昧な「コミットして」を reviewable な atomic commit 要求として解釈したい
+- 新メンバーに再現可能なコミット運用を教えたい
+
+## 関連スキル
+
+- **`github-pr-workflow`** - PR作成とマージ運用
+- **`github-issue-intake`** - Issue作成とトリアージ
+- **`github`** - 広い GitHub 入口から「コミットして」をこの skill に流すための補助入口
+
 ---
 
-# Git Commit Practices
-
-Practical patterns for consistent commit messages, atomic changes, and durable history.
-
-Default interpretation: when the user simply says "commit this" or `コミットして`, treat that as a request for an atomic commit by default, not just a raw `git commit` command.
-
-## When to Use This Skill
-
-Use this skill when:
-- Standardizing commit messages across a multi-developer repository
-- Writing Japanese commit subjects that stay clear in long histories
-- Splitting work into atomic commits for safe reviews and rollbacks
-- Documenting "why" in commit bodies for future maintainers
-- Preparing clean commit history before Pull Request (PR) review
-- Interpreting a vague "commit this" request as a need for atomic, reviewable history
-- Teaching new teammates a repeatable commit workflow
-
-## Related Skills
-
-- **`github-pr-workflow`** - Typical downstream workflow once commits are review-ready
-- **`github-pr-review-response`** - Follow-up workflow when review feedback requires additional commits
-- **`git-init-to-github`** - First-commit context for new repositories
-- **`github`** - Thin entry skill that should route broad "コミットして" requests here before PR work
-
----
-
-## Dependencies
+## 依存関係
 
 - Git 2.30+
-- Team agreement on Conventional Commits
-- Pull Request (PR) workflow for review
+- Conventional Commitsの合意
+- Pull Request (PR)運用
 
-## Core Principles
+## コア原則
 
-1. **Single Intent** - One commit equals one change intent that can be reviewed and reverted independently, not one session or one story-sized batch (基礎と型)
-2. **Explain Why** - Reasons outlive implementation details (成長の複利)
-3. **Consistent Format** - Predictable history for automation (ニュートラル)
-4. **Reviewable Chunks** - Small commits reduce risk (継続は力)
-5. **Learning Asset** - Commit history teaches future teams (温故知新)
+1. **単一責務** - 1コミット=1変更意図。1 session や 1 wave をまとめる境界にはしない (基礎と型)
+2. **Whyを残す** - 理由は実装より長持ちする (成長の複利)
+3. **形式の一貫性** - 自動化と検索性を高める (ニュートラル)
+4. **レビュー容易性** - 小さなコミットでリスク低減 (継続は力)
+5. **学習資産化** - 履歴をチームの教材にする (温故知新)
 
 ---
 
-## Workflow: Write Quality Commits
+## ワークフロー: 品質の高いコミットを書く
 
-### Step 1: Confirm Feature Branch
+### Step 1: feature branchにいることを確認する
 
-Verify you are on a feature branch before committing. Never commit directly to main.
+コミット前に、必ず feature branch にいることを確認します。mainへの直接コミットは禁止です。
 
 ```bash
-# Check current branch
+# 現在のブランチを確認
 git branch --show-current
 
-# If on main, create a feature branch first
+# main にいる場合は feature branch を作成
 git switch -c feature/your-change
 ```
 
-Use when starting any new work, or when the agent begins a commit workflow.
+新しい作業を開始するとき、またはエージェントがコミットワークフローを始めるときに使います。
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 2: Use Conventional Commits Format
+### Step 2: Conventional Commits形式を使う
 
-Follow the `type(scope): subject` structure so every commit is parseable by humans and tools.
+`type(scope): subject` 形式に従い、人と自動化ツールの両方が解析できるメッセージを書きます。
 
 ```bash
 git commit -m "feat(auth)!: OAuth2を導入
@@ -73,78 +71,77 @@ git commit -m "feat(auth)!: OAuth2を導入
 BREAKING CHANGE: /auth/login を /oauth/authorize に変更"
 ```
 
-Use when multiple contributors need consistent messages or you want automated changelogs.
+複数人で統一した形式が必要な場合や、CHANGELOGの自動生成をしたいときに使います。
 
-### Step 3: Select Type and Scope
+### Step 3: タイプとスコープを選定する
 
-Pick the type that matches your intent, and add a scope when modules are clearly separated.
+変更意図に合ったtypeを選び、モジュール分割が明確なときはscopeを付けます。
 
-| Type | Use | Example |
-|------|-----|---------|
-| `feat` | New feature | `feat: 通知を追加` |
-| `fix` | Bug fix | `fix: 文字化け修正` |
-| `docs` | Docs update | `docs: 手順追加` |
-| `test` | Tests | `test: E2E追加` |
-| `refactor` | Internal change | `refactor: 命名整理` |
+| Type | 用途 | 例 |
+|------|-----|----|
+| `feat` | 新機能 | `feat: 通知を追加` |
+| `fix` | バグ修正 | `fix: 文字化け修正` |
+| `docs` | 文書更新 | `docs: 手順追加` |
+| `test` | テスト | `test: E2E追加` |
+| `refactor` | 内部整理 | `refactor: 命名整理` |
 
 ```bash
-# Scoped change for multi-domain repos
+# scope指定でドメインを明示
 git commit -m "feat(api): 決済APIを追加"
 ```
 
-Use when the repo has multiple modules or domains that benefit from explicit scope labels.
+モジュールやドメインが明確に分離されているリポジトリで使います。
 
-### Step 4: Write Clear Japanese Subjects
+### Step 4: 明確な日本語メッセージを書く
 
-Be specific so subjects are searchable and self-explanatory in `git log`.
+`git log` で検索可能で自己説明的なメッセージにします。
 
 ```bash
-# ✅ CORRECT - specific action and target
+# ✅ CORRECT - 具体的な対象と操作
 git commit -m "feat: 注文履歴画面に検索フィルタを追加
 
 Why: サポート対応で検索要求が多かったため"
 
-# ❌ WRONG - vague
+# ❌ WRONG - 曖昧
 git commit -m "fix: バグ修正"
 ```
 
-Use when Japanese is the primary team language or commit history will be used for audits.
+日本語がチームの主要言語である場合や、履歴を監査で使うときに使います。
 
-### Step 5: Split Into Atomic Commits
+### Step 5: 原子的コミットに分割する
 
-Each commit should represent one change intent so it can be reviewed and reverted independently. In this repository, that means you do **not** batch changes together just because they happened in the same session, the same issue, or the same implementation wave.
+1つのコミットに1つの**変更意図**だけを含め、個別にレビュー・リバートできるようにします。このリポジトリでは、同じ session・同じ issue・同じ実装 wave で行った変更でも、意図が別ならコミットを分けます。
 
-When the request is only "commit this", use this step as the default interpretation: inspect the diff, separate concerns, and create the smallest useful atomic commit set instead of one catch-all commit.
+依頼が単に「コミットして」だけなら、この step を既定解釈にします。まず diff を見て関心事を分離し、1つの大きなコミットではなく最小の atomic commit 群に分けます。
 
 ```bash
-# ❌ WRONG - multiple concerns in one commit
+# ❌ WRONG - 複数責務を同居
 git commit -m "feat: 認証追加とUI改善とテスト追加"
 
-# ✅ CORRECT - split into focused commits
+# ✅ CORRECT - 変更意図ごとに分割
 git commit -m "feat: 認証機能を追加"
 git commit -m "refactor: UIレイアウトを改善"
 git commit -m "test: 認証フローのテストを追加"
 ```
 
 ```text
-# ❌ WRONG - one session / one wave is not a commit boundary
-- eval tooling
-- skill wording changes
-- router docs
-- changelog updates
-=> committed as one "evaluation wave" commit
+# ❌ WRONG - 「同じ作業波だったからまとめる」
+- eval基盤追加
+- skill本文修正
+- docs更新
+=> 1コミットにまとめる
 
-# ✅ CORRECT - split by change intent
-1. feat: extract prompt corpus script を追加
-2. docs: skill router 評価結果を記録
-3. fix: git-commit-practices に atomic commit の判断基準を明記
+# ✅ CORRECT - 変更意図単位で分ける
+1. feat: prompt corpus 抽出スクリプトを追加
+2. docs: 評価結果を追記
+3. fix: atomic commit 判断基準を明文化
 ```
 
-Use when reviewers need to verify changes incrementally or you want safe rollbacks.
+レビューで段階的に確認したい場合や、安全にリバートしたいときに使います。
 
-### Step 6: Add Body with Why
+### Step 6: 本文にWhyを記述する
 
-Explain "why" in the commit body so future readers understand the decision, not just the diff.
+コミット本文に「なぜ」を残し、将来の読者がdiffではなく判断理由を理解できるようにします。
 
 ```bash
 git commit -m "fix: APIタイムアウトを10s→30sに変更
@@ -154,11 +151,11 @@ git commit -m "fix: APIタイムアウトを10s→30sに変更
 Why: SLA達成率が低下していたため"
 ```
 
-Use when a change might be questioned later or you need to preserve decision context.
+後から理由が問われそうな変更や、判断根拠を残したい場合に使います。
 
-### Step 7: Run Pre-Commit Checks
+### Step 7: コミット前チェックを実行する
 
-Review your diff and run tests before committing to keep history clean.
+diffを確認し、テストを実行してからコミットし、履歴をクリーンに保ちます。
 
 ```bash
 git diff
@@ -173,92 +170,91 @@ rules:
   type-enum: [2, "always", ["feat","fix","docs","test","refactor","chore"]]
 ```
 
-Use before pushing a branch to open a PR or when onboarding new contributors.
+PRを開く前のプッシュ時や、新規メンバーのオンボーディングで使います。
 
-### Step 8: Amend and Rebase Safely
+### Step 8: AmendとRebaseの安全運用
 
-Rewrite history only before it is shared. After pushing, prefer a new commit.
+履歴の書き換えは共有前のみ行います。push後は新しいコミットで対応します。
 
 ```bash
-# Before push: amend or interactive rebase
+# push前: amendまたはinteractive rebase
 git commit --amend -m "fix: 正しいメッセージ"
 git rebase -i HEAD~3
 
-# After push: add a new commit instead
+# push後: 新コミットで修正
 git commit -m "fix: 補足修正"
 ```
 
-Use when a commit needs cleanup before PR or when you want to keep shared branches stable.
+PR前に履歴を整理したい場合や、共有ブランチの安定を守りたいときに使います。
 
-## Best Practices
+## ベストプラクティス
 
-- Use action verbs in subject lines
-- Define a 50-character subject limit
-- Apply "Why" lines for non-obvious changes
-- Avoid mixing documentation with code changes
-- Consider splitting large changes into multiple commits
-- Split by change intent, not by session, branch lifetime, or implementation wave
-
----
-
-## Common Pitfalls
-
-1. **Vague messages**  
-Fix: Use specific nouns and actions in the subject.
-
-2. **Mixing unrelated changes**  
-Fix: Split by change intent until each commit has one reviewable purpose.
-
-3. **Skipping context**  
-Fix: Add a "Why" line for decisions.
+- 動詞で始める
+- 50文字以内のルールを決める
+- Why行で理由を残す
+- ドキュメント更新は分離する
+- 大きな変更は「変更意図単位」でコミット分割する
 
 ---
 
-## Anti-Patterns
+## よくある落とし穴
 
-- Using TODO comments instead of commits
-- Rebasing shared branches after review
-- Hiding multiple changes in one commit
-- Bundling changes only because they happened in the same session or "wave"
+1. **曖昧なメッセージ**  
+Fix: 名詞と動詞で具体化する。
+
+2. **複数の変更を混在**  
+Fix: session単位ではなく変更意図単位で原子的コミットに分割する。
+
+3. **文脈がない**  
+Fix: Why行を追加する。
 
 ---
 
-## Quick Reference
+## アンチパターン
 
-### Commit Checklist
+- TODOコメントで先送り
+- 共有ブランチのrebase
+- 1コミットに複数責務を入れる
+- 同じ session / wave だったという理由だけで一括コミットする
 
-- [ ] Confirm on feature branch (not main)
-- [ ] Review `git diff`
-- [ ] Ensure one change intent per commit
-- [ ] Use Conventional Commits format
-- [ ] Add "Why" when needed
+---
 
-### Decision Table
+## クイックリファレンス
 
-| Situation | Action | Why |
-|----------|--------|-----|
-| Change <30 minutes | Commit directly | Keep momentum |
-| Multiple concerns | Split by change intent | Safer review and rollback |
-| Same session but multiple intents | Still split commits | Session boundary is not a commit boundary |
-| User says "commit this" | Start with atomic split review | Default to reviewable history instead of one large commit |
-| Shared branch | Avoid rebase | Preserve history |
+### コミットチェック
+
+- [ ] feature branch にいることを確認（mainでない）
+- [ ] `git diff` を確認
+- [ ] 1コミット=1変更意図
+- [ ] Conventional Commits形式
+- [ ] Whyを付ける
+
+### 判断テーブル
+
+| 状況 | 対応 | 理由 |
+|------|------|------|
+| 30分以内 | そのままコミット | テンポ維持 |
+| 複数責務 | 変更意図単位で分割 | レビュー安全 |
+| 同じsessionだが複数意図 | それでも分割 | session境界はコミット境界ではない |
+| 「コミットして」と言われた | まず atomic split を検討 | 大きすぎる1コミットを避ける |
+| 共有ブランチ | rebase回避 | 履歴保護 |
 
 ---
 
 ## FAQ
 
-**Q: Should I always add a scope?**  
-A: Add scopes when modules are clear or the repo is large.
+**Q: スコープは必須ですか？**  
+A: モジュールが明確なら付けると便利です。
 
-**Q: Can I use WIP commits?**  
-A: WIP is ok locally, but clean up before PR.
+**Q: WIPコミットは許容？**  
+A: ローカルならOKですがPR前に整理します。
 
-**Q: What if I already pushed the wrong message?**  
-A: Add a new fix commit instead of rewriting shared history.
+**Q: 間違ったメッセージをpushしたら？**  
+A: rebaseせず新しい修正コミットを追加します。
 
 ---
 
-## Resources
+## リソース
 
 - https://www.conventionalcommits.org
 - https://git-scm.com/docs/git-commit

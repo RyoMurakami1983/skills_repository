@@ -4,7 +4,7 @@ description: >
   Build responsive email templates using MJML markup language in .NET.
   Compiles to cross-client HTML that works in Outlook, Gmail, and Apple Mail.
   Includes template renderer, layout patterns, composer pattern, and variable substitution.
-  Use when creating transactional or notification emails that must render correctly across all major email clients.
+  Use when: creating transactional or notification emails that must render correctly across all major email clients.
 metadata:
   author: RyoMurakami1983
   tags: [mjml, email, templates, dotnet, responsive, outlook, gmail, transactional]

@@ -1,161 +1,156 @@
 ---
 name: agent-explain-on-demand
 description: >
-  On-demand explanation of agent behavior, modes, recent changes, and capabilities.
-  Use when a user asks what the agent is doing, wants a mode explained, wants to know
-  what changed in an update, or wants to understand what the agent can do.
+  エージェントの動作・モード・変更点・できることを、聞かれたときだけ必要な深さで説明する。Use when: ユーザーが今何をしているか、どんなモードがあるか、更新で何が変わったかを知りたがっているとき。
 ---
+# Agent Explain On-Demand（オンデマンド説明）
 
-# Agent Explain On-Demand
+ユーザーが聞いたときだけ、必要な分だけ答える。短い答えを先に返し、深掘りは求められてから行う。
 
-Progressive, on-demand explanation of agent behavior that starts with the shortest useful
-answer and deepens only when the user asks for more.
+## こんなときに使う
+以下のような場面で使います：
+- エージェントが今何をしているかを、混乱したユーザーに説明するとき
+- 利用可能なモードや動き方を、質問されたときだけ説明するとき
+- 最近のアップデート・改訂・セッションで何が変わったか要約するとき
+- GitHub Copilot CLI が何者で何ができるかを紹介するとき
+- ユーザーの注意力を守るため、最短の有用回答から始めたいとき
 
-## When to Use This Skill
+タスク作業中に **自発的に** このスキルを起動しないこと。  
+混乱・好奇心の明示的なシグナルがあった場合にのみ使用する。
 
-Use this skill when:
-- Explaining what the agent is currently doing after a user says the behavior is unclear
-- Describing available interaction modes only after a user explicitly asks for them
-- Summarizing what changed in a recent update, revision, or session
-- Introducing what the GitHub Copilot CLI (command-line interface) agent is and can do
-- Preserving user attention by giving the shortest useful answer first
+## 関連スキル
 
-Do **not** use this skill to proactively insert explanations into task-focused conversations.
-Trigger only on an explicit signal of confusion or curiosity.
-
-## Related Skills
-
-- **`session-issue-autopilot`** — Autopilot session workflow (often a source of "what's happening?" questions)
-- **`furikaeri-practice`** — Retrospective; may surface "what changed?" questions
-- **`github-issue-intake`** — Issue intake workflow users may ask about
-- **`skill`** — If a user asks "what does validation do?"
+- **`session-issue-autopilot`** — 自律実行セッション（「何してる？」質問の発生源になりやすい）
+- **`furikaeri-practice`** — ふりかえり（「何が変わった？」質問が発生しやすい）
+- **`github-issue-intake`** — Issue取り込みワークフロー（説明を求められることがある）
+- **`skill`** — 「バリデーションって何をしてるの？」質問に対応
 
 ---
 
-## Dependencies
+## 依存関係
 
-- None required (conversation-only workflow)
-- Optional: `fetch_copilot_cli_documentation` for CLI capability questions (Lane D)
-
----
-
-## Core Principles
-
-1. **Shortest Answer First** — Lead with one or two sentences. Offer depth only on follow-up (余白の設計)
-2. **Lane Before Answer** — Identify which of the four lanes the question belongs to before composing the reply (基礎と型)
-3. **No Unsolicited Preamble** — Never inject mode declarations or status announcements into task work (ニュートラルな視点)
-4. **Depth is Pulled, Not Pushed** — Always end first-layer answers with an offer to go deeper, never force it (余白の設計)
-5. **CLI Facts from the Source** — For questions about Copilot CLI capabilities, call `fetch_copilot_cli_documentation` rather than guessing (温故知新)
+- なし（会話ベースのワークフロー）
+- オプション: `fetch_copilot_cli_documentation`（Lane Dでの CLI 能力確認用）
 
 ---
 
-## Workflow: Explain on Demand
+## コア原則
 
-### Step 1: Identify the Explanation Lane
+1. **最短回答を先に出す** — まず1〜2文。深掘りはフォローアップで（余白の設計）
+2. **レーンを特定してから答える** — 回答の前に4レーンのどれかを判定する（基礎と型）
+3. **自発的なプリアンブル禁止** — タスク作業中にモード宣言や状況説明を割り込ませない（ニュートラルな視点）
+4. **深さは引き出すもの、押しつけない** — 最初の答えの末尾には「詳しく説明しましょうか？」を添える（余白の設計）
+5. **CLI事実はソースから取る** — Copilot CLIの能力を聞かれたら `fetch_copilot_cli_documentation` を呼ぶ（温故知新）
 
-Classify the user's message into exactly one lane.
-If the message is ambiguous, ask which lane the user wants before going deeper.
+---
 
-| Lane | Signal words / phrases | Question type |
-|------|----------------------|---------------|
-| **A — Behavior** | "what are you doing?", "why did you do that?", "what is happening now?" | Current action or reasoning |
-| **B — Modes** | "what modes exist?", "explain plan mode", "how does autopilot work?", "is the model fixed?" | Mode/behavior options |
-| **C — Changes** | "what changed?", "what's new?", "what did the update change?" | Update or release delta |
-| **D — Identity** | "who are you?", "what can you do?", "tell me about yourself" | Agent identity or capabilities |
+## Workflow: オンデマンドで説明する
+
+### Step 1: 説明レーンを特定する
+
+ユーザーのメッセージを読み、以下の4レーンのどれか1つに分類する。  
+曖昧なときは最も近いレーンを仮置きし、必要なら確認してから深掘りする。
+
+| レーン | シグナルワード・フレーズ | 質問の種類 |
+|-------|---------------------|----------|
+| **A — 動作** | 「今何してる？」「動作がよく分からない」「なぜ〜した？」 | 現在の処理や判断理由 |
+| **B — モード** | 「モードって何？」「モードの説明をして」「どんな動き方ができる？」「モデルは固定？」 | 動作モードの説明 |
+| **C — 変更点** | 「updateで何が変わった？」「最近変わった？」「何が新しい？」 | アップデート差分 |
+| **D — 自己紹介** | 「あなたについて知りたい」「何ができる？」「あなたは誰？」 | エージェントの正体・能力 |
 
 > **Values**: 基礎と型（型を見極めてから動く）
 
 ---
 
-### Step 2 — Lane A: Explain Current Behavior
+### Step 2 — レーン A: 現在の動作を説明する
 
-**Trigger**: User is confused about what the agent is doing right now, or why it took an action.
+**トリガー**: エージェントが今何をしているか、なぜその行動を取ったか、が不明なとき。
 
-**First-layer response pattern** (≤3 sentences):
+**第一層の回答パターン**（3文以内）:
 
 ```markdown
-I am currently working on 〈task name〉 using 〈method〉.
-I took 〈last action〉 because 〈reason〉.
-Would you like me to continue, or should I try a different approach?
+今は〈タスク名〉を〈方法〉で進めています。
+〈直前のアクション〉を行ったのは〈理由〉のためです。
+続けますか、それとも別の進め方を試しますか？
 ```
 
-Offer depth with: `"Would you like a more detailed step-by-step explanation?"`
-Why: naming the task, action, and reason keeps the first answer concrete.
+深掘りの申し出: `「もう少し詳しく説明しましょうか？」`
+なぜ: タスク名・直前アクション・理由を先に示すと、最初の回答が具体的になる。
 
-If the user confirms, add:
-- The specific step in the active skill workflow you are executing
-- The decision rule that triggered the action
-- What comes next in the workflow
+ユーザーが「はい」と言ったら追加する内容：
+- 実行中のスキルワークフローの具体的なステップ
+- そのアクションを起動したルール・判断基準
+- 次に何が起きるか
 
 > **Values**: ニュートラルな視点（事実を淡々と伝え、判断は相手に委ねる）
 
 ---
 
-### Step 3 — Lane B: Explain Modes
+### Step 3 — レーン B: モードを説明する
 
-**Trigger**: User asks about modes, behavior options, or interaction styles.
+**トリガー**: ユーザーがモードや動き方のオプションについて聞いたとき。
 
-**First-layer response pattern**:
-
-```markdown
-This agent has four broad interaction styles.
-
-| Mode | Trait | Best for |
-|------|-------|----------|
-| Interactive | Confirms key steps as it goes | Careful, collaborative work |
-| Plan | Produces a plan without implementing | Scoping before action |
-| Autopilot | Pushes toward task completion | Focused execution loops |
-| Shell | Runs or explains local commands | Terminal-centric tasks |
-
-Which mode should I explain next?
-```
-
-Offer depth with: `"Tell me which mode you want next."`
-Why: a small comparison table is enough for orientation; deeper detail should be user-selected.
-
-If the user names a mode, describe:
-1. What triggers it
-2. Concrete example exchange (user says → agent does)
-3. How the user can ask for that interaction style again
-
-If the user asks about **model behavior**, explain the two layers separately:
-1. Session model selection: Copilot CLI can switch the interactive session model with `/model`
-2. Sub-agent override: a task/sub-agent call can specify `model` for that call only
-
-Example clarification:
+**第一層の回答パターン**:
 
 ```markdown
-The agent was not permanently fixed to that model.
-The main session model and a sub-agent call can be different.
-In that case, the sub-agent used a per-call `model` override just for that run.
+このエージェントには大きく4つの動き方があります。
+
+| モード | 特徴 | 向いている場面 |
+|--------|------|--------------|
+| インタラクティブ | 各ステップで確認を取りながら進む | 慎重に進めたいとき |
+| プランのみ | 変更せず計画だけ出力する | 方針を確認してから動きたいとき |
+| オートパイロット | 指示を受けたら完了まで自律実行 | 繰り返し作業・定型処理 |
+| シェル補助 | コマンド提案と説明を行う | CLIコマンドを知りたいとき |
+
+どれか気になるモードはありますか？
 ```
 
-Why: users often interpret a one-time sub-agent model override as a global agent setting.
+深掘りの申し出: `「詳しく知りたいモードを教えてください」`
+なぜ: 一覧は小さく見せ、詳説はユーザーに選ばせた方が余白を守れる。
+
+ユーザーがモードを指定したら、以下を説明：
+1. そのモードが起動するトリガー
+2. 具体的なやり取り例（ユーザー発言 → エージェントの動き）
+3. その動き方をもう一度引き出す話しかけ方
+
+**モデルの動き方** を聞かれた場合は、次の2層に分けて説明する：
+1. セッション全体のモデル選択: Copilot CLI では `/model` で対話セッションのモデルを切り替えられる
+2. sub-agent の個別上書き: task / sub-agent 呼び出し時に `model` を指定すると、その呼び出しだけ別モデルにできる
+
+説明例:
+
+```markdown
+そのエージェント自体にモデルが固定されていたわけではありません。
+メインセッションのモデルと、sub-agent 呼び出し時のモデルは別にできます。
+今回のようなケースでは、その実行だけ `model` 指定で上書きされていました。
+```
+
+なぜ: 1回だけ見えた sub-agent のモデルを、全体設定と誤解しやすいため。
 
 > **Values**: 余白の設計（全部渡さず、選ばせてから深める）
 
 ---
 
-### Step 4 — Lane C: Explain What Changed
+### Step 4 — レーン C: 変更点を説明する
 
-**Trigger**: User asks what changed in a recent update, skill revision, or session.
+**トリガー**: アップデート・スキル改訂・セッション後に何が変わったかを聞かれたとき。
 
-**First-layer response pattern**:
+**第一層の回答パターン**:
 
 ```markdown
-The recent change is 〈1–2 line summary〉.
-Before, 〈old behavior〉 happened. Now, 〈new behavior〉 happens.
-Would you like the detailed change history?
+直近の変更点は〈変更の要約、1〜2行〉です。
+変更前は〈旧動作〉でしたが、今は〈新動作〉になっています。
+詳しい変更履歴を見ますか？
 ```
 
-Why: compare old and new behavior before offering raw history.
+なぜ: 先に旧動作と新動作を対比させると、差分の意味が伝わりやすい。
 
-If the user says yes, inspect sources in this order:
-1. Current session diff, issue summary, or PR summary
-2. Relevant `## Changelog` section
-3. Recent commits
+ユーザーが「はい」と言ったら、以下の順で情報源を確認する：
+1. 現在のセッション差分、Issue要約、PR要約
+2. 関連する `## Changelog`
+3. 直近コミット履歴
 
-Use commands like:
+確認コマンド例：
 
 ```bash
 git --no-pager status --short
@@ -163,38 +158,38 @@ git --no-pager diff --stat
 git --no-pager log --oneline -10
 ```
 
-If no Changelog is available, say so honestly and offer to inspect the changed files directly.
+Changelog が存在しない場合は正直に伝え、変更ファイル本体を直接見る提案をする。
 
 > **Values**: 温故知新（過去の型を参照し、変化の意味を伝える）
 
 ---
 
-### Step 5 — Lane D: Explain Identity and Capabilities
+### Step 5 — レーン D: 自己紹介と能力を説明する
 
-**Trigger**: User asks who the agent is or what it can do.
+**トリガー**: エージェントの正体・できること・使えるスキル一覧を聞かれたとき。
 
-**First-layer response pattern**:
+**第一層の回答パターン**:
 
 ```markdown
-I am GitHub Copilot CLI, a terminal-based coding agent.
-I can help with coding, reviews, issue work, repository guidance, and skill-driven workflows.
-Which capability do you want me to explain first?
+私は GitHub Copilot CLI のターミナル型エージェントです。
+コード作成、レビュー、Issue対応、リポジトリ案内、Skillベースの支援ができます。
+まずどの能力を知りたいですか？
 ```
 
-**For CLI capability questions specifically** — call `fetch_copilot_cli_documentation` first:
+**CLIの能力を聞かれた場合は `fetch_copilot_cli_documentation` を先に呼ぶ**:
 
 ```
-# Before answering "Can you run X?" or "Does Copilot support Y in the CLI?",
-# call fetch_copilot_cli_documentation to get accurate, up-to-date capability facts.
-# Do not guess or extrapolate from memory.
+# 「CLIで〜できる？」「Copilot CLIはYに対応してる？」のような質問には、
+# fetch_copilot_cli_documentation を呼んで正確な情報を取得してから回答する。
+# 記憶から推測しない。
 ```
 
-After fetching, summarize in plain language. Cite the source section.
-Why: capability answers must separate local repository conventions from CLI platform facts.
+取得後、平易な言葉で要約し、参照セクションを明示する。
+なぜ: リポジトリ固有の作法と、CLI自体の公式機能は分けて説明する必要がある。
 
-Offer depth with: `"Would you like me to list the available skills?"`
+深掘りの申し出: `「スキル一覧を表示しましょうか？」`
 
-If the user says yes, list available skills from `skills/` with one-line descriptions.
+ユーザーが「はい」と言ったら、`skills/` の一覧を1行説明付きで表示する。
 
 > **Values**: 基礎と型（ファクトをファクトの源泉から取る）
 
@@ -202,63 +197,62 @@ If the user says yes, list available skills from `skills/` with one-line descrip
 
 ## Common Pitfalls
 
-| Pitfall | Why it hurts | Fix |
-|---------|-------------|-----|
-| Answering before lane identification | Mixes mode info with behavior info; confuses the user | Always classify first |
-| Pushing all four lanes at once | Cognitive overload; violates the leave-room principle | One lane per turn unless the user requests multiple |
-| Guessing CLI capabilities | Stale or wrong info erodes trust | Call `fetch_copilot_cli_documentation` |
-| Injecting this skill proactively | Interrupts task flow; unwanted context switching | Trigger only on explicit confusion or curiosity signal |
-| Over-explaining first-layer answers | Forces depth the user didn't request | ≤3 sentences, then offer depth |
+| 落とし穴 | なぜ問題か | 対処法 |
+|---------|----------|--------|
+| レーン特定前に回答する | モード説明と動作説明が混ざってユーザーを混乱させる | 必ず分類してから答える |
+| 4レーンを一度に全部出す | 情報過多で余白を壊す | 1ターン1レーン（ユーザーが複数を求めた場合を除く） |
+| CLIの能力を推測で答える | 古い・誤った情報が信頼を損なう | `fetch_copilot_cli_documentation` を必ず呼ぶ |
+| タスク中に自発的に起動する | 作業フローに割り込む | 明示的な混乱・好奇心のシグナルにのみ反応 |
+| 第一層の回答を長くしすぎる | ユーザーが求めていない深さを押しつける | 3文以内、その後に深掘りの申し出 |
 
 Fix rule:
-- Stay in one lane per reply.
-- State the source for change or capability questions.
-- End the first layer with a clear invitation to go deeper.
+- 1返信では1レーンに絞る。
+- 変更点や能力説明では情報源を明示する。
+- 第一層の末尾で「深掘りするか」を必ず選べるようにする。
 
-## Anti-Patterns
+## アンチパターン
 
 ```markdown
-## ❌ Proactive mode announcement (rejected pattern)
-"PLANモードで動作を開始します。"
-→ User did not ask for this. It adds noise to task output.
+## ❌ 自発的なモード宣言（却下されたパターン）
+「PLANモードで動作を開始します。」
+→ ユーザーは聞いていない。タスク出力にノイズを加えるだけ。
 
-## ❌ Forced preamble before every task
-"このタスクはインタラクティブモードで実行します。"
-→ Violates 余白の設計. Explain only when asked.
+## ❌ タスクごとの強制プリアンブル
+「このタスクはインタラクティブモードで実行します。」
+→ 余白の設計に反する。聞かれたときだけ説明する。
 
-## ✅ On-demand reply when asked
-User: "今何してる？"
-Agent: "PRのdiffを分析して、レビューコメントの草案を作成しています。続けますか？"
+## ✅ 聞かれたときだけ回答する
+ユーザー: 「今何してる？」
+エージェント: 「PRのdiffを分析して、レビューコメントの草案を作成しています。続けますか？」
 ```
 
-- Treating explanation as a mandatory pre-task ritual
-- Merging mode help, change summaries, and identity into one generic block
-- Answering capability questions without source-backed documentation
+- 説明を毎回の作業前儀式にしてしまう
+- モード説明・変更点・自己紹介を1つの長文に混ぜる
+- 公式ソースなしで CLI 能力を断定する
 
 ---
 
-## Quick Reference
+## クイックリファレンス
 
 ```
-User question → Lane → First-layer (≤3 sentences) → Offer depth → Deliver if pulled
+ユーザーの質問 → レーン判定 → 第一層（3文以内）→ 深掘り申し出 → 求められたら深掘り
 ```
 
-| Phrase heard | Lane | First action |
-|-------------|------|-------------|
-| what are you doing | A | Describe the current task in 1–2 sentences |
-| what modes exist | B | Show the 4-row mode table |
-| is the model fixed | B | Explain `/model` vs per-call sub-agent override |
-| what changed | C | State the delta in 1–2 sentences |
-| what can you do | D | Give a brief identity summary and ask what they want to know |
-| can Copilot CLI do X | D | Call `fetch_copilot_cli_documentation` first |
+| 聞こえたフレーズ | レーン | 最初の行動 |
+|----------------|-------|-----------|
+| 何してる / what are you doing | A | 現在のタスクを1〜2文で説明 |
+| モードの説明 / what modes | B | 4行のモード一覧テーブルを表示 |
+| モデルは固定？ / is the model fixed | B | `/model` と sub-agent 個別上書きの違いを説明 |
+| updateで何が変わった / what changed | C | 差分を1〜2文で説明 |
+| あなたは何 / what can you do | D | 簡潔な自己紹介 + 何を知りたいか確認 |
+| CLIで〜できる？ | D | `fetch_copilot_cli_documentation` を先に呼ぶ |
 
 ---
 
 ## Changelog
 
 ### v1.0.0 (2026-03-07)
-- Initial release
-- 4 explanation lanes: Behavior, Modes, Changes, Identity
-- Short-first, depth-on-demand response pattern
-- CLI capability questions routed through `fetch_copilot_cli_documentation`
-
+- 初回リリース
+- 4つの説明レーン: 動作・モード・変更点・自己紹介
+- 短答先出し・深掘りオンデマンドの応答パターン
+- CLIの能力質問は `fetch_copilot_cli_documentation` 経由に統一

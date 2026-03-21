@@ -1,6 +1,6 @@
 ---
 name: typescript-tauri-setup
-description: Set up Tauri v2 desktop app environment with MSVC, Rust, and Tauri CLI on top of a TypeScript project. Use when building a lightweight desktop app from an existing TypeScript/HTML/CSS codebase.
+description: Set up Tauri v2 desktop app environment with MSVC, Rust, and Tauri CLI on top of a TypeScript project. Use when: building a lightweight desktop app from an existing TypeScript/HTML/CSS codebase.
 metadata:
   author: RyoMurakami1983
   tags: [tauri, rust, msvc, desktop, typescript, windows]

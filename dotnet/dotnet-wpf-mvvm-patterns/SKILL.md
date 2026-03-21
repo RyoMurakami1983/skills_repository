@@ -3,7 +3,7 @@ name: dotnet-wpf-mvvm-patterns
 description: >
   Build WPF applications using CommunityToolkit.Mvvm with proper MVVM separation,
   commanding, validation, and dialog patterns.
-  Use when implementing new WPF views or refactoring code-behind into ViewModel-first architecture.
+  Use when: implementing new WPF views or refactoring code-behind into ViewModel-first architecture.
 metadata:
   author: RyoMurakami1983
   tags: [wpf, mvvm, csharp, communitytoolkit, xaml, dotnet]

@@ -2,7 +2,7 @@
 name: dotnet-marketplace-publishing
 description: >
   Publish skills and agents to the dotnet-skills Claude Code marketplace.
-  Use when adding new skills, registering agents, updating plugin.json,
+  Use when: adding new skills, registering agents, updating plugin.json,
   or releasing a new marketplace version.
 license: MIT
 metadata:

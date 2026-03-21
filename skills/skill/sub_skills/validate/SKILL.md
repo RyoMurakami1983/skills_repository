@@ -1,7 +1,7 @@
 ---
 name: validate
 description: >
-  スキルの構造品質と出荷可否を段階的に検証する。こんなときに使う: draft の最低基準確認、
+  スキルの構造品質と出荷可否を段階的に検証する。Use when: draft の最低基準確認、
   公開前レビュー、rollout 可否の判断をしたいとき。
 compatibility: "_foundation/QUALITY.md, _eval/scripts/validate_skill.py"
 ---

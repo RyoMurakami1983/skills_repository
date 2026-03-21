@@ -3,7 +3,7 @@ name: dotnet-verify-email-snapshots
 description: >
   Snapshot test email templates using Verify to catch rendering regressions.
   Validates rendered HTML output matches approved baselines with MJML support.
-  Use when verifying email template rendering against human-approved snapshots.
+  Use when: verifying email template rendering against human-approved snapshots.
 metadata:
   author: RyoMurakami1983
   tags: [verify, snapshot-testing, email-testing, mjml, xunit, dotnet, regression]

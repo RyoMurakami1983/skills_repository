@@ -1,102 +1,95 @@
 ---
 name: dotnet-skill-deploy
 description: >
-  Deploy selected dotnet skills to a project's .github/skills/ directory.
-  Use when setting up a new .NET project, onboarding a team to dotnet skills,
-  or updating project-level skills from the skills_repository.
-allowed-tools:
-  - powershell
+  選択した dotnet skill をプロジェクトの .github/skills/ に配備する。Use when: 新しい .NET プロジェクトへ skill を導入したいとき、チームへ共通 skill を展開したいとき、skills_repository の更新を反映したいとき。
 ---
+# dotnetスキルをプロジェクトにデプロイする
 
-# Deploy Dotnet Skills to Project
+`skills_repository/dotnet/` から選択したdotnetスキルを、対象プロジェクトの `.github/skills/` にデプロイする対話型ワークフロー。エージェントがプロジェクト分析、カテゴリ選択、実行を `Deploy-DotnetSkills.ps1` 経由でガイドする。
 
-Interactive workflow for deploying selected dotnet skills from `skills_repository/dotnet/` to a target project's `.github/skills/` directory. The agent guides the user through project analysis, category selection, and execution via `Deploy-DotnetSkills.ps1`.
-
-## When to Use This Skill
-
-Use this skill when:
-- Setting up a new .NET project that needs relevant dotnet skills deployed
-- Onboarding a team member who needs project-level coding standards
-- Updating project-level skills from the latest skills_repository
-- Responding to a user request to add dotnet skills to a project ("deploy skills to my project")
-- Starting a new WPF, Blazor, or class library project with standardized patterns
+## こんなときに使う
+以下の場面で使用：
+- 新規.NETプロジェクトのセットアップ時に関連スキルをデプロイしたい
+- チームメンバーのオンボーディングでプロジェクトレベルのコーディング標準が必要
+- skills_repositoryの最新版でプロジェクトレベルのスキルを更新したい
+- 「dotnet skills をプロジェクトに追加して」と依頼された
+- 新規WPF、Blazor、クラスライブラリプロジェクトを開始する
 
 ## Related Skills
 
-- **`dotnet`** — Thin entry skill when the user starts from broad `.NET` intent and still needs routing
-- **`dotnet-modern-csharp-coding-standards`** — One of the foundation skills frequently deployed
-- **`dotnet-wpf-mvvm-patterns`** — WPF MVVM foundation skill
-- **`dotnet-project-structure`** — Project structure skill
-- **`git-initial-setup`** — Often used alongside skill deployment for new projects
+- **`dotnet`** — `.NET` という広い相談から適切な具体 skill や deploy workflow へ振り分ける入口 skill
+- **`dotnet-modern-csharp-coding-standards`** — 頻繁にデプロイされる基盤スキル
+- **`dotnet-wpf-mvvm-patterns`** — WPF MVVM基盤スキル
+- **`dotnet-project-structure`** — プロジェクト構造スキル
+- **`git-initial-setup`** — 新規プロジェクトでスキルデプロイと併用
 
 ---
 
 ## Decision Table
 
-Use this to jump directly to the right step based on what you need.
+現在の状況に応じて適切なステップに直接ジャンプできる。
 
-| Situation | Current state | Action |
-|-----------|---------------|--------|
-| New project setup | No skills deployed yet | Step 1 → 2 → 3 |
-| Check available categories | No deployment needed yet | Step 2, run `-List` |
-| First-time deployment | Target path confirmed | Step 3 (without `-Force`) |
-| Update existing skills | Skills already in `.github/skills/` | Step 3 with `-Force` |
-| Preview before committing | Scope unclear | Step 3 with `-WhatIf` |
-| Verify deployment result | Scripts just ran | Step 4 |
+| 状況 | 現在の状態 | アクション |
+|------|-----------|-----------|
+| 新規プロジェクトセットアップ | スキル未デプロイ | Step 1 → 2 → 3 |
+| 利用可能なカテゴリを確認したい | デプロイ不要 | Step 2 で `-List` 実行 |
+| 初回デプロイ | ターゲットパス確定済み | Step 3（`-Force` なし） |
+| 既存スキルを最新版に更新 | `.github/skills/` に既存スキルあり | Step 3 に `-Force` |
+| 変更内容をプレビューしたい | スコープ不明 | Step 3 に `-WhatIf` |
+| デプロイ結果を確認 | スクリプト実行直後 | Step 4 |
 
 ---
 
 ## Dependencies
 
-- PowerShell 5.1+ (Windows)
-- `skills_repository` cloned locally — set `$env:SKILLS_REPO` (PowerShell) or `$SKILLS_REPO` (bash/WSL) to its path (e.g., `C:\tools\skills_repository` on Windows, `/mnt/c/tools/skills_repository` on WSL)
+- PowerShell 5.1+（Windows）
+- `skills_repository` がローカルにクローン済み — パスを `$env:SKILLS_REPO`（PowerShell）または `$SKILLS_REPO`（bash/WSL）に設定（例: Windows は `C:\tools\skills_repository`、WSL は `/mnt/c/tools/skills_repository`）
 
 ## Core Principles
 
-1. **Selective Deployment** — Copy only relevant skills to avoid agent context noise (余白の設計)
-2. **Category-Driven Selection** — Use predefined categories aligned with `dotnet-shihan` jurisdiction for consistent grouping (基礎と型)
-3. **Idempotent Operations** — Safe to re-run; existing skills are skipped unless `-Force` is specified (継続は力)
-4. **Transparency First** — Always show what will be deployed before executing; support `-WhatIf` for dry runs (ニュートラルな視点)
+1. **選択的デプロイ** — 関連するスキルのみコピーし、エージェントのコンテキストノイズを回避（余白の設計）。なぜ？ — 不要なスキルがプロジェクトにあると、Copilotエージェントのコンテキストウィンドウに入り、関連しないパターンを参照してしまう。WPFプロジェクトにBlazorスキルは不要。
+
+2. **カテゴリ駆動選択** — `dotnet-shihan` 管轄に整合したカテゴリで一貫したグルーピング（基礎と型）。なぜ？ — 31スキルを一つずつ選ぶのは非効率。dotnet-shihan.agent.mdの分類と同じカテゴリを使うことで、エージェントとユーザーの間に共通言語が生まれる。
+
+3. **べき等な操作** — 安全に再実行可能。既存スキルは `-Force` 指定時のみ上書き（継続は力）。なぜ？ — 誤って実行しても既存のスキルを壊さない。更新時は明示的に `-Force` を使うことで意図を明確にする。
+
+4. **透明性優先** — 実行前に何がデプロイされるか常に表示。`-WhatIf` でドライラン対応（ニュートラルな視点）。なぜ？ — 「何が起こるか分からない」ツールは使われない。事前プレビューが信頼を生む。
 
 ---
 
-## Workflow: Deploy Dotnet Skills
+## Workflow: dotnetスキルのデプロイ
 
-### Step 1 — Confirm Project Information
+### Step 1 — プロジェクト情報の確認
 
-Confirm the target project path and project type before running any deployment command.
+デプロイのコンテキストをユーザーから収集：
 
-Gather deployment context from the user:
-
-1. **Target project path**: Confirm where `.github/skills/` should be created
-2. **Project type**: Identify the project category to recommend skills
+1. **ターゲットプロジェクトパス**: `.github/skills/` を作成する場所を確認
+2. **プロジェクトの種類**: スキル推奨のためのプロジェクトカテゴリを特定
 
 ```
-Questions to ask:
-- "Which project should I deploy skills to? (provide the project root path)"
-- "What type of .NET project is this?"
-  Options: WPF application, Class library, Blazor app, Console app, Other
+質問例:
+- 「どのプロジェクトにスキルをデプロイしますか？（プロジェクトのルートパスを教えてください）」
+- 「このプロジェクトの種類は？」
+  選択肢: WPFアプリケーション、クラスライブラリ、Blazorアプリ、コンソールアプリ、その他
 ```
 
-**Output**: Target path and project type confirmed.
+**出力**: ターゲットパスとプロジェクト種別が確定。
 
 > **Values**: ニュートラルな視点（先入観なく、プロジェクトの実態に合わせる）
 
-### Step 2 — Recommend Categories and Skills
+### Step 2 — カテゴリ・スキルの提案
 
-Run `-List` first to discover all available categories, then match to the project type.
+プロジェクト種別に基づき適切なスキルカテゴリを推奨：
 
-Based on the project type, recommend appropriate skill categories:
+| プロジェクト種別 | 推奨カテゴリ | 概算スキル数 |
+|---------------|------------|------------|
+| WPFアプリケーション | `wpf-app`（複合） | 15 |
+| クラスライブラリ | `foundation` + `data` | 8 |
+| Blazorアプリ | `foundation` + `testing`（playwright） | 12 |
+| コンソールアプリ | `foundation` | 5 |
+| フルスタック | `all` | 31 |
 
-| Project Type | Recommended Categories | Typical Skill Count |
-|-------------|----------------------|-------------------|
-| WPF Application | `wpf-app` (composite) | 15 |
-| Class Library | `foundation` + `data` | 8 |
-| Blazor App | `foundation` + `testing` (playwright) | 12 |
-| Console App | `foundation` | 5 |
-| Full Stack | `all` | 31 |
-
-**Run `-List` to show all options**:
+**`-List` で全オプションを表示**:
 
 ```powershell
 & "<skills_repository>\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1" `
@@ -104,58 +97,55 @@ Based on the project type, recommend appropriate skill categories:
     -List
 ```
 
-**Available categories** (aligned with `dotnet-shihan.agent.md`):
+**利用可能なカテゴリ**（`dotnet-shihan.agent.md` と整合）:
 
-| Category | Count | Description |
-|----------|-------|-------------|
-| `foundation` | 5 | Technical foundation (modern-csharp, type-design, project-structure, slopwatch, api-design) |
-| `data` | 3 | Data & persistence (efcore, database-performance, serialization) |
-| `testing` | 7 | Concurrency, testing & CI (concurrency, testcontainers, snapshot-testing, verify-email, crap-analysis, playwright-blazor, playwright-ci-caching) |
-| `wpf` | 11 | WPF & desktop (mvvm, secure-config, oracle, dify, UI components, matching) |
-| `infra` | 6 | Infrastructure & packages (DI, configuration, local-tools, package-management, marketplace, mjml) |
-| `wpf-app` | 15 | **Composite**: foundation subset + wpf + infra subset |
-| `all` | 31 | All dotnet skills |
+| カテゴリ | 数 | 説明 |
+|---------|---|------|
+| `foundation` | 5 | 技術基盤（modern-csharp, type-design, project-structure, slopwatch, api-design） |
+| `data` | 3 | データ・永続化（efcore, database-performance, serialization） |
+| `testing` | 7 | 並行・テスト・CI（concurrency, testcontainers, snapshot-testing, verify-email, crap-analysis, playwright-blazor, playwright-ci-caching） |
+| `wpf` | 11 | WPF・デスクトップ（mvvm, secure-config, oracle, dify, UIコンポーネント, マッチング） |
+| `infra` | 6 | インフラ・パッケージ（DI, configuration, local-tools, package-management, marketplace, mjml） |
+| `wpf-app` | 15 | **複合**: foundation一部 + wpf + infra一部 |
+| `all` | 31 | 全dotnetスキル |
 
-Present the recommendation and let the user adjust:
+推奨を提示し、ユーザーに調整を依頼：
 
 ```
-"For a WPF application, I recommend the 'wpf-app' category (15 skills).
-This includes coding standards, MVVM patterns, secure config, and all WPF UI components.
-Would you like to proceed, or adjust the selection?"
+「WPFアプリケーションには 'wpf-app' カテゴリ（15スキル）を推奨します。
+コーディング標準、MVVMパターン、セキュア設定、全WPF UIコンポーネントが含まれます。
+このまま進めますか？カスタマイズしますか？」
 ```
 
-**Output**: Selected categories and/or individual skills confirmed.
+**出力**: 選択されたカテゴリ・個別スキルが確定。
 
 > **Values**: 基礎と型（カテゴリが選択の型を提供）/ 成長の複利（必要なスキルだけで精度向上）
 
-### Step 3 — Execute Deployment
+### Step 3 — デプロイ実行
 
-Always preview with `-WhatIf` before the first deployment to a project. Then run the deployment script with confirmed parameters:
+確定したパラメータでデプロイスクリプトを実行：
 
-**Category deployment**:
+**カテゴリデプロイ**:
 
 ```powershell
-# Why: category deployment is the recommended default — ensures consistent skill sets
 & "<skills_repository>\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1" `
     -SourceRoot "<skills_repository>\dotnet" `
     -Target "<project_path>" `
     -Category <selected_category>
 ```
 
-**Individual skills deployment**:
+**個別スキルデプロイ**:
 
 ```powershell
-# Why: use individual selection when only specific skills are needed
 & "<skills_repository>\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1" `
     -SourceRoot "<skills_repository>\dotnet" `
     -Target "<project_path>" `
     -Skills <skill1>,<skill2>,<skill3>
 ```
 
-**For updates (overwrite existing)**:
+**更新（既存を上書き）**:
 
 ```powershell
-# Why: -Force ensures latest skill versions replace outdated copies
 & "<skills_repository>\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1" `
     -SourceRoot "<skills_repository>\dotnet" `
     -Target "<project_path>" `
@@ -163,10 +153,9 @@ Always preview with `-WhatIf` before the first deployment to a project. Then run
     -Force
 ```
 
-**Important**: Always run with `-WhatIf` first if the user wants to preview:
+**重要**: プレビュー希望時は先に `-WhatIf` を実行：
 
 ```powershell
-# Why: preview prevents accidental overwrites and confirms scope
 & "<skills_repository>\skills\dotnet-skill-deploy\scripts\Deploy-DotnetSkills.ps1" `
     -SourceRoot "<skills_repository>\dotnet" `
     -Target "<project_path>" `
@@ -174,39 +163,36 @@ Always preview with `-WhatIf` before the first deployment to a project. Then run
     -WhatIf
 ```
 
-**Output**: Skills copied to `<project_path>\.github\skills\`.
-
-✅ **Good**: Run `-WhatIf` first, confirm the scope, then execute the real deployment.
-❌ **Bad**: Deploy directly without `-WhatIf` — unexpected files may appear in the project.
+**出力**: スキルが `<project_path>\.github\skills\` にコピー完了。
 
 > **Values**: 継続は力（繰り返し実行可能な自動化）
 
-### Step 4 — Verify and Guide Next Steps
+### Step 4 — 確認と次のステップ案内
 
-After deployment, verify and provide guidance:
+デプロイ後の確認とガイダンス：
 
-1. **Verify deployment**: List the deployed skills directory
+1. **デプロイ確認**: デプロイされたスキルディレクトリを一覧表示
 
 ```powershell
 Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 ```
 
-2. **Advise on git tracking**: The user decides whether to git-track the deployed skills
+2. **Git管理のアドバイス**: デプロイされたスキルのGit追跡はユーザーが決定
 
 ```
-"Skills have been deployed to .github/skills/.
-These skills are NOT git-tracked by default.
-If you want to track them in your project repository, run:
+「スキルが .github/skills/ にデプロイされました。
+デフォルトではGit追跡されていません。
+プロジェクトリポジトリで管理する場合は以下を実行:
   git add .github/skills/
-  git commit -m 'feat: add dotnet skills for project-level guidance'"
+  git commit -m 'feat: add dotnet skills for project-level guidance'」
 ```
 
-3. **Suggest next steps**:
-   - Review deployed skills in the project
-   - Run `git-initial-setup` if this is a new repository
-   - Start coding with `@dotnet-shihan` referencing the deployed skills
+3. **次のステップ提案**:
+   - プロジェクト内のデプロイ済みスキルを確認
+   - 新規リポジトリなら `git-initial-setup` を実行
+   - `@dotnet-shihan` でデプロイ済みスキルを参照しながらコーディング開始
 
-**Output**: Deployment confirmed with actionable next steps.
+**出力**: デプロイ確認と具体的な次のアクション。
 
 > **Values**: 成長の複利（デプロイ後のアクション案内で学習を加速）
 
@@ -214,104 +200,90 @@ If you want to track them in your project repository, run:
 
 ## Best Practices
 
-- Use `-Category` for bulk deployment, then `-Skills` to add extras. Why: categories provide the right defaults for 80% of cases.
-- Avoid deploying `all` by default — select the category that fits your project type. Why: extra skills add context noise for the agent.
-- Apply `-WhatIf` before every deployment to preview what will be copied. Why: transparency builds trust and prevents accidental overwrites.
-- Define your project type clearly in Step 1 before selecting categories. Why: wrong category leads to irrelevant skills in the project.
-- Consider adding `-Force` on re-runs to ensure the latest skill patterns are applied. Why: skills evolve; outdated copies can mislead the agent.
-- Use `-SourceRoot` and `-Target` parameters explicitly — never hardcode paths. Why: reproducible commands work across environments.
-- Implement periodic updates when `skills_repository` is updated. Why: skills evolve with new patterns and best practices.
+- ✅ **カテゴリで始め、個別スキルで微調整** — `-Category` で一括、`-Skills` で追加
+- ✅ **まずプレビュー** — 実デプロイ前に必ず `-WhatIf` を提案
+- ✅ **少なく、多くなく** — 余分なスキルはエージェントのコンテキストノイズ
+- ✅ **定期的に更新** — skills_repository更新時に `-Force` で再実行
+- ✅ **プロジェクト種別に合わせる** — WPFアプリにBlazor/Playwrightスキルは不要
+- ✅ **カテゴリ定義を同期する** — dotnetスキルの追加・削除時は repoルート相対パス `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` の `CategoryMap`、複合カテゴリ `wpf-app`、`agents/dotnet-shihan.agent.md` を必ず同期
 
-✅ **Good**: Match the category to your project type — WPF app gets `wpf-app`, class library gets `foundation`.
-❌ **Bad**: Deploy `all` for every project — irrelevant skills dilute the agent's context window.
-✅ **Good**: Always preview with `-WhatIf` before the first deployment to a new project.
-❌ **Bad**: Skip the preview and deploy directly — accidental overwrites are hard to recover from.
+### カテゴリ保守ルール（dotnetスキル追加・削除時）
 
-### Category Maintenance Rule (when dotnet skills change)
-
-1. Update `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` `CategoryMap`.
-2. Add/remove the skill in the correct category and review `wpf-app` composite entries.
-3. Sync jurisdiction list in `agents/dotnet-shihan.agent.md`.
-4. Run `Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -List` and confirm output.
+1. `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` の `CategoryMap` を更新する。
+2. 該当カテゴリへの追加・削除と、`wpf-app` 複合カテゴリの内訳を確認する。
+3. `agents/dotnet-shihan.agent.md` の管轄スキル一覧を同期する。
+4. `Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -List` を実行し、表示結果を確認する。
 
 ## Anti-Patterns
 
-- ❌ **Deploy `all` by default** → Fix: select relevant categories based on project type
-- ❌ **Skip verification** → Fix: always confirm deployed skills in Step 4
-- ❌ **Hardcode paths** → Fix: use `-SourceRoot` and `-Target` parameters
-- ❌ **Forget `-Force` on updates** → Fix: explicitly add `-Force` when updating existing skills
+- ❌ **デフォルトで `all` をデプロイ** — 不要なコンテキストノイズを追加。関連カテゴリを選択
+- ❌ **確認をスキップ** — Step 4で必ずデプロイ結果を確認
+- ❌ **パスをハードコード** — `-SourceRoot` と `-Target` パラメータを使い、仮定しない
+- ❌ **更新時の `-Force` 忘れ** — なしでは既存スキルがサイレントにスキップされる
+
+---
 
 ## Common Pitfalls
 
-| Pitfall | Symptom | Fix |
-|---------|---------|-----|
-| Wrong `-SourceRoot` path | "SourceRoot not found" error | Verify `skills_repository\dotnet` path exists |
-| Missing `.github\skills\` directory | No skills visible to agent | Script creates it automatically; verify `-Target` path |
-| Deploying without `-WhatIf` first | Unexpected files in project | Always preview first, then deploy |
-| Mixing categories with overlap | Duplicate copy attempts | Script deduplicates automatically; no action needed |
+| 問題 | 症状 | 対処 |
+|------|------|------|
+| `-SourceRoot` のパスが間違っている | "SourceRoot not found" エラー | `skills_repository\dotnet` パスの存在を確認 |
+| `.github\skills\` ディレクトリが見えない | エージェントにスキルが表示されない | スクリプトが自動作成するので `-Target` パスを確認 |
+| `-WhatIf` なしでデプロイ | 意図しないファイルがプロジェクトに入る | 必ずプレビューしてからデプロイ |
+| カテゴリが重複してスキルが混在 | 重複コピーの警告 | スクリプトが自動重複排除するため対応不要 |
 
 ---
 
-## Quick Reference
+## スクリプトリファレンス
 
-**Decision: which flag to use?**
+デプロイスクリプトは repoルート相対パス `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1` に配置。
 
-| Flag | When to use | Example |
-|------|-------------|---------|
-| `-List` | Discover available categories and skills | `-List` |
-| `-WhatIf` | Preview deployment without writing files | `-Category wpf-app -WhatIf` |
-| `-Category` | Deploy all skills in a named category | `-Category foundation` |
-| `-Skills` | Deploy specific named skills | `-Skills skill1,skill2` |
-| `-Force` | Overwrite existing skills on update | `-Category wpf-app -Force` |
+| パラメータ | 型 | 必須 | 説明 |
+|-----------|---|------|------|
+| `-SourceRoot` | string | Yes | dotnetスキルのソースディレクトリパス |
+| `-Target` | string | デプロイ時 | ターゲットプロジェクトのルートパス |
+| `-Category` | string | デプロイ時* | カテゴリ名: foundation, data, testing, wpf, infra, wpf-app, all |
+| `-Skills` | string[] | デプロイ時* | カンマ区切りのスキル名 |
+| `-List` | switch | No | 利用可能なカテゴリとスキルを表示 |
+| `-Force` | switch | No | 既存スキルを上書き |
+| `-WhatIf` | switch | No | コピーせずプレビュー |
 
-```
-# List available categories and skills
-Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -List
-
-# Deploy by category (preview first)
-Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Category wpf-app -WhatIf
-Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Category wpf-app
-
-# Deploy individual skills
-Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Skills skill1,skill2
-
-# Update existing skills
-Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Category wpf-app -Force
-```
-
----
-
-## Script Reference
-
-The deployment script is located at repo-root-relative `skills/dotnet-skill-deploy/scripts/Deploy-DotnetSkills.ps1`.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `-SourceRoot` | string | Yes | Path to dotnet skills source directory |
-| `-Target` | string | For deploy | Path to target project root |
-| `-Category` | string | For deploy* | Category name: foundation, data, testing, wpf, infra, wpf-app, all |
-| `-Skills` | string[] | For deploy* | Comma-separated skill names |
-| `-List` | switch | No | Show available categories and skills |
-| `-Force` | switch | No | Overwrite existing skills |
-| `-WhatIf` | switch | No | Preview without copying |
-
-\* At least one of `-Category` or `-Skills` is required for deployment.
+\* デプロイには `-Category` または `-Skills` のいずれかが必要。
 
 ---
 
 ## FAQ
 
-**Q: Where should skills_repository be cloned?**
-A: Anywhere you prefer. Set `$env:SKILLS_REPO` (PowerShell) or `$SKILLS_REPO` (bash/WSL) to the clone path and use it as `-SourceRoot "$env:SKILLS_REPO\dotnet"`. The recommended Windows location is `C:\tools\skills_repository`; the equivalent WSL path is `/mnt/c/tools/skills_repository`.
+**Q: skills_repositoryはどこにクローンすべき？**
+A: どこでも可。クローン先のパスを `$env:SKILLS_REPO`（PowerShell）または `$SKILLS_REPO`（bash/WSL）に設定し、`-SourceRoot "$env:SKILLS_REPO\dotnet"` として使用。Windows推奨パスは `C:\tools\skills_repository`、WSL相当パスは `/mnt/c/tools/skills_repository`。
 
-**Q: Can I combine `-Category` and `-Skills`?**
-A: Yes. The script merges both selections (deduplicates automatically).
+**Q: `-Category` と `-Skills` を組み合わせられる？**
+A: はい。スクリプトは両方の選択をマージ（重複自動排除）。
 
-**Q: What happens if a skill already exists in the target?**
-A: Without `-Force`, it's skipped. With `-Force`, it's overwritten (deleted and re-copied).
+**Q: 既存スキルがターゲットにある場合は？**
+A: `-Force` なしではスキップ。`-Force` ありでは上書き（削除して再コピー）。
 
-**Q: Are copied skills git-tracked?**
-A: Not automatically. The user decides whether to `git add` them.
+**Q: コピーされたスキルはGit管理される？**
+A: 自動的には管理されない。ユーザーが `git add` するかどうかを決定。
 
-**Q: Can I deploy production/ skills too?**
-A: This skill is dotnet-specific. For production skills, copy them manually: `Copy-Item -Recurse production\* .github\skills\`.
+**Q: production/ スキルもデプロイできる？**
+A: このスキルはdotnet専用。productionスキルは手動コピー: `Copy-Item -Recurse production\* .github\skills\`。
+
+---
+
+## Quick Reference
+
+```
+# 利用可能カテゴリとスキルを一覧表示
+Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -List
+
+# カテゴリデプロイ（プレビュー→実行）
+Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Category wpf-app -WhatIf
+Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Category wpf-app
+
+# 個別スキルデプロイ
+Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Skills skill1,skill2
+
+# 既存スキルを最新版に更新
+Deploy-DotnetSkills.ps1 -SourceRoot <dotnet_path> -Target <project> -Category wpf-app -Force
+```

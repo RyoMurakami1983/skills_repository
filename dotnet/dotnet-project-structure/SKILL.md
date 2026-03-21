@@ -2,7 +2,7 @@
 name: dotnet-project-structure
 description: >
   Modern .NET project structure with .slnx, Directory.Build.props, central package management,
-  SourceLink, version management, and SDK pinning. Use when setting up or modernizing a .NET solution.
+  SourceLink, version management, and SDK pinning. Use when: setting up or modernizing a .NET solution.
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, msbuild, nuget, slnx, sourcelink, project-structure]

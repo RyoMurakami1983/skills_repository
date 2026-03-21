@@ -3,7 +3,7 @@ name: evidence-response
 description: >
   Build a reusable evidence-response system for recurring business inquiries — audits,
   questionnaires, compliance surveys — using historical evidence archives and structured
-  workflows. Use when your organization repeatedly receives the same structured inquiries,
+  workflows. Use when: your organization repeatedly receives the same structured inquiries,
   you need to leverage past responses instead of starting from scratch, or you are setting
   up a new operational domain response capability.
 ---
