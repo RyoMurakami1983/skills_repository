@@ -99,9 +99,11 @@ ADR は「なぜその設計判断を採ったのか」を後から追えるよ�
 
 ## SKILL の言語方針
 
-この repo では、skill の正本を **`SKILL.md` 1つ** に寄せる方向へ切り替えています。
+この repo では、`skills/` 配下の skill の正本を **`SKILL.md` 1つ** に統一します。
 
-まずは `skills/skill/` を pilot にして、従来の「英語 `SKILL.md` + `references/SKILL.ja.md`」運用から、**日本語 `SKILL.md` を正本とする段階移行**を進めます。目的は英語を排除することではなく、二重管理コストを減らし、validator / template / generator を含む skill の型を repo 実態に合わせて簡素化することです。
+`skills/skill/` で確立した型を基に、従来の「英語 `SKILL.md` + `references/SKILL.ja.md`」運用から、**日本語 `SKILL.md` を正本とする運用**へ横展開します。目的は英語を排除することではなく、二重管理コストを減らし、validator / template / generator を含む skill の型を repo 実態に合わせて簡素化することです。
+
+不変条件として、**JSON key / schema key / file name / enum は英語のまま維持**します。`references/` は overflow docs や補助資料の置き場として残し、`references/SKILL.ja.md` は常設前提にしません。
 
 判断理由と移行原則は [`docs/adr/ADR-003-skill-japanese-primary-language-policy.md`](docs/adr/ADR-003-skill-japanese-primary-language-policy.md) を参照してください。
 
@@ -109,7 +111,7 @@ ADR は「なぜその設計判断を採ったのか」を後から追えるよ�
 
 **2026-03**
 
-- `skills/skill/` を追加し、メタスキル群を単一入口 + sub_skills / _foundation / _eval / scripts 構成へ統合した
+- `skills/skill/` を追加してメタスキル群を単一入口 + sub_skills / _foundation / _eval / scripts 構成へ整備し、そこで固めた日本語正本化ルールを `skills/` の残り skill へ横展開して `references/SKILL.ja.md` の常設をやめた
 - `skill/_eval/scripts/validate_skill.py`、`skill/scripts/create_skill.py` などを新構造へ移し、スキル用ツールチェインを同梱した
 - README は Windows の `.copilot` 同期を最優先に保ちつつ、詳細を `docs/INSTALL.md` へ分離した
 

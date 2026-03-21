@@ -4,7 +4,7 @@ description: >
   Write integration tests using Testcontainers for .NET with xUnit and real Docker
   infrastructure. Covers SQL Server, PostgreSQL, Redis, RabbitMQ, multi-container
   networks, container reuse, and Respawn database reset.
-  Use when writing integration tests that need real databases, caches, or message queues
+  Use when: writing integration tests that need real databases, caches, or message queues
   instead of mocks.
 metadata:
   author: RyoMurakami1983

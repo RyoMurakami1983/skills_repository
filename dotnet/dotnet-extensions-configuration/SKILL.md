@@ -4,7 +4,7 @@ description: >
   Implement strongly-typed configuration with validation using Microsoft.Extensions.Options.
   Bind appsettings.json to POCO classes, validate at startup with Data Annotations or
   IValidateOptions<T>, and choose correct IOptions lifetime for each scenario.
-  Use when designing configuration classes that are testable, validated, and maintainable.
+  Use when: designing configuration classes that are testable, validated, and maintainable.
 metadata:
   author: RyoMurakami1983
   tags: [configuration, options-pattern, dotnet, aspnetcore, validation, ioptions, strongly-typed]

@@ -1,6 +1,6 @@
 ---
 name: dotnet-ocr-matching-workflow
-description: Use when you need to orchestrate an end-to-end OCR-to-database matching WPF workflow by composing existing skills (secure-config, Oracle, Dify OCR, matching, and comparison UI).
+description: Use when: you need to orchestrate an end-to-end OCR-to-database matching WPF workflow by composing existing skills (secure-config, Oracle, Dify OCR, matching, and comparison UI).
 license: MIT
 metadata:
   author: RyoMurakami1983

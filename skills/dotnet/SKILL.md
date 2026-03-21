@@ -1,52 +1,43 @@
 ---
 name: dotnet
 description: >
-  Route .NET requests to the right existing dotnet skill or deployment workflow.
-  Use when the user says "dotnet", ".NET", "C#", "WPF", "EF Core", or
-  related platform terms but has not named the exact skill yet.
+  広い .NET / C# / WPF 相談を、既存の dotnet skill や deploy workflow へ案内する薄い入口 skill。Use when: ユーザーが「dotnet」「.NET」「C#」「WPF」「EF Core」など広く言っていて、まだ具体 skill が定まっていないとき。
 ---
+# .NET 入口 skill
 
-# .NET Entry Skill
+`.NET` 系の相談で、まだどの具体 skill を使うべきか曖昧なときに最初に入るための薄い入口です。
 
-Use this skill as a thin entry point when the user clearly needs `.NET` guidance but the best existing skill is still ambiguous. Why: broad platform requests often arrive before the user knows whether they need WPF, data, bootstrap, testing, or deployment guidance.
+この skill は `dotnet-project-structure` や `dotnet-wpf-mvvm-patterns` など既存の具体 skill を置き換えません。最初の振り分けだけを担当し、意図が明確になったら速やかに具体 skill へ委譲します。
 
-This skill does not replace the direct use of concrete skills such as `dotnet-project-structure` or `dotnet-wpf-mvvm-patterns`. Its job is to route quickly, then get out of the way.
-
-## When to Use This Skill
-
-Use this skill when:
-- Interpreting a broad `.NET` or `C#` request before the right skill is obvious
-- Routing a new WPF application request into the most relevant WPF-focused skills
-- Mapping solution bootstrap questions to project-structure, DI, configuration, or package-management skills
-- Directing EF Core, serialization, and database topics to the right data-oriented skills
-- Guiding a team on whether to deploy a curated category set into `.github/skills/`
+## こんなときに使う
+次のような場面で使います。
+- `.NET` や `C#` の広い相談を最初に分類したいとき
+- WPF アプリ関連の相談をどの WPF 系 skill に振るか判断したいとき
+- solution bootstrap を project structure / DI / configuration / package management に振り分けたいとき
+- EF Core、serialization、database performance を data 系 skill へ案内したいとき
+- `.github/skills/` への curated deployment が必要か判断したいとき
 
 ## Decision Table
 
-| Your intent | Route | What to do |
+| 意図 | ルート | 何をするか |
 | --- | --- | --- |
-| Start a new `.NET` solution or modernize repo structure | `dotnet-project-structure` | Use the project-structure workflow first, then add adjacent infra skills only when needed. |
-| Deploy a recommended set of `.NET` skills into a project | `dotnet-skill-deploy` | Choose a category such as `foundation`, `wpf`, or `wpf-app` and deploy only the needed skills. |
-| Build or refactor a WPF application | `dotnet-wpf-mvvm-patterns` | Start with MVVM as the WPF foundation, then branch into secure config, dialogs, OCR, PDF, or integrations. |
-| Work on EF Core, serialization, or database performance | `dotnet-efcore-patterns`, `dotnet-serialization`, `dotnet-database-performance` | Stay in the data track rather than routing through UI or bootstrap skills. |
-| Improve testing, snapshotting, Playwright, or containers | `dotnet-testcontainers`, `dotnet-snapshot-testing`, `dotnet-playwright-blazor`, `dotnet-playwright-ci-caching` | Route by testing concern and keep platform-specific advice narrow. |
-| Work on DI, configuration, tools, or package management | `dotnet-extensions-dependency-injection`, `dotnet-extensions-configuration`, `dotnet-local-tools`, `dotnet-package-management` | Treat these as infrastructure or bootstrap concerns, not application-feature concerns. |
+| 新しい `.NET` solution を作る・整える | `dotnet-project-structure` | まず project structure から入り、必要に応じて infra skill を追加する。 |
+| 推奨 skill セットをプロジェクトへ配備したい | `dotnet-skill-deploy` | `foundation`、`wpf`、`wpf-app` などのカテゴリから必要分だけ配備する。 |
+| WPF アプリを作る・改善する | `dotnet-wpf-mvvm-patterns` | まず MVVM を土台にし、その後 secure config、dialog、OCR、PDF、integration に分岐する。 |
+| EF Core / serialization / DB 性能に取り組む | `dotnet-efcore-patterns`、`dotnet-serialization`、`dotnet-database-performance` | UI や bootstrap ではなく data 系の流れに留まる。 |
+| テスト、snapshot、Playwright、containers を整える | `dotnet-testcontainers`、`dotnet-snapshot-testing`、`dotnet-playwright-blazor`、`dotnet-playwright-ci-caching` | testing concern ごとに絞って案内する。 |
+| DI、configuration、tools、package management を扱う | `dotnet-extensions-dependency-injection`、`dotnet-extensions-configuration`、`dotnet-local-tools`、`dotnet-package-management` | アプリ機能ではなく infra / bootstrap concern として扱う。 |
 
 ## Related Skills
 
-- **`dotnet-skill-deploy`** — Deploy curated `.NET` skill sets into a target project's `.github/skills/`
-- **`dotnet-project-structure`** — Strong first route for new or modernized solutions
-- **`dotnet-wpf-mvvm-patterns`** — Strong first route for WPF requests
-- **`dotnet-efcore-patterns`** — Primary data/persistence route
-- **`dotnet-testcontainers`** — Representative testing/integration route
+- **`dotnet-skill-deploy`** — `.NET` skill セットをプロジェクトに配備する
+- **`dotnet-project-structure`** — 新規 solution や modernize の第一候補
+- **`dotnet-wpf-mvvm-patterns`** — WPF 相談の第一候補
+- **`dotnet-efcore-patterns`** — data / persistence の第一候補
+- **`dotnet-testcontainers`** — testing / integration の代表ルート
 
 ## Routing Notes
 
-- Prefer direct skill invocation once the user's intent is clear; this entry skill is only for early ambiguity.
-- Treat `WPF` as the strongest sub-domain inside `.NET`, but do not create a separate top-level `wpf` entry unless evidence shows the `dotnet` route is too broad.
-- Keep deployment concerns in `dotnet-skill-deploy`; this skill should recommend deployment, not perform it.
-
-## Pitfalls
-
-- **Staying in the router too long**: once the user's real concern is clear, switch to the concrete skill instead of repeating high-level category guidance.
-- **Using `dotnet` as a replacement for direct skills**: this entry skill exists to resolve ambiguity, not to hide concrete skills such as `dotnet-project-structure` or `dotnet-wpf-mvvm-patterns`.
+- 意図が明確になったら直接 concrete skill を呼ぶ。入口 skill に留まり続けない。
+- `WPF` は `.NET` の中で最も強い sub-domain だが、現時点では top-level `wpf` skill へは分離しない。
+- deploy 実行は `dotnet-skill-deploy` に委譲し、この skill 自体は routing に集中する。

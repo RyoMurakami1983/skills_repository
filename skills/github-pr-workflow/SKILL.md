@@ -1,110 +1,108 @@
 ---
 name: github-pr-workflow
-description: "Create and manage pull requests with the canonical flow from branch validation to PR creation, review waiting, and human merge handoff. Use when implementation is validated and ready for the PR lifecycle."
+description: >
+  実装の検証後に、ブランチ確認から PR 作成、レビュー待機、人間へのマージ引き継ぎまでを標準フローで進める。Use when: feature branch の変更がレビュー準備完了になり、PR lifecycle に入りたいとき。
 ---
-
 # GitHub PR Workflow
 
-A state-driven workflow that routes from validated implementation through PR creation, issue linkage, review waiting, and human merge handoff.
+状態検知からPR作成・Issue連携・レビュー待機・人間へのマージ引き継ぎまでを扱うワークフロー。
 
-Canonical route: implementation -> `github-pr-workflow` -> wait for a real review signal -> `github-pr-review-response` -> human merge decision/handoff.
+標準ルート: implementation -> `github-pr-workflow` -> 実際のレビューシグナル待ち -> `github-pr-review-response` -> 人間のマージ判断/引き継ぎ。
 
-**Pull Request (PR)**: A reviewed change proposal in GitHub.
+**Pull Request (PR)**: GitHub上でレビューする変更提案。
 
-Detect state first. Create the PR only from a feature branch. Use `--body-file` for any non-trivial body.
+先に状態を検知してください。PRは必ず feature branch から作成してください。複数行本文は `--body-file` を使ってください。
 
-## When to Use This Skill
+## こんなときに使う
+以下の状況で活用してください：
+- feature branch の作業がレビュー準備完了になり、PRを作成するとき
+- 未コミット・未push の変更をPR作成前にルーティングするとき
+- `Closes #N` や `Refs #N` で Issue 連携しながらPRを作成するとき
+- `gh pr create` 前にブランチ状態と認証状態を確認するとき
+- マージ判断を自動化せず、レビュー待ちへ安全に引き渡すとき
 
-Use this skill when:
-- Creating a PR after feature-branch work is ready for review
-- Routing uncommitted or unpushed changes before opening a PR
-- Linking issues with `Closes #N` or `Refs #N` during PR creation
-- Verifying branch and authentication state before running `gh pr create`
-- Handing off a review-ready PR without automating the merge decision
+> **スコープ**: このスキルは状態検知からPR作成・Issue連携・低消費なレビュー待機への受け渡し、および残PRブランチ向けの確認済みマージ後同期までを扱います。詳細なレビュー対応とマージ判断そのものはスコープ外です。
 
-> **Scope**: This skill covers state detection through PR creation, issue linkage, low-cost handoff into review waiting, and confirmed post-merge sync for remaining PR branches. Detailed review handling and the merge decision itself stay out of scope.
+## 関連スキル
 
-## Related Skills
-
-- **`github`** - Thin entry skill for broad GitHub delivery requests before the exact concrete workflow is obvious
-- **`github-pr-review-response`** - Review comment triage, fixes, replies, and re-review request after a real review signal
-- **`git-commit-practices`** - Commit formatting and atomic changes (delegated from Step 1)
-- **`git-initial-setup`** - Branch protection defaults
-- **`github-issue-intake`** - Issue creation and triage
+- **`github-pr-review-response`** - 実際のレビューシグナル到着後のコメント分類・修正・返信・再レビュー依頼
+- **`git-commit-practices`** - コミット形式と原子的コミット（Step 1から委譲）
+- **`git-initial-setup`** - ブランチ保護の初期設定
+- **`github-issue-intake`** - Issue作成とトリアージ
 
 ---
 
-## Dependencies
+## 依存関係
 
 - Git 2.30+
-- GitHub CLI (`gh`) — verify with `gh auth status`
-- GitHub repository with push access
+- GitHub CLI (`gh`) — `gh auth status` で事前確認
+- GitHubリポジトリへのpush権限
 
 ---
 
-## Core Principles
+## コア原則
 
-1. **Branch First, Clean Main** (基礎と型) - Keep work off main until review and only let verified changes reach main
-2. **Traceability** (成長の複利) - Link PRs to issues so future developers learn why
-3. **Japanese PR Body** (ニュートラル) - Write PR descriptions in Japanese for the team
-4. **State-Driven** (温故知新) - Detect current state and route to the right action
-5. **Event-Driven Waiting** (余白の設計) - Wait for review signals instead of repeatedly re-checking the same PR
+1. **ブランチ優先で main を清潔に保つ** (基礎と型) - 作業はレビュー完了まで main に載せず、検証済み変更だけを main に到達させる
+2. **追跡性** (成長の複利) - PRとIssueを紐付け、将来の開発者が変更理由を学べるように
+3. **日本語PR本文** (ニュートラル) - チーム標準としてPR本文を日本語で記述
+4. **状態駆動** (温故知新) - 現在の状態を検知し、適切なアクションにルーティング
+5. **イベント駆動で待つ** (余白の設計) - 同じPRを何度も見に行かず、レビューのシグナルを待つ
 
 ---
 
-## Decision Table
+## 判断テーブル
 
-Use this table to choose the next action at a glance.
+次の一手をひと目で決めるためのテーブルです。
 
-| Current state | Next move | Why |
+| 現在の状態 | 次のアクション | 理由 |
 |---|---|---|
-| On `main` | Create a feature branch first | Keeps reviewable work off default branch |
-| Uncommitted changes exist | Commit before PR creation | Preserves traceable state |
-| Commits are local only | Push branch first | `gh pr create` needs the remote branch |
-| PR does not exist yet | Create the PR | Opens review flow and issue links |
-| PR already exists | Report status and stop | Avoids duplicate PRs |
+| `main` にいる | 先に feature branch を作る | default branch にレビュー前の作業を置かないため |
+| 未コミット変更あり | PR前にコミットする | 追跡可能な状態を保つため |
+| ローカルコミットのみ | 先に push する | `gh pr create` にはリモートブランチが必要なため |
+| PR未作成 | PRを作成する | レビューフローとIssue連携を開くため |
+| PR既存 | 状態を報告して止まる | 重複PRを防ぐため |
 
 ---
 
-## Responsibility Boundaries
+## 責務境界
 
-Keep the merge boundary explicit so automation does not overreach.
+自動化がやり過ぎないよう、マージ境界を明示します。
 
-| Phase | Agent responsibility | Human responsibility |
+| フェーズ | エージェントの責務 | 人間の責務 |
 |---|---|---|
-| Before PR | Detect state, create branch, prepare validated changes | Confirm the work is ready to propose |
-| PR creation | Open the PR, link issues, summarize evidence | Decide who reviews and when |
-| Review waiting | Record the PR URL once, stop polling, and wait for a real review signal | Decide whether to reprioritize before a signal arrives |
-| Review response | Hand off to `github-pr-review-response` when a review signal arrives | Review the response and decide whether approval is sufficient |
-| Merge decision | Summarize readiness only | Decide whether and when to merge on GitHub |
-| After merge | Help with local sync only after merge is confirmed | Confirm the merge actually happened |
-| Parallel PR cleanup | Sync remaining PR branches from `origin/main`, rerun checks, summarize re-review needs | Decide merge order and resolve any product-level reprioritization |
+| PR前 | 状態検知、ブランチ作成、検証済み変更の準備 | 提案可能な状態か判断する |
+| PR作成 | PR作成、Issue連携、検証根拠の要約 | 誰にレビューを依頼するか、いつ出すか決める |
+| レビュー待機 | PR URL を1回記録し、ポーリングを止めて実際のレビューシグナルを待つ | シグナル前に優先順位を変えるか判断する |
+| レビュー対応 | レビューシグナル到着時に `github-pr-review-response` へ委譲する | 返信内容を確認し、承認で十分か判断する |
+| マージ判断 | 準備完了状況を要約するだけ | GitHub上でマージするか、いつするか決める |
+| マージ後 | マージ確認後にローカル同期を補助する | 実際にマージされたことを確認する |
+| 並行PRの後処理 | `origin/main` を残PRブランチへ取り込み、再検証・再レビュー要否を要約する | マージ順序の判断やプロダクト優先度の見直しを行う |
 
-Use when the user asks what this skill will and will not automate.
+このスキルが自動化する範囲・しない範囲を説明するときに使います。
 
 > **Values**: ニュートラル / 余白の設計
-## Workflow: Ship via Pull Request
+## ワークフロー: プルリクエストで出荷する
 
-### Step 1: Detect State and Route
+### Step 1: 状態を検知してルーティングする
 
-Check the current git state and take the appropriate action.
+現在のgit状態を確認し、適切なアクションを取ります。
 
 ```bash
-# 1. Check current branch
+# 1. 現在のブランチを確認
 BRANCH=$(git branch --show-current)
 
-# 2. Check for uncommitted changes
+# 2. 未コミットの変更を確認
 git status --short
 
-# 3. Check for unpushed commits
+# 3. 未pushのコミットを確認
 git log "origin/${BRANCH}..HEAD" --oneline 2>/dev/null
 
-# 4. Check for existing PR
+# 4. 既存PRの確認
 gh pr list --head "$BRANCH" --state open
 ```
 
 ```powershell
-# PowerShell equivalent
+# PowerShell版
 $Branch = git branch --show-current
 
 git status --short
@@ -114,26 +112,26 @@ git log "origin/$Branch..HEAD" --oneline 2>$null
 gh pr list --head $Branch --state open
 ```
 
-| State | Action |
-|-------|--------|
-| On main | Create feature branch (Step 2) |
-| Uncommitted changes | Delegate to `git-commit-practices`, then return |
-| Committed but not pushed | `git push -u origin BRANCH`, then Step 3 |
-| Pushed but no PR | Proceed to Step 3 |
-| PR already exists | Report PR status and URL |
+| 状態 | アクション |
+|------|-----------|
+| mainブランチにいる | feature branch を作成（Step 2） |
+| 未コミットの変更あり | `git-commit-practices` に委譲してコミット後、戻る |
+| コミット済・未push | `git push -u origin BRANCH` してから Step 3 へ |
+| push済・PR未作成 | Step 3（PR作成）へ進む |
+| PR既存 | PRステータスとURLを報告 |
 
-> **Important**: If uncommitted changes exist, delegate to `git-commit-practices` first. If on main, create a feature branch before any commits.
+> **重要**: 未コミットの変更がある場合は `git-commit-practices` ワークフローに委譲してください（先にコミット、その後戻る）。mainにいる場合は、コミット前に必ず feature branch を作成してください。
 
-Use when any PR-related request is received. Why: state detection prevents wrong branching, pushing, or duplicate PR creation.
+「プルリクして」「PR作成して」等のPR関連リクエスト時に使用します。Why: 状態検知を先に行うと、誤った分岐や重複PR作成を防げます。
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 2: Create Feature Branch
+### Step 2: フィーチャーブランチの作成
 
-Branch from the latest main. Use descriptive prefixes (`feature/`, `fix/`, `docs/`) with the issue number.
+最新のmainからブランチを作成します。追跡性のためにIssue番号付きの説明的プレフィックス（`feature/`、`fix/`、`docs/`）を使用します。
 
 ```bash
-# Verify authentication before branching (catches push failures early)
+# ブランチ作成前に認証確認（push失敗を防ぐ）
 gh auth status
 git switch main
 git pull --ff-only
@@ -141,15 +139,15 @@ git switch -c feature/issue-123
 git push -u origin feature/issue-123
 ```
 
-Use when starting new work or when Step 1 detected you are on main. Why: creating the branch first keeps later commits clean and reviewable.
+新しい作業を開始するとき、または Step 1 で main にいることが検知された場合に使用します。Why: 先にブランチを切ると、その後のコミット履歴がきれいに保てます。
 
 > **Values**: 基礎と型
 
-### Step 3: Open PR and Link Issues
+### Step 3: PR作成とIssue連携
 
-Create a PR with a Japanese body (team policy). Use `Closes` to auto-close issues on merge.
+日本語の本文でPRを作成します。`Closes` でマージ時にIssueを自動クローズします。
 
-**Inline body** (single-line only):
+**インライン本文**（1行本文のみ）:
 
 ```bash
 gh pr create \
@@ -157,13 +155,13 @@ gh pr create \
   --body "注文履歴画面に検索フィルタを追加。Closes #123. Refs #130."
 ```
 
-**File-based body** (standard default for multiline Markdown, code fences, or backticks):
+**ファイル経由の本文**（複数行Markdown・コードフェンス・バッククォートを含む本文の標準既定）:
 
 ```bash
-# Write body to a unique temp file with a quoted heredoc.
-# Why: mktemp avoids filename collisions, and trap cleans up on failure paths too.
+# 一意な一時ファイルを作り、クォート付きHEREDOCで書き出す
+# なぜ: mktemp で衝突を避け、trap で失敗時も確実に削除できる
 BODY_FILE="$(mktemp "${TMPDIR:-/tmp}/pr_body.XXXXXX")" || {
-  echo "Failed to create temporary file for PR body" >&2
+  echo "PR本文用の一時ファイル作成に失敗しました" >&2
   exit 1
 }
 cleanup() {
@@ -188,200 +186,200 @@ EOF
 gh pr create --title "feat: 支払い画面にフィルタを追加" --body-file "$BODY_FILE"
 ```
 
-Prefer this pattern for any non-trivial body. For reusable shell-safe templates (PowerShell + Bash), see `docs/patterns/environment-portability.md` (Template 2).
+複数段落の本文、シェル例、バッククォートを含むMarkdownでは、このパターンを既定にしてください。PowerShell/Bash両対応の再利用テンプレは `docs/patterns/environment-portability.md`（テンプレート2）を参照します。
 
-✅ **Good**: Generate the body file, inspect it, then call `gh pr create --body-file`.
-❌ **Bad**: Paste multiline Markdown with backticks directly into `--body` and hope shell quoting survives.
-Why: the file-based path is reproducible, reviewable, and safe across shells.
+✅ **良い例**: 本文ファイルを生成して確認してから `gh pr create --body-file` を実行する。
+❌ **悪い例**: バッククォート入りの複数行Markdownを `--body` に直接貼り付けてクォート崩れに賭ける。
+Why: ファイル経由の方が再現性・レビュー性・シェル安全性が高いからです。
 
-| Keyword | Effect |
-|---------|--------|
-| `Closes #N` | Auto-closes Issue #N on merge |
-| `Refs #N` | Links to Issue #N without closing |
+| キーワード | 効果 |
+|-----------|------|
+| `Closes #N` | マージ時にIssue #N を自動クローズ |
+| `Refs #N` | Issue #N へのリンク（クローズしない） |
 
-Use when the branch is pushed and no PR exists yet.
+ブランチがpush済みでPRが未作成の場合に使用します。
 
 > **Values**: 成長の複利 / ニュートラル
 
-✅ **Good**: Create the PR once, record the URL, and hand it off to waiting mode.
-❌ **Bad**: Re-run PR creation commands or re-check the same branch with no state change.
-Why: one clean handoff preserves traceability and avoids duplicate effort.
+✅ **良い例**: PRを1回作成し、URLを記録して待機モードへ受け渡す。
+❌ **悪い例**: 状態変化がないのにPR作成や確認コマンドを何度も繰り返す。
+Why: きれいな受け渡しの方が追跡性を保ち、重複作業を防げるからです。
 
-### Step 4: Enter Review Waiting Mode Efficiently
+### Step 4: 低コストでレビュー待機モードに入る
 
-After the PR is open, stop active polling. Wait for a concrete trigger, then hand off to `github-pr-review-response` exactly once per new signal.
+PRを開いたら、能動的なポーリングを止めます。具体的なシグナルが来たときだけ `github-pr-review-response` へ、シグナルごとに1回だけ受け渡します。
 
 ```bash
-# Capture the PR URL once, then stop looping on checks
+# PR URL を1回だけ記録し、その後はループ確認を止める
 gh pr view --json url,updatedAt --jq '{url: .url, updatedAt: .updatedAt}'
 
-# Optional low-frequency batch check during a natural pause
+# 自然な作業区切りでのみ、まとめて1回確認
 gh pr status
 ```
 
-| Signal | Stay in waiting mode? | Next action | Avoid |
+| シグナル | 待機継続？ | 次のアクション | 避けること |
 |---|---|---|---|
-| New review submitted | No | Open `github-pr-review-response` and inspect comments once | Re-checking before any signal |
-| Review requested from you | No | Open `github-pr-review-response` and inspect comments once | Re-checking before any signal |
-| User reports new review activity | No | Verify once, then open `github-pr-review-response` | Re-checking before any signal |
-| PR is still open but unchanged | Yes | Stay idle | "Just checking again" behavior |
-| Only a CI status changed | Usually | Check once only if review work may be blocked | Treating CI noise as review input |
-| PR closed or merged | Exit | Stop waiting and move to the next confirmed state | Continuing review checks |
+| 新しいレビューが送信された | いいえ | `github-pr-review-response` を開き、コメントを1回確認 | シグナル前の再確認 |
+| 自分に review request が来た | いいえ | `github-pr-review-response` を開き、コメントを1回確認 | シグナル前の再確認 |
+| ユーザーが新規レビュー活動を共有した | いいえ | 1回だけ確認してから `github-pr-review-response` へ委譲 | シグナル前の再確認 |
+| PRは開いているが変化なし | はい | 待機を継続 | 「念のためもう1回」の確認 |
+| CI ステータスだけ変わった | 通常ははい | レビュー作業が止まる可能性がある場合だけ1回確認 | CIノイズをレビュー入力扱いすること |
+| PRがクローズ/マージ済み | 終了 | 待機を終えて次の確定状態へ進む | レビュー確認を続ける |
 
-Waiting rules:
-- Do not re-check the PR just because it remains open
-- If you must check manually, batch all PR checks into one pass at a natural pause
-- After `github-pr-review-response` requests re-review, return to this signal-driven waiting mode until a new review signal or explicit human merge direction arrives
+待機ルール:
+- PRが開いたままという理由だけで再確認しない
+- 手動確認が必要でも、自然な区切りで全PRをまとめて1回確認する
+- `github-pr-review-response` で再レビュー依頼を出した後は、新しいレビューシグナルまたは人間の明示的なマージ判断が来るまで、この待機モードへ戻る
 
-Use when the PR exists and work has shifted from creation to waiting.
+PR作成後、作業が「作成」から「待機」へ移るときに使います。
 
 > **Values**: 余白の設計 / 継続は力
 
-### Step 5: Sync Remaining PR Branches After One PR Merges
+### Step 5: 1本マージ後に残PRブランチへ main を同期する
 
-If multiple PRs are in flight and one of them gets merged, sync each remaining PR branch with the latest `origin/main` before asking reviewers to continue.
+複数のPRを並行で進めていて、そのうち1本がマージされたら、残っているPRブランチすべてへ最新の `origin/main` を取り込み、レビュー継続前に差分を揃えます。
 
 ```bash
-# Start from a clean worktree and the remaining PR branch
+# 作業ツリーがクリーンであることを確認し、残PRブランチへ移動
 git status --short
 git fetch origin
 git switch feature/issue-124-followup
 
-# Bring in the newly merged main history
+# マージ済み main の履歴を取り込む
 git merge origin/main
 
-# If conflicts occur, resolve them first, then rerun validation
-npm test          # or repo-equivalent checks
-npm run lint      # or repo-equivalent checks
+# conflict があれば解消してから再検証
+npm test          # またはこのリポジトリ相当の検証
+npm run lint      # またはこのリポジトリ相当の検証
 
-# Push the sync or conflict-resolution commit
+# 同期または conflict 解消コミットを push
 git push origin HEAD
 ```
 
-Parallel-PR checklist after one branch merges:
+並行PRの post-merge チェックリスト:
 
-1. Confirm the first PR is actually merged on GitHub.
-2. Switch to each remaining PR branch and merge `origin/main`.
-3. Resolve conflicts immediately if they appear.
-4. Rerun validator / lint / relevant tests after the merge.
-5. Push the updated branch and request re-review if new commits were added.
+1. 先行PRが GitHub 上で本当にマージ済みか確認する。
+2. 残PRブランチごとに切り替え、`origin/main` を取り込む。
+3. conflict が出たらその場で解消する。
+4. 取り込み後に validator / lint / 関連テストを再実行する。
+5. ブランチが更新されたら push し、必要に応じて再レビューを依頼する。
 
-✅ **Good**: Treat post-merge sync as a required follow-up whenever sibling PRs touch nearby files or the same workflow.
-❌ **Bad**: Leave remaining PRs stale after a related merge, then discover conflicts only at the next merge attempt.
-Why: immediate sync keeps review state honest and prevents hidden drift across parallel PRs.
+✅ **良い例**: 同じworkflowや近いファイルを触る sibling PR があるなら、1本マージごとに同期を必須フォローアップとして扱う。
+❌ **悪い例**: 残PRを古いまま放置し、次のマージ直前になってから conflict に気づく。
+Why: 早期同期の方がレビュー状態を正確に保てて、並行PR間の隠れたドリフトを防げるからです。
 
-Use when one PR from a parallel set has merged and other review branches still remain open.
+並行しているPRのうち1本がマージされ、まだレビュー継続中のブランチが残っているときに使います。
 
 > **Values**: 基礎と型 / 継続は力
 
 ---
 
-## Best Practices
+## ベストプラクティス
 
-- Write PR body in Japanese (team policy)
-- Use Conventional Commits format for titles (`feat:`, `fix:`, etc.)
-- Always include `Closes #N` to auto-close linked issues
-- Prefer `--body-file` for any multiline or shell-sensitive body; on Windows, make it the default
-- Use `mktemp` + `trap` with a single-quoted heredoc (`<<'EOF'`) when generating body files in Bash
-- Verify authentication with `gh auth status` before creating PRs
-- Prefer event-driven review waiting; do not burn cycles on repeated checks with no signal
-- Batch PR status checks at natural context switches instead of polling one PR at a time
-- After one PR merges from a parallel set, sync every remaining branch with `origin/main` before continuing review
-- Do not create stacked dependent PR branches from feature branches
-- After a base PR merges, run `git fetch origin` and create the next work branch from latest `origin/main` before opening another PR
+- PR本文は日本語で記述する（チーム標準）
+- タイトルは Conventional Commits 形式（`feat:`, `fix:` 等）
+- `Closes #N` で Issue を自動クローズする
+- 複数行やシェルに敏感な本文では `--body-file` を既定にする（Windows では必須寄り）
+- Bashで本文ファイルを作るときは `mktemp` + `trap` とクォート付きHEREDOC（`<<'EOF'`）を使う
+- `gh auth status` で認証を事前確認する
+- レビュー待機はイベント駆動を優先し、シグナルなしの再確認を繰り返さない
+- PRごとのポーリングではなく、自然な区切りでまとめ確認する
+- 並行PRの1本が先にマージされたら、残ブランチを `origin/main` と同期してからレビュー継続へ戻す
+- feature branch から次のPR用ブランチを派生させる積み上げ運用をしない
+- ベースPRがマージされた後、`git fetch origin` で最新状態を取得し、次の作業ブランチは必ず最新 `origin/main` から新規作成する
 
-### Preflight Checklist (Before `gh pr create`)
+### 事前チェックリスト（`gh pr create` 前）
 
-- [ ] You are on a feature branch (not `main`)
-- [ ] `gh auth status` succeeds for the intended account
-- [ ] Branch can be pushed to remote (no protection conflict)
-- [ ] If changes include `.github/workflows/*`, token includes `workflow` scope
-- [ ] Existing open PR for the branch is checked (`gh pr list --head BRANCH --state open`)
-- [ ] If `skills/**/SKILL.md` changed, run `uv run python skills/skill/_eval/scripts/validate_skill.py skills/<skill_id>/SKILL.md` before PR creation
-- [ ] For skill changes, confirm validation gate: overall score ≥85% and each category ≥80% (review warnings and fix high-signal items before review)
-
----
-
-## Common Pitfalls
-
-1. **PR body written in English**
-   Fix: Use the team's Japanese PR template heading order shown in Step 3, not the English Summary/Reason/Test/Related sequence.
-
-2. **Missing issue link**
-   Fix: Always include `Closes #N` in the Related section.
-
-3. **Creating PR from main branch**
-   Fix: Step 1 state detection routes to feature branch creation first.
-
-4. **Polling for review every few minutes**
-   Fix: Switch to event-driven waiting and batch status checks only at planned pauses.
-
-5. **Backticks or `$()` break the PR body**
-   Fix: Generate the body with a single-quoted heredoc and pass it via `--body-file`.
-
-6. **Remaining PR branches are left unsynced after a sibling PR merges**
-   Fix: Merge `origin/main` into each open sibling branch, rerun checks, and request re-review if the branch changed.
-
-7. **Creating a PR branch from another feature branch (stacked dependency)**
-   Fix: Do not stack dependent PR branches. Merge the base PR first, run `git fetch origin`, then branch fresh from latest `origin/main`.
-
-## Troubleshooting
-
-- **`workflow ... not found on the default branch` when dispatching Actions**
-  - Cause: `workflow_dispatch` targets workflows present on the default branch.
-  - Fix: Merge the workflow file into default branch first, then dispatch.
-
-- **Push rejected for `.github/workflows/*` due to scope**
-  - Cause: Token lacks `workflow` scope.
-  - Fix: Re-authenticate with `gh auth refresh -h github.com -s workflow`.
-
-- **A remaining PR turns conflicted after another PR merged**
-  - Cause: The branch still points to pre-merge main history.
-  - Fix: `git fetch origin`, switch to the remaining branch, merge `origin/main`, resolve conflicts, rerun checks, and push before asking for more review.
+- [ ] feature branch 上で作業している（`main` ではない）
+- [ ] `gh auth status` が対象アカウントで成功する
+- [ ] ブランチをリモートへ push できる（保護ルールに抵触しない）
+- [ ] `.github/workflows/*` を変更する場合、トークンに `workflow` scope がある
+- [ ] 対象ブランチに既存のOpen PRがないことを確認済み（`gh pr list --head BRANCH --state open`）
+- [ ] `skills/**/SKILL.md` を変更した場合、PR作成前に `uv run python skills/skill/_eval/scripts/validate_skill.py skills/<skill_id>/SKILL.md` を実行している
+- [ ] スキル変更時は検証ゲートを確認している（overall ≥85%、各カテゴリ ≥80%、warning は高シグナル項目を優先修正）
 
 ---
 
-## Anti-Patterns
+## よくある落とし穴
 
-- Pushing directly to main, then creating a PR
-- Creating PRs without issue numbers
-- Leaving PR body empty
+1. **PR本文が英語になる**
+   修正: テンプレ見出しを日本語で統一（概要/理由/テスト/関連）。
+
+2. **Issueリンクの忘れ**
+   修正: `## 関連` セクションに `Closes #N` を必ず含める。
+
+3. **mainブランチから直接PRを作る**
+   修正: Step 1 の状態検知で feature branch 作成に誘導。
+
+4. **数分おきにレビューを確認し続ける**
+   修正: イベント駆動の待機に切り替え、計画した区切りでのみまとめ確認する。
+
+5. **バッククォートや `$()` を含む本文が壊れる**
+   修正: クォート付きHEREDOCで本文ファイルを生成し、`--body-file` で渡す。
+
+6. **兄弟PRがマージされたのに残ブランチを同期しない**
+   修正: 各残PRブランチへ `origin/main` を取り込み、再検証後に必要なら再レビューを依頼する。
+
+7. **feature branch から別のPRブランチを切る（依存した積み上げPR）**
+   修正: 依存ブランチを増やさず、ベースPRのマージ後に `git fetch origin` で最新状態を取得し、`origin/main` から新規ブランチを作る。
+
+## トラブルシューティング
+
+- **Actions実行時に `workflow ... not found on the default branch` が出る**
+  - 原因: `workflow_dispatch` は default branch 上に存在する workflow を対象にする。
+  - 対処: 先に workflow ファイルを default branch にマージしてから手動実行する。
+
+- **`.github/workflows/*` を含む push が権限エラーで拒否される**
+  - 原因: トークンに `workflow` scope が不足している。
+  - 対処: `gh auth refresh -h github.com -s workflow` で再認証する。
+
+- **別PRのマージ後、残PRが conflict 状態になった**
+  - 原因: ブランチがマージ前の main 履歴を前提にしたまま残っている。
+  - 対処: `git fetch origin` 後に対象ブランチへ切り替え、`origin/main` をマージして conflict を解消し、再検証してから push する。
 
 ---
 
-## Quick Reference
+## アンチパターン
 
-### PR Flow Checklist
+- main に直接 push してから PR を作る
+- Issue 番号なしで PR を作成する
+- PR 本文を空にする
 
-- [ ] Verify `gh auth status`
-- [ ] Detect state (uncommitted / unpushed / no PR)
-- [ ] Commit via `git-commit-practices` if needed
-- [ ] Push branch to origin
-- [ ] Create PR with `gh pr create` (Japanese body + `Closes #N`)
-- [ ] Record the PR URL once, then enter signal-driven review waiting
-- [ ] On a real review signal, hand off to `github-pr-review-response` for fixes, replies, and re-review request
-- [ ] Hand the merge decision to a human after review work is complete
-- [ ] If a sibling PR merges first, sync this branch with `origin/main`, rerun checks, and re-request review as needed
+---
 
-### Self-Review Checklist (Before finishing)
+## クイックリファレンス
 
-- [ ] PR body includes intent, reason, test, and issue links
-- [ ] Body generation uses quoted heredoc + `--body-file` when Markdown contains backticks or shell examples
-- [ ] New automation/workflow changes include required path preparation steps
-- [ ] GitHub API create operations are idempotent (e.g., tolerate 422 race)
-- [ ] Label names/colors follow repository conventions
+### PRフローチェックリスト
 
-### PR Body Template
+- [ ] `gh auth status` で認証を確認
+- [ ] 状態を検知（未コミット / 未push / PR無し）
+- [ ] 必要なら `git-commit-practices` でコミット
+- [ ] ブランチを origin に push
+- [ ] `gh pr create` で PR 作成（日本語本文 + `Closes #N`）
+- [ ] PR URL を記録したら、シグナル駆動のレビュー待機へ入る
+- [ ] 実際のレビューシグナルが来たら `github-pr-review-response` へ委譲し、修正・返信・再レビュー依頼を行う
+- [ ] レビュー作業完了後、マージ判断は人間へ引き継ぐ
+- [ ] sibling PR が先にマージされたら、このブランチへ `origin/main` を取り込み、再検証して必要なら再レビュー依頼
+
+### セルフレビューチェックリスト（完了前）
+
+- [ ] PR本文に「意図・理由・テスト・Issueリンク」が揃っている
+- [ ] バッククォートやシェル例を含む本文では、クォート付きHEREDOC + `--body-file` を使っている
+- [ ] 自動化/workflow変更では必要な出力先ディレクトリ準備がある
+- [ ] GitHub API の create 処理が冪等（422競合など）になっている
+- [ ] ラベル名・色がリポジトリ規約に一致している
+
+### PR本文テンプレート
 
 ```markdown
 ## 概要
-(What changed)
+（何を変更したか）
 
 ## 理由
-(Why this change is needed)
+（なぜこの変更が必要か）
 
 ## テスト
-(How it was verified)
+（どう検証したか）
 
 ## 関連
 Closes #N
@@ -391,19 +389,18 @@ Closes #N
 
 ## FAQ
 
-**Q: Can PR body be written in English?**
-A: No. Team policy requires Japanese PR descriptions.
+**Q: PR本文は英語でも良い？**
+A: チームポリシーとして日本語で統一しています。
 
-**Q: Does this skill handle reviews and merges?**
-A: It handles PR creation, signal-driven review waiting, and confirmed post-merge sync for remaining PR branches. The standard route is implementation -> `github-pr-workflow` -> wait for review signal -> `github-pr-review-response` -> human merge decision/handoff.
+**Q: レビューやマージはこのスキルで扱う？**
+A: PR作成、シグナル駆動のレビュー待機、残PRブランチ向けの確認済みマージ後同期まで扱います。標準ルートは implementation -> `github-pr-workflow` -> レビューシグナル待ち -> `github-pr-review-response` -> 人間のマージ判断/引き継ぎ です。
 
-**Q: What if `gh` is not installed?**
-A: `gh auth status` will fail. Install [GitHub CLI](https://cli.github.com/) first.
+**Q: `gh` が未インストールの場合は？**
+A: `gh auth status` でエラーになります。[GitHub CLI](https://cli.github.com/) をインストールしてください。
 
 ---
 
-## Resources
+## リソース
 
 - https://docs.github.com/en/pull-requests
 - https://cli.github.com/manual/gh_pr_create
-

@@ -1,268 +1,266 @@
 ---
 name: github-pr-review-response
-description: "Respond to pull request reviews with the canonical flow from comment triage through fixes, re-review request, and human merge handoff. Use when a PR review signal arrives and you need structured review response."
+description: >
+  PR レビューコメントの分類から修正、返信、再レビュー依頼、人間へのマージ引き継ぎまでを標準フローで進める。Use when: PR に review signal が届き、構造化された対応が必要なとき。
 ---
-
 # GitHub PR Review Response
 
-A single-workflow skill for systematically responding to PR (Pull Request) review feedback — from analysis through fix implementation, reviewer reply, re-review request, and human merge handoff.
+PR（プルリクエスト）レビューフィードバックに体系的に対応するワークフロー — 分析から修正実装、レビュアーへの返信、再レビュー依頼、人間へのマージ引き継ぎまで。
 
-Canonical route for Option A: implementation -> `github-pr-workflow` -> wait for a real review signal -> `github-pr-review-response` -> human merge decision/handoff. Enter this skill only at the highlighted response step.
+Option A の標準ルート: implementation -> `github-pr-workflow` -> 実際のレビューシグナル待ち -> `github-pr-review-response` -> 人間のマージ判断/引き継ぎ。このスキルは強調したレビュー応答フェーズでのみ開始します。
 
-**Review Response**: The structured process of reading, categorizing, fixing, and replying to PR review comments.
+**レビュー対応**: PRレビューコメントを読み、分類し、修正し、返信する構造化されたプロセス。
 
-## When to Use This Skill
+## こんなときに使う
+以下の状況で活用してください：
 
-Use this skill when:
+- PRにレビューコメントが付き、コード修正や返信が必要なとき
+- レビューフィードバックを重要度別に分類して修正順を決めたいとき
+- コードレビューで発見された重大なバグやセキュリティ問題を修正するとき
+- 単一PRに対する複数のレビューコメントへの構造化された対応計画を作成するとき
+- レビュアーの質問に対して設計理由を明確に説明して返信するとき
+- すべてのレビューコメントへの対応が完了し、再レビューを依頼するとき
 
-- Receiving review comments on a pull request that require code changes or replies
-- Categorizing review feedback by severity to decide fix order and priority level
-- Implementing fixes for critical bugs or security issues found during code review
-- Creating a structured response plan for multiple review comments on a single PR
-- Replying to reviewer questions with clear explanations of why a design was chosen
-- Requesting re-review after all review comments have been addressed with commits
+> **スコープ**: このスキルはレビューコメントのトリアージから再レビュー依頼までを扱います。マージ判断は人間が行い、CIゲートとマージ後同期は別のフォローアップ対象です。
 
-> **Scope**: This skill covers review comment triage through re-review request. The merge decision stays with a human; CI gates and post-merge sync remain separate follow-up concerns.
+## レビュー待機戦略
 
-## Review Waiting Strategy
+PRが開いているだけでは、このワークフローに入りません。実際に対応が必要なレビューシグナルが来たときだけ開始します。
 
-Do not enter this workflow just because the PR is still open. Enter only when a real review signal says action is needed.
-
-| Signal | Enter this skill? | Action |
+| シグナル | このスキルに入る？ | アクション |
 |---|---|---|
-| New review submitted | Yes | Start Step 1 once |
-| Review requested from you | Yes | Start Step 1 once |
-| User reports new review activity | Yes | Verify and start Step 1 |
-| PR is still open but unchanged | No | Stay idle |
-| Only a CI status changed | Maybe | Check whether review work is actually blocked |
+| 新しいレビューが送信された | はい | Step 1 を1回開始 |
+| 自分に review request が来た | はい | Step 1 を1回開始 |
+| ユーザーが新規レビュー到着を共有した | はい | 確認して Step 1 を開始 |
+| PRは開いているが変化なし | いいえ | 待機継続 |
+| CIステータスだけ変わった | 場合による | 本当にレビュー対応が必要か確認 |
 
-Low-consumption waiting rules:
-- Prefer notifications, explicit user messages, or other event signals over manual polling
-- If you must check manually, batch all PR checks into one pass at a natural pause
-- Stop checking once there is no new signal to act on
+低消費で待つルール:
+- 手動ポーリングより、通知・ユーザー共有・イベントシグナルを優先する
+- 手動確認が必要でも、自然な区切りで全PRをまとめて1回確認する
+- 対応すべき新しいシグナルがなければ確認を止める
 
-Exit waiting mode when the PR is closed, merged, or no review action remains.
+PRがクローズ・マージ済み、または対応すべきレビューがなくなったら待機を終了します。
 
-Re-review request rule: request re-review only after new commits or substantive replies are ready. Do not ping reviewers again when nothing changed.
+再レビュー依頼ルール: 新しいコミットや実質的な返信がそろったときだけ再レビューを依頼します。変化がない状態でレビュアーを再度 ping しません。
 
-## Related Skills
+## 関連スキル
 
-- **`github`** — Thin entry skill for broad GitHub requests before the exact delivery phase is clear
-- **`github-pr-workflow`** — PR creation, issue linking, and signal-driven review waiting (upstream workflow)
-- **`session-issue-autopilot`** — Session-level wrapper that delegates PR creation/waiting to `github-pr-workflow` and review handling to this skill
-- **`git-commit-practices`** — Commit formatting and atomic changes (delegated from Step 5)
-- **`github-issue-intake`** — Creating follow-up issues for deferred review items
+- **`github-pr-workflow`** — PR作成・Issue連携・シグナル駆動のレビュー待機（上流ワークフロー）
+- **`session-issue-autopilot`** — セッション全体を包み、PR作成/待機を `github-pr-workflow`、レビュー対応をこのスキルへ委譲する上位ラッパー
+- **`git-commit-practices`** — コミット形式と原子的コミット（Step 5から委譲）
+- **`github-issue-intake`** — 保留レビュー項目のフォローアップIssue作成
 
 ---
 
-## Dependencies
+## 依存関係
 
 - Git 2.30+
-- GitHub CLI (`gh`) — verify with `gh auth status`
-- GitHub repository with push access
-- An open PR with review comments to address
+- GitHub CLI (`gh`) — `gh auth status` で事前確認
+- GitHubリポジトリへのpush権限
+- 対応すべきレビューコメントがあるオープンPR
 
 ---
 
-## Core Principles
+## コア原則
 
-1. **Actionable First** (基礎と型) — Address review comments with code, not just words
-2. **Traceability** (成長の複利) — Every fix links back to the review comment that triggered it
-3. **Quality Maintenance** (継続は力) — Fixes must not regress existing quality or break tests
-4. **Respectful Dialogue** (ニュートラル) — Reply to every comment, even if you disagree, with reason
-5. **Systematic Triage** (温故知新) — Categorize before acting to avoid fixing low-priority items first
+1. **行動優先** (基礎と型) — レビューコメントには言葉だけでなくコードで対応する。「なぜ」：言葉だけの返信では問題は解決しない
+2. **追跡性** (成長の複利) — すべての修正はそれを引き起こしたレビューコメントにリンクする。「なぜ」：将来の開発者が変更理由を学べるように
+3. **品質維持** (継続は力) — 修正が既存の品質を低下させたりテストを壊してはならない。「なぜ」：レビュー対応で新たなバグを生むのは本末転倒
+4. **敬意ある対話** (ニュートラル) — 反対意見でも理由を添えてすべてのコメントに返信する。「なぜ」：無視はチームの信頼を損なう
+5. **体系的トリアージ** (温故知新) — 行動する前に分類する。「なぜ」：低優先度の項目を先に修正する無駄を防ぐ
 
 ---
 
-## Decision Table
+## 判断テーブル
 
-How to categorize review comments and decide the correct action:
+レビューコメントの分類方法と正しいアクション：
 
-| Comment Type | Action | Priority | Example |
+| コメント種類 | アクション | 優先度 | 例 |
 |---|---|---|---|
-| Bug/Security | Must fix before merge | Critical | "This has an SQL injection vulnerability" |
-| Logic Error | Must fix before merge | Critical | "This condition is inverted" |
-| Missing Feature | Fix or create follow-up issue | High | "Error handling is missing here" |
-| Improvement | Fix if straightforward | Medium | "Consider using a guard clause" |
-| Style/Formatting | Fix unless team disagrees | Low | "Inconsistent indentation" |
-| Question/Clarification | Reply with explanation | Low | "Why did you choose this approach?" |
+| バグ/セキュリティ | マージ前に必ず修正 | 最重要 | 「SQLインジェクションの脆弱性がある」 |
+| ロジックエラー | マージ前に必ず修正 | 最重要 | 「この条件が反転している」 |
+| 機能不足 | 修正またはフォローアップIssue作成 | 高 | 「エラーハンドリングがない」 |
+| 改善提案 | 簡単なら修正 | 中 | 「ガード句の使用を検討して」 |
+| スタイル/フォーマット | チーム合意がなければ修正 | 低 | 「インデントが不統一」 |
+| 質問/確認 | 説明を返信 | 低 | 「なぜこのアプローチを選んだの？」 |
 
-Use this table in Step 1 to classify each comment before writing any code.
+Step 1でこのテーブルを使い、コードを書く前に各コメントを分類してください。
 
 ---
 
-## Responsibility Boundaries
+## 責務境界
 
-| Phase | Agent responsibility | Human responsibility |
+| フェーズ | エージェントの責務 | 人間の責務 |
 |---|---|---|
-| Review signal intake | Inspect the new review once and triage comments | Confirm whether the signal changes priorities |
-| Fixes and replies | Implement fixes, explain rationale, and keep evidence traceable | Judge whether the proposed response matches team expectations |
-| Re-review request | Request re-review only after actionable updates are pushed or posted | Decide whether another reviewer should be involved |
-| Merge decision | Summarize readiness only | Decide whether and when to merge on GitHub |
+| レビューシグナル受付 | 新規レビューを1回だけ確認し、コメントをトリアージする | そのシグナルで優先順位が変わるか判断する |
+| 修正と返信 | 修正を実装し、根拠付きで返信して追跡性を保つ | 返信内容がチーム期待に合うか判断する |
+| 再レビュー依頼 | 行動可能な更新が push / 投稿された後だけ再レビューを依頼する | 追加レビュアーが必要か判断する |
+| マージ判断 | 準備完了を要約するだけ | GitHub上でマージするか、いつするか決める |
 
-Use when the user asks where this skill stops.
+このスキルがどこで止まるかを説明するときに使います。
 
 > **Values**: ニュートラル / 余白の設計
-## Workflow: PR Review Response
+## ワークフロー: PRレビュー対応
 
-### Step 1: Receive and Categorize Review Comments
+### Step 1: レビューコメントの受信と分類
 
-Read all review comments on the PR. Classify each comment using the Decision Table above.
+PRのすべてのレビューコメントを読みます。上記の判断テーブルを使って各コメントを分類します。
 
 ```bash
-# Fetch all review comments for the current PR
+# PRのレビューコメントを取得
 gh pr view --json reviews,reviewRequests --jq '.reviews'
 
-# List review threads with resolution status
+# レビュースレッドの解決状況を確認
 gh pr view --json reviewThreads --jq '.reviewThreads[] | {path: .path, body: .comments[0].body, isResolved: .isResolved}'
 ```
 
 ```powershell
-# PowerShell: list review comments
+# PowerShell: レビューコメントを一覧
 gh pr view --json reviews,reviewRequests --jq '.reviews'
 ```
 
-Create a categorized list:
+分類リストを作成します：
 
 ```markdown
-## Review Comment Analysis
-| # | File | Comment | Type | Priority |
-|---|------|---------|------|----------|
-| 1 | src/auth.py | Missing input validation | Bug | Critical |
-| 2 | src/utils.py | Consider guard clause | Improvement | Medium |
-| 3 | README.md | Typo in heading | Style | Low |
+## レビューコメント分析
+| # | ファイル | コメント | 種類 | 優先度 |
+|---|---------|---------|------|--------|
+| 1 | src/auth.py | 入力バリデーション不足 | バグ | 最重要 |
+| 2 | src/utils.py | ガード句の検討 | 改善 | 中 |
+| 3 | README.md | 見出しのタイポ | スタイル | 低 |
 ```
 
-Use when you first open a PR that has received review feedback.
+レビューフィードバックを受け取ったPRを最初に開くときに使用します。
 
 > **Values**: 温故知新 / 基礎と型
 
-### Step 2: Create Response Plan
+### Step 2: 対応計画の作成
 
-Document the analysis in plan.md with a problem table, fix strategy, and task list. This prevents ad-hoc fixes and ensures nothing is missed.
+plan.mdに分析結果を文書化します。問題テーブル、修正戦略、タスクリストを含めます。「なぜ」：場当たり的な修正を防ぎ、漏れをなくすため。
 
 ```markdown
-# PR Review Response Plan
+# PRレビュー対応計画
 
-## Problem Table
-| # | Comment | Category | Fix Strategy | Estimated Effort |
-|---|---------|----------|-------------|-----------------|
-| 1 | SQL injection in query | Critical/Bug | Use parameterized queries | 15 min |
-| 2 | Guard clause suggestion | Medium/Improvement | Refactor to early return | 5 min |
-| 3 | Missing error handling | High/Missing Feature | Add try-catch with logging | 10 min |
+## 問題テーブル
+| # | コメント | カテゴリ | 修正戦略 | 見積もり |
+|---|---------|---------|---------|---------|
+| 1 | クエリのSQLインジェクション | 最重要/バグ | パラメータ化クエリを使用 | 15分 |
+| 2 | ガード句の提案 | 中/改善 | 早期リターンにリファクタ | 5分 |
+| 3 | エラーハンドリング不足 | 高/機能不足 | try-catchとログ追加 | 10分 |
 
-## Task Order
-1. Fix #1 — Critical bug (SQL injection)
-2. Fix #3 — High priority (error handling)
-3. Fix #2 — Medium improvement (guard clause)
+## タスク順序
+1. #1を修正 — 最重要バグ（SQLインジェクション）
+2. #3を修正 — 高優先度（エラーハンドリング）
+3. #2を修正 — 中程度の改善（ガード句）
 
-## Out of Scope (create follow-up issues)
-- Performance optimization suggested in review (not blocking merge)
+## スコープ外（フォローアップIssueを作成）
+- レビューで提案されたパフォーマンス最適化（マージをブロックしない）
 ```
 
-Use when multiple review comments need coordination to avoid conflicts.
+複数のレビューコメントの調整が必要で競合を避けたいときに使用します。
 
 > **Values**: 基礎と型 / 余白の設計
 
-### Step 3: Implement Fixes
+### Step 3: 修正の実装
 
-Address critical issues first, then work down through high and medium priority items. Each fix should be a focused, atomic change.
+最重要の問題から順に対応します。各修正は焦点を絞った原子的な変更にします。
 
 ```bash
-# Fix critical issues first — one logical change at a time
-# Why: atomic fixes are easier to review and revert if needed
+# 最重要の問題から修正 — 一度に1つの論理的変更
+# なぜ：原子的な修正はレビューしやすく、必要時に巻き戻しやすい
 
-# Example: fix SQL injection (Critical)
+# 例：SQLインジェクションの修正（最重要）
 git add src/auth.py
-git commit -m "fix: use parameterized queries to prevent SQL injection
+git commit -m "fix: パラメータ化クエリでSQLインジェクションを防止
 
-Addresses review comment on src/auth.py regarding
-unsafe string interpolation in database queries."
+src/auth.pyのデータベースクエリにおける
+安全でない文字列補間に関するレビューコメントに対応。"
 ```
 
 ```powershell
-# PowerShell: same git commands apply
+# PowerShell: 同じgitコマンドを使用
 git add src/auth.py
-git commit -m "fix: use parameterized queries to prevent SQL injection"
+git commit -m "fix: パラメータ化クエリでSQLインジェクションを防止"
 ```
 
-✅ **Do**: Fix one issue per commit for clear traceability
-❌ **Don't**: Bundle all review fixes into a single large commit
+✅ **推奨**: 追跡性のため1つのコミットで1つの問題を修正する
+❌ **非推奨**: すべてのレビュー修正を1つの大きなコミットにまとめる
 
-Use when your response plan is ready and you begin writing code fixes.
+対応計画が準備でき、コード修正を開始するときに使用します。
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 4: Run Quality Checks
+### Step 4: 品質チェックの実行
 
-Run linters, tests, and validation scripts to ensure fixes do not regress existing quality. Never push without verifying.
+リンター、テスト、バリデーションスクリプトを実行して修正が既存の品質を低下させないことを確認します。検証なしでプッシュしないでください。
 
 ```bash
-# Run project tests to confirm no regression
-# Why: review fixes can introduce new bugs if untested
-npm test        # or: pytest, dotnet test, go test ./...
+# プロジェクトテストを実行してリグレッションがないことを確認
+# なぜ：レビュー修正はテストなしでは新たなバグを生む可能性がある
+npm test        # または: pytest, dotnet test, go test ./...
 
-# Run linter to catch style issues
-npm run lint    # or: flake8, dotnet format --verify-no-changes
+# リンターを実行してスタイル問題を検出
+npm run lint    # または: flake8, dotnet format --verify-no-changes
 
-# If this repo has a skill validator, run it
+# スキルバリデーターがあれば実行
 uv run python scripts/validate_skill.py path/to/SKILL.md
 ```
 
 ```powershell
-# PowerShell: run tests and linter
+# PowerShell: テストとリンターを実行
 npm test
 npm run lint
 ```
 
-If any check fails, fix the regression before proceeding to Step 5.
+チェックが失敗した場合、Step 5に進む前にリグレッションを修正してください。
 
-Use when all planned fixes are implemented and you need to verify correctness.
+すべての計画修正が実装され、正確性を検証する必要があるときに使用します。
 
 > **Values**: 継続は力 / 基礎と型
 
-### Step 5: Commit with Conventional Format
+### Step 5: Conventional形式でコミット
 
-Use Conventional Commits format. Reference the review context in the commit body so future developers understand why the change was made.
+Conventional Commits形式を使用します。将来の開発者が変更理由を理解できるよう、コミット本文にレビューコンテキストを参照します。
 
 ```bash
-# Choose the correct commit type based on what changed
-# fix:      bug fix or security fix from review
-# refactor: code improvement suggested in review
-# docs:     documentation fix from review
-# style:    formatting fix from review
+# 変更内容に基づいて正しいコミットタイプを選択
+# fix:      レビューからのバグ修正またはセキュリティ修正
+# refactor: レビューで提案されたコード改善
+# docs:     レビューからのドキュメント修正
+# style:    レビューからのフォーマット修正
 
-git commit -m "fix: add input validation for user email
+git commit -m "fix: ユーザーメールの入力バリデーションを追加
 
-Review feedback: reviewer flagged missing validation
-on the email field in the registration form.
+レビューフィードバック：登録フォームのメールフィールドの
+バリデーション不足をレビュアーが指摘。
 
 Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
 ```
 
-| Commit Type | When to Use |
+| コミットタイプ | 使用場面 |
 |---|---|
-| `fix:` | Bug fix or security issue from review |
-| `refactor:` | Code structure improvement from review |
-| `docs:` | Documentation correction from review |
-| `style:` | Formatting or style fix from review |
+| `fix:` | レビューからのバグ修正またはセキュリティ問題 |
+| `refactor:` | レビューからのコード構造改善 |
+| `docs:` | レビューからのドキュメント修正 |
+| `style:` | レビューからのフォーマット修正 |
 
-Use when each fix is complete and tests pass, ready to be committed.
+各修正が完了しテストが通り、コミットの準備ができたときに使用します。
 
 > **Values**: 成長の複利 / 継続は力
 
-### Step 6: Push and Reply to Comments
+### Step 6: プッシュとコメントへの返信
 
-Push all fix commits, then reply to each review comment explaining what was done and why.
+すべての修正コミットをプッシュし、各レビューコメントに何をしたか、なぜそうしたかを説明して返信します。
 
 ```bash
-# Push fix commits to the PR branch
+# 修正コミットをPRブランチにプッシュ
 git push origin HEAD
 
-# Add a general review comment summarizing changes via body-file.
-# Why: mktemp avoids collisions, and trap cleans up even on failures.
+# body-fileで全体コメントを追加
+# なぜ: mktemp で衝突を避け、trap で失敗時も確実に削除できる
 REVIEW_BODY="$(mktemp "${TMPDIR:-/tmp}/review_response.XXXXXX")" || {
-  echo "Failed to create temporary file for review response" >&2
+  echo "レビュー返信用の一時ファイル作成に失敗しました" >&2
   exit 1
 }
 cleanup_review_body() {
@@ -270,56 +268,56 @@ cleanup_review_body() {
 }
 trap cleanup_review_body EXIT
 cat > "$REVIEW_BODY" <<'EOF'
-All review comments addressed. See individual commits for details.
+全レビューコメントに対応済みです。各コミットの詳細を参照してください。
 
-- Fixed null-handling in `build_payload()`
-- Added a regression test for the failure path
+- `build_payload()` の nullハンドリングを修正
+- 失敗経路の回帰テストを追加
 EOF
 
 gh pr review --comment --body-file "$REVIEW_BODY"
 
-# For threaded replies to specific review comments, use GitHub web UI
-# or the API: gh api repos/OWNER/REPO/pulls/comments/COMMENT_ID/replies -f body="Fixed in abc1234"
+# 特定のレビューコメントスレッドへの返信はGitHub Web UIを使用
+# またはAPI: gh api repos/OWNER/REPO/pulls/comments/COMMENT_ID/replies -f body="abc1234で修正済み"
 ```
 
 ```powershell
-# PowerShell: push and add review comment
+# PowerShell: プッシュとレビューコメント追加
 git push origin HEAD
 
 $reviewBody = @"
-All review comments addressed. See individual commits for details.
+全レビューコメントに対応済みです。各コミットの詳細を参照してください。
 
-- Fixed null-handling in `build_payload()`
-- Added a regression test for the failure path
+- `build_payload()` の nullハンドリングを修正
+- 失敗経路の回帰テストを追加
 "@
 [System.IO.File]::WriteAllText("$env:TEMP\review_response.md", $reviewBody, [System.Text.UTF8Encoding]::new($false))
 gh pr review --comment --body-file "$env:TEMP\review_response.md"
 Remove-Item "$env:TEMP\review_response.md"
 ```
 
-Reply guidelines:
+返信ガイドライン：
 
-- ✅ **Do**: Reference the specific commit that addresses the comment
-- ✅ **Do**: Explain why you chose a particular fix approach
-- ✅ **Do**: Use `--body-file` when a reply includes multiple lines, backticks, or shell snippets
-- ❌ **Don't**: Reply with just "Fixed" — explain what changed and why
-- ❌ **Don't**: Ignore comments you disagree with — reply with your reasoning instead
+- ✅ **推奨**: コメントに対応した具体的なコミットを参照する
+- ✅ **推奨**: 特定の修正アプローチを選んだ理由を説明する
+- ✅ **推奨**: 複数行・バッククォート・シェル断片を含む返信は `--body-file` を使う
+- ❌ **非推奨**: 「修正済み」だけの返信 — 何をなぜ変更したか説明する
+- ❌ **非推奨**: 反対意見のコメントを無視する — 理由を添えて返信する
 
-Use when all commits are pushed and you need to close the feedback loop.
+すべてのコミットがプッシュされ、フィードバックループを閉じる必要があるときに使用します。
 
 > **Values**: ニュートラル / 成長の複利
 
-### Step 7: Request Re-review
+### Step 7: 再レビューの依頼
 
-After all comments are addressed and pushed, request a re-review from the original reviewer. Tie the request to actual updates so reviewers only get pinged when something changed.
+すべてのコメントに対応しプッシュが完了したら、元のレビュアーに再レビューを依頼します。実際の更新と結びつけ、変化があるときだけ通知します。
 
 ```bash
-# Request re-review from the reviewer
+# レビュアーに再レビューを依頼
 gh pr edit --add-reviewer reviewer-username
 
-# Optionally leave a summary comment via body-file
+# サマリーコメントを body-file で残す（任意）
 REREVIEW_BODY="$(mktemp "${TMPDIR:-/tmp}/rereview_summary.XXXXXX")" || {
-  echo "Failed to create temporary file for re-review summary" >&2
+  echo "再レビュー要約用の一時ファイル作成に失敗しました" >&2
   exit 1
 }
 cleanup_rereview_body() {
@@ -327,164 +325,164 @@ cleanup_rereview_body() {
 }
 trap cleanup_rereview_body EXIT
 cat > "$REREVIEW_BODY" <<'EOF'
-All review comments addressed:
-- Fixed SQL injection (commit abc1234)
-- Added error handling (commit def5678)
-- Refactored to guard clause (commit ghi9012)
+すべてのレビューコメントに対応しました：
+- SQLインジェクション修正（コミットabc1234）
+- エラーハンドリング追加（コミットdef5678）
+- ガード句にリファクタ（コミットghi9012）
 
-Ready for re-review. Thank you for the feedback!
+再レビューをお願いします。フィードバックありがとうございました！
 EOF
 
 gh pr comment --body-file "$REREVIEW_BODY"
 ```
 
 ```powershell
-# PowerShell: request re-review
+# PowerShell: 再レビュー依頼
 gh pr edit --add-reviewer reviewer-username
 
 $reReviewBody = @"
-All review comments addressed:
-- Fixed SQL injection (commit abc1234)
-- Added error handling (commit def5678)
-- Refactored to guard clause (commit ghi9012)
+すべてのレビューコメントに対応しました：
+- SQLインジェクション修正（コミットabc1234）
+- エラーハンドリング追加（コミットdef5678）
+- ガード句にリファクタ（コミットghi9012）
 
-Ready for re-review. Thank you for the feedback!
+再レビューをお願いします。フィードバックありがとうございました！
 "@
 [System.IO.File]::WriteAllText("$env:TEMP\rereview_summary.md", $reReviewBody, [System.Text.UTF8Encoding]::new($false))
 gh pr comment --body-file "$env:TEMP\rereview_summary.md"
 Remove-Item "$env:TEMP\rereview_summary.md"
 ```
 
-Re-review decision table:
+再レビュー判断テーブル:
 
-| Situation | Request re-review? | Why |
+| 状況 | 再レビュー依頼する？ | 理由 |
 |---|---|---|
-| New commits or substantive replies are complete | Yes | Reviewer attention is now actionable |
-| Only acknowledgement was posted and no real update exists | No | Avoid noisy reviewer pings |
-| Another review arrives after an earlier re-review request | Return to Step 1 first | Keep each request tied to fresh work |
+| 新しいコミットまたは実質的な返信がそろった | はい | レビュアーの確認が行動可能な状態になったため |
+| あいさつや受領だけで、実質更新がない | いいえ | 不要な reviewer ping を避けるため |
+| 以前の再レビュー依頼後にさらに新しいレビューが来た | まず Step 1 に戻る | 依頼を常に最新の作業に紐付けるため |
 
-Use when every review comment has a fix commit or a reply, and all tests pass.
+すべてのレビューコメントに修正コミットまたは返信があり、テストが通った状態で使用します。
 
 > **Values**: 成長の複利 / ニュートラル
 
-### Step 8: Stop at the Human Merge Gate
+### Step 8: 人間のマージ判断ゲートで止める
 
-After requesting re-review, return to waiting for the next real review signal or hand the PR to a human merge decision. Summarize readiness if helpful, but do not merge the PR yourself.
+再レビュー依頼が完了したら、次の実際のレビューシグナルを待つか、人間のマージ判断へ引き継いで止まります。必要なら準備完了状況を要約しますが、PRを自分でマージしてはいけません。
 
 ```markdown
-Ready for human merge decision:
-- Review comments addressed
-- Validation rerun and green
-- Re-review requested
-- Ready either for the next review signal or a human merge decision
+人間のマージ判断に引き渡せる状態:
+- レビューコメント対応済み
+- 検証を再実行しグリーン
+- 再レビュー依頼済み
+- 次のレビューシグナル待ち、または人間のマージ判断へ引き渡し可能
 ```
 
-If the PR is later merged and the user explicitly asks for local cleanup, follow your repository's post-merge sync or cleanup procedure and first verify the worktree is clean.
+後でPRがマージされ、ユーザーがローカル後処理を明示依頼した場合のみ、リポジトリのマージ後同期または後処理手順に従い、先に worktree が clean か確認します。
 
-Use when review response work is complete and the next action is a merge decision.
+レビュー対応が完了し、次のアクションがマージ判断になるときに使います。
 
 > **Values**: ニュートラル / 余白の設計
 
 ---
 
-## Best Practices
+## ベストプラクティス
 
-- Implement fixes in priority order: Critical → High → Medium → Low
-- Use one commit per review comment for clear traceability
-- Use `fix:` or `refactor:` commit types to distinguish bug fixes from improvements
-- Avoid force-pushing after review — it hides review conversation history
-- Create follow-up issues for suggestions that are out of scope for the current PR
-- Use `gh pr review --comment` to reply directly in the review thread
-- Stop at readiness; do not merge on behalf of the user
-- Start this workflow only on a real review trigger, not on repeated idle checks
-- Request re-review only when new commits or substantive replies are ready
-- Prefer `--body-file` for multi-line review summaries and replies
-
----
-
-## Common Pitfalls
-
-1. **Fixing everything in one large commit**
-   Fix: Use atomic commits — one commit per review comment for clear code history.
-
-2. **Ignoring low-priority comments without replying**
-   Fix: Reply to every comment, even to acknowledge and defer to a follow-up issue.
-
-3. **Pushing fixes without running tests first**
-   Fix: Always run the full test suite and linter before pushing (Step 4 method).
-
-4. **Replying "Fixed" without context**
-   Fix: Reference the commit hash and explain the fix approach in your reply.
-
-5. **Opening the review workflow with no new signal**
-   Fix: Stay in waiting mode until a new review, review request, or explicit user signal arrives.
-
-6. **Inline reply bodies break because of backticks or shell characters**
-   Fix: Write the reply with a quoted heredoc and send it via `--body-file`.
+- 修正は優先度順に実装する：最重要 → 高 → 中 → 低
+- 追跡性のため1つのコミットで1つのレビューコメントに対応する
+- バグ修正と改善を区別するため `fix:` や `refactor:` のコミットタイプを使用する
+- レビュー後のforce-pushを避ける — レビュー会話の履歴が消える
+- 現在のPRのスコープ外の提案にはフォローアップIssueを作成する
+- レビュースレッドに直接返信するため `gh pr review --comment` を使用する
+- 準備完了の要約で止め、人間の代わりにマージしない
+- 実際のレビューシグナルが来たときだけこのワークフローを開始する
+- 新しいコミットや実質返信がそろったときだけ再レビューを依頼する
+- 複数行のレビュー要約や返信では `--body-file` を優先する
 
 ---
 
-## Anti-Patterns
+## よくある落とし穴
 
-- Pushing directly to main to bypass the review process — violates branch-first design
-- Bundling unrelated changes with review fixes — breaks atomic commit structure
-- Dismissing reviewer feedback without explanation — undermines team trust
-- Force-pushing to hide review conversation history — destroys traceability
+1. **すべてを1つの大きなコミットで修正する**
+   修正方法: 原子的コミットを使う — 明確なコード履歴のため1コミット1レビューコメント。
+
+2. **低優先度のコメントに返信せず無視する**
+   修正方法: すべてのコメントに返信する。認識したうえでフォローアップIssueに延期する場合も。
+
+3. **テスト実行なしで修正をプッシュする**
+   修正方法: プッシュ前に必ずテストスイートとリンターを完全実行する（Step 4の手法）。
+
+4. **コンテキストなしで「修正済み」と返信する**
+   修正方法: コミットハッシュを参照し、返信で修正アプローチを説明する。
+
+5. **新しいシグナルがないのにレビュー対応フローを開く**
+   修正方法: 新規レビュー・review request・ユーザー共有が来るまで待機を続ける。
+
+6. **バッククォートやシェル文字を含む返信本文が壊れる**
+   修正方法: クォート付きHEREDOCで返信本文を作り、`--body-file` で送る。
 
 ---
 
-## Quick Reference
+## アンチパターン
 
-### Review Response Checklist
+- レビュープロセスをバイパスするためmainに直接プッシュする — ブランチ優先の設計に違反
+- レビュー修正に無関係な変更をバンドルする — 原子的コミット構造を壊す
+- 説明なしでレビュアーのフィードバックを却下する — チームの信頼を損なう
+- レビュー会話履歴を隠すためにforce-pushする — 追跡性を破壊する
 
-| Step | Action | Verify |
-|------|--------|--------|
-| 1 | Read and categorize all review comments | Decision Table applied |
-| 2 | Create response plan in plan.md | All comments tracked |
-| 3 | Implement fixes (Critical → Low) | One fix per commit |
-| 4 | Run tests and linters | All checks pass |
-| 5 | Commit with Conventional format | Review context in body |
-| 6 | Push and reply to each comment | Every comment answered |
-| 7 | Request re-review | Reviewer notified |
+---
 
-### Waiting Mode Rules
+## クイックリファレンス
 
-- React to new reviews or review requests, not to an unchanged open PR
-- Batch manual checks instead of polling repeatedly
-- Request re-review only after new work is ready
-- Exit waiting mode when there is nothing new to address
+### レビュー対応チェックリスト
 
-### Reply Template
+| ステップ | アクション | 確認事項 |
+|---------|----------|---------|
+| 1 | すべてのレビューコメントを読み分類 | 判断テーブル適用済み |
+| 2 | plan.mdに対応計画を作成 | 全コメント追跡済み |
+| 3 | 修正を実装（最重要 → 低） | 1コミット1修正 |
+| 4 | テストとリンターを実行 | 全チェック通過 |
+| 5 | Conventional形式でコミット | 本文にレビューコンテキスト |
+| 6 | プッシュして各コメントに返信 | 全コメントに回答済み |
+| 7 | 再レビューを依頼 | レビュアーに通知済み |
+
+### 待機モードのルール
+
+- 新規レビューや review request に反応し、変化のない open PR には反応しない
+- 手動確認はまとめて行い、繰り返しポーリングしない
+- 再レビュー依頼は新しい作業がそろった後だけ行う
+- 新しく対応すべきものがなければ待機モードを終了しない
+
+### 返信テンプレート
 
 ```markdown
-Fixed in commit `<hash>`.
+コミット `<ハッシュ>` で修正済み。
 
-**What changed**: <brief description of the fix>
-**Why this approach**: <reasoning behind the chosen solution>
+**変更内容**: <修正の簡潔な説明>
+**このアプローチの理由**: <選択した解決策の理由>
 ```
 
 ---
 
 ## FAQ
 
-**Q: What if I disagree with a review comment?**
-A: Reply with your reasoning. Explain why you chose a different approach. Never ignore the comment.
+**Q: レビューコメントに同意できない場合は？**
+A: 理由を添えて返信してください。なぜ別のアプローチを選んだかを説明します。コメントを無視しないでください。
 
-**Q: Should I create a new branch for review fixes?**
-A: No. Push fixes to the same PR branch. This keeps the review conversation intact.
+**Q: レビュー修正用に新しいブランチを作るべき？**
+A: いいえ。同じPRブランチに修正をプッシュしてください。レビュー会話を維持するためです。
 
-**Q: What if a suggestion is out of scope?**
-A: Acknowledge the comment, create a follow-up issue via `github-issue-intake`, and link it in your reply.
+**Q: 提案がスコープ外の場合は？**
+A: コメントを認識し、`github-issue-intake` でフォローアップIssueを作成し、返信にリンクしてください。
 
-**Q: Does this skill handle the initial PR creation?**
-A: No. Use `github-pr-workflow` to create the PR and enter review waiting first. The standard route is implementation -> `github-pr-workflow` -> wait for review signal -> this skill -> human merge decision.
+**Q: このスキルは最初のPR作成を扱う？**
+A: いいえ。PR作成とレビュー待機には `github-pr-workflow` を使ってください。標準ルートは implementation -> `github-pr-workflow` -> レビューシグナル待ち -> このスキル -> 人間のマージ判断 です。
 
-**Q: Does this skill merge the PR after re-review?**
-A: No. Merge remains a human decision. This skill ends after replies, validation, and re-review request are complete.
+**Q: 再レビュー後にこのスキルがPRをマージする？**
+A: いいえ。マージは人間の判断です。このスキルは返信・検証・再レビュー依頼までで終了します。
 
 ---
 
-## Resources
+## リソース
 
 - https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests
 - https://cli.github.com/manual/gh_pr_review

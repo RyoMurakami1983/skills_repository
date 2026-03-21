@@ -1,283 +1,282 @@
 ---
 name: project-dev-constitution
-description: Create and maintain a .github/copilot-instructions.md development constitution that captures product essence, architecture principles, UI policy, and test strategy. Use when starting a new project, when implementation decisions feel inconsistent, or when onboarding new team members.
+description: >
+  プロジェクトの .github/copilot-instructions.md を作成・維持し、開発憲法として共有する。Use when: 新しいプロジェクトを立ち上げるとき、設計判断がぶれてきたとき、開発方針を onboarding 用に明文化したいとき。
 ---
+# プロジェクト開発憲法
 
-# Project Development Constitution
+`.github/copilot-instructions.md` を「生きたドキュメント」として作成・維持するワークフロー。製品の本質、アーキテクチャ原則、ドメイン設計ルール、UIポリシー、テスト方針、Git規約を記録し、実装中のすべての判断をブレのない基盤に根ざす。
 
-A workflow for creating and maintaining `.github/copilot-instructions.md` as a living document. Captures the product's core purpose, architecture principles, domain design rules, UI policy, test strategy, and Git conventions — keeping every implementation decision grounded in an explicit foundation.
+**背景**: このスキルは `rakugaki_writer` プロジェクトで `copilot-instructions.md` を実際に作成した経験から生まれた。核心となる気づき：「明示的なアーキテクチャ基盤なしに実装が加速すると、ドメイン境界が溶けていく」。
 
-**Origin**: This skill was distilled from the experience of building `copilot-instructions.md` for the `rakugaki_writer` project. The core insight: "without an explicit architecture foundation, domain boundaries blur as implementation accelerates."
+## こんなときに使う
+以下の場面で使います：
+- 新しいプロジェクトを立ち上げ、最初のアーキテクチャ決定を行うとき
+- 既存プロジェクトのアーキテクチャが曖昧になり、一貫性が失われてきたとき
+- 設計意図を理解する必要がある新メンバーが加わるとき
+- ふりかえりで「実装の判断がブレていた」と気づいたとき
+- AIコーディングエージェントがセッション開始前にグラウンディングコンテキストを必要とするとき
 
-## When to Use This Skill
+**このスキルではないもの**: `git-initial-setup` はGit操作のデフォルト（フック、ブランチ保護）を扱う。このスキルは*設計思想*のドキュメント化を扱う。
 
-Use this skill when:
-- Starting a new project and making the first architectural decisions
-- Diagnosing an existing project whose architecture has become ambiguous or inconsistently applied
-- Onboarding a new team member who needs to understand design intent
-- Identifying drift after a retrospective reveals "implementation decisions were inconsistent"
-- Grounding an AI coding agent before it starts a new session
+## 関連スキル
 
-**Not this skill**: `git-initial-setup` handles Git operation defaults (hooks, branch protection). This skill handles *design philosophy* documentation.
-
-## Related Skills
-
-- **`furikaeri-practice`** — Triggers constitution updates when new insights surface
-- **`git-initial-setup`** — Git operational setup (branch protection, hooks)
-- **`git-commit-practices`** — Commit conventions referenced in Step 6
-- **`github-issue-intake`** — Capture architecture decisions as issues
-
----
-
-## Dependencies
-
-- A `.github/` directory in the project root (create if absent)
-- No tooling required — this is a documentation workflow
-
-## Core Principles
-
-1. **Domain-First** — Core domain is defined before implementation begins (基礎と型)
-2. **Living Document** — Append and revise; don't rewrite from scratch (継続は力)
-3. **Explicit Over Implicit** — Record decisions and their rationale, not just outcomes (温故知新)
-4. **AI-Readable** — Written so a coding agent can use it as grounding context (余白の設計)
-5. **Minimal Ceremony** — One file, plain markdown; avoid tooling overhead (ニュートラル)
+- **`furikaeri-practice`** — ふりかえりで新しい知見が生まれたとき、憲法更新のトリガーになる
+- **`git-initial-setup`** — Git操作設定（ブランチ保護、フック）
+- **`git-commit-practices`** — Step 6で参照するコミット規約
+- **`github-issue-intake`** — アーキテクチャ決定をIssueとして記録
 
 ---
 
-## Workflow: Build the Development Constitution
+## 依存関係
 
-### Step 1: Define the Product Essence
+- プロジェクトルートに `.github/` ディレクトリ（なければ作成）
+- ツール不要 — ドキュメント化ワークフロー
 
-Write 1–3 sentences answering: "Who does this project serve, and what problem does it solve?"
+## コア原則
 
-Three required elements:
+1. **ドメインファースト** — 実装開始前にコアドメインを定義する (基礎と型)
+2. **生きたドキュメント** — 追記・修正が基本。ゼロから書き直さない (継続は力)
+3. **暗黙知より形式知** — 結果だけでなく、決断とその理由を記録する (温故知新)
+4. **AIが読める形式** — AIコーディングエージェントがグラウンディングコンテキストとして使える書き方で (余白の設計)
+5. **最小の儀式** — 1ファイル、プレーンMarkdown。ツールのオーバーヘッドを避ける (ニュートラル)
 
-| Element | Question | Example |
-|---------|----------|---------|
-| **Who** | Target user | Solo writers who want distraction-free writing |
-| **What problem** | Pain being solved | Context-switching breaks creative flow |
-| **Core value** | The irreducible benefit | The app gets out of the way |
+---
+
+## ワークフロー: 開発憲法を作る
+
+### Step 1: 製品本質を定義する
+
+「このプロジェクトは誰のために何を解決するか」を1〜3文で書く。
+
+3つの必須要素：
+
+| 要素 | 問い | 例 |
+|------|------|-----|
+| **Who** | ターゲットユーザー | 集中して書きたいソロライター |
+| **What problem** | 解決する痛み | ツールバー操作で思考が途切れる |
+| **Core value** | 削れない核の価値 | エディタが消える——文章だけが残る |
 
 ```markdown
 ## 製品本質 / Product Essence
 
-- **Who**: Solo writers who want distraction-free, offline-first writing
-- **What problem**: Context-switching between editing modes and toolbars breaks creative flow
-- **Core value**: The editor disappears — only the writing remains
+- **Who**: オフラインファーストで集中執筆したいソロライター
+- **What problem**: モード切り替えとツールバー操作が創造的フローを断ち切る
+- **Core value**: エディタが邪魔をしない——書くことだけに集中できる
 ```
 
-This becomes the north star for every feature decision. If a proposed feature contradicts the core value, it belongs in a different product.
+これがすべての機能判断の北極星になる。この核心価値に矛盾する機能提案は、別のプロダクトの話だ。
 
-Use when starting any project, or when stakeholders debate feature priorities.
+新規プロジェクト開始時、またはステークホルダーがフィーチャー優先度で議論するとき。
 
 > **Values**: 基礎と型 / ニュートラル
 
-### Step 2: Record Architecture Principles
+### Step 2: アーキテクチャ方針を記録する
 
-Document the adopted architectural pattern, layer structure, and dependency rules.
+採用したアーキテクチャパターン、レイヤー構造、依存方向のルールを記録する。
 
-Required elements:
-- **Layer structure** (e.g., DDD: domain / application / infrastructure / presentation)
-- **Dependency direction** (e.g., "UI depends on domain. Domain must not depend on UI.")
-- **Tech stack with selection rationale** (why this stack, not just what)
+必須要素：
+- **レイヤー構造**（例：DDD: domain / application / infrastructure / presentation）
+- **依存方向のルール**（例：「UIはドメインに依存する。逆は禁止」）
+- **技術スタックと選定理由**（なぜこのスタックか、何かだけでなく）
 
 ```markdown
 ## アーキテクチャ方針 / Architecture Principles
 
-### Layer Structure
-- `domain/` — Entities, ValueObjects, UseCases, Repository interfaces (ports)
-- `application/` — Orchestration, command/query handlers
-- `infrastructure/` — File system, OS APIs, external storage (adapters)
-- `presentation/` — UI components, state binding
+### レイヤー構造
+- `domain/` — Entity・ValueObject・UseCase・Repositoryインターフェース（ポート）
+- `application/` — オーケストレーション、コマンド/クエリハンドラ
+- `infrastructure/` — ファイルシステム、OS API、外部ストレージ（アダプタ）
+- `presentation/` — UIコンポーネント、状態バインディング
 
-### Dependency Rules
-- Dependency direction: presentation → application → domain ← infrastructure (never reversed)
-- Domain layer has zero knowledge of UI frameworks, file system, or network
-- Infrastructure implements domain interfaces (ports); it never defines them
+### 依存方向
+- 依存方向: presentation → application → domain ← infrastructure（逆は禁止）
+- domainはUIフレームワーク・ファイルシステム・ネットワークを一切知らない
+- infrastructureはdomainのインターフェース（ポート）を実装する。定義はしない
 
-### Tech Stack
-- **Tauri + Rust** — Cross-platform native runtime; offline-first without Electron overhead
-- **React + TypeScript** — Component model with strong type safety
-- **Vite** — Fast dev iteration, minimal config overhead
+### 技術スタック
+- **Tauri + Rust** — クロスプラットフォームネイティブランタイム。Electronオーバーヘッドなしのオフラインファースト
+- **React + TypeScript** — 強い型安全性を持つコンポーネントモデル
+- **Vite** — 高速な開発イテレーション、最小限の設定
 ```
 
-Use when setting up a new project or when a team member asks "where does this code belong?"
+新規プロジェクト設定時、またはチームメンバーが「このコードはどこに置く？」と聞いたとき。
 
 > **Values**: 基礎と型 / 温故知新
 
-### Step 3: Domain-First Checklist
+### Step 3: コアドメイン先行チェックリスト
 
-A five-item checklist to run before starting any new feature. Prevents the most common drift: building UI before the domain model is clear.
+新機能を始める前に必ず確認する5項目のチェックリスト。最も多い判断ブレ——ドメインモデルが明確になる前にUIを作り始める——を防ぐ。
 
 ```markdown
 ## コアドメイン先行チェックリスト / Domain-First Checklist
 
-Before implementing any new feature:
-- [ ] Identified what domain model changes are needed (Entity / ValueObject / UseCase)
-- [ ] Implementation starts from the domain layer — not from the UI
-- [ ] Ports (interfaces) are defined before infrastructure is written
-- [ ] Domain-layer tests are written before application/UI layers
-- [ ] No infrastructure dependency (file system / DB / OS API) leaks into domain
+新機能追加前に確認:
+- [ ] ドメインモデルの変更を特定した（Entity / ValueObject / UseCase）
+- [ ] ドメイン層から実装を始める——UIから始めていない
+- [ ] ポート（インターフェース）を先に定義した
+- [ ] ドメイン層のテストを先に書く
+- [ ] インフラ依存（ファイルシステム / DB / OS API）がdomainに漏れていない
 ```
 
-**Why this matters**: Starting from the UI is natural — it's visible and concrete. But UI-first development embeds accidental complexity into the domain. The checklist creates a moment of deliberate pause before each feature.
+**なぜ重要か**: UIから始めるのは自然だ——見えるし、具体的だから。しかしUIファーストの開発はドメインに偶発的複雑さを埋め込む。チェックリストは、各機能の前に意図的な立ち止まりの瞬間を作る。
 
-Use before every new feature, story, or significant bug fix.
+すべての新機能・ストーリー・重要なバグ修正の前に。
 
 > **Values**: 基礎と型 / 余白の設計
 
-### Step 4: Codify the UI Policy
+### Step 4: UIポリシーを明文化する
 
-Record UI design decisions as policy rather than personal preference. Future contributors (human and AI) need to know what is intentional.
+UI設計の決断を個人の好みではなくポリシーとして記録する。将来のコントリビューター（人間とAI両方）が何が意図的かを知る必要がある。
 
-Required elements:
-- **Inspiration / design reference** — The aesthetic target
-- **Explicit prohibitions** — What must not be built (as important as what should)
-- **Accessibility commitment** — Minimum viable accessibility stance
+必須要素：
+- **インスピレーション / デザイン参照** — 目指す美的ターゲット
+- **明示的な禁止事項** — 作ってはいけないもの（作るべきものと同じくらい重要）
+- **アクセシビリティのコミットメント** — 最低限のアクセシビリティ方針
 
 ```markdown
 ## UIポリシー / UI Policy
 
-### Design Direction
-- Notion-inspired: minimal header, context-dependent toolbar, focus on content canvas
-- Single-surface editor: no modal dialogs for routine operations
+### デザイン方向
+- Notionインスパイア: 最小ヘッダー、コンテキスト依存ツールバー、コンテンツキャンバスへの集中
+- シングルサーフェスエディタ: 日常操作にモーダルダイアログを使わない
 
-### Prohibitions
-- Do NOT pack mode buttons into the header toolbar
-- Do NOT show formatting controls when no text is selected
-- Do NOT add persistent sidebars without explicit user opt-in
+### 禁止事項
+- ヘッダーツールバーにモードボタンを詰め込まない
+- テキスト未選択時にフォーマットコントロールを表示しない
+- ユーザーの明示的なオプトインなしに永続サイドバーを追加しない
 
-### Accessibility
-- Keyboard navigation required for all primary actions
-- Sufficient color contrast (WCAG AA minimum)
-- Screen reader labels on all icon-only buttons
+### アクセシビリティ
+- すべての主要操作にキーボードナビゲーション必須
+- 十分なカラーコントラスト（WCAG AA最低限）
+- アイコンのみのボタンにはすべてスクリーンリーダー用ラベル
 ```
 
-Use when implementing any UI component or reviewing a UI-related PR.
+UIコンポーネント実装時、またはUI関連PRのレビュー時。
 
 > **Values**: 基礎と型 / ニュートラル
 
-### Step 5: Define the Test Strategy
+### Step 5: テスト方針を明文化する
 
-Establish testing principles before writing the first test. Inconsistent testing philosophy compounds over time.
+最初のテストを書く前にテスト原則を確立する。一貫性のないテスト哲学は時間とともに複利で悪化する。
 
-Required elements:
-- **Strategy** — TDD / BDD / After (pick one as default)
-- **Priority order** — Which layers get tested first
-- **Mock policy** — When mocking is allowed vs. forbidden
-- **File placement** — Convention for test file location
+必須要素：
+- **戦略** — TDD / BDD / After（デフォルトを1つ選ぶ）
+- **優先順位** — どのレイヤーを最初にテストするか
+- **モック方針** — モックが許可 / 禁止の条件
+- **ファイル配置** — テストファイルの場所の規約
 
 ```markdown
 ## テスト方針 / Test Strategy
 
-### Strategy
-TDD for domain and application layers; integration tests for infrastructure adapters.
+### 戦略
+domainとapplicationレイヤーはTDD。infrastructureアダプタは結合テスト。
 
-### Priority
-1. Domain layer (pure business logic — no mocks needed)
-2. Application layer (use case orchestration — mock domain ports)
-3. Infrastructure layer (adapter contracts — test against real dependencies)
-4. UI layer (interaction tests — focus on user workflows, not implementation)
+### 優先順位
+1. domainレイヤー（純粋なビジネスロジック——モック不要）
+2. applicationレイヤー（ユースケースオーケストレーション——domainポートをモック）
+3. infrastructureレイヤー（アダプタ契約——実依存でテスト）
+4. UIレイヤー（インタラクションテスト——実装ではなくユーザーワークフローに集中）
 
-### Mock Policy
-- Domain layer: No mocks. If you need a mock, the dependency belongs in infrastructure.
-- Application layer: Mock domain ports (interfaces) only.
-- Infrastructure layer: Use real implementations for adapter tests.
+### モック方針
+- domainレイヤー: モック禁止。モックが必要なら依存はinfrastructureに属する。
+- applicationレイヤー: domainポート（インターフェース）のみモック可。
+- infrastructureレイヤー: アダプタテストには実実装を使う。
 
-### File Placement
-- Unit tests: colocated with source (`*.test.ts`)
-- Integration tests: `tests/integration/`
-- E2E tests: `tests/e2e/`
+### ファイル配置
+- ユニットテスト: ソースと同置（`*.test.ts`）
+- 結合テスト: `tests/integration/`
+- E2Eテスト: `tests/e2e/`
 ```
 
-Use when setting up a project, or when a PR introduces a test pattern that violates the policy.
+プロジェクト設定時、またはポリシーに違反するテストパターンを導入するPRのレビュー時。
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 6: Git and Coding Conventions
+### Step 6: Git・コーディング規約
 
-Record the commit format, branch strategy, and language-specific style rules. These should align with `git-commit-practices`.
+コミット形式、ブランチ戦略、言語固有のスタイルルールを記録する。`git-commit-practices` と整合させること。
 
 ```markdown
 ## Git・コーディング規約 / Git and Coding Conventions
 
-### Commit Format (Conventional Commits)
-- `feat:` — New feature
-- `fix:` — Bug fix
-- `refactor:` — No behavior change
-- `test:` — Test additions / modifications
-- `docs:` — Documentation only
-- `chore:` — Tooling, dependencies
+### コミット形式（Conventional Commits）
+- `feat:` — 新機能
+- `fix:` — バグ修正
+- `refactor:` — 振る舞いの変更なし
+- `test:` — テストの追加・修正
+- `docs:` — ドキュメントのみ
+- `chore:` — ツール、依存関係
 
-### Branch Strategy
-- `main` — Production-ready; protected (no direct push)
-- `feat/<issue-number>-<short-description>` — Feature branches
-- `fix/<issue-number>-<short-description>` — Bug fix branches
+### ブランチ戦略
+- `main` — 本番相当。保護済み（直接プッシュ禁止）
+- `feat/<issue番号>-<短い説明>` — フィーチャーブランチ
+- `fix/<issue番号>-<短い説明>` — バグ修正ブランチ
 
-### Coding Style
-- TypeScript strict mode enabled
-- No `any` without explicit justification in a comment
-- Pure functions for domain logic; side effects only in infrastructure/presentation
-- Rust: follow `clippy` defaults; no `unwrap()` in production paths
+### コーディングスタイル
+- TypeScript strictモード有効
+- コメントによる明示的な正当化なしに `any` を使わない
+- domainロジックは純粋関数。副作用はinfrastructure/presentationのみ
+- Rust: `clippy` デフォルトに従う。本番パスで `unwrap()` を使わない
 ```
 
 > **Values**: 継続は力 / 基礎と型
 
-### Step 7: Update Cadence and Triggers
+### Step 7: 更新タイミングの指針
 
-The development constitution is a living document. Define when it gets updated.
+開発憲法は生きたドキュメント。いつ更新するかを定義する。
 
-**Update triggers**:
+**更新トリガー**:
 
-| Trigger | Action |
-|---------|--------|
-| Retrospective surfaces new insight (`furikaeri-practice` Step 5) | Add a line to the relevant section |
-| Architecture decision made | Record it in Step 2 with rationale |
-| A decision pattern was applied 3+ times | Promote it to an explicit rule |
-| New team member asks "why did we do X?" | Add the answer to the constitution |
+| トリガー | アクション |
+|---------|----------|
+| ふりかえりで新しい知見が生まれた（`furikaeri-practice` Step 5） | 該当セクションに1行追記 |
+| アーキテクチャ決定を行った | Step 2に理由付きで記録 |
+| 判断パターンを3回以上適用した | 明示的なルールとして昇格させる |
+| 新メンバーが「なぜこうしたの？」と聞いた | 答えを憲法に追記する |
 
-**Update discipline**:
-- **Append and revise** — Do not rewrite the document; add to it
-- **Date-stamp significant changes** in the Update Log section
-- **Do not update for every PR** — Update when a decision has proven durable
+**更新の規律**:
+- **追記・修正が基本** — ゼロから書き直さない
+- **重要な変更は更新ログに日付を記録**
+- **毎PR更新しない** — 決断が定着したと確認できたときに更新
 
-Use when closing a sprint, completing a `furikaeri-practice` session, or recording an ADR (Architecture Decision Record).
+スプリント終了時、`furikaeri-practice` セッション完了時、またはADR（アーキテクチャ決定レコード）記録時。
 
 > **Values**: 継続は力 / 温故知新 / 成長の複利
 
 ---
 
-## Common Pitfalls
+## よくある失敗
 
-1. **Writing the constitution after implementation**
-   Fix: Block implementation until Steps 1–3 are complete. The constitution protects the domain model, not the UI.
+1. **実装後に憲法を書く**
+   対策: Steps 1–3が完了するまで実装をブロックする。憲法はドメインモデルを守るためのもの——UIを守るためではない。
 
-2. **Too abstract to be actionable**
-   Fix: Every section must contain at least one concrete prohibition or concrete example. Vague principles ("keep it simple") provide no constraint.
+2. **抽象的すぎてアクション不可能**
+   対策: 各セクションに必ず具体的な禁止事項または具体的な例を含める。曖昧な原則（「シンプルに保つ」）は制約にならない。
 
-3. **Never updated after creation**
-   Fix: Add the constitution review to `furikaeri-practice` Step 5 as a default Skill-ization Check. If insights are surfaced, update the document.
+3. **作成後に一度も更新されない**
+   対策: `furikaeri-practice` Step 5のSkill-izationチェックに憲法レビューをデフォルトで追加する。知見が表面化したら文書を更新する。
 
-4. **Copying a template without customizing**
-   Fix: Step 1 (Product Essence) is non-negotiable. A generic "North Star" that fits any project fits none.
+4. **テンプレートをカスタマイズせずにコピーする**
+   対策: Step 1（製品本質）は必須。どのプロジェクトにも当てはまる汎用的な「北極星」は、どのプロジェクトにも当てはまらない。
 
-5. **Conflating this with a README**
-   Fix: The README is for users and contributors; the constitution is for AI agents and design decision tracking. Keep them separate.
-
----
-
-## Anti-Patterns
-
-- Writing the constitution as a one-time exercise and archiving it
-- Using the constitution as a constraints document ("you can't do X") without rationale
-- Adding every coding style preference (that belongs in linting config)
-- Letting AI agents generate the constitution without human editorial on Step 1
+5. **READMEと混同する**
+   対策: READMEはユーザーとコントリビューター向け。憲法はAIエージェントと設計決定追跡のためのもの。別ファイルに保つ。
 
 ---
 
-## Quick Reference
+## アンチパターン
 
-### Development Constitution Template
+- 憲法を一度きりの作業として書いてアーカイブする
+- 理由なしに制約ドキュメントとして使う（「Xはできない」だけで理由がない）
+- すべてのコーディングスタイル好みを追加する（それはlint設定に属する）
+- AIエージェントに憲法を生成させてStep 1のヒューマンレビューをスキップする
+
+---
+
+## クイックリファレンス
+
+### 開発憲法テンプレート
 
 ```markdown
 # 開発憲法 / Development Constitution
@@ -288,67 +287,67 @@ Use when closing a sprint, completing a `furikaeri-practice` session, or recordi
 <!-- Core value: -->
 
 ## アーキテクチャ方針 / Architecture Principles
-<!-- Layers: -->
-<!-- Dependency rules: -->
-<!-- Tech stack + rationale: -->
+<!-- レイヤー構造: -->
+<!-- 依存方向のルール: -->
+<!-- 技術スタック + 選定理由: -->
 
 ## コアドメイン先行チェックリスト / Domain-First Checklist
 
-Before implementing any new feature:
-- [ ] Identified what domain model changes are needed (Entity / ValueObject / UseCase)
-- [ ] Implementation starts from the domain layer — not from the UI
-- [ ] Ports (interfaces) are defined before infrastructure is written
-- [ ] Domain-layer tests are written before application/UI layers
-- [ ] No infrastructure dependency leaks into domain
+新機能追加前に確認:
+- [ ] ドメインモデルの変更を特定した（Entity / ValueObject / UseCase）
+- [ ] ドメイン層から実装を始める——UIから始めていない
+- [ ] ポート（インターフェース）を先に定義した
+- [ ] ドメイン層のテストを先に書く
+- [ ] インフラ依存をdomainに入れない
 
 ## UIポリシー / UI Policy
-<!-- Design direction / inspiration: -->
-<!-- Prohibitions: -->
-<!-- Accessibility: -->
+<!-- デザイン方向 / インスピレーション: -->
+<!-- 禁止事項: -->
+<!-- アクセシビリティ: -->
 
 ## テスト方針 / Test Strategy
-<!-- Strategy (TDD/BDD/After): -->
-<!-- Priority order: -->
-<!-- Mock policy: -->
-<!-- File placement: -->
+<!-- 戦略（TDD/BDD/After）: -->
+<!-- 優先順位: -->
+<!-- モック方針: -->
+<!-- ファイル配置: -->
 
 ## Git・コーディング規約 / Git and Coding Conventions
-<!-- Commit format: -->
-<!-- Branch strategy: -->
-<!-- Language-specific style: -->
+<!-- コミット形式: -->
+<!-- ブランチ戦略: -->
+<!-- 言語固有スタイル: -->
 
 ## 更新ログ / Update Log
-- YYYY-MM-DD: Initial constitution created
+- YYYY-MM-DD: 開発憲法を初回作成
 ```
 
-### Step Summary
+### Stepサマリー
 
-| Step | Output | Trigger to Skip |
-|------|--------|-----------------|
-| 1 Product Essence | 1–3 sentence north star | Never — required for all projects |
-| 2 Architecture Principles | Layer diagram + dependency rules | Prototype with no architecture intent |
-| 3 Domain-First Checklist | 5-item pre-feature gate | Project has no domain model |
-| 4 UI Policy | Design direction + prohibitions | Non-UI project |
-| 5 Test Strategy | Strategy + priority + mock policy | Spike / throwaway prototype |
-| 6 Git Conventions | Commit format + branch strategy | Solo, no-PR workflow |
-| 7 Update Cadence | Triggers + discipline | N/A — always maintain |
+| Step | 成果物 | スキップの条件 |
+|------|--------|-------------|
+| 1 製品本質 | 1〜3文の北極星 | なし——すべてのプロジェクトで必須 |
+| 2 アーキテクチャ方針 | レイヤー図 + 依存ルール | アーキテクチャ意図のないプロトタイプ |
+| 3 コアドメイン先行チェックリスト | 機能前5項目ゲート | ドメインモデルのないプロジェクト |
+| 4 UIポリシー | デザイン方向 + 禁止事項 | 非UIプロジェクト |
+| 5 テスト方針 | 戦略 + 優先順位 + モック方針 | スパイク / 捨てるプロトタイプ |
+| 6 Git規約 | コミット形式 + ブランチ戦略 | ソロ・PRなしワークフロー |
+| 7 更新タイミング | トリガー + 規律 | なし——常に維持する |
 
-### Decision Table
+### 判断テーブル
 
-| Situation | Action |
-|-----------|--------|
-| New project, day one | Complete Steps 1–6 before writing implementation code |
-| Existing project, architecture drifting | Complete Steps 1–3; skip or skim Steps 4–6 if policy exists |
-| New team member | Share the constitution file; walk through Step 1 together |
-| Retrospective insight about design | Update the relevant section via Step 7 |
-| AI agent starting a new session | Point the agent to `.github/copilot-instructions.md` as grounding |
+| 状況 | アクション |
+|------|----------|
+| 新規プロジェクト、初日 | 実装コードを書く前にSteps 1–6を完了する |
+| 既存プロジェクト、アーキテクチャが漂流中 | Steps 1–3を完了。ポリシーが存在すればSteps 4–6はスキム |
+| 新メンバー参加 | 憲法ファイルを共有。Step 1を一緒に歩む |
+| ふりかえりで設計に関する知見が出た | Step 7経由で該当セクションを更新 |
+| AIエージェントが新セッション開始 | `.github/copilot-instructions.md` をグラウンディングとして指示 |
 
 ---
 
-## Resources
+## 参考文献
 
-- Eric Evans, *Domain-Driven Design* — foundational reading for Step 2–3
-- Michael Feathers, *Working Effectively with Legacy Code* — motivates domain isolation
-- [Conventional Commits](https://www.conventionalcommits.org/) — Step 6 commit format
-- `furikaeri-practice` — triggers Step 7 update cadence
-- `git-commit-practices` — detailed commit workflow aligned with Step 6
+- Eric Evans, *Domain-Driven Design* — Steps 2–3のベース読書
+- Michael Feathers, *Working Effectively with Legacy Code* — ドメイン分離の動機
+- [Conventional Commits](https://www.conventionalcommits.org/) — Step 6のコミット形式
+- `furikaeri-practice` — Step 7の更新サイクルのトリガー
+- `git-commit-practices` — Step 6と整合する詳細なコミットワークフロー

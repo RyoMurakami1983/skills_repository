@@ -1,83 +1,76 @@
 ---
 name: python-skill-deploy
 description: >
-  Deploy selected Python skills to a project's .github/skills/ directory.
-  Use when setting up a new Python project, onboarding a team to Python skills,
-  or updating project-level skills from the skills_repository.
-allowed-tools:
-  - powershell
-  - bash
+  選択した Python skill をプロジェクトの .github/skills/ へ配備する。Use when: 新しい Python プロジェクトへ skill を導入したいとき、チームへ共通 Python skill を展開したいとき、skills_repository の更新を反映したいとき。
 ---
+# Pythonスキルをプロジェクトへデプロイする
 
-# Deploy Python Skills to Project
+`skills_repository/python/` から選択したPythonスキルを、対象プロジェクトの `.github/skills/` へ配置する対話型ワークフローです。PowerShell と Bash の両方から実行できます。
 
-Interactive workflow for deploying selected Python skills from `skills_repository/python/` to a target project's `.github/skills/` directory, with both PowerShell and Bash entrypoints.
-
-## When to Use This Skill
-
-Use this skill when:
-- Setting up a new Python project that needs project-level Python workflow skills
-- Onboarding a team member who needs Python guidance inside the target repository
-- Updating an existing project with the latest Python skills from this repository
-- Responding to "python skills をプロジェクトに追加して" or "deploy python skills"
-- Previewing which Python skills would be copied before touching the target project
+## こんなときに使う
+次のような場面で使います。
+- 新しいPythonプロジェクトへ、プロジェクトレベルのPythonワークフロースキルを入れたいとき
+- チームメンバーにPython運用ガイドをリポジトリ内で配布したいとき
+- 既存プロジェクトへ、このリポジトリの最新Pythonスキルを反映したいとき
+- 「python skills をプロジェクトに追加して」や「deploy python skills」と依頼されたとき
+- どのPythonスキルがコピーされるかを、実行前にプレビューしたいとき
 
 ## Related Skills
 
-- **`python-setup-dev-environment`** — Common first deployment target for Python projects
-- **`python-debug-tdd`** — Optional debugging workflow that may be deployed with `all`
-- **`git-initial-setup`** — Often paired with new-project bootstrap
-- **`skill`** — Validate this skill after edits
+- **`python-setup-dev-environment`** — Pythonプロジェクトで最初に配布しやすい基盤スキル
+- **`python-debug-tdd`** — `all` で一緒に配布できる追加ワークフロー
+- **`git-initial-setup`** — 新規リポジトリの初期整備と併用しやすい
+- **`skill`** — このスキル文書を検証するときに使う
 
 ---
 
 ## Dependencies
 
-- PowerShell 5.1+ or Bash 4.0+
-- `skills_repository` cloned locally
-- `$env:SKILLS_REPO` (PowerShell) or `$SKILLS_REPO` (bash/WSL) set to the repository root
+- PowerShell 5.1+ または Bash 4.0+
+- `skills_repository` がローカルにクローン済みであること
+- `$env:SKILLS_REPO`（PowerShell）または `$SKILLS_REPO`（bash/WSL）がリポジトリルートを指していること
 
 ---
 
 ## Core Principles
 
-1. **Selective deployment** — Copy only skills that improve the target project right now (余白の設計)
-2. **Category-first guidance** — Recommend a small default category before individual overrides (基礎と型)
-3. **Safe re-runs** — Skip existing skills unless `-Force` makes overwrite intent explicit (継続は力)
-4. **Transparent execution** — Show list/preview output before file changes so users understand scope (ニュートラル)
+1. **選択的にデプロイする** — そのプロジェクトで今必要なスキルだけをコピーする（余白の設計）
+2. **カテゴリを先に提案する** — まず小さな既定カテゴリを提示し、必要なら個別スキルで補う（基礎と型）
+3. **再実行を安全にする** — 既存スキルは `-Force` を明示したときだけ上書きする（継続は力）
+4. **何をするか先に見せる** — list/preview の結果で変更範囲を見える化してから実行する（ニュートラル）
 
 ---
 
-## Workflow: Deploy Python Skills
+## Workflow: Pythonスキルをデプロイする
 
-### Step 1 — Confirm Target Project and Python Context
+### Step 1 — 対象プロジェクトとPython文脈を確認する
 
-Confirm where the skills should be deployed and what kind of Python work the project does.
+どこへデプロイするか、そしてそのPythonプロジェクトに何が必要かを先に確認します。
 
 ```powershell
-# Questions to ask before deployment
-# - Which project root should receive .github/skills/?
-# - Is this mainly setup/onboarding work, or do you also want debug workflows?
+# デプロイ前に確認する質問
+# - どのプロジェクトルートへ .github/skills/ を作るか
+# - 開発環境整備が主目的か、デバッグ系ワークフローも欲しいか
 ```
 
-Recommended decision rule:
-- Default to `dev-env` for a fresh Python project
-- Use `all` only when the project wants every currently available Python project skill
-- Add individual `-Skills` entries when the category is almost right but not complete
+判断ルール:
+- 新規Pythonプロジェクトなら `dev-env` を既定にする
+- 現在あるPythonプロジェクトスキルを全部入れたいときだけ `all` を使う
+- カテゴリがほぼ合っていて一つだけ足りないときは `-Skills` を追加する
 
-Use when starting deployment or clarifying vague requests like "add Python skills".
+使うとき: 「Pythonスキルを入れて」のような広い依頼を具体化するとき。
 
 > **Values**: ニュートラル / 基礎と型
 
-### Step 2 — Recommend Category or Individual Skills
+### Step 2 — カテゴリまたは個別スキルを提案する
 
-Recommend the smallest useful skill set, then show the available choices.
+最小で役立つ構成を提案し、その後に選択肢一覧を見せます。
 
-| Project situation | Recommended selection | Why |
+| プロジェクト状況 | 推奨選択 | 理由 |
 |---|---|---|
-| New Python repository | `dev-env` | Establishes reproducible environment practices first |
-| Team wants every current Python project skill | `all` | Copies all discoverable skills from `python/` |
-| Team needs one extra workflow beyond the default | `-Category dev-env -Skills ...` | Keeps defaults while adding a precise exception |
+| 新しいPythonリポジトリ | `dev-env` | まず再現可能な開発環境の型を入れるため |
+| 今あるPythonプロジェクトスキルを全部使いたい | `all` | `python/` 配下の全スキルを配布できるため |
+| 既定カテゴリに1つだけ追加したい | `-Category dev-env -Skills ...` | 既定を保ったまま例外を最小化できるため |
 
 ```powershell
 & "<skills_repository>\skills\python-skill-deploy\scripts\Deploy-PythonSkills.ps1" `
@@ -91,36 +84,36 @@ Recommend the smallest useful skill set, then show the available choices.
   --list
 ```
 
-Current categories:
+現在のカテゴリ:
 
-| Category | Count | Contents |
+| カテゴリ | 数 | 内容 |
 |---|---:|---|
 | `dev-env` | 1 | `python-setup-dev-environment` |
-| `all` | dynamic | All Python source skills currently present under `python/` |
+| `all` | 可変 | `python/` 配下に現在存在する全Pythonソーススキル |
 
-Use when the user needs a recommendation before copying files.
+使うとき: コピー前に推奨案と選択肢を示したいとき。
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 3 — Execute Deployment Safely
+### Step 3 — 安全にデプロイを実行する
 
-Run the deploy script with the confirmed selection. Offer `-WhatIf` first when the user wants a preview.
+確定した選択でスクリプトを実行します。初回や不安があるときは `-WhatIf` を先に提案します。
 
 ```powershell
-# Preview category deployment
+# カテゴリデプロイをプレビュー
 & "<skills_repository>\skills\python-skill-deploy\scripts\Deploy-PythonSkills.ps1" `
     -SourceRoot "<skills_repository>\python" `
     -Target "<project_path>" `
     -Category dev-env `
     -WhatIf
 
-# Execute category deployment
+# カテゴリを実デプロイ
 & "<skills_repository>\skills\python-skill-deploy\scripts\Deploy-PythonSkills.ps1" `
     -SourceRoot "<skills_repository>\python" `
     -Target "<project_path>" `
     -Category dev-env
 
-# Add an extra skill explicitly
+# 追加スキルを個別指定
 & "<skills_repository>\skills\python-skill-deploy\scripts\Deploy-PythonSkills.ps1" `
     -SourceRoot "<skills_repository>\python" `
     -Target "<project_path>" `
@@ -129,44 +122,44 @@ Run the deploy script with the confirmed selection. Offer `-WhatIf` first when t
 ```
 
 ```bash
-# Preview category deployment
+# カテゴリデプロイをプレビュー
 "<skills_repository>/skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh" \
   --source-root "<skills_repository>/python" \
   --target "<project_path>" \
   --category dev-env \
   --what-if
 
-# Execute category deployment
+# カテゴリを実デプロイ
 "<skills_repository>/skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh" \
   --source-root "<skills_repository>/python" \
   --target "<project_path>" \
   --category dev-env
 ```
 
-For updates, add `-Force` so overwrite intent is explicit.
+更新時は `-Force` を付けて、上書き意図を明示します。
 
-✅ **Good**: Run `-WhatIf` first for a new target project, then execute the same command without `-WhatIf`.
-❌ **Bad**: Jump straight to `-Force` on the first run or guess the source path from memory.
-Why: preview-first deployment catches path mistakes and reduces accidental overwrite risk.
+✅ **良い例**: 初めて触るターゲットには先に `-WhatIf` を実行し、その後に同じコマンドから `-WhatIf` だけ外して本番実行する。
+❌ **悪い例**: 初回からいきなり `-Force` を使ったり、ソースパスを記憶頼みで決め打ちしたりする。
+Why: 先にプレビューするとパス誤りや想定外上書きを、実変更前に止められるからです。
 
-Use when the target path and selection are confirmed.
+使うとき: 対象パスと配布対象が確定したあと。
 
 > **Values**: 継続は力 / 基礎と型
 
-### Step 4 — Verify Deployment and Guide Next Steps
+### Step 4 — デプロイ結果を確認し、次の一手を案内する
 
-Verify the deployed directories, then tell the user what to do next.
+デプロイ後にディレクトリ一覧を確認し、次にやることまで案内します。
 
 ```powershell
 Get-ChildItem "<project_path>\.github\skills" -Directory | Select-Object Name
 ```
 
-Follow-up guidance:
-1. Review the copied skills in `.github/skills/`
-2. Decide whether to `git add .github/skills/`
-3. Start the target project session with `@python-shihan`
+次の一手:
+1. `.github/skills/` にコピーされたスキルを確認する
+2. `git add .github/skills/` するかどうか判断する
+3. `@python-shihan` で、そのプロジェクトの作業を始める
 
-Use when the copy step is complete and the user needs confirmation plus next actions.
+使うとき: コピーが終わり、結果確認と引き継ぎをしたいとき。
 
 > **Values**: 成長の複利 / ニュートラル
 
@@ -174,58 +167,58 @@ Use when the copy step is complete and the user needs confirmation plus next act
 
 ## Best Practices
 
-- Start with `dev-env`, then add individual skills only if a real need exists.
-- Offer `-WhatIf` before the first live deployment into an unfamiliar repository.
-- Keep `all` dynamic so newly added Python source skills become deployable without manual duplication.
-- Sync category definitions with `agents/python-shihan.agent.md` when Python project skills change.
-- Re-run with `-Force` only when the user explicitly wants to replace copied skills.
-- Prefer `Deploy-PythonSkills.sh` in WSL/bash-first workflows to avoid path and encoding friction.
-- Keep script console output ASCII-safe so Windows PowerShell, WSL, and logs render consistently.
+- まず `dev-env` から始め、本当に必要なときだけ個別スキルを足す
+- 初回の本番コピー前には `-WhatIf` を提案する
+- `all` は動的に保ち、新しいPythonソーススキルが増えても再利用できるようにする
+- Pythonプロジェクトスキルが増減したら `agents/python-shihan.agent.md` とカテゴリ定義を同期する
+- 更新時だけ `-Force` を使い、上書き意図をあいまいにしない
+- WSL や bash 主体の作業では `Deploy-PythonSkills.sh` を優先し、PowerShell 変換の手間を減らす
+- Windows PowerShell / WSL / ログ出力で崩れないよう、スクリプトのコンソール出力は ASCII 安全に保つ
 
 ---
 
 ## Common Pitfalls
 
-1. **Using the wrong `-SourceRoot`**
-   Fix: Point `-SourceRoot` to the repository's `python/` directory, not `skills/`.
+1. **`-SourceRoot` を間違える**
+   Fix: `skills/` ではなく、リポジトリの `python/` を指定する。
 
-2. **Deploying everything by habit**
-   Fix: Default to `dev-env`; use `all` only when the team truly wants every current Python project skill.
+2. **習慣で全部デプロイしてしまう**
+   Fix: 既定は `dev-env` にし、`all` は本当に全部必要なときだけ使う。
 
-3. **Forgetting overwrite intent during updates**
-   Fix: Add `-Force` when refreshing already-copied skills.
+3. **更新時の上書き意図を明示しない**
+   Fix: 既存コピーを更新したいときだけ `-Force` を付ける。
 
-4. **Skipping verification after copy**
-   Fix: List `.github/skills/` immediately after deployment and confirm the expected directories exist.
+4. **コピー後の確認を省略する**
+   Fix: 直後に `.github/skills/` を一覧表示し、期待したディレクトリがあるか確認する。
 
-5. **Windows/WSL console output becomes mojibake**
-   Fix: Keep deploy-script console output ASCII-safe and move localized guidance into SKILL docs instead of script output.
+5. **Windows/WSL で文字化けした出力をそのまま使う**
+   Fix: スクリプト出力は ASCII 安全に保ち、ローカライズ説明は SKILL 文書側へ寄せる。
 
 ---
 
 ## Anti-Patterns
 
-- Copying Python skills manually from Explorer/Finder instead of using a repeatable script
-- Hardcoding repository paths in the script instead of passing `-SourceRoot` and `-Target`
-- Treating deployment as complete without telling the user whether the copied skills should be git-tracked
+- Explorer/Finder で手動コピーして再現可能な手順を残さない
+- スクリプト内でリポジトリパスをハードコードし、`-SourceRoot` / `-Target` を使わない
+- 配布後にGit追跡するかどうかをユーザーへ案内せず終える
 
 ## Troubleshooting
 
-- **`SourceRoot not found`**
-  - Cause: The command points at the wrong repository path.
-  - Fix: Set `$env:SKILLS_REPO` correctly and use `-SourceRoot "$env:SKILLS_REPO\python"`.
+- **`SourceRoot not found` が出る**
+  - 原因: リポジトリパスの指定先が誤っている。
+  - 対処: `$env:SKILLS_REPO` を確認し、`-SourceRoot "$env:SKILLS_REPO\python"` を使う。
 
-- **`Skills not found in source`**
-  - Cause: The requested skill name does not match a directory under `python/`.
-  - Fix: Run `-List`, copy the exact skill name, then retry.
+- **`Skills not found in source` が出る**
+  - 原因: 指定したスキル名が `python/` 配下のディレクトリ名と一致していない。
+  - 対処: `-List` で正式名を確認してから再実行する。
 
-- **No visible change in the target project**
-  - Cause: The run used `-WhatIf`, or existing skills were skipped without `-Force`.
-  - Fix: Check the summary output, then rerun without `-WhatIf` or with `-Force` as needed.
+- **ターゲットに見た目の変化がない**
+  - 原因: `-WhatIf` のままだったか、`-Force` なしで既存スキルがスキップされた。
+  - 対処: サマリー出力を確認し、必要なら `-WhatIf` を外すか `-Force` を付けて再実行する。
 
-- **WSL user does not want to invoke PowerShell**
-  - Cause: The workflow is being run from a bash-first environment.
-  - Fix: Use `skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh` with `--source-root`, `--target`, and the same category/skill choices.
+- **WSL で PowerShell を呼びたくない**
+  - 原因: bash 主体の環境で PowerShell スクリプトを経由したくない。
+  - 対処: `skills/python-skill-deploy/scripts/Deploy-PythonSkills.sh` を使い、`--source-root` / `--target` / `--category` で同じ操作を行う。
 
 ---
 
@@ -233,54 +226,54 @@ Use when the copy step is complete and the user needs confirmation plus next act
 
 ### Preflight Checklist
 
-- [ ] `skills_repository` path is known and `python/` exists under it
-- [ ] Target project root is confirmed
-- [ ] Intended selection (`dev-env`, `all`, or specific `-Skills`) is confirmed
-- [ ] Preview requirement (`-WhatIf`) is decided before live copy
+- [ ] `skills_repository` の場所が分かっており、その下に `python/` が存在する
+- [ ] ターゲットプロジェクトルートが確定している
+- [ ] `dev-env` / `all` / 個別 `-Skills` のどれを使うか決まっている
+- [ ] 本番コピー前に `-WhatIf` を使うかどうか決めている
 
 ### Self-Review Checklist
 
-- [ ] The command uses either `Deploy-PythonSkills.ps1` or `Deploy-PythonSkills.sh`
-- [ ] Source root flag (`-SourceRoot` or `--source-root`) points to `python/`, not another category directory
-- [ ] The copy summary matches expected deployed skills
-- [ ] The target `.github/skills/` directories were listed after deployment
+- [ ] `Deploy-PythonSkills.ps1` または `Deploy-PythonSkills.sh` を使っている
+- [ ] ソースルート（`-SourceRoot` / `--source-root`）が `python/` を指している
+- [ ] サマリー出力が期待した配布対象と一致している
+- [ ] 配布後にターゲット `.github/skills/` を一覧表示して確認した
 
 ### Decision Table
 
-| Situation | Action | Why |
+| 状況 | 推奨アクション | なぜ |
 |---|---|---|
-| New Python project with no existing skills | Deploy `dev-env` | Establish the base workflow with minimal noise |
-| Team wants every current Python project skill | Deploy `all` | Mirror all currently available source skills |
-| Existing copied skills need refresh | Add `-Force` | Make overwrite intent explicit |
-| User is unsure about impact | Add `-WhatIf` first | Preview copy scope before changing files |
+| 新しいPythonプロジェクトで、まだスキルが無い | `dev-env` を配布する | 最小ノイズで基盤ワークフローを入れられる |
+| 今あるPythonプロジェクトスキルを全て入れたい | `all` を配布する | 現在のソーススキルをまとめて反映できる |
+| 既存コピーを最新版へ更新したい | `-Force` を付ける | 上書き意図を明示できる |
+| 影響範囲に不安がある | 先に `-WhatIf` を付ける | ファイル変更前にコピー範囲を確認できる |
 
 ### Command Summary
 
 ```powershell
-# List categories and skills
+# カテゴリとスキル一覧
 Deploy-PythonSkills.ps1 -SourceRoot <python_path> -List
 
-# Preview deploy
+# プレビュー
 Deploy-PythonSkills.ps1 -SourceRoot <python_path> -Target <project> -Category dev-env -WhatIf
 
-# Deploy category
+# カテゴリ配布
 Deploy-PythonSkills.ps1 -SourceRoot <python_path> -Target <project> -Category dev-env
 
-# Deploy category + extra skill
+# カテゴリ + 追加スキル
 Deploy-PythonSkills.ps1 -SourceRoot <python_path> -Target <project> -Category dev-env -Skills python-debug-tdd
 
-# Refresh existing copied skills
+# 既存コピー更新
 Deploy-PythonSkills.ps1 -SourceRoot <python_path> -Target <project> -Category all -Force
 ```
 
 ```bash
-# List categories and skills
+# カテゴリとスキル一覧
 Deploy-PythonSkills.sh --source-root <python_path> --list
 
-# Preview deploy
+# プレビュー
 Deploy-PythonSkills.sh --source-root <python_path> --target <project> --category dev-env --what-if
 
-# Deploy category
+# カテゴリ配布
 Deploy-PythonSkills.sh --source-root <python_path> --target <project> --category dev-env
 ```
 
@@ -291,6 +284,5 @@ Deploy-PythonSkills.sh --source-root <python_path> --target <project> --category
 - [PowerShell documentation](https://learn.microsoft.com/powershell/)
 - [Bash manual](https://www.gnu.org/software/bash/manual/bash.html)
 - [uv documentation](https://docs.astral.sh/uv/)
-- [Python Setup Dev Environment](../../python/python-setup-dev-environment/SKILL.md)
-- [Deploy Dotnet Skills to Project](../dotnet-skill-deploy/SKILL.md)
-
+- [Python Setup Dev Environment](../../../python/python-setup-dev-environment/SKILL.md)
+- [Deploy Dotnet Skills to Project](../../dotnet-skill-deploy/SKILL.md)

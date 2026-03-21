@@ -1,108 +1,105 @@
 ---
 name: notion-safe-operations
-description: "Reliable and secure Notion MCP operations with preflight checks, data source ID handling, and fallback payloads. Use when creating, updating, or querying Notion pages and databases through MCP, especially when handling authentication errors or DS ID resolution."
+description: >
+  Notion MCP 操作を安全かつ再現可能に進めるために、preflight、DS ID 運用、失敗時フォールバックを標準化する。Use when: Notion ページやデータソースを作成・更新・検索するとき、認証や data source ID 周りで詰まりやすいとき。
 ---
-
 # Notion Safe Operations
 
-Use one reusable workflow for Notion operations instead of duplicating ad-hoc steps per skill.
+Notion操作をスキル横断で共通化し、セッション差分による失敗を減らすための標準手順です。
 
-## When to Use This Skill
+## こんなときに使う
+以下の状況で使います：
+- ふりかえり結果を Notion に保存するとき
+- Notion ページのプロパティ更新を実行するとき
+- agent/model 切替後にツール可用性を確認するとき
+- Data Source（DS）ID を安全に解決するとき
+- create/update 失敗時に作業停止を避けたいとき
+- Notion運用をスキル間で統一したいとき
 
-Use this skill when:
-- Saving retrospective records to Notion from another skill
-- Updating page properties in a Notion data source
-- Validating tool availability after agent/model changes
-- Resolving a Data Source (DS) ID from local secure config
-- Handling create/update failures without blocking user progress
-- Standardizing Notion operation behavior across skills
+## 関連スキル
 
-## Related Skills
-
-- **`furikaeri-practice`** - Stores retrospective logs to Notion
-- **`knowledge-capture`** - Applies anonymization before public outputs
-- **`skill`** - Applies this base pattern to existing skills
-
----
-
-## Dependencies
-
-- Notion MCP tools (`notion-notion-fetch`, `notion-notion-create-pages`)
-- Local environment variable for DS ID (example: `NOTION_FURIKAERI_DS_ID`)
-- Target Notion database access permissions
+- **`furikaeri-practice`** - ふりかえりログの保存
+- **`knowledge-capture`** - 公開前の匿名化
+- **`skill`** - 既存スキルへの適用
 
 ---
 
-## Core Principles
+## 依存関係
 
-1. **Run Preflight First** - Execute a real call before writing (基礎と型)
-2. **Store IDs Locally** - Keep DS IDs outside repository files (ニュートラル)
-3. **Fail with Context** - Return actionable fallback payloads (継続は力)
-4. **Reuse One Workflow** - Eliminate duplicated Notion procedures (温故知新)
-5. **Explain Rationale** - Always include why each guard exists (成長の複利)
+- Notion MCP ツール（`notion-notion-fetch`, `notion-notion-create-pages`）
+- DS ID 用のローカル環境変数（例: `NOTION_FURIKAERI_DS_ID`）
+- 対象 Notion DB へのアクセス権
 
 ---
 
-## Workflow: Safe Notion Execution
+## コア原則
 
-### Step 1: Run Tool Preflight
+1. **Run Preflight First** - 書き込み前に実呼び出しで確認する（基礎と型）
+2. **Store IDs Locally** - DS ID は repo外で管理する（ニュートラル）
+3. **Fail with Context** - 失敗時は再実行可能な情報を返す（継続は力）
+4. **Reuse One Workflow** - Notion手順を重複記述しない（温故知新）
+5. **Explain Rationale** - 手順と理由をセットで残す（成長の複利）
 
-Run a real fetch call before any write operation.
+---
+
+## ワークフロー: Notionを安全に実行する
+
+### Step 1: ツール Preflight 実行
+
+書き込み前に、実際の fetch を1回実行する。
 
 ```text
-# ✅ CORRECT - verify callable tool path
+# ✅ CORRECT - 実呼び出し確認
 notion-notion-fetch(id="collection://<your-data-source-id>")
 
-# ❌ WRONG - trust static listing only
+# ❌ WRONG - 一覧表示だけで可用性判定
 /mcp show
 ```
 
-| Signal | Decision |
+| シグナル | 判断 |
 |---|---|
-| Fetch succeeds | Continue to Step 2 |
-| Error contains "unauthorized" / "401" / "authentication" | Auth expired → ask user to run `/mcp r`, then re-run the Step 1 preflight fetch (retry Step 1) |
-| Tool missing / fetch fails (other) | Stop writes and use Step 5 fallback |
+| fetch成功 | Step 2へ進む |
+| "unauthorized" / "401" / "authentication" を含むエラー | 認証切れ → ユーザーに `/mcp r` を実行するよう案内 → 再認証後に Step 1 を再実行 |
+| ツール未検出/その他失敗 | Step 5フォールバックへ |
 
-Why: `/mcp show` can list integrations while current runtime still cannot invoke the tool.
+**なぜ？** `/mcp show` で見えても、実行コンテキストで呼べない場合があるため。
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 2: Resolve DS ID Securely
+### Step 2: DS ID を安全に解決
 
-Load DS ID from local environment variables first.
+まずローカル環境変数を使う。
 
 ```bash
-# preferred local config
 export NOTION_FURIKAERI_DS_ID="collection://..."
 ```
 
-If missing, fetch the database URL and read `collection://...` from the `<data-source>` tag.
+未設定なら DB URL を fetch し、`<data-source>` の `collection://...` を取得する。
 
 ```text
 notion-notion-fetch(id="https://www.notion.so/...database-url...")
 ```
 
-Why: local configuration is reproducible and avoids leaking workspace identifiers.
+**なぜ？** ローカル設定は再現性が高く、識別子漏洩も防げるため。
 
 > **Values**: ニュートラル / 基礎と型
 
-### Step 3: Validate Schema Before Write
+### Step 3: スキーマ確認
 
-Fetch the target data source and verify property names before creating pages.
+対象 data source を fetch し、必須プロパティ名を完全一致で確認する。
 
 ```text
 notion-notion-fetch(id="collection://...")
-# Check required properties exist with exact names:
-# タイトル, ステータス, 実施内容, 学び・気づき, 課題・問題点, 次回アクション
+# 必須: タイトル, ステータス, 実施内容, 学び・気づき, 課題・問題点, 次回アクション
 ```
 
-Why: property name mismatch is the most common source of create/update failures.
+**なぜ？** create/update 失敗の多くはプロパティ名の不一致が原因。
 
 > **Values**: 成長の複利 / 基礎と型
 
-### Step 4: Execute Create/Update
+### Step 4: Create/Update 実行
 
-Use explicit property keys and expanded date fields.
+明示的なプロパティ名と日付expanded keysを使う。
 
 ```json
 {
@@ -125,34 +122,34 @@ Use explicit property keys and expanded date fields.
 }
 ```
 
-Why: explicit keys reduce ambiguity and improve repeatability across sessions.
+**なぜ？** 曖昧さを減らし、セッション間で同じ結果を再現しやすくするため。
 
 > **Values**: 基礎と型 / 温故知新
 
-### Step 5: Return Deterministic Fallback
+### Step 5: 失敗時フォールバック
 
-If write execution fails, return a copy-paste payload and retry guidance.
+失敗時は必ず、貼り付け可能 payload と再試行手順を返す。
 
 ```markdown
 ## Notion write failed
 - Error: <exact error>
 - Retry:
 
-  **If error contains "unauthorized" / "401" / "authentication" (auth expired):**
-  1. Run `/mcp r` in the terminal to re-authenticate Notion
-  2. Re-run Step 1 preflight
-  3. Re-submit the same payload
+  **"unauthorized" / "401" / "authentication" を含む場合（認証切れ）:**
+  1. ターミナルで `/mcp r` を実行して Notion を再認証する
+  2. Step 1 preflight を再実行
+  3. 同じ payload を再送
 
-  **Other failures:**
-  1. Reset agent/model context
-  2. Re-run Step 1 preflight
-  3. Re-submit the same payload
+  **その他の失敗:**
+  1. agent/model を再初期化
+  2. Step 1 preflight を再実行
+  3. 同じ payload を再送
 
 Payload:
 { ...ready-to-paste JSON... }
 ```
 
-Why: a structured fallback preserves momentum even when tools are unstable.
+**なぜ？** ツール不安定時でも、ユーザーの作業を止めないため。
 
 > **Values**: 継続は力 / 成長の複利
 
@@ -160,29 +157,29 @@ Why: a structured fallback preserves momentum even when tools are unstable.
 
 ## Common Pitfalls
 
-1. **Using `/mcp show` as the only health check**
-   Fix: Always run `notion-notion-fetch` preflight before writes.
+1. **`/mcp show` だけで健全性判定する**
+   修正: 書き込み前に `notion-notion-fetch` を必ず実行。
 
-2. **Hardcoding DS ID in committed markdown**
-   Fix: Store DS ID in local environment variables.
+2. **DS ID をコミット済みファイルに直書きする**
+   修正: ローカル環境変数で管理する。
 
-3. **Guessing property names**
-   Fix: Fetch schema and copy exact field names.
+3. **プロパティ名を推測して書く**
+   修正: スキーマを fetch して正確な名前を使用。
 
 ---
 
-## Best Practices
+## ベストプラクティス
 
-- Run preflight in every write flow
-- Reuse this skill from other skills instead of duplicating procedures
-- Keep fallback payloads short and executable
-- Keep sensitive identifiers in local-only configuration
+- すべての write フローで preflight を実行
+- Notion手順は基盤スキルに集約
+- 失敗時payloadは即貼り付け可能形式にする
+- 機密識別子はローカル設定に限定する
 
-## Anti-Patterns
+## アンチパターン
 
-- Proceeding after preflight failure
-- Returning generic "failed" messages without retry steps
-- Mixing inline Notion logic into unrelated workflow skills
+- preflight 失敗後にそのまま書き込み継続
+- 再試行情報なしで「失敗しました」だけ返す
+- 各スキルにNotion手順を重複記載する
 
 ---
 
@@ -190,41 +187,40 @@ Why: a structured fallback preserves momentum even when tools are unstable.
 
 ### Decision Table
 
-| Situation | Action |
+| 状況 | アクション |
 |---|---|
-| Need to write Notion data | Run Step 1 preflight first |
-| DS ID unknown | Run Step 2 resolution flow |
-| Property error occurs | Re-run Step 3 schema check |
-| Auth expired (401 / unauthorized) | Run `/mcp r` to re-authenticate, then retry Step 1 |
-| Tool call fails in runtime (non-auth error) | Use Step 5 fallback payload |
+| Notionへ書き込みたい | Step 1 preflight を先に実行 |
+| DS ID が不明 | Step 2 解決フローを実行 |
+| Property error が出た | Step 3 スキーマ確認を再実行 |
+| 認証切れ（401 / unauthorized） | `/mcp r` を実行して再認証し、Step 1 からやり直す |
+| 実行時にツール失敗（その他） | Step 5 フォールバックを返す |
 
-### Minimal Checklist
+### 最小チェックリスト
 
-- [ ] Preflight fetch succeeded
-- [ ] DS ID resolved from local config
-- [ ] Schema verified
-- [ ] Payload uses exact property names
-- [ ] Fallback payload prepared
+- [ ] preflight fetch 成功
+- [ ] DS ID をローカル設定から解決
+- [ ] スキーマ確認済み
+- [ ] payload が正確なプロパティ名を使用
+- [ ] フォールバックpayloadを準備
 
 ---
 
 ## FAQ
 
-**Q: What if Notion auth expires mid-session?**
-A: The preflight fetch will return an "unauthorized" or 401 error. Run `/mcp r` in the terminal to re-authenticate, then retry from Step 1.
+**Q: セッション中に Notion の認証が切れたらどうする？**
+A: preflight fetch が "unauthorized" や 401 エラーを返します。ターミナルで `/mcp r` を実行して再認証し、Step 1 からやり直してください。
 
-**Q: Why not save DS IDs in repository docs?**
-A: DS IDs are workspace-specific identifiers; local-only storage is safer and cleaner.
+**Q: なぜ DS ID をリポジトリに書かない？**
+A: ワークスペース固有識別子の漏洩を防ぎ、環境依存を減らすため。
 
-**Q: Why run preflight every time?**
-A: Model/agent context changes can affect callable tool availability.
+**Q: なぜ毎回 preflight が必要？**
+A: セッション/agent/model でツール可用性が変動するため。
 
-**Q: What is MCP?**
-A: MCP means Model Context Protocol, the tool bridge used to call integrations like Notion.
+**Q: MCP とは？**
+A: Model Context Protocol の略で、Notion など外部ツール呼び出しの橋渡し。
 
 ---
 
 ## Resources
 
 - https://developers.notion.com/reference/intro
-

@@ -2,7 +2,7 @@
 name: dotnet-oracle-wpf-integration
 description: >
   Add Oracle DB connection to WPF apps with repository pattern and CRUD operations.
-  Use when integrating Oracle Database into existing WPF applications with MVVM settings
+  Use when: integrating Oracle Database into existing WPF applications with MVVM settings
   dialog, repository pattern, and secure DPAPI-encrypted configuration.
 license: MIT
 metadata:

@@ -2,7 +2,7 @@
 name: dotnet-csharp-concurrency-patterns
 description: >
   Choose the right .NET concurrency abstraction — async/await, Channels, Akka.NET Streams,
-  Reactive Extensions, or Akka.NET Actors. Use when deciding how to handle concurrent operations,
+  Reactive Extensions, or Akka.NET Actors. Use when: deciding how to handle concurrent operations,
   evaluating concurrency tools, or managing state across multiple concurrent entities.
 license: MIT
 metadata:

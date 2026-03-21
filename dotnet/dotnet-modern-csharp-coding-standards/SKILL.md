@@ -2,7 +2,7 @@
 name: dotnet-modern-csharp-coding-standards
 description: >
   Write modern, high-performance C# code using records, pattern matching, composition,
-  and Result-type error handling. Use when writing new C# code, designing APIs,
+  and Result-type error handling. Use when: writing new C# code, designing APIs,
   or refactoring to C# 12+ idioms.
 license: MIT
 metadata:

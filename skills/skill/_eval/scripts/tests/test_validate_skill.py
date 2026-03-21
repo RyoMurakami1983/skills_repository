@@ -20,7 +20,6 @@ def write_skill(
     folder: str,
     content: str,
     *,
-    with_legacy_reference: bool = False,
     with_references_dir: bool = True,
 ) -> Path:
     skill_dir = tmp_path / folder
@@ -29,8 +28,6 @@ def write_skill(
     else:
         skill_dir.mkdir(parents=True, exist_ok=True)
     (skill_dir / "SKILL.md").write_text(content, encoding="utf-8")
-    if with_legacy_reference:
-        (skill_dir / "references" / "SKILL.ja.md").write_text("# ja\n", encoding="utf-8")
     return skill_dir / "SKILL.md"
 
 
@@ -42,7 +39,7 @@ def test_l1_passes_for_japanese_router_style_skill(tmp_path: Path):
         """---
 name: router-skill
 description: >
-  スキル運用を整理するルーター。こんなときに使う: 新しいスキルを
+  スキル運用を整理するルーター。Use when: 新しいスキルを
   作るとき、品質を確認するとき、既存 guidance を改善するとき。
 compatibility: test
 ---
@@ -68,7 +65,7 @@ compatibility: test
     assert len(report.critical) == 5
 
 
-def test_l1_passes_for_legacy_english_router_style_skill(tmp_path: Path):
+def test_l1_passes_for_english_router_style_skill_without_translation_pair(tmp_path: Path):
     mod = load_module()
     skill_path = write_skill(
         tmp_path,
@@ -76,7 +73,7 @@ def test_l1_passes_for_legacy_english_router_style_skill(tmp_path: Path):
         """---
 name: legacy-router-skill
 description: >
-  Route skill operations. Use when creating skills, validating drafts, or
+  Route skill operations. Use when: creating skills, validating drafts, or
   improving published guidance.
 ---
 
@@ -95,8 +92,7 @@ Use this skill when:
 | --- | --- |
 | Create | new |
 | Improve | improve |
-""",
-        with_legacy_reference=True,
+        """,
     )
     report = mod.validate(skill_path, "L1")
     assert report.critical_passed is True
@@ -110,7 +106,7 @@ def test_l2_can_pass_without_references_dir_when_skill_is_compact(tmp_path: Path
         """---
 name: compact-skill
 description: >
-  小さな skill を検証する。こんなときに使う: 最小構成で L2 を確認したいとき。
+  小さな skill を検証する。Use when: 最小構成で L2 を確認したいとき。
 ---
 
 # Compact Skill

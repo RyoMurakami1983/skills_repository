@@ -1,7 +1,7 @@
 ---
 name: improve
 description: >
-  既存スキルを evidence ベースで改善する。こんなときに使う: trigger 精度、
+  既存スキルを evidence ベースで改善する。Use when: trigger 精度、
   説明の冗長さ、関連資料の同期ずれを直したいとき。
 compatibility: "_foundation/CONVENTIONS.md, _eval/scripts/validate_skill.py"
 ---

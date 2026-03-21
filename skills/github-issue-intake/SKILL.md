@@ -1,122 +1,121 @@
 ---
 name: github-issue-intake
-description: "Capture deferred work as actionable GitHub issues with standardized titles, labels, and priority. Use when triaging out-of-scope bugs during PR review, deferring non-critical fixes to later sprints, converting support requests into engineering work, or clarifying vague existing issues."
+description: >
+  スコープ外や後続対応を、実行可能な GitHub Issue として記録・具体化する。Use when: PR レビュー中に見つけた別件を切り出したいとき、サポート依頼を開発タスクに変えたいとき、曖昧な依頼を backlog 化したいとき。
 ---
+# Issueインテーク
 
-# Issue Intake
+スコープ外のバグや改善を、再現可能で追跡可能なGitHub Issueとして記録し、曖昧なIssueは「行動可能」な形に具体化します。
 
-Turn out-of-scope bugs or improvements into actionable GitHub issues with consistent structure, ownership, and priority.
+## こんなときに使う
+以下の状況で活用してください：
+- Pull Request (PR)レビュー中に見つけたバグを切り分けたい
+- 今すぐ対応しない修正をスプリント後に回したい
+- Issueのタイトル、ラベル、優先度を標準化したい
+- **内容が曖昧で何を直したいのか分からないIssueを、タイトル/本文から具体化したい**
+- 断続的な障害の再現手順を記録したい
+- サポート依頼を開発タスクとして追跡したい
+- フォローアップ作業を別担当に引き渡したい
 
-## When to Use This Skill
+## 関連スキル
 
-Use this skill when:
-- Capturing out-of-scope bugs discovered during a Pull Request (PR) review
-- Deferring non-critical fixes to a later sprint or milestone
-- Standardizing issue titles, labels, and priority across teams
-- Clarifying existing issues that are vague or hard to act on (rewrite title/body)
-- Recording reproducible steps for intermittent production failures
-- Converting support requests into trackable engineering work
-- Handing off follow-up tasks to another owner or team
-
-## Related Skills
-
-- **`github`** - Thin entry skill for broad GitHub requests before the exact issue / PR / repo workflow is obvious
-- **`github-pr-review-response`** - Typical upstream flow when review feedback reveals follow-up work that should be deferred instead of fixed in the current PR
-- **`github-pr-workflow`** - Delivery workflow that often precedes issue capture when scope expands during PR work
-- **`github-repo-label-setup`** - Label taxonomy this skill can apply during issue creation and triage
-- **`knowledge-capture`** - Anonymization gate for public-repo content
-
----
-
-## Dependencies
-
-- GitHub account with repo access
-- GitHub CLI (gh) for CLI workflow (optional)
-- Team label/priority taxonomy
+- **`git-commit-practices`** - コミット運用と実践
+- **`github-pr-workflow`** - PR運用とマージ方針
+- **`git-initial-setup`** - リポジトリ初期保護
+- **`skill`** - 変更管理と履歴整理
+- **`skill`** - ドキュメント品質検証
+- **`knowledge-capture`** - 公開リポジトリ向けコンテンツの匿名化ゲート
 
 ---
 
-## Core Principles
+## 依存関係
 
-1. **Actionable First** - Every issue includes clear next steps (基礎と型)
-2. **Scope Separation** - Track later work without blocking now (ニュートラル)
-3. **Traceability** - Link issues to PRs and evidence (成長の複利)
-4. **Consistency** - Use standard labels, priorities, and templates (温故知新)
-5. **Low Friction** - Capture fast to avoid forgotten work (継続は力)
+- GitHubアカウント（リポジトリ権限）
+- GitHub CLI (gh)（CLI運用時・任意）
+- チームのラベル/優先度規約
 
 ---
 
-## Workflow: Capture Deferred Work as Issues
+## コア原則
 
-### Step 1: Decide Fix Now or File Issue
+1. **行動可能性** - すべてのIssueに明確な次のステップを含める（基礎と型）
+2. **スコープ分離** - 今の作業をブロックせずに後続作業を追跡する（ニュートラル）
+3. **トレーサビリティ** - IssueをPRと証拠に紐付ける（成長の複利）
+4. **一貫性** - 標準ラベル・優先度・テンプレートを使う（温故知新）
+5. **低摩擦** - 素早く記録して忘れない（継続は力）
 
-Determine whether to fix inline or defer. Use a simple decision matrix based on impact, effort, and scope relevance. If the fix is out of scope or exceeds a 30-minute timebox, file an issue instead.
+---
+
+## ワークフロー: 先送りした作業をIssueとして記録する
+
+### Step 1: 今直すかIssue化するか判断
+
+インラインで修正するか先送りするかを判断します。影響度・工数・スコープ関連性に基づくシンプルな判断マトリクスを使います。スコープ外または30分のタイムボックスを超える場合はIssue化します。
 
 ```text
-# ✅ CORRECT - File issue when out of scope
+# ✅ CORRECT - スコープ外はIssue化
 Issue: "🟡 CSV import: UTF-8 BOM を受け付けない"
-Scope: Not required for current PR
-Action: Create issue and continue
+Scope: 現PRでは不要
+Action: Issueを作成して続行
 
-# ❌ WRONG - Hide in TODO
+# ❌ WRONG - TODOで埋める
 // TODO: fix later
 ```
 
-**When**: You discover scope creep during a PR or a fix risks delaying the current release.
+**いつ**: PR中にスコープクリープを発見した場合、または修正が現リリースを遅延させるリスクがある場合。
 
-### Step 1.5: Apply Anonymization Gate (Public Repo)
+### Step 1.5: 匿名化ゲートの適用（公開リポジトリ向け）
 
-Before writing any content, check whether the destination repository is **public**. If yes, apply the [Anonymization Checklist from `knowledge-capture`](../knowledge-capture/SKILL.md#anonymization-checklist) (AC-1 through AC-4):
+コンテンツを書く前に、投稿先リポジトリが**公開**かどうかを確認する。公開の場合は [`knowledge-capture` の匿名化チェックリスト](../../knowledge-capture/SKILL.md#anonymization-checklist)（AC-1〜AC-4）を適用する：
 
-| Check | What to scan in the issue |
-|-------|--------------------------|
-| AC-1 | Project names, org names, private repo names (e.g., `MyOrg/my-private-repo`) |
-| AC-2 | Internal IDs, data formats, function/class names specific to a private codebase |
-| AC-3 | Domain-specific terminology that identifies the internal system or client |
-| AC-4 | Real numeric thresholds, config values, or business-specific numbers |
+| チェック | Issueで確認すべき内容 |
+|---------|---------------------|
+| AC-1 | プロジェクト名・組織名・private repoの名前（例: `MyOrg/my-private-repo`）|
+| AC-2 | 内部ID・データフォーマット・private codebase固有の関数名/クラス名 |
+| AC-3 | 内部システムや顧客を特定するドメイン固有用語 |
+| AC-4 | 実際の閾値・設定値・業務固有の数値 |
 
-Replace private details with generic equivalents before writing the issue body.
+Issue本文を書く前に、固有の詳細を汎用表現に置き換える。
 
 ```markdown
-# ❌ WRONG — private repo details exposed
-## Background
-Practiced during `internal_project` bug fix. See: MyOrg/my-private-repo PR #3
+# ❌ NG — private repoの固有名詞がそのまま
+## 背景
+optimizer_project の internal_function_name バグ修正時に実践。
+参考: MyOrg/my-private-repo PR #3
 
-# ✅ CORRECT — anonymized
-## Background
-Practiced during a numerical optimization library bug fix session.
-See: (private repo / internal PR)
+# ✅ OK — 匿名化済み
+## 背景
+数値最適化ライブラリのバグ修正セッションで実践。
+参考: (private repo / 社内PR)
 ```
 
-**Decision Rule**: Is the destination repository public? → Yes = Apply AC-1 through AC-4 before writing.
+**判断基準**: 投稿先リポジトリは公開か？ → Yes = 書く前に AC-1〜AC-4 を適用する。
 
 > **Values**: ニュートラルな視点（固有知識を普遍化して公開する）
 
-**When**: Every time you create an issue in a public repository that references internal project work.
+**いつ**: 社内プロジェクトの作業を参照するIssueを公開リポジトリに作成するたびに。
 
-### Step 2: Write (or Refactor) Title and Body
+### Step 2: タイトルと本文を書く（または既存Issueを具体化する）
 
-Write a clear, searchable title and a structured body.
-In this repository, default to Japanese issue titles and bodies. Keep proper nouns, CLI commands, code identifiers, and external service names in English when that improves recognition.
+検索しやすいタイトルと、構造化された本文を書きます。曖昧Issueはここで「目的・範囲・DoD」が分かる形に書き直します。
+このリポジトリでは、Issue のタイトルと本文は日本語を既定にします。認知しやすさを優先し、固有名詞・CLI コマンド・コード識別子・外部サービス名は必要に応じて英語のまま残します。
 
-#### Recommended: priority markers in the title
+#### 推奨: タイトルの優先度マーカー（カラー丸）
 
-Use color-circle markers for quick scanning during triage. Keep labels as the source of truth; the emoji is for visibility.
+トリアージで一目で分かるように、タイトル先頭にカラー丸を付けます。ラベルを正としつつ、可視性を上げるための補助として使います。
 
-| Marker | Meaning | Typical mapping |
-|--------|---------|-----------------|
-| 🔴 | Urgent / P0 | Production down |
-| 🟡 | High / P1 | Major user impact |
-| 🟢 | Medium / P2 | Standard bug / improvement |
-| 🔵 | Low / P3 | Minor / cleanup |
+| マーカー | 意味 | 目安 |
+|---------|------|------|
+| 🔴 | 緊急 / P0 | 本番停止 |
+| 🟡 | High / P1 | 重大影響 |
+| 🟢 | Medium / P2 | 標準バグ/改善 |
+| 🔵 | Low / P3 | 軽微/整理 |
 
-Examples:
+例：
 - `🟡 validate_skill.py: Workflow/Router向けのセクション抽出を堅牢化する`
 - `🟢 github-issue-intake: Issueは日本語で起票する方針を明記する`
 
-#### Body template
-
-A good title in this repository uses a priority marker plus a short Japanese summary. Keep English only where it improves recognition, such as product names, CLI commands, or code identifiers.
+#### 本文テンプレ
 
 ```markdown
 Title: "🟢 github-issue-intake: Issueは日本語で起票する方針を明記する"
@@ -135,20 +134,20 @@ Issue の言語方針が明文化されておらず、起票者ごとに英語 /
 - [ ] 英語併記を許容する条件が分かる
 ```
 
-**Note (Markdown gotcha)**: Avoid placeholders like `<path>` in issue bodies — they may be treated as HTML tags and disappear. Prefer `PATH` / `FILE` or fenced code blocks.
+**注意（Markdownの罠）**: 本文内で `<path>` のような表記はHTMLタグ扱いで消える場合があります。`PATH` / `FILE` のようなプレースホルダにするか、フェンス付きコードブロックを使ってください。
 
-**When**: Every new issue and every “unclear issue” you choose to refactor.
+**いつ**: 新規Issue作成時、または「内容が分からないIssue」を具体化するとき。
 
-### Step 3: Apply Labels and Priority
+### Step 3: ラベルと優先度を付与
 
-Assign labels for type, priority, and area so the backlog is sortable. At minimum, every issue needs a type label and a priority label.
+バックログをソート可能にするため、種別・優先度・領域のラベルを付与します。最低限、すべてのIssueに種別ラベルと優先度ラベルが必要です。
 
-| Priority | Meaning | SLA |
-|----------|---------|-----|
-| P0 | Production down | Same day |
-| P1 | Major user impact | 1–3 days |
-| P2 | Standard bug | 1–2 sprints |
-| P3 | Minor/cleanup | Backlog |
+| 優先度 | 意味 | SLA |
+|--------|------|-----|
+| P0 | 本番停止 | 当日 |
+| P1 | 重大影響 | 1–3日 |
+| P2 | 標準バグ | 1–2スプリント |
+| P3 | 軽微/整理 | バックログ |
 
 ```yaml
 # ✅ CORRECT
@@ -158,11 +157,11 @@ labels: [t/bug, p/high, a/import]
 labels: []
 ```
 
-**When**: Before triage meetings or when handing off to another team member.
+**いつ**: トリアージミーティング前、または別メンバーへの引き渡し時。
 
-### Step 4: Add Repro Steps and Evidence
+### Step 4: 再現手順と証拠を追加
 
-Include numbered reproduction steps, expected vs actual results, and supporting evidence (logs, screenshots, request IDs). The next owner should be able to reproduce the problem without asking follow-up questions.
+番号付きの再現手順、期待結果と実際の結果、裏付け証拠（ログ、スクリーンショット、リクエストID）を含めます。次の担当者がフォローアップの質問なしで問題を再現できるようにします。
 
 ```markdown
 ## Steps to Reproduce
@@ -180,27 +179,27 @@ Import succeeds
 Log: 2026-02-12T12:03:11Z ERROR import failed (BOM detected)
 ```
 
-**When**: Always for bugs; for features, include user-scenario context instead.
+**いつ**: バグの場合は常に。機能の場合はユーザーシナリオのコンテキストを代わりに含める。
 
-### Step 5: Create or Edit Issues via CLI (Recommended)
+### Step 5: CLIでIssueを作成/更新（推奨）
 
-Use `gh issue create` for fast, repeatable creation, and `gh issue edit` to refactor unclear issues.
+`gh issue create` で新規作成、`gh issue edit` で既存Issueの具体化（title/body整備）を行います。
 
 ```bash
-# Create
+# 新規作成
 gh issue create \
   --title "🟢 github-issue-intake: Issueは日本語で起票する方針を明記する" \
   --body-file issue.md \
   --label t/chore,p/medium,a/skills \
   --assignee @me
 
-# Edit
+# 更新（具体化）
 gh issue edit 123 --title "🟢 Windows: UTF-8 入出力の標準化を行う" --body-file issue.md
 ```
 
-#### Windows / PowerShell: safest body-file approach (UTF-8)
+#### Windows / PowerShell: 最も安全な body-file 手順（UTF-8）
 
-Avoid passing large multiline strings via `--body` (quoting can break or hang). Generate a UTF-8 body file and pass it.
+PowerShellで `--body` に長文を直接渡すと、クォート崩れやハングの原因になりがちです。UTF-8でファイルを書き出して `--body-file` で渡してください。
 
 ```powershell
 $bodyLines = @(
@@ -217,25 +216,25 @@ gh issue edit 123 --title '🟢 ...' --body-file $bodyFile
 Remove-Item -LiteralPath $bodyFile -Force
 ```
 
-**When**: You are already in the terminal and want speed, repeatability, and consistent formatting.
+**いつ**: ターミナルで作業中で、再現性と安全性を重視する場合。
 
-### Step 6: Create Issue via Web UI
+### Step 6: Web UIでIssueを作成
 
-Use the GitHub web interface when you need drag-and-drop screenshots, rich Markdown preview, or template selection.
+ドラッグ＆ドロップのスクリーンショット、リッチMarkdownプレビュー、テンプレート選択が必要な場合はGitHub Web UIを使います。
 
 ```text
-1. Open repository → Issues → New issue
-2. Select template (e.g., Bug Report)
-3. Fill required fields, attach screenshots
-4. Add labels, milestone, and assignee
-5. Submit
+1. リポジトリ → Issues → New issue を開く
+2. テンプレートを選択（例: Bug Report）
+3. 必須項目を入力し、スクリーンショットを添付
+4. ラベル、マイルストーン、担当者を追加
+5. 送信
 ```
 
-**When**: The issue needs embedded images, complex formatting, or you are triaging from the browser.
+**いつ**: 埋め込み画像、複雑なフォーマット、またはブラウザからのトリアージが必要な場合。
 
-### Step 7: Link Issues to PRs
+### Step 7: IssueをPRにリンク
 
-Reference issues in PR descriptions using closing keywords so issues close automatically on merge. Use `Closes #N` for direct fixes and `Refs #N` for related context.
+PR説明文にクローズキーワードを使ってIssueを参照し、マージ時に自動クローズさせます。
 
 ```markdown
 ## Related
@@ -243,88 +242,88 @@ Closes #123
 Refs #130
 ```
 
-For cross-repo references, use the full `owner/repo#N` syntax:
+クロスリポジトリ参照には完全な `owner/repo#N` 構文を使います：
 
 ```markdown
 Fixes owner/repo#123
 ```
 
-**When**: Every PR that resolves or relates to a tracked issue.
+**いつ**: 追跡対象のIssueを解決または関連するすべてのPR。
 
 ---
 
-## Best Practices
+## ベストプラクティス
 
-- Refactor unclear issues into an actionable format (Background → Goal → Scope → DoD)
-- In this repository, default to Japanese issue titles and bodies
-- Keep proper nouns, CLI commands, code identifiers, and service names in English when that improves recognition
-- Use the priority marker scheme (🔴🟡🟢🔵) consistently in titles
-- Use explicit Japanese action phrases in titles when helpful (for example: `標準化する`, `明記する`, `棚卸しする`)
-- Keep one issue per problem
-- Add impact and priority before triage meetings
-- Include repro steps or evidence whenever possible
-- Link PRs with closing keywords
-- Use `--body-file` for anything beyond one-line bodies
-
----
-
-## Common Pitfalls
-
-- Writing vague titles like "Bug" or "Fix later"
-- Skipping repro steps for intermittent failures
-- Mixing multiple problems into one issue
-- Passing long bodies via `gh issue edit --body ...` on PowerShell
-- Using placeholders like `<PATH>` that may disappear in Markdown rendering
-- Mixing English-first and Japanese-first issue styles in the same repository without a policy
-
-Fix: Use the standard template and split issues by scope.
-Fix: Always add repro steps or evidence links.
-Fix: Prefer `--body-file` with UTF-8 for CLI edits.
+- **「分からないIssue」を放置しない**：背景→目的→スコープ→DoD に整形して具体化する
+- このリポジトリでは、日本語タイトル・日本語本文を既定にする
+- ただし固有名詞・CLI コマンド・コード識別子・外部サービス名は、認知しやすさを優先して英語併記または英語のままでもよい
+- タイトルの優先度マーカー（🔴🟡🟢🔵）をチームで統一する
+- タイトルでは `標準化する`、`明記する`、`棚卸しする` のような明示的な日本語の動詞を使う
+- 1 Issue = 1 問題に絞る
+- トリアージ前に影響度と優先度を付ける
+- 可能な限り再現手順か証拠を記載
+- `--body-file` を基本にする（1行を超える本文は特に）
 
 ---
 
-## Anti-Patterns
+## よくある落とし穴
 
-- Using TODO comments instead of filing issues
-- Creating issues without a clear next action
-- Closing issues without documenting resolution
+- "Bug" や "Fix later" のような曖昧なタイトル
+- 断続的障害で再現手順を省略する
+- 1つのIssueに複数の問題を混在させる
+- PowerShellで `gh issue edit --body ...` に長文を直接渡す
+- `<PATH>` のような表記が本文から消える（HTMLタグ扱い）
+- リポジトリ内で英語起票と日本語起票が混在し、後から言語統一の手戻りが発生する
+
+Fix: 標準テンプレートを使い、スコープ別にIssueを分割する。
+Fix: 再現手順か証拠リンクを必ず追加する。
+Fix: UTF-8の `--body-file` 経由で編集する。
+
+---
+
+## アンチパターン
+
+- TODOコメントでIssueを作らない
+- 明確な次のアクションがないIssueを作る
+- 解決内容を記録せずIssueを閉じる
 
 ---
 
 ## FAQ
 
-**Q: When should I file an issue instead of fixing now?**
-A: File an issue when the fix is out of scope or exceeds your timebox.
+**Q: 今直すかIssue化するか、いつ判断すべき？**
+A: 修正がスコープ外、またはタイムボックスを超える場合はIssue化する。
 
-**Q: What labels are mandatory?**
-A: At minimum, include one type label (`t/*`) and one priority label (`p/*`).
+**Q: 既存Issueが曖昧で分からないときは？**
+A: コメントで済ませず、title/bodyを具体化（背景・目的・DoD）して「次の人が動ける」状態にする。
 
-**Q: Should issues in this repository be written in Japanese or English?**
-A: Default to Japanese for titles and bodies. Keep proper nouns, CLI commands, code identifiers, and external service names in English when that improves recognition.
+**Q: このリポジトリのIssueは日本語と英語のどちらで書くべき？**
+A: 既定は日本語。固有名詞・CLI コマンド・コード識別子・外部サービス名は、認知しやすさを優先して英語のまま使ってよい。
 
-**Q: Can I edit existing issues to make them clearer?**
-A: Yes — treat it as backlog maintenance. Update title/body (and add DoD) so the next owner can act without questions.
+**Q: 最低限必要なラベルは？**
+A: 少なくとも種別ラベル（`t/*`）を1つと、優先度ラベル（`p/*`）を1つ付ける。
 
 ---
 
-## Quick Reference
+## クイックリファレンス
 
-| Step | Action | Output |
-|------|--------|--------|
-| 1 | Decide fix vs issue | Decision logged |
-| 1.5 | Apply anonymization gate (public repo) | No private data in issue |
-| 2 | Write/refactor title + body (use 🔴🟡🟢🔵) | Searchable, actionable issue |
-| 3 | Apply labels and priority | Sortable backlog |
-| 4 | Add repro steps and evidence | Reproducible report |
-| 5 | Create/edit via CLI (`--body-file`) | Fast, safe workflow |
-| 6 | Create via Web UI | Rich formatted issue |
-| 7 | Link to PR | Auto-close on merge |
+| Step | アクション | 結果 |
+|------|------------|------|
+| 1 | 今直すかIssue化か判断 | 判断を記録 |
+| 1.5 | 匿名化ゲートの適用（公開リポジトリ） | Issue内に固有データなし |
+| 2 | タイトル/本文を作成（🔴🟡🟢🔵） | 検索可能で行動可能なIssue |
+| 3 | ラベルと優先度を付与 | ソート可能なバックログ |
+| 4 | 再現手順と証拠を追加 | 再現可能なレポート |
+| 5 | CLIで作成/更新（`--body-file`） | 高速で安全 |
+| 6 | Web UIで作成 | リッチフォーマット |
+| 7 | PRにリンク | マージで自動クローズ |
 
+---
 ```bash
-# CLI quick create
+# CLI で新規作成
 gh issue create --title "🟢 改善: ..." --body-file issue.md --label t/feature,p/medium,a/skills
 
-# CLI quick edit
+# CLI で更新
 gh issue edit 123 --title "🟢 〜を明記する" --body-file issue.md
 ```
 
@@ -338,4 +337,3 @@ gh issue edit 123 --title "🟢 〜を明記する" --body-file issue.md
 - [GitHub CLI issue edit](https://cli.github.com/manual/gh_issue_edit)
 
 ---
-

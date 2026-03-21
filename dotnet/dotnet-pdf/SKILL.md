@@ -1,6 +1,6 @@
 ---
 name: dotnet-pdf
-description: Use when you need to route a .NET PDF-related task to the right skill, such as scan PDF lightweighting, WPF PDF preview, OCR input optimization, or future PDF split/crop workflows.
+description: Use when: you need to route a .NET PDF-related task to the right skill, such as scan PDF lightweighting, WPF PDF preview, OCR input optimization, or future PDF split/crop workflows.
 ---
 
 # Route .NET PDF Workflows to the Right Skill

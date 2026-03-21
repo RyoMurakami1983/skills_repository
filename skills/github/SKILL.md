@@ -1,54 +1,50 @@
 ---
 name: github
 description: >
-  Route broad GitHub requests to the right existing GitHub workflow skill.
-  Use when the user says "GitHub", "プルリクして", "PRレビュー待機して",
-  "レビュー対応して", or "Issue登録して" without naming the exact skill yet.
+  GitHub 系の広い依頼を、既存の具体 workflow skill へ振り分ける薄い入口 skill。Use when: ユーザーが「GitHub」「プルリクして」「レビュー対応して」「Issue登録して」など広く頼んでおり、まだ具体 skill 名を指定していないとき。
 ---
+# GitHub 入口 skill
 
-# GitHub Entry Skill
+GitHub 上の delivery や issue 運用が必要なのは明らかだが、まだどの具体 skill に入るべきか曖昧なときに最初に使う薄い入口です。
 
-Use this skill as a thin entry point when the user clearly needs GitHub delivery help but the best existing skill is still ambiguous. Why: daily delivery requests often arrive as short natural phrases before the user names whether they need PR creation, review response, issue intake, or a full issue session workflow.
+この skill は `github-pr-workflow` や `github-pr-review-response` を置き換えません。役割は最初の振り分けだけで、意図が見えたらすぐに canonical workflow へ委譲します。
 
-This skill does not replace concrete skills such as `github-pr-workflow` or `github-pr-review-response`. Its job is to route quickly, then hand off to the canonical workflow.
-
-## When to Use This Skill
-
-Use this skill when:
-- Interpreting a broad GitHub request before the right concrete skill is obvious
-- Routing "プルリクして" into the canonical PR creation and review-wait flow
-- Routing "PRレビュー待機して" or "レビュー対応して" into the right review-phase skill
-- Mapping "Issue登録して" or vague backlog-capture requests to the issue intake workflow
-- Directing a greeting-driven issue execution session into the end-to-end issue autopilot
-- Redirecting "コミットして" to `git-commit-practices` when clean atomic commits are needed before PR work
+## こんなときに使う
+次のような場面で使います。
+- 広い GitHub 依頼を最初に分類したいとき
+- 「プルリクして」を canonical な PR 作成 + レビュー待機フローへつなぎたいとき
+- 「PRレビュー待機して」「レビュー対応して」を review phase の適切な skill へ振り分けたいとき
+- 「Issue登録して」や backlog 化したい依頼を issue intake へ案内したいとき
+- greeting 起点で issue を end-to-end に進める session workflow へつなぎたいとき
+- 「コミットして」を PR 前の atomic commit 要求として `git-commit-practices` に流したいとき
 
 ## Decision Table
 
-| Your intent | Route | What to do |
+| 意図 | ルート | 何をするか |
 | --- | --- | --- |
-| Open a PR, link an issue, or enter review waiting | `github-pr-workflow` | Use the canonical PR workflow from branch/state detection through review waiting. |
-| Respond to new PR review comments or request re-review | `github-pr-review-response` | Enter only when there is a real review signal that needs action. |
-| Capture deferred work or create a follow-up issue | `github-issue-intake` | Turn scope expansion or vague work into a structured GitHub issue. |
-| Run one issue end-to-end in the current session | `session-issue-autopilot` | Use the session orchestrator when the user wants guided issue execution through PR flow. |
-| Standardize labels or quality gates at the repo level | `github-repo-label-setup`, `github-quality-gate-setup` | Treat these as repository bootstrap or hardening concerns, not PR concerns. |
-| Prepare commits before PR work | `git-commit-practices` | Interpret "コミットして" as a request for atomic commits by default. |
+| PR を作る、Issue を紐づける、レビュー待機へ入る | `github-pr-workflow` | branch/state 判定から PR 作成、review waiting まで canonical workflow を使う。 |
+| 新しい PR review comment に対応する、再レビュー依頼する | `github-pr-review-response` | 実際の review signal があるときだけ入る。 |
+| スコープ外作業や後続対応を Issue 化する | `github-issue-intake` | scope expansion や vague work を構造化された GitHub Issue にする。 |
+| 1つの Issue を今の session で end-to-end に進める | `session-issue-autopilot` | Issue 実行から PR flow まで guided に進める。 |
+| labels や quality gate を repo レベルで整える | `github-repo-label-setup`、`github-quality-gate-setup` | PR concern ではなく repo bootstrap / hardening concern として扱う。 |
+| PR 前に commit を整える | `git-commit-practices` | 「コミットして」は原則として atomic commit 要求として解釈する。 |
 
 ## Related Skills
 
-- **`github-pr-workflow`** — Primary route for PR creation, issue linkage, and review waiting
-- **`github-pr-review-response`** — Primary route for review feedback handling
-- **`github-issue-intake`** — Primary route for issue capture and defer/triage work
-- **`session-issue-autopilot`** — End-to-end session wrapper for issue execution
-- **`git-commit-practices`** — Upstream commit hygiene route when PR-ready history is not prepared yet
+- **`github-pr-workflow`** — PR 作成、Issue 連携、レビュー待機の第一候補
+- **`github-pr-review-response`** — review feedback 対応の第一候補
+- **`github-issue-intake`** — Issue 起票・defer/triage の第一候補
+- **`session-issue-autopilot`** — Issue 実行の session wrapper
+- **`git-commit-practices`** — PR 前に履歴を reviewable に整えるための上流 route
 
 ## Routing Notes
 
-- Prefer direct skill invocation once the user's intent is clear; this entry skill exists only for early ambiguity.
-- Treat "コミットして" as a `git-commit-practices` route with atomic commit expectations, not as a generic GitHub action.
-- Keep merge decisions human-in-the-loop; this skill should route to the right workflow, not blur merge ownership.
+- 意図が明確になったら直接 concrete skill を呼ぶ。入口 skill に留まり続けない。
+- 「コミットして」は generic な GitHub 作業ではなく、atomic commit を前提とした `git-commit-practices` ルートとして扱う。
+- merge 判断は人間が持つ。routing skill が merge ownership を曖昧にしない。
 
 ## Pitfalls
 
-- **Staying in the router too long**: once the user's real concern is clear, switch to the concrete skill instead of repeating a category explanation.
-- **Using `github` as a mega-workflow**: this is an entry skill, not a replacement for `github-pr-workflow`, `github-pr-review-response`, or `github-issue-intake`.
-- **Forgetting commit hygiene**: if the branch is not clean enough for review, route to `git-commit-practices` first and split into atomic commits before PR creation.
+- **router に留まりすぎる**: 具体意図が見えたら category 説明を続けず、すぐ concrete skill に渡す。
+- **`github` を巨大 workflow にしてしまう**: これは入口であり、`github-pr-workflow` や `github-pr-review-response` の代替ではない。
+- **commit hygiene を飛ばす**: review に耐える履歴でなければ、まず `git-commit-practices` で atomic commit に分割してから PR に進む。

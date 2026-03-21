@@ -1,363 +1,361 @@
 ---
 name: furikaeri-practice
-description: "Guided retrospective after sessions or PR reviews using KPT and YWT frameworks. Use when reflecting on completed work, planning improvements, capturing lessons learned, or logging retrospectives to a Notion furikaeri database."
+description: >
+  セッションや PR レビュー後のふりかえりを、KPT や YWT などの型で進める。Use when: 作業の学びを整理したいとき、改善アクションを決めたいとき、ふりかえり結果を蓄積したいとき。
 ---
+# ふりかえりプラクティス
 
-# Furikaeri Practice
+AI アシスタントとのセッションに、チームのふりかえり手法（KPT・YWT・5つのなぜ・SMART目標）を適用する構造化ワークフロー。暗黙知を形式知に変え、継続的カイゼンを実現する。
 
-A structured retrospective workflow for AI-assisted sessions. Apply proven team retrospective techniques — KPT, YWT, 5 Whys, SMART goals — to individual or pair sessions with an AI assistant, turning implicit lessons into explicit improvements.
+> **命名について**: 「ふりかえり」はひらがな表記が正式名称です。漢字の「振り返り」とは意図的に区別しています。「ふりかえり」は構造化された改善プラクティスを指し、単なる「過去を振り返る」行為とは異なります。
 
-> **Note**: "ふりかえり" (furikaeri) is intentionally written in hiragana, not kanji (振り返り). It denotes a deliberate, structured improvement practice — not casual "looking back."
+## こんなときに使う
+以下のような場面で使います：
+- コーディングセッションや複数ターンの会話を終えるとき
+- PR レビューのフィードバック対応が完了したとき
+- スプリントやマイルストーンの区切り
+- セッションをまたいで同じ問題が繰り返し発生しているとき
+- 暗黙知をドキュメント化された改善に変えたいとき
+- 新しいプラクティスを導入して効果を追跡したいとき
 
-## When to Use This Skill
+## 関連スキル
 
-Use this skill when:
-- Wrapping up a coding session or multi-turn conversation
-- Completing PR review feedback and fixes
-- Finishing a sprint or milestone
-- Encountering repeated problems across sessions
-- Wanting to turn tacit knowledge into documented improvements
-- Onboarding a new practice and tracking what works
-
-## Related Skills
-
-- **`git-commit-practices`** — Commit history as learning asset
-- **`github-pr-workflow`** — PR creation and issue close
-- **`github-issue-intake`** — Capture improvement items as issues
-- **`knowledge-capture`** — Anonymization gate for documents that may become public skills
-
----
-
-## Dependencies
-
-- None required (conversation-only workflow)
-- Optional: GitHub CLI (`gh`) for creating improvement issues
-
-## Core Principles
-
-1. **Stop and Reflect** — Pause to observe before rushing to the next task (温故知新)
-2. **Small Kaizen** — Change little by little; small steps compound (継続は力)
-3. **Externalize Knowledge** — Turn tacit lessons into team assets (成長の複利)
-4. **Fact-Based** — Start from facts, not assumptions or blame (ニュートラル)
-5. **Form Yields Insight** — KPT, YWT, 5 Whys, SMART are forms that unlock depth (基礎と型)
+- **`git-commit-practices`** — コミット履歴を学習資産に
+- **`github-pr-workflow`** — PR作成とIssue close
+- **`github-issue-intake`** — 改善項目をIssueとして起票
 
 ---
 
-## Three Purposes of Furikaeri
+## 依存関係
 
-1. **Stop** — Create a moment of change. Look around you.
-2. **Accelerate Growth** — Frequent communication surfaces problems early and solves them fast.
-3. **Kaizen the Process** — Focus on *how* value is created. Change small, change often.
+- 必須なし（会話のみのワークフロー）
+- オプション: GitHub CLI (`gh`) — 改善Issueの作成に使用
+
+## コア原則
+
+1. **立ち止まる** — 次のタスクに急ぐ前に、一度止まって観察する (温故知新)
+2. **小さくカイゼン** — 少しずつ変える。小さな一歩が複利で効く (継続は力)
+3. **知識を外に出す** — 暗黙の学びをチームの資産にする (成長の複利)
+4. **事実ベース** — 事実から出発する。思い込みや責任追及ではなく (ニュートラル)
+5. **型が洞察を生む** — KPT・YWT・5つのなぜ・SMARTという型が深い気づきを引き出す (基礎と型)
 
 ---
 
-## Workflow: Run a Furikaeri
+## ふりかえりの3つの目的
 
-### Step 1: Organize the Session Story
+1. **立ち止まる** — 変化のきっかけをつくる。周りをみる。
+2. **成長を加速させる** — 高頻度のコミュニケーションで悩み・問題を自然に共有し、即解決する。
+3. **プロセスをカイゼンする** — 「価値をどう生み出しているか」に着目する。変更は小さく少しずつ。
 
-Lay out what happened in chronological order. Focus on facts — emotions and judgments come later.
+---
+
+## ワークフロー: ふりかえりを実施する
+
+### Step 1: セッションストーリーを整理する
+
+何が起きたかを時系列で整理する。事実に集中し、感情や判断は次のステップで扱う。
 
 ```markdown
-## Session Story
+## セッションストーリー
 
-1. Started with Issue #42 — add search filter
-2. Created feature branch, wrote tests first (TDD)
-3. Hit unexpected API timeout during integration
-4. Switched to mocking, tests passed
-5. PR review requested 2 changes
-6. Fixed and merged
+1. Issue #42（検索フィルタ追加）に着手
+2. featureブランチを作成、テストファーストで実装（TDD）
+3. 結合テストでAPIタイムアウトが発生
+4. モック化に切り替え、テスト通過
+5. PRレビューで2件の修正指摘
+6. 修正してマージ完了
 ```
 
-Prompt the user:
-- "What did we work on today?"
-- "Walk me through the timeline of this session."
+ユーザーへの問いかけ:
+- 「今日は何に取り組みましたか？」
+- 「このセッションの流れを教えてください。」
 
-Use when starting any furikaeri. Always do this step first.
+どのふりかえりでも最初に必ず行う。
 
 > **Values**: 温故知新 / ニュートラル
 
-### Step 2: Analyze with KPT or YWT
+### Step 2: KPT または YWT で分析する
 
-Choose one framework and categorize the session story.
+フレームワークを1つ選び、セッションストーリーを分類する。
 
-**KPT (Keep / Problem / Try)**
+**KPT（Keep / Problem / Try）**
 
-| Category | Description | Example |
-|----------|------------|---------|
-| **Keep** | What went well — continue doing | TDD caught the timeout early |
-| **Problem** | What went wrong — needs fixing | API docs were outdated |
-| **Try** | What to experiment with next | Add integration test timeout config |
+| カテゴリ | 説明 | 例 |
+|---------|------|-----|
+| **Keep** | うまくいったこと — 続けたい | TDDでタイムアウトを早期発見できた |
+| **Problem** | うまくいかなかったこと — 修正が必要 | APIドキュメントが古かった |
+| **Try** | 次に試したいこと | テスト設定にタイムアウト設定を追加 |
 
-Try items have two purposes:
-- **Keep strengthening** — Amplify what already works (marked ← K)
-- **Problem kaizen** — Fix or prevent what went wrong (marked ← P)
+Try には2つの目的があります：
+- **Keep強化** — すでにうまくいっていることをさらに伸ばす（← K と表記）
+- **Problemカイゼン** — うまくいかなかったことを修正・防止する（← P と表記）
 
-**YWT (Y: did / W: learned / T: next)**
+**YWT（やったこと / わかったこと / つぎにやること）**
 
-| Category | Description | Example |
-|----------|------------|---------|
-| **Y** | What you did | Wrote 5 unit tests, 1 integration test |
-| **W** | What you learned | Mock-first is faster for unstable APIs |
-| **T** | What to do next | Create a mock library for the team |
+| カテゴリ | 説明 | 例 |
+|---------|------|-----|
+| **Y**（やったこと） | 実際にやったこと | ユニットテスト5件、結合テスト1件を書いた |
+| **W**（わかったこと） | 気づいたこと・学んだこと | 不安定なAPIにはモックファーストが速い |
+| **T**（つぎにやること） | 次にやること | チーム用のモックライブラリを作る |
 
 ```markdown
 ## KPT
 
 ### Keep
-- TDD workflow caught issues early
-- Atomic commits made review easy
+- TDDワークフローで問題を早期発見できた
+- アトミックコミットのおかげでレビューがスムーズだった
 
 ### Problem
-- API documentation was stale
-- Spent 30 min debugging timeout
+- APIドキュメントが古くなっていた
+- タイムアウトのデバッグに30分かかった
 
 ### Try
-- (← K) Add timeout configuration to test setup
-- (← P) Update API docs as part of definition of done
+- (← K) テストセットアップにタイムアウト設定を追加する
+- (← P) APIドキュメント更新を完了定義（Definition of Done）に含める
 ```
 
-Prompt the user:
-- "Shall we use KPT or YWT?" (default: KPT)
-- "What should we Keep doing?"
-- "What Problems did we hit?"
-- "What should we Try next time?"
+ユーザーへの問いかけ:
+- 「KPTとYWT、どちらを使いますか？」（デフォルト: KPT）
+- 「続けたいこと（Keep）は何ですか？」
+- 「困ったこと（Problem）は何でしたか？」
+- 「次に試したいこと（Try）は何ですか？」
 
-Use when analyzing any session. This is the core analysis step.
+必ず行う。ふりかえりの中核となる分析ステップ。
 
-> **Note**: Always render KPT/YWT lists as plain markdown text in the conversation so they remain visible when scrolling back. Reserve interactive selection UIs (e.g., `ask_user`) for moments that require a user decision, such as priority voting in Step 3.
+> **Note**: KPT/YWTのリストは必ずマークダウンテキストで会話に出力し、スクロールして見返せる形で残すこと。`ask_user` 等の選択UIは、Step 3の優先度選択など判断が必要な場面のみ使用する。選択UIは選択後に内容が消えるため、分析内容の記録には不向き。
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 3: Pick the Most Important Items
+### Step 3: 重要項目をピックアップする
 
-Not everything matters equally. Select the items with the highest impact.
+すべてが同じ重要度ではない。影響の大きい項目に絞り込む。
 
-Present the combined list from Step 2 and ask the user to pick 1–3 items:
+Step 2 の結果をまとめて提示し、ユーザーに1〜3項目を選んでもらう:
 
 ```markdown
-## Priority Items (dot-vote style)
+## 優先項目（ドット投票方式）
 
-From the KPT above, which items matter most?
+KPTの結果から、最も重要な項目はどれですか？
 
-1. 🔴 API documentation was stale (Problem)
-2. 🟡 Add timeout configuration (Try)
-3. 🟢 TDD workflow caught issues early (Keep)
+1. 🔴 APIドキュメントが古かった（Problem）
+2. 🟡 タイムアウト設定を追加（Try）
+3. 🟢 TDDワークフローが有効だった（Keep）
 
-→ User picks: #1 (stale docs) and #2 (timeout config)
+→ ユーザー選択: #1（ドキュメント問題）と #2（タイムアウト設定）
 ```
 
-Rules:
-- Maximum 3 items to focus on
-- At least 1 item must be actionable (Problem or Try)
-- Keep items are acknowledged but don't need action plans
+ルール:
+- 最大3項目に絞る
+- 少なくとも1つはアクション可能な項目（Problem または Try）を含める
+- Keep 項目は認識するが、アクションプランは不要
 
-Use when prioritizing action items. Forces focus on what matters most.
+必ず行う。本当に大事なことにフォーカスさせる。
 
 > **Values**: ニュートラル / 継続は力
 
-> **Next**: The prioritized items selected here will be converted into GitHub Issues in **Step 6a**. Do not end the session before completing Step 6 — unregistered actions are lost.
+> **次のステップ**: ここで選んだ優先項目は **Step 6a** で必ず GitHub Issue に変換する。Step 6 を完了せずにセッションを終了しないこと — 登録されなかったアクションは消える。
 
-### Step 4: Dig Deeper (When Needed)
+### Step 4: 深掘りする（必要な場合のみ）
 
-For items with unclear root causes, apply **5 Whys** to find the real problem. Then set a **SMART goal** for the action item.
+根本原因が不明な項目には **5つのなぜ** を適用する。その後、アクション項目を **SMART目標** に落とし込む。
 
-**5 Whys Example**
+**5つのなぜ（例）**
 
 ```markdown
-## 5 Whys: API documentation was stale
+## 5つのなぜ: APIドキュメントが古かった
 
-1. Why was the documentation stale?
-   → Nobody updated it when the API changed.
-2. Why didn't anyone update it?
-   → It wasn't part of the PR checklist.
-3. Why wasn't it in the checklist?
-   → We didn't have a definition of done for API changes.
-4. Why no definition of done?
-   → We haven't formalized our API change process.
-5. Why not formalized?
-   → Small team, assumed everyone knew.
+1. なぜドキュメントが古かった？
+   → API変更時に誰も更新しなかった。
+2. なぜ誰も更新しなかった？
+   → PRチェックリストに含まれていなかった。
+3. なぜチェックリストに含まれていなかった？
+   → API変更の完了定義を決めていなかった。
+4. なぜ完了定義がなかった？
+   → API変更プロセスを形式化していなかった。
+5. なぜ形式化していなかった？
+   → 少人数チームで、全員わかっていると思い込んでいた。
 
-Root cause: No formalized API change process.
+根本原因: API変更プロセスが形式化されていなかった。
 ```
 
-**SMART Goal**
+**SMART目標**
 
-| Element | Value |
-|---------|-------|
-| **S**pecific | Add "Update API docs" to PR checklist |
-| **M**easurable | 100% of API PRs include doc updates |
-| **A**chievable | One checklist item addition |
-| **R**elevant | Directly prevents stale documentation |
-| **T**ime-bound | Add to checklist by next sprint |
+| 要素 | 内容 |
+|------|------|
+| **S**pecific（具体的） | PRチェックリストに「APIドキュメント更新」を追加 |
+| **M**easurable（測定可能） | API関連PRの100%にドキュメント更新を含める |
+| **A**chievable（達成可能） | チェックリスト1項目の追加 |
+| **R**elevant（関連性） | ドキュメント陳腐化を直接防止 |
+| **T**ime-bound（期限付き） | 次のスプリントまでに追加 |
 
-Use when a Problem item has unclear root cause, or a Try item needs a concrete plan.
+Problem項目の根本原因が不明な場合、またはTry項目に具体的な計画が必要な場合。
 
 > **Values**: 温故知新 / 基礎と型
 
-### Step 5: Furikaeri the Furikaeri
+### Step 5: ふりかえりのふりかえり
 
-Improve the retrospective process itself. Ask one question:
+ふりかえりプロセス自体を改善する。1つだけ質問する:
 
-> "What would you change about this furikaeri next time?"
+> 「次のふりかえりで変えたいことは何ですか？」
 
-Examples:
-- "Spend less time on story, more on analysis"
-- "Try YWT instead of KPT next session"
-- "Include metrics (time spent, commits count)"
-- "Skip 5 Whys — problems were straightforward"
+例:
+- 「ストーリーに時間をかけすぎた。分析を増やしたい」
+- 「次回はKPTの代わりにYWTを試してみる」
+- 「メトリクス（所要時間、コミット数）を含める」
+- 「5つのなぜは不要だった。問題はシンプルだった」
 
-Record the answer for the next session.
+次のセッション用に記録する。
 
 ```markdown
-## Meta-Furikaeri
+## メタふりかえり
 
-Next time: Try YWT format — KPT felt repetitive for this type of session.
+次回の改善: YWT形式を試す — 今回のセッションタイプにはKPTが単調だった。
 ```
 
-Use when finishing any furikaeri. Even 1 sentence improves the next one.
+必ず行う。たった1文でも次のふりかえりを改善する。
 
 > **Values**: 継続は力 / 成長の複利
 
-#### Skill-ization Check
+#### スキル化候補チェック
 
-After the meta question, ask one additional question:
+メタ質問の後、もう一つ問う：
 
-> "Was there any tacit know-how surfaced in this session that could become a reusable skill?"
+> 「今回のセッションで言語化されたノウハウをスキル化できるものはあるか？」
 
-Examples of skill-ization candidates:
-- A checklist invented on the fly (e.g., "domain-first design checklist")
-- A pattern for handling a recurring problem class
-- A decision framework that proved useful and could apply to other contexts
-- A workflow improvement discovered during meta-furikaeri
+スキル化候補の例：
+- その場で生み出したチェックリスト（例：「コアドメイン先行設計チェックリスト」）
+- 繰り返す問題クラスへの対処パターン
+- 他のコンテキストにも応用できる意思決定フレームワーク
+- メタふりかえりで発見したワークフロー改善
 
-Action routing:
-- **New skill needed** → Invoke `skill`
-- **Existing skill needs update** → Invoke `skill` on the relevant skill
-- **Nothing identified** → Proceed to Step 6
+アクション分岐：
+- **新スキルが必要** → `skill` を起動
+- **既存スキルの更新** → 該当スキルに対して `skill` を起動
+- **候補なし** → Step 6 に進む
 
 ```markdown
-## Skill-ization Check
+## スキル化候補チェック
 
-Candidates:
-- [Pattern/checklist name]: → skill / skill ([skill-name])
-- None identified this session
+候補：
+- [パターン名/チェックリスト名]: → skill / skill（[スキル名]）
+- 今回のセッションでは候補なし
 ```
 
-> **Why this matters**: Furikaeri surfaces know-how. Skills preserve it. Without this step, tacit knowledge is verbalized once and then lost. Closing the loop here turns individual learning into a reusable team asset.
+> **なぜ重要か**：ふりかえりはノウハウを表面化させる。スキルはそれを保存する。このステップなしでは、暗黙知は一度言語化されるだけで失われる。ここでループを閉じることで、個人の学びが再利用可能なチーム資産になる。
 
 > **Values**: 基礎と型 / 成長の複利 / 教える→広める→仕組み化
 
-### Step 6: Persist the Furikaeri Record
+### Step 6: ふりかえり記録の保存
 
-#### 6a: Register Actions as GitHub Issues
+#### 6a: アクションを GitHub Issue に登録
 
-Convert prioritized actions from Steps 3–4 into trackable execution items.
+優先したアクション項目を、追跡可能なIssueに変換する。
 
-1. Confirm whether each prioritized action should be turned into an issue.
-2. If yes, create an issue (or a draft) with SMART context (goal, definition of done, due date).
-3. Add the issue number to furikaeri notes, and in the created issue include a link (URL/path) back to the furikaeri note so links stay bidirectional.
+1. 各優先アクションについて「Issue化しますか？」を確認する。  
+2. はいの場合は、SMART文脈（目的・完了条件・期限）を含めてIssueを作成（またはIssue下書きを提示）する。  
+3. 発行したIssue番号をふりかえりノート側に記録し、Issue本文（またはコメント）にも当該ふりかえりノートへのリンク（URLやパス）を追記して相互参照にする。
 
 ```markdown
-## Action ↔ Issue Mapping
+## Action → Issue 対応
 
-| Action | Issue |
-|--------|-------|
-| Require API doc updates on API changes | #128 |
-| Standardize test timeout configuration | #129 |
+| Action (SMART) | Issue |
+|---|---|
+| PRチェックリストに「APIドキュメント更新」を追加（次スプリントまで） | #128 |
+| テストセットアップへタイムアウト設定を追加（今週中） | Draft: "Add timeout config to integration tests" |
 ```
 
-> **Action type routing**
-> - **Coding/process improvements** → Create a GitHub Issue (this step)
-> - **Skill/pattern/workflow improvements** → Invoke `skill` to update the relevant skill
+> **アクション種別による分岐**
+> - **コーディング・プロセスの改善** → GitHub Issue を作成（本ステップ）
+> - **skill・型・ワークフローの改善** → `skill` を起動して該当スキルを更新
 
-#### 6b: Save to Notion (RyoMurakami1983 only)
+#### 6b: Notion へ保存（RyoMurakami1983 のみ）
 
-> **Applies to**: sessions where `metadata.author == "RyoMurakami1983"` (i.e., this skills_repository).
-> Skip this step in other contexts.
+> **適用条件**: `metadata.author == "RyoMurakami1983"` のセッション（このskills_repository）のみ。
+> その他のコンテキストではこのステップをスキップする。
 
-Save the furikaeri record using **`notion-safe-operations`**.
+ふりかえり内容は **`notion-safe-operations`** を使って保存する。
 
-> **Why this routing?** Notion tool availability may differ by session/agent/model. The base skill enforces preflight checks, secure DS ID handling, and deterministic fallback payloads.
+> **なぜこの分岐？** Notionツールの可用性はセッション/エージェント/モデルで変動する。基盤スキルに集約することで、Preflight確認・DS ID安全管理・失敗時フォールバックを一貫運用できる。
 
-> **DS ID policy**: Use local environment variables (for example, `NOTION_FURIKAERI_DS_ID`) or local agent config. Do **not** commit real UUIDs.
+> **DS ID 運用方針**: `NOTION_FURIKAERI_DS_ID` などのローカル環境変数、またはローカル設定を使う。実UUIDをリポジトリへコミットしない。
 
-Map KPT/YWT outputs to database fields:
+KPT/YWT のアウトプットをフィールドにマッピングする:
 
-| Notion Field | Content |
+| Notion フィールド | 内容 |
 |---|---|
-| `タイトル` | Session title (concise, describes what was done) |
-| `セッション日時` | Session date (`YYYY-MM-DD`) |
+| `タイトル` | セッションタイトル（何をしたか簡潔に） |
+| `セッション日時` | セッション日付（`YYYY-MM-DD`） |
 | `ステータス` | `完了` |
-| `実施内容` | Numbered list of what was done (from Step 1 story) |
-| `学び・気づき` | Keep items + new insights (from Step 2) |
-| `課題・問題点` | Problem items (from Step 2) |
-| `次回アクション` | SMART goals + Issue numbers (from Steps 3–4 + 6a) |
-| `関連タグ` | JSON array — choose from: `["開発", "デバッグ", "設計", "テスト", "レビュー", "リファクタリング", "ドキュメント", "会議", "学習"]` |
+| `実施内容` | Step 1 のストーリーを番号付きリストで |
+| `学び・気づき` | Keep 項目 + 新しい気づき（Step 2 から） |
+| `課題・問題点` | Problem 項目（Step 2 から） |
+| `次回アクション` | SMART 目標 + Issue 番号（Steps 3–4 + 6a から） |
+| `関連タグ` | JSON 配列 — 選択肢: `["開発", "デバッグ", "設計", "テスト", "レビュー", "リファクタリング", "ドキュメント", "会議", "学習"]` |
 
-Invoke `notion-safe-operations` and pass this mapped content into the create-page payload.
+`notion-safe-operations` を呼び出し、上記マッピング済みコンテンツを create-page payload に渡す。
 
-Use when finishing any furikaeri in this workspace or team context. Enables long-term trend tracking.
+> **なぜ？** — GitHub Issue は「次にやること」の追跡に強く、Notion は「時系列のふりかえりログ」として長期トレンドの把握に強い。両方を使うことで、実行管理と成長記録を分離できる。
 
-> **Completion gate (default)**: Do not end a furikaeri after Step 5 alone. Treat the session as complete only when **both** of the following are done:
-> 1. Prioritized actions are converted into GitHub Issues (or explicitly declined with a reason) in **Step 6a**
-> 2. The furikaeri record is saved in Notion when **Step 6b** applies
+> **完了ゲート（既定）**: Step 5 の分析だけでセッションを終えないこと。ふりかえりは、次の2つが完了して初めて「完了」とみなす。
+> 1. **Step 6a** で優先アクションを GitHub Issue に変換する（または作成しない理由を明示する）
+> 2. **Step 6b** が適用されるコンテキストでは Notion に記録を保存する
 >
-> If Step 6b does not apply in the current context, still finish Step 6a and explicitly record where the retrospective note will live.
+> Step 6b が適用されない場合でも、Step 6a を終えたうえで「ふりかえりノートをどこに残すか」を明示する。
 
 > **Values**: 継続は力 / 成長の複利 / 基礎と型
 
 ### Step 7: Anonymization Gate (Before Output)
 
-If the furikaeri content may flow into a public skill or reference, apply the `knowledge-capture` **Anonymization Checklist** (AC-1 through AC-4) before committing. Replace project names, data formats, domain terms, and numeric values with generic equivalents.
+ふりかえり内容が公開スキルや共有ドキュメントに流れる可能性がある場合は、`knowledge-capture` の **Anonymization Checklist**（AC-1〜AC-4）を適用してから出力する。プロジェクト固有名、データ形式、業務ドメイン語、具体的な数値は一般化する。
 
 > **Values**: ニュートラルな視点（固有データの漏洩を入口で防ぐ）
 
 ---
 
-## Best Practices
+## ベストプラクティス
 
-- Keep furikaeri under 10 minutes for solo sessions
-- Use KPT for problem-focused sessions, YWT for learning-focused ones
-- Write down action items immediately — don't rely on memory
-- Link action items to GitHub Issues for tracking
-- Treat **Issue creation + note persistence** as the default finish line, not optional cleanup
-- Review previous furikaeri notes before starting a new one
+- ソロセッションのふりかえりは10分以内に収める
+- 問題解決型のセッションにはKPT、学習型のセッションにはYWTを使う
+- アクション項目はすぐに書き留める — 記憶に頼らない
+- アクション項目をGitHub Issueに紐づけて追跡する
+- **Issue化 + 記録保存** を既定の終了条件とし、後片付け扱いにしない
+- 新しいふりかえりを始める前に、前回のふりかえりノートを読む
 
-## Common Pitfalls
+## よくある失敗
 
-1. **Skipping the story step**
-   Fix: Always start with facts. Analysis without context leads to wrong conclusions.
+1. **ストーリーステップを飛ばす**
+   対策: 必ず事実から始める。文脈なしの分析は誤った結論を招く。
 
-2. **Too many action items**
-   Fix: Pick 1–3 items maximum. Better to finish 1 than abandon 5.
+2. **アクション項目が多すぎる**
+   対策: 最大3項目に絞る。5つ放置するより1つ完了する方がよい。
 
-3. **Vague Try items**
-   Fix: Convert to SMART goals. "Be more careful" is not actionable.
+3. **Tryが曖昧**
+   対策: SMART目標に変換する。「もっと気をつける」はアクションではない。
 
-4. **Blame-oriented Problems**
-   Fix: Focus on process and tools, not people. "The process allowed X" not "Person did X."
+4. **犯人探しのProblem**
+   対策: プロセスとツールに注目する。「〇〇さんがミスした」ではなく「プロセスがXを許容した」。
 
-5. **Never reviewing past furikaeri**
-   Fix: Spend 1 minute reading the previous session's notes before starting.
+5. **過去のふりかえりを見返さない**
+   対策: 開始前に前回のノートを1分だけ読む。
 
-6. **Stopping after analysis**
-   Fix: Do not finish at Step 5. Close the loop with Issue registration and note persistence in Step 6.
+6. **分析で終わってしまう**
+   対策: Step 5 で止めず、Step 6 の Issue化と記録保存まで回してループを閉じる。
 
-## Anti-Patterns
+## アンチパターン
 
-- Treating furikaeri as a status report (it's about improvement, not reporting)
-- Only doing furikaeri when things go wrong (good sessions have lessons too)
-- Skipping "furikaeri the furikaeri" (the meta-step drives long-term improvement)
-- Writing action items but never following up
+- ふりかえりをステータスレポートにする（改善のためのもので、報告のためではない）
+- 問題が起きたときだけふりかえる（良いセッションにも学びがある）
+- 「ふりかえりのふりかえり」を飛ばす（メタステップが長期改善を駆動する）
+- アクション項目を書いてフォローアップしない
 
 ---
 
-## Quick Reference
+## クイックリファレンス
 
-### KPT Template
+### KPT テンプレート
 
 ```markdown
-## KPT — [Date/Session]
+## KPT — [日付/セッション名]
 
 ### Keep
 - 
@@ -366,83 +364,82 @@ If the furikaeri content may flow into a public skill or reference, apply the `k
 - 
 
 ### Try
-- (← K) Keep strengthening idea
-- (← P) Problem kaizen idea
+- (← K) Keep強化案
+- (← P) Problemカイゼン案
 
-### Priority (top 1-3)
+### 優先項目（上位1-3）
 1. 
 
-### Action (SMART)
+### アクション（SMART）
 - 
 
-### Meta
-- Next furikaeri change: 
+### メタ
+- 次回のふりかえり改善点: 
 
-### Skill-ization Check
-- Candidate: 
+### スキル化候補チェック
+- 候補: 
 ```
 
-### YWT Template
+### YWT テンプレート
 
 ```markdown
-## YWT — [Date/Session]
+## YWT — [日付/セッション名]
 
-### Y (What I Did)
+### Y（やったこと）
 - 
 
-### W (What I Learned)
+### W（わかったこと）
 - 
 
-### T (What To Do Next)
+### T（つぎにやること）
 - 
 
-### Priority (top 1-3)
+### 優先項目（上位1-3）
 1. 
 
-### Action (SMART)
+### アクション（SMART）
 - 
 
-### Meta
-- Next furikaeri change: 
+### メタ
+- 次回のふりかえり改善点: 
 
-### Skill-ization Check
-- Candidate: 
+### スキル化候補チェック
+- 候補: 
 ```
 
-### Decision Table
+### 判断テーブル
 
-| Situation | Framework | Why |
-|-----------|-----------|-----|
-| Problem-heavy session | KPT | Separates Keep from Problem clearly |
-| Learning-heavy session | YWT | Focuses on what was discovered |
-| Root cause unclear | KPT + 5 Whys | Drills into systemic issues |
-| First furikaeri ever | KPT | Simpler, more intuitive |
+| 状況 | フレームワーク | 理由 |
+|------|-------------|------|
+| 問題が多いセッション | KPT | KeepとProblemを明確に分離できる |
+| 学びが多いセッション | YWT | 発見したことに焦点を当てられる |
+| 根本原因が不明 | KPT + 5つのなぜ | システム的な問題を掘り下げられる |
+| 初めてのふりかえり | KPT | よりシンプルで直感的 |
 
 ---
 
 ## FAQ
 
-**Q: How long should a furikaeri take?**
-A: 5–10 minutes for a solo AI session. 15–30 minutes for a team session.
+**Q: ふりかえりにはどのくらい時間をかけるべき？**
+A: AI とのソロセッションなら5〜10分。チームセッションなら15〜30分。
 
-**Q: KPT or YWT — which is better?**
-A: KPT for problem-solving sessions, YWT for learning-focused ones. Try both and see what fits.
+**Q: KPT と YWT、どちらが良い？**
+A: 問題解決型のセッションにはKPT、学習型にはYWT。両方試して合うものを選ぶ。
 
-**Q: Do I need to do all 7 steps every time?**
-A: In most sessions, treat Steps 1–3, 5, and 6 as the default path. Step 4 (5 Whys + SMART) is for complex or recurring problems, and Step 7 (Anonymization Gate) is required only when content may be published/shared. In practice, do not consider the furikaeri complete until Step 6 is finished.
+**Q: 毎回7ステップ全部やる必要がある？**
+A: 基本は Step 1〜3・Step 5・Step 6 を実施する。Step 4（5つのなぜ + SMART）は複雑/再発問題のときに使い、Step 7（Anonymization Gate）は公開・共有に流れる可能性がある場合のみ必須。実務上は Step 6 が終わるまで、ふりかえり完了とはみなさない。
 
-**Q: What if nothing went wrong?**
-A: Great sessions still have Keep items and Try items. "What could be even better?" always yields insights.
+**Q: 何も問題がなかったら？**
+A: 良いセッションにもKeep項目やTry項目がある。「もっと良くするには？」は必ず何かを生む。
 
-**Q: Should I store furikaeri notes somewhere?**
-A: Yes. For `RyoMurakami1983` sessions, save to your designated private Notion database for furikaeri logs via Step 6b. For other contexts, create GitHub Issues for follow-up actions and keep the retrospective note in a durable place (for example, a project note or agreed team workspace). Do not treat the session as done until action tracking and note storage are both handled.
+**Q: ふりかえりノートはどこに保存する？**
+A: `RyoMurakami1983` のセッションでは Step 6b で自分専用のプライベート Notion ふりかえりログ DB に保存する。その他のコンテキストでは、フォローアップ用 GitHub Issue を作成したうえで、ふりかえりノート本体をプロジェクトノートや合意済みのチーム保存先に残す。アクション追跡と記録保存の両方が済むまでは、セッションを完了扱いにしない。
 
 ---
 
-## Resources
+## 参考文献
 
-- Esther Derby & Diana Larsen, *Agile Retrospectives*
+- Esther Derby & Diana Larsen, *Agile Retrospectives*（アジャイルレトロスペクティブズ）
 - https://www.funretrospectives.com
-- Toyota Production System — 5 Whys
+- トヨタ生産方式 — 5つのなぜ
 - George T. Doran, "There's a S.M.A.R.T. Way to Write Management Goals and Objectives"
-

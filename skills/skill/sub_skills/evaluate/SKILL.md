@@ -1,7 +1,7 @@
 ---
 name: evaluate
 description: >
-  baseline / legacy / current を比較し、skill の行動変化を測定する。こんなときに使う:
+  baseline / legacy / current を比較し、skill の行動変化を測定する。Use when:
   trigger 精度、出力品質、回帰リスクを実証的に確認したいとき。
 compatibility: "_eval/agents/, _eval/scripts/, _eval/schemas/"
 ---

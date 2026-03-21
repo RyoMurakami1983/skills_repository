@@ -155,7 +155,7 @@
 ```markdown
 ---
 name: "{role}"
-description: "Use when {trigger context}. Handles {specific task}."
+description: "Use when: {trigger context}. Handles {specific task}."
 tools:
   - read
   - edit

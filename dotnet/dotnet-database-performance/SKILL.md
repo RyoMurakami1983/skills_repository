@@ -2,7 +2,7 @@
 name: dotnet-database-performance
 description: >
   Optimize .NET database access with CQRS read/write separation, N+1 prevention,
-  AsNoTracking, row limits, and SQL-side joins. Use when designing data access layers,
+  AsNoTracking, row limits, and SQL-side joins. Use when: designing data access layers,
   optimizing slow queries, or choosing between EF Core and Dapper.
 license: MIT
 metadata:

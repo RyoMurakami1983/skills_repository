@@ -2,7 +2,7 @@
 name: dotnet-crap-analysis
 description: >
   Analyze code coverage and CRAP (Change Risk Anti-Patterns) scores to identify
-  high-risk .NET code. Use when evaluating test coverage, setting up OpenCover
+  high-risk .NET code. Use when: evaluating test coverage, setting up OpenCover
   with ReportGenerator, or enforcing coverage thresholds in CI/CD pipelines.
 metadata:
   author: RyoMurakami1983

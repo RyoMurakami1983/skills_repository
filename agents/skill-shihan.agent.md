@@ -96,17 +96,17 @@ skill-shihan がオーナーとして品質管理を担当する。
 - **SKILL.md** のトップレベル許可キー: `name`, `description`, `compatibility`（必要時のみ）
 - **agent.md** のトップレベル許可キー: `name`, `description`, `tools`（エージェント専用）
 - `metadata:` ブロック（author/tags/invocable/tool_versions 等）は**廃止**
-- `description` ≤1024文字、"Use when" トリガーフレーズ必須（W7 警告: ≥80文字、action verb、capability列挙）
+- `description` ≤1024文字、`Use when:` トリガーラベル必須（W7 警告: ≥80文字、action verb、capability列挙）
 
 ### 構造
 - 500行以内（超過分は `references/` へ分離）
 - 標準H2構造: When to Use → Core Principles → Workflow/Patterns → Pitfalls → Anti-Patterns → Quick Reference
-- `references/SKILL.ja.md` 必須（EN/JA構造パリティ）
+- `references/` は overflow docs 用の任意ディレクトリとし、`references/SKILL.ja.md` は前提にしない
 - 運用リスクがあるスキルは Preflight / Self-Review / Troubleshooting を含める
 
 ### Values
 - 全Workflow StepにValues blockquote
-- "Use when..." ガイダンスを独立した文として記述
+- `Use when:` ガイダンスを独立した文として記述
 
 ### バリデーション
 - `uv run python skills/skill/_eval/scripts/validate_skill.py <path>` で Critical 全PASS
@@ -120,9 +120,9 @@ skill-shihan がオーナーとして品質管理を担当する。
 
 - [ ] フロントマター: 非標準キーなし（version等）
 - [ ] `compatibility` は実在する制約がある場合のみ
-- [ ] description: "Use when" トリガーフレーズあり
+- [ ] description に `Use when:` トリガーフレーズあり
 - [ ] 500行以内（超過は references/ に分離済み）
-- [ ] references/SKILL.ja.md 存在、EN/JA構造パリティ
+- [ ] `references/` は補助資料が必要な場合のみ存在し、`SKILL.md` 単体で正本として読める
 - [ ] 全StepにValues blockquote
 - [ ] 運用リスクがある場合、Preflight / Self-Review / Troubleshooting がある
 - [ ] コードブロック: コンパイル可能 or 明示的に擬似コード

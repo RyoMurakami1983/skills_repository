@@ -1,7 +1,7 @@
 ---
 name: skill
 description: >
-  スキルの作成・改善・検証・評価を 1 つの入口にまとめる。こんなときに使う:
+  スキルの作成・改善・検証・評価を 1 つの入口にまとめる。Use when:
   新しいスキルを作りたいとき、公開済みスキルを改善したいとき、品質や効果を確認したいとき、関連スキル群をまとめて設計したいとき。
 compatibility: GitHub Copilot Agent, Claude Code, Codex
 ---

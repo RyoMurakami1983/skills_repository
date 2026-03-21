@@ -1,6 +1,6 @@
 ---
 name: typescript-setup-dev-environment
-description: Set up a reproducible TypeScript dev environment with Node.js, npm, ESLint, Prettier, and Jest. Use when starting a new TypeScript project or standardizing team tooling.
+description: Set up a reproducible TypeScript dev environment with Node.js, npm, ESLint, Prettier, and Jest. Use when: starting a new TypeScript project or standardizing team tooling.
 metadata:
   author: RyoMurakami1983
   tags: [typescript, nodejs, npm, eslint, prettier, jest, vscode]

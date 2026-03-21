@@ -3,7 +3,7 @@ name: dotnet-type-design-performance
 description: >
   Design .NET types for performance with sealed classes, readonly structs,
   static functions, deferred enumeration, and immutable collections.
-  Use when designing new types, reviewing performance, or choosing between class/struct/record.
+  Use when: designing new types, reviewing performance, or choosing between class/struct/record.
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, csharp, performance, type-design, sealed, readonly-struct, collections]

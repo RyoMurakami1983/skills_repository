@@ -4,7 +4,7 @@ description: >
   Approve rendered output, API surfaces, HTTP responses, and serialized objects
   using Verify snapshot testing in .NET. Captures output as human-reviewed baselines
   and detects unintended changes through diff comparison.
-  Use when validating complex output where manual assertions are impractical.
+  Use when: validating complex output where manual assertions are impractical.
 metadata:
   author: RyoMurakami1983
   tags: [verify, snapshot-testing, xunit, dotnet, api-approval, email-testing, regression]

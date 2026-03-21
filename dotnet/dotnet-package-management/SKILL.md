@@ -2,7 +2,7 @@
 name: dotnet-package-management
 description: >
   Manage NuGet packages using Central Package Management (CPM) and dotnet CLI commands.
-  Use when adding, removing, updating, or centralizing NuGet package versions across .NET projects.
+  Use when: adding, removing, updating, or centralizing NuGet package versions across .NET projects.
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, nuget, cpm, package-management, cli]

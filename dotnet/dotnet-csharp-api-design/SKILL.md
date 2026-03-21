@@ -2,7 +2,7 @@
 name: dotnet-csharp-api-design
 description: >
   Design stable, compatible public APIs for NuGet packages and distributed systems.
-  Use when planning API surfaces, managing breaking changes, implementing wire compatibility,
+  Use when: planning API surfaces, managing breaking changes, implementing wire compatibility,
   or reviewing pull requests for API compatibility issues.
 metadata:
   author: RyoMurakami1983

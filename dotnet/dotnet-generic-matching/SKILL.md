@@ -1,6 +1,6 @@
 ---
 name: dotnet-generic-matching
-description: Use when you need generic weighted field matching with scoring in a .NET Domain layer.
+description: Use when: you need generic weighted field matching with scoring in a .NET Domain layer.
 license: MIT
 metadata:
   author: RyoMurakami1983
