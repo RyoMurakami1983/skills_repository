@@ -120,7 +120,7 @@ skill-shihan がオーナーとして品質管理を担当する。
 
 - [ ] フロントマター: 非標準キーなし（version等）
 - [ ] `compatibility` は実在する制約がある場合のみ
-- [ ] description: "Use when" トリガーフレーズあり
+- [ ] description に `Use when:` トリガーフレーズあり
 - [ ] 500行以内（超過は references/ に分離済み）
 - [ ] `references/` は補助資料が必要な場合のみ存在し、`SKILL.md` 単体で正本として読める
 - [ ] 全StepにValues blockquote
