@@ -1,0 +1,243 @@
+{
+  "run_id": "run-20260321-003",
+  "responses": {
+    "baseline": {
+      "tc-001": "新規 skill 作成の相談なので、まずは sub_skills/new が適切です。いきなり実装に入る前に、目的・利用場面・期待する成果を整理するのが次の一手です。",
+      "tc-002": "既存 skill 群の見直しと再編の相談なので、主 route は sub_skills/improve が適切です。既存資産を前提に、管理・基盤系スキルファミリーの段階的な再編方針を固めるのがよいです。",
+      "tc-003": "既存の github-issue-intake を改善したい依頼なので、sub_skills/improve が適切です。今回の有効だった方法を再利用できる形で取り込み、改善点を整理して反映する流れがよいです。",
+      "tc-004": "これは section 構成への設計レビューなので、sub_skills/improve で扱うのが自然です。When to Use This Skill と全体の構成を見直し、文脈を失わない分割方針に修正するのが次の一手です。",
+      "tc-005": "これは公開前の品質ゲート確認なので、sub_skills/validate が適切です。references への分離方針も含めて、公開可能かどうかを validate する流れがよいです。",
+      "tc-006": "既存 skill の運用方針修正なので、sub_skills/improve が適切です。skill_jp.md へ日本語を集約する前提で、既存 skill との同期方針を整理して反映するのがよいです。",
+      "tc-007": "これは新規作成や改修というより、命名・taxonomy・governance の相談です。4 route に無理に寄せず、skill 名の命名規則と分類原則を先に決めるのが適切です。",
+      "tc-008": "今は skill 作成より先に git-init-to-github のような初期化対応が適切です。まず Git と GitHub の土台を整え、その後に skill 作成へ進むのが自然です。",
+      "tc-009": "これは skill router の対象ではなく、PowerPoint 作成支援の別ドメイン依頼です。meta skill の話ではないので out-of-scope として切り分けるのが適切です。",
+      "tc-010": "これは behavioral evaluation の依頼なので、sub_skills/evaluate が適切です。baseline / legacy / current を比較し、benchmark_summary.json と viewer.html まで確認する流れがよいです。"
+    },
+    "legacy": {
+      "tc-001": "Route: `sub_skills/new`。まず目的、利用場面、トリガー条件、出力形を確認し、既存と重複しない新規 skill として下書きを始めます。",
+      "tc-002": "Route: `sub_skills/improve`。既存 skills の再編として扱い、管理・基盤系ファミリーの構造と命名を揃えながら段階的に改善します。",
+      "tc-003": "Route: `sub_skills/improve`。`github-issue-intake` の既存 guidance を、今回の有効だった方法を再利用できる形に整理して改善します。",
+      "tc-004": "Route: `sub_skills/improve`。section 構成の問題として扱い、`When to Use This Skill` と他 section の役割を整理して文脈が切れない構成に見直します。",
+      "tc-005": "Route: `sub_skills/validate`。公開前の品質ゲートとして扱い、references への移動方針も含めて L1-L2 を確認し、公開可否を判定します。",
+      "tc-006": "Route: `sub_skills/improve`。既存 skill の JP/EN 同期改善として、`skill_jp.md` への日本語集約方針を反映し、関連参照もそろえます。",
+      "tc-007": "これは 4 route に無理に入れず、まず命名規則と taxonomy の相談として扱います。skill- / dotnet- / python- の切り方を、対象ドメインと discoverability 基準で決めるのが次アクションです。",
+      "tc-008": "先に `git-init-to-github` を使うのが適切です。Git/GitHub 初期化を済ませ、その後 に skill 化すべき workflow が固まった段階で新規 skill 作成へ進みます。",
+      "tc-009": "これは skill router ではなく out-of-scope です。pptx でのポスター作成支援という別ドメイン依頼として扱い、対応する作業手順や専用 skill を検討します。",
+      "tc-010": "Route: `sub_skills/evaluate`。baseline / legacy / current の同条件比較を設計し、集計後に `benchmark_summary.json` と `viewer.html` を生成して差分を確認します。"
+    },
+    "current": {
+      "tc-001": "route: `sub_skills/new/`。まず目的・トリガー・成功条件を整理し、曖昧な新規依頼として要件を固めてから草案化します。",
+      "tc-002": "route: `sub_skills/improve/`。既存 skill 群の再編として扱い、管理・基盤系ファミリーを段階的に再編しながら guidance と構造を磨きます。",
+      "tc-003": "route: `sub_skills/improve/`。`github-issue-intake` の既存 skill を、今回の有効だったノウハウを再利用できる形に一般化して改善します。",
+      "tc-004": "route: `sub_skills/improve/`。section 構成の改善として扱い、分割しすぎず文脈を保てる構成へ見直します。",
+      "tc-005": "route: `sub_skills/validate/`。公開前の品質ゲートとして、500〜550行超は references への退避も含めて確認し、公開可能かを L1-L4 で検証します。",
+      "tc-006": "route: `sub_skills/improve/`。既存 skill を、`skill_jp.md` への日本語集約方針に合わせて見直し、JP/EN guidance と references の同期を整えます。",
+      "tc-007": "この相談は4 routeに無理に入れず、命名と taxonomy の governance として先に整理します。まず prefix 方針と分類原則を決め、その後に各 skill 名へ反映します。",
+      "tc-008": "まずは `git-init-to-github` に route します。Git/GitHub 初期化を完了し、その後に skill 作成へ進むのが次アクションです。",
+      "tc-009": "これは skill ルーターでは out-of-scope です。pptx のポスター作成支援という別ドメイン依頼として扱います。",
+      "tc-010": "route: `sub_skills/evaluate/`。baseline / legacy / current を同条件で比較し、`benchmark_summary.json` を集計して `viewer.html` でレビューできる形まで進めます。"
+    }
+  },
+  "llm_grade": {
+    "baseline": {
+      "tc-001": [
+        {
+          "passed": true,
+          "detail": "新規依頼を新設ルートに回し要件確認も置けています。"
+        }
+      ],
+      "tc-002": [
+        {
+          "passed": true,
+          "detail": "既存群の再編として改善ルートに自然に載せています。"
+        }
+      ],
+      "tc-003": [
+        {
+          "passed": true,
+          "detail": "既存のnamed skill改修として改善ルートに接続できています。"
+        }
+      ],
+      "tc-004": [
+        {
+          "passed": true,
+          "detail": "section構成の批評として構造改善ルートを返せています。"
+        }
+      ],
+      "tc-005": [
+        {
+          "passed": false,
+          "detail": "品質ゲートの方向性はあるが検証手順の像が足りません。"
+        }
+      ],
+      "tc-006": [
+        {
+          "passed": false,
+          "detail": "既存修正の扱いはよいがJP/EN同期と参照整理が不足です。"
+        }
+      ],
+      "tc-007": [
+        {
+          "passed": true,
+          "detail": "4 routeに押し込まず命名とtaxonomyの相談だと示せています。"
+        }
+      ],
+      "tc-008": [
+        {
+          "passed": true,
+          "detail": "GitとGitHub初期化を先に置きskill作成を後段化できています。"
+        }
+      ],
+      "tc-009": [
+        {
+          "passed": true,
+          "detail": "meta skillに誤誘導せず別ドメイン依頼として扱えています。"
+        }
+      ],
+      "tc-010": [
+        {
+          "passed": true,
+          "detail": "評価ルートにつなぎbenchmarkとviewerの流れも示せています。"
+        }
+      ]
+    },
+    "legacy": {
+      "tc-001": [
+        {
+          "passed": true,
+          "detail": "新規依頼を新設ルートに回し確認項目も先に置けています。"
+        }
+      ],
+      "tc-002": [
+        {
+          "passed": true,
+          "detail": "既存群の段階的再編として改善ルートを主軸にできています。"
+        }
+      ],
+      "tc-003": [
+        {
+          "passed": true,
+          "detail": "既存のnamed skill改修として改善ルートに自然に接続できています。"
+        }
+      ],
+      "tc-004": [
+        {
+          "passed": true,
+          "detail": "section設計の見直しとして構造改善ルートを返せています。"
+        }
+      ],
+      "tc-005": [
+        {
+          "passed": true,
+          "detail": "品質ゲートとして検証観点まで添えて妥当に案内できています。"
+        }
+      ],
+      "tc-006": [
+        {
+          "passed": true,
+          "detail": "JP/EN同期と参照整理を伴う既存修正として扱えています。"
+        }
+      ],
+      "tc-007": [
+        {
+          "passed": true,
+          "detail": "4 routeに押し込まずgovernance相談だと明示できています。"
+        }
+      ],
+      "tc-008": [
+        {
+          "passed": true,
+          "detail": "GitとGitHub初期化を優先しskill作成を後段に整理できています。"
+        }
+      ],
+      "tc-009": [
+        {
+          "passed": true,
+          "detail": "skill語に引かれず別ドメインの依頼として切り分けられています。"
+        }
+      ],
+      "tc-010": [
+        {
+          "passed": true,
+          "detail": "評価ルートにつなぎ生成物までの道筋を示せています。"
+        }
+      ]
+    },
+    "current": {
+      "tc-001": [
+        {
+          "passed": true,
+          "detail": "新規依頼を新設ルートに回し成功条件の確認も置けています。"
+        }
+      ],
+      "tc-002": [
+        {
+          "passed": true,
+          "detail": "既存群の段階的再編として改善ルートを適切に返せています。"
+        }
+      ],
+      "tc-003": [
+        {
+          "passed": true,
+          "detail": "既存のnamed skill改修として改善ルートに自然に接続できています。"
+        }
+      ],
+      "tc-004": [
+        {
+          "passed": true,
+          "detail": "section構成の改善課題として構造改善ルートを返せています。"
+        }
+      ],
+      "tc-005": [
+        {
+          "passed": true,
+          "detail": "品質ゲートとして検証レベルまで示し妥当に案内できています。"
+        }
+      ],
+      "tc-006": [
+        {
+          "passed": true,
+          "detail": "JP/EN同期とreferences整理を伴う既存修正として扱えています。"
+        }
+      ],
+      "tc-007": [
+        {
+          "passed": true,
+          "detail": "4 routeに押し込まず命名とtaxonomyのgovernanceだと示せています。"
+        }
+      ],
+      "tc-008": [
+        {
+          "passed": true,
+          "detail": "GitとGitHub初期化を優先しskill作成を後段に整理できています。"
+        }
+      ],
+      "tc-009": [
+        {
+          "passed": true,
+          "detail": "meta skillに誤誘導せず別ドメイン依頼として扱えています。"
+        }
+      ],
+      "tc-010": [
+        {
+          "passed": true,
+          "detail": "評価ルートにつなぎbenchmarkとviewerの道筋を示せています。"
+        }
+      ]
+    }
+  },
+  "variant_meta": {
+    "baseline": {
+      "source_ref": "no-skill",
+      "skill_snapshot_hash": "NO_SKILL"
+    },
+    "legacy": {
+      "source_ref": "git:674fe58^ (skills/skill bilingual snapshot bundle)",
+      "skill_snapshot_hash": "5F1FC6ED30E3B38041D5D9FE86B7708C52371B6875AAE502B39CC379FFDC4E9A"
+    },
+    "current": {
+      "source_ref": "worktree:feature/baseline-legacy-current-eval@0ca35ef2882e7443514b8e36a6d8ac23602401b1",
+      "skill_snapshot_hash": "8E74F0AC31724946149BB4C98F6DA8C07D6D1F710F9F1B2763C0AD12919A553C"
+    }
+  }
+}

@@ -8,7 +8,7 @@
 
 - 元の test case（`id`、`prompt`、`assertions` を含む）
 - agent の応答本文
-- run mode（`with_skill` または `baseline`）
+- run variant（`baseline` / `legacy` / `current`。旧 `with_skill` は `current` の互換名）
 - `run_id`
 
 返す結果は `../schemas/schemas.md` に合う `grading_result.json` でなければなりません。
@@ -46,7 +46,8 @@ score = Σ(assertion.weight * (passed ? 1 : 0)) / Σ(assertion.weight)
 {
   "case_id": "<case.id>",
   "run_id": "<run_id>",
-  "mode": "<with_skill|baseline>",
+  "mode": "<baseline|legacy|current>",
+  "variant_id": "<baseline|legacy|current>",
   "score": 0.8750,
   "assertions": [
     {

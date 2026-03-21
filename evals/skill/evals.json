@@ -128,7 +128,7 @@
     },
     {
       "id": "tc-010",
-      "prompt": "このスキルが trigger quality を改善するか、with-skill と baseline で測りたいです。benchmark_summary.json と viewer.html まで見たいです。",
+      "prompt": "このスキルが trigger quality を改善するか、baseline / legacy / current で測りたいです。benchmark_summary.json と viewer.html まで見たいです。",
       "source": "synthetic-guard",
       "source_count": 0,
       "tags": ["meta", "evaluate", "benchmark", "behavior"],

@@ -28,6 +28,39 @@ def load_benchmark(evals_dir: Path, skill_id: str) -> dict:
         return json.load(f)
 
 
+def load_history(evals_dir: Path, skill_id: str) -> list[dict]:
+    """append-only の履歴 ledger を読み込む。"""
+    path = evals_dir / skill_id / "benchmark_history.jsonl"
+    if not path.exists():
+        return []
+
+    records: list[dict] = []
+    skipped = 0
+    for lineno, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        line = raw_line.strip()
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            records.append(json.loads(line))
+        except json.JSONDecodeError as exc:
+            skipped += 1
+            summary = raw_line.strip()
+            if len(summary) > 200:
+                summary = summary[:200] + "..."
+            print(
+                f"WARNING: Malformed JSON in {path} at line {lineno}: {exc} | {summary}",
+                file=sys.stderr,
+            )
+            continue
+    if skipped:
+        print(
+            f"WARNING: Skipped {skipped} malformed JSON line(s) while reading {path}",
+            file=sys.stderr,
+        )
+    return records
+
+
 def render(template: str, data: dict) -> str:
     """HTML template の data placeholder へ benchmark JSON を埋め込む。
 
@@ -73,6 +106,8 @@ def main() -> int:
     except FileNotFoundError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
+
+    data["history"] = load_history(evals_dir, args.skill_id)
 
     if not TEMPLATE_PATH.exists():
         print(f"ERROR: Viewer template not found: {TEMPLATE_PATH}", file=sys.stderr)

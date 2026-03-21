@@ -25,7 +25,7 @@ compatibility: GitHub Copilot Agent, Claude Code, Codex
 | 新しいスキルを作る | `sub_skills/new/` | 意図整理、制約調査、雛形作成、初期検証まで進める。 |
 | 既存スキルを改善する | `sub_skills/improve/` | 変更の種類を見極め、弱い guidance を削り、説明と metadata を磨く。 |
 | 品質を確認する | `sub_skills/validate/` | L1-L4 の順で検証し、どこが出荷の妨げかを明確にする。 |
-| 効果を測定する | `sub_skills/evaluate/` | ケース設計、with-skill / baseline 比較、集計、次アクション判定を行う。 |
+| 効果を測定する | `sub_skills/evaluate/` | ケース設計、baseline / legacy / current 比較、集計、次アクション判定を行う。 |
 | スキル群をまとめて作る | `sub_skills/new/` | バッチモードで命名と相互参照をそろえる。 |
 
 ## 共通リソース

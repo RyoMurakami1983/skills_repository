@@ -1,15 +1,23 @@
 {
   "skill_id": "skill",
   "eval_version": "1.0.0",
-  "runs": {
-    "with_skill": {
+  "campaign_id": "skill-ja-impact-20260321",
+  "variants": {
+    "baseline": {
       "count": 10,
-      "mean": 0.9342,
-      "stddev": 0.1974,
-      "min": 0.3421,
+      "mean": 0.9474,
+      "stddev": 0.1053,
+      "min": 0.7368,
       "max": 1.0
     },
-    "baseline": {
+    "current": {
+      "count": 10,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    },
+    "legacy": {
       "count": 10,
       "mean": 1.0,
       "stddev": 0.0,
@@ -17,10 +25,64 @@
       "max": 1.0
     }
   },
+  "runs": {
+    "baseline": {
+      "count": 10,
+      "mean": 0.9474,
+      "stddev": 0.1053,
+      "min": 0.7368,
+      "max": 1.0
+    },
+    "current": {
+      "count": 10,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    },
+    "legacy": {
+      "count": 10,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    },
+    "with_skill": {
+      "count": 10,
+      "mean": 1.0,
+      "stddev": 0.0,
+      "min": 1.0,
+      "max": 1.0
+    }
+  },
+  "comparisons": {
+    "current_vs_legacy": {
+      "lhs": "current",
+      "rhs": "legacy",
+      "delta": 0.0,
+      "improvement_pct": 0.0,
+      "verdict": "neutral"
+    },
+    "current_vs_baseline": {
+      "lhs": "current",
+      "rhs": "baseline",
+      "delta": 0.0526,
+      "improvement_pct": 5.55,
+      "verdict": "improved"
+    },
+    "legacy_vs_baseline": {
+      "lhs": "legacy",
+      "rhs": "baseline",
+      "delta": 0.0526,
+      "improvement_pct": 5.55,
+      "verdict": "improved"
+    }
+  },
   "summary": {
-    "delta": -0.0658,
-    "improvement_pct": -6.58,
-    "verdict": "degraded"
+    "delta": 0.0,
+    "improvement_pct": 0.0,
+    "verdict": "neutral",
+    "primary_comparison": "current_vs_legacy"
   },
   "case_breakdown": [
     {
@@ -32,47 +94,214 @@
         "underspecified",
         "router"
       ],
-      "with_skill_mean": 1.0,
+      "variant_results": {
+        "baseline": {
+          "score": 1.0,
+          "response_snippet": "新規 skill 作成の相談なので、まずは sub_skills/new が適切です。いきなり実装に入る前に、目的・利用場面・期待する成果を整理するのが次の一手です。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "新規依頼を新設ルートに回し要件確認も置けています。"
+            }
+          ]
+        },
+        "legacy": {
+          "score": 1.0,
+          "response_snippet": "Route: `sub_skills/new`。まず目的、利用場面、トリガー条件、出力形を確認し、既存と重複しない新規 skill として下書きを始めます。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "新規依頼を新設ルートに回し確認項目も先に置けています。"
+            }
+          ]
+        },
+        "current": {
+          "score": 1.0,
+          "response_snippet": "route: `sub_skills/new/`。まず目的・トリガー・成功条件を整理し、曖昧な新規依頼として要件を固めてから草案化します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "新規依頼を新設ルートに回し成功条件の確認も置けています。"
+            }
+          ]
+        }
+      },
       "baseline_mean": 1.0,
+      "legacy_mean": 1.0,
+      "current_mean": 1.0,
+      "with_skill_mean": 1.0,
+      "primary_mean": 1.0,
+      "reference_mean": 1.0,
       "delta": 0.0,
+      "current_vs_legacy_delta": 0.0,
+      "current_vs_baseline_delta": 0.0,
+      "legacy_vs_baseline_delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
           "value": "sub_skills/new",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "目的",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/evaluate",
           "weight": 0.6,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "llm_grade",
           "value": "曖昧な新規 skill 作成依頼を `sub_skills/new` にルーティングし、いきなり作り切る前に目的や要件の確認を置けているか",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": "新規依頼を新設ルートに回し要件確認も置けています。"
+            },
+            "current": {
+              "passed": true,
+              "detail": "新規依頼を新設ルートに回し成功条件の確認も置けています。"
+            },
+            "legacy": {
+              "passed": true,
+              "detail": "新規依頼を新設ルートに回し確認項目も先に置けています。"
+            }
+          },
           "baseline_passed": true,
-          "detail": "新規 skill 作成依頼を `sub_skills/new` にルーティングし、目的整理を先に置いている。"
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
+          "detail": "新規依頼を新設ルートに回し確認項目も先に置けています。"
         }
       ],
-      "with_skill_snippet": "Route: sub_skills/new. 承知しました。新しいskillの実装として扱うので、まず目的・トリガー・出力を整理してからドラフト化します。",
-      "baseline_snippet": "Route: sub_skills/new. 新しいskillの作成依頼として扱うのが適切です。まず目的・対象タスク・出力イメージを確認してから設計に入ります。",
+      "current_snippet": "route: `sub_skills/new/`。まず目的・トリガー・成功条件を整理し、曖昧な新規依頼として要件を固めてから草案化します。",
+      "with_skill_snippet": "route: `sub_skills/new/`。まず目的・トリガー・成功条件を整理し、曖昧な新規依頼として要件を固めてから草案化します。",
+      "legacy_snippet": "Route: `sub_skills/new`。まず目的、利用場面、トリガー条件、出力形を確認し、既存と重複しない新規 skill として下書きを始めます。",
+      "baseline_snippet": "新規 skill 作成の相談なので、まずは sub_skills/new が適切です。いきなり実装に入る前に、目的・利用場面・期待する成果を整理するのが次の一手です。",
       "gap_summary": [],
-      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+      "recommendation": "基準版も十分な回答を生成できています。汎用知識で対応可能なケースです。",
+      "reference_variant": "legacy",
+      "primary_comparison": "current_vs_legacy"
     },
     {
       "case_id": "tc-002",
@@ -83,55 +312,256 @@
         "refactor",
         "skill-family"
       ],
-      "with_skill_mean": 1.0,
+      "variant_results": {
+        "baseline": {
+          "score": 1.0,
+          "response_snippet": "既存 skill 群の見直しと再編の相談なので、主 route は sub_skills/improve が適切です。既存資産を前提に、管理・基盤系スキルファミリーの段階的な再編方針を固めるのがよいです。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "既存群の再編として改善ルートに自然に載せています。"
+            }
+          ]
+        },
+        "legacy": {
+          "score": 1.0,
+          "response_snippet": "Route: `sub_skills/improve`。既存 skills の再編として扱い、管理・基盤系ファミリーの構造と命名を揃えながら段階的に改善します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "既存群の段階的再編として改善ルートを主軸にできています。"
+            }
+          ]
+        },
+        "current": {
+          "score": 1.0,
+          "response_snippet": "route: `sub_skills/improve/`。既存 skill 群の再編として扱い、管理・基盤系ファミリーを段階的に再編しながら guidance と構造を磨きます。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "既存群の段階的再編として改善ルートを適切に返せています。"
+            }
+          ]
+        }
+      },
       "baseline_mean": 1.0,
+      "legacy_mean": 1.0,
+      "current_mean": 1.0,
+      "with_skill_mean": 1.0,
+      "primary_mean": 1.0,
+      "reference_mean": 1.0,
       "delta": 0.0,
+      "current_vs_legacy_delta": 0.0,
+      "current_vs_baseline_delta": 0.0,
+      "legacy_vs_baseline_delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
           "value": "sub_skills/improve",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "既存",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "再編",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/new",
           "weight": 0.7,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "llm_grade",
           "value": "既存 skill 群の構造整理・段階的改善として扱い、`sub_skills/improve` を主 route にできているか",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": "既存群の再編として改善ルートに自然に載せています。"
+            },
+            "current": {
+              "passed": true,
+              "detail": "既存群の段階的再編として改善ルートを適切に返せています。"
+            },
+            "legacy": {
+              "passed": true,
+              "detail": "既存群の段階的再編として改善ルートを主軸にできています。"
+            }
+          },
           "baseline_passed": true,
-          "detail": "既存 skill family の構造改善として `sub_skills/improve` に正しく接続している。"
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
+          "detail": "既存群の段階的再編として改善ルートを主軸にできています。"
         }
       ],
-      "with_skill_snippet": "Route: sub_skills/improve. これは既存skillsの改善案件として進めるのが適切です。@local_reference_skills\\ を根拠に、管理・基盤系スキルファミリーの段階的な再編と品質向上を進めます。",
-      "baseline_snippet": "Route: sub_skills/improve. 既存skillsの段階的な再編・品質改善なので、改善ルートで進めるのが自然です。@local_reference_skills\\ を根拠に、既存資産の整理方針とファミリー構造を見直しましょう。",
+      "current_snippet": "route: `sub_skills/improve/`。既存 skill 群の再編として扱い、管理・基盤系ファミリーを段階的に再編しながら guidance と構造を磨きます。",
+      "with_skill_snippet": "route: `sub_skills/improve/`。既存 skill 群の再編として扱い、管理・基盤系ファミリーを段階的に再編しながら guidance と構造を磨きます。",
+      "legacy_snippet": "Route: `sub_skills/improve`。既存 skills の再編として扱い、管理・基盤系ファミリーの構造と命名を揃えながら段階的に改善します。",
+      "baseline_snippet": "既存 skill 群の見直しと再編の相談なので、主 route は sub_skills/improve が適切です。既存資産を前提に、管理・基盤系スキルファミリーの段階的な再編方針を固めるのがよいです。",
       "gap_summary": [],
-      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+      "recommendation": "基準版も十分な回答を生成できています。汎用知識で対応可能なケースです。",
+      "reference_variant": "legacy",
+      "primary_comparison": "current_vs_legacy"
     },
     {
       "case_id": "tc-003",
@@ -142,55 +572,256 @@
         "named-skill",
         "evidence-driven"
       ],
-      "with_skill_mean": 1.0,
+      "variant_results": {
+        "baseline": {
+          "score": 1.0,
+          "response_snippet": "既存の github-issue-intake を改善したい依頼なので、sub_skills/improve が適切です。今回の有効だった方法を再利用できる形で取り込み、改善点を整理して反映する流れがよいです。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "既存のnamed skill改修として改善ルートに接続できています。"
+            }
+          ]
+        },
+        "legacy": {
+          "score": 1.0,
+          "response_snippet": "Route: `sub_skills/improve`。`github-issue-intake` の既存 guidance を、今回の有効だった方法を再利用できる形に整理して改善します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "既存のnamed skill改修として改善ルートに自然に接続できています。"
+            }
+          ]
+        },
+        "current": {
+          "score": 1.0,
+          "response_snippet": "route: `sub_skills/improve/`。`github-issue-intake` の既存 skill を、今回の有効だったノウハウを再利用できる形に一般化して改善します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "既存のnamed skill改修として改善ルートに自然に接続できています。"
+            }
+          ]
+        }
+      },
       "baseline_mean": 1.0,
+      "legacy_mean": 1.0,
+      "current_mean": 1.0,
+      "with_skill_mean": 1.0,
+      "primary_mean": 1.0,
+      "reference_mean": 1.0,
       "delta": 0.0,
+      "current_vs_legacy_delta": 0.0,
+      "current_vs_baseline_delta": 0.0,
+      "legacy_vs_baseline_delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
           "value": "sub_skills/improve",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "github-issue-intake",
           "weight": 0.6,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "再利用",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/new",
           "weight": 0.7,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "llm_grade",
           "value": "既存の named skill を recent evidence で改修するケースとして `sub_skills/improve` に自然に接続できているか",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": "既存のnamed skill改修として改善ルートに接続できています。"
+            },
+            "current": {
+              "passed": true,
+              "detail": "既存のnamed skill改修として改善ルートに自然に接続できています。"
+            },
+            "legacy": {
+              "passed": true,
+              "detail": "既存のnamed skill改修として改善ルートに自然に接続できています。"
+            }
+          },
           "baseline_passed": true,
-          "detail": "named skill の evidence-driven revision として `sub_skills/improve` に接続している。"
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
+          "detail": "既存のnamed skill改修として改善ルートに自然に接続できています。"
         }
       ],
-      "with_skill_snippet": "Route: sub_skills/improve. @skills\\github-issue-intake\\ の改善として対応します。今回有効だったやり方を一般化して取り込み、再利用できる guidance に更新します。",
-      "baseline_snippet": "Route: sub_skills/improve. @skills\\github-issue-intake\\ の改修依頼なので、既存skillの改善として扱います。今回有効だったノウハウを再利用可能な形で反映する前提で見直します。",
+      "current_snippet": "route: `sub_skills/improve/`。`github-issue-intake` の既存 skill を、今回の有効だったノウハウを再利用できる形に一般化して改善します。",
+      "with_skill_snippet": "route: `sub_skills/improve/`。`github-issue-intake` の既存 skill を、今回の有効だったノウハウを再利用できる形に一般化して改善します。",
+      "legacy_snippet": "Route: `sub_skills/improve`。`github-issue-intake` の既存 guidance を、今回の有効だった方法を再利用できる形に整理して改善します。",
+      "baseline_snippet": "既存の github-issue-intake を改善したい依頼なので、sub_skills/improve が適切です。今回の有効だった方法を再利用できる形で取り込み、改善点を整理して反映する流れがよいです。",
       "gap_summary": [],
-      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+      "recommendation": "基準版も十分な回答を生成できています。汎用知識で対応可能なケースです。",
+      "reference_variant": "legacy",
+      "primary_comparison": "current_vs_legacy"
     },
     {
       "case_id": "tc-004",
@@ -201,55 +832,256 @@
         "structure",
         "section-shape"
       ],
-      "with_skill_mean": 1.0,
+      "variant_results": {
+        "baseline": {
+          "score": 1.0,
+          "response_snippet": "これは section 構成への設計レビューなので、sub_skills/improve で扱うのが自然です。When to Use This Skill と全体の構成を見直し、文脈を失わない分割方針に修正するのが次の一手です。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "section構成の批評として構造改善ルートを返せています。"
+            }
+          ]
+        },
+        "legacy": {
+          "score": 1.0,
+          "response_snippet": "Route: `sub_skills/improve`。section 構成の問題として扱い、`When to Use This Skill` と他 section の役割を整理して文脈が切れない構成に見直します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "section設計の見直しとして構造改善ルートを返せています。"
+            }
+          ]
+        },
+        "current": {
+          "score": 1.0,
+          "response_snippet": "route: `sub_skills/improve/`。section 構成の改善として扱い、分割しすぎず文脈を保てる構成へ見直します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "section構成の改善課題として構造改善ルートを返せています。"
+            }
+          ]
+        }
+      },
       "baseline_mean": 1.0,
+      "legacy_mean": 1.0,
+      "current_mean": 1.0,
+      "with_skill_mean": 1.0,
+      "primary_mean": 1.0,
+      "reference_mean": 1.0,
       "delta": 0.0,
+      "current_vs_legacy_delta": 0.0,
+      "current_vs_baseline_delta": 0.0,
+      "legacy_vs_baseline_delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
           "value": "sub_skills/improve",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "section",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "構成",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/evaluate",
           "weight": 0.6,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "llm_grade",
           "value": "section 構成や分割方針への設計批評として捉え、構造改善の route を返せているか",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": "section構成の批評として構造改善ルートを返せています。"
+            },
+            "current": {
+              "passed": true,
+              "detail": "section構成の改善課題として構造改善ルートを返せています。"
+            },
+            "legacy": {
+              "passed": true,
+              "detail": "section設計の見直しとして構造改善ルートを返せています。"
+            }
+          },
           "baseline_passed": true,
-          "detail": "section 構成と分割方針への設計批評を `sub_skills/improve` で扱えている。"
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
+          "detail": "section設計の見直しとして構造改善ルートを返せています。"
         }
       ],
-      "with_skill_snippet": "Route: sub_skills/improve. はい、これは既存skillの構成見直しとして改善ルートが適切です。section構成と文脈保持のバランスを見直し、分割しすぎによる読みにくさを修正します。",
-      "baseline_snippet": "Route: sub_skills/improve. これはsection設計と分割方針への改善指摘として扱うのが適切です。文脈を失わない粒度に戻しつつ、構成を再設計しましょう。",
+      "current_snippet": "route: `sub_skills/improve/`。section 構成の改善として扱い、分割しすぎず文脈を保てる構成へ見直します。",
+      "with_skill_snippet": "route: `sub_skills/improve/`。section 構成の改善として扱い、分割しすぎず文脈を保てる構成へ見直します。",
+      "legacy_snippet": "Route: `sub_skills/improve`。section 構成の問題として扱い、`When to Use This Skill` と他 section の役割を整理して文脈が切れない構成に見直します。",
+      "baseline_snippet": "これは section 構成への設計レビューなので、sub_skills/improve で扱うのが自然です。When to Use This Skill と全体の構成を見直し、文脈を失わない分割方針に修正するのが次の一手です。",
       "gap_summary": [],
-      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+      "recommendation": "基準版も十分な回答を生成できています。汎用知識で対応可能なケースです。",
+      "reference_variant": "legacy",
+      "primary_comparison": "current_vs_legacy"
     },
     {
       "case_id": "tc-005",
@@ -260,55 +1092,256 @@
         "quality-gate",
         "release"
       ],
+      "variant_results": {
+        "baseline": {
+          "score": 0.7368,
+          "response_snippet": "これは公開前の品質ゲート確認なので、sub_skills/validate が適切です。references への分離方針も含めて、公開可能かどうかを validate する流れがよいです。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": false,
+              "weight": 1.0,
+              "detail": "品質ゲートの方向性はあるが検証手順の像が足りません。"
+            }
+          ]
+        },
+        "legacy": {
+          "score": 1.0,
+          "response_snippet": "Route: `sub_skills/validate`。公開前の品質ゲートとして扱い、references への移動方針も含めて L1-L2 を確認し、公開可否を判定します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "品質ゲートとして検証観点まで添えて妥当に案内できています。"
+            }
+          ]
+        },
+        "current": {
+          "score": 1.0,
+          "response_snippet": "route: `sub_skills/validate/`。公開前の品質ゲートとして、500〜550行超は references への退避も含めて確認し、公開可能かを L1-L4 で検証します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "品質ゲートとして検証レベルまで示し妥当に案内できています。"
+            }
+          ]
+        }
+      },
+      "baseline_mean": 0.7368,
+      "legacy_mean": 1.0,
+      "current_mean": 1.0,
       "with_skill_mean": 1.0,
-      "baseline_mean": 1.0,
+      "primary_mean": 1.0,
+      "reference_mean": 1.0,
       "delta": 0.0,
+      "current_vs_legacy_delta": 0.0,
+      "current_vs_baseline_delta": 0.2632,
+      "legacy_vs_baseline_delta": 0.2632,
       "assertion_detail": [
         {
           "type": "contains",
           "value": "sub_skills/validate",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "公開",
           "weight": 0.6,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "references",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/new",
           "weight": 0.7,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "llm_grade",
           "value": "公開可否の品質ゲートとして `sub_skills/validate` にルーティングし、最低限の validator 実行イメージを示せているか",
           "weight": 1.0,
+          "results": {
+            "baseline": {
+              "passed": false,
+              "detail": "品質ゲートの方向性はあるが検証手順の像が足りません。"
+            },
+            "current": {
+              "passed": true,
+              "detail": "品質ゲートとして検証レベルまで示し妥当に案内できています。"
+            },
+            "legacy": {
+              "passed": true,
+              "detail": "品質ゲートとして検証観点まで添えて妥当に案内できています。"
+            }
+          },
+          "baseline_passed": false,
+          "legacy_passed": true,
+          "current_passed": true,
           "with_skill_passed": true,
-          "baseline_passed": true,
-          "detail": "品質 gate / 公開可否として `sub_skills/validate` に接続している。"
+          "detail": "品質ゲートとして検証観点まで添えて妥当に案内できています。"
         }
       ],
-      "with_skill_snippet": "Route: sub_skills/validate. これは品質確認と公開可否の判断なので validate に進めるのが適切です。行数超過や references への退避方針も含めて、公開前チェックとして確認します。",
-      "baseline_snippet": "Route: sub_skills/validate. 公開可否の確認と品質ゲートの話なので、まずは検証ルートが適切です。長すぎる本文の references 移管も含め、構造と公開基準をチェックしましょう。",
+      "current_snippet": "route: `sub_skills/validate/`。公開前の品質ゲートとして、500〜550行超は references への退避も含めて確認し、公開可能かを L1-L4 で検証します。",
+      "with_skill_snippet": "route: `sub_skills/validate/`。公開前の品質ゲートとして、500〜550行超は references への退避も含めて確認し、公開可能かを L1-L4 で検証します。",
+      "legacy_snippet": "Route: `sub_skills/validate`。公開前の品質ゲートとして扱い、references への移動方針も含めて L1-L2 を確認し、公開可否を判定します。",
+      "baseline_snippet": "これは公開前の品質ゲート確認なので、sub_skills/validate が適切です。references への分離方針も含めて、公開可能かどうかを validate する流れがよいです。",
       "gap_summary": [],
-      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+      "recommendation": "基準版も十分な回答を生成できています。汎用知識で対応可能なケースです。",
+      "reference_variant": "legacy",
+      "primary_comparison": "current_vs_legacy"
     },
     {
       "case_id": "tc-006",
@@ -319,55 +1352,256 @@
         "jp-sync",
         "references"
       ],
+      "variant_results": {
+        "baseline": {
+          "score": 0.7368,
+          "response_snippet": "既存 skill の運用方針修正なので、sub_skills/improve が適切です。skill_jp.md へ日本語を集約する前提で、既存 skill との同期方針を整理して反映するのがよいです。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": false,
+              "weight": 1.0,
+              "detail": "既存修正の扱いはよいがJP/EN同期と参照整理が不足です。"
+            }
+          ]
+        },
+        "legacy": {
+          "score": 1.0,
+          "response_snippet": "Route: `sub_skills/improve`。既存 skill の JP/EN 同期改善として、`skill_jp.md` への日本語集約方針を反映し、関連参照もそろえます。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "JP/EN同期と参照整理を伴う既存修正として扱えています。"
+            }
+          ]
+        },
+        "current": {
+          "score": 1.0,
+          "response_snippet": "route: `sub_skills/improve/`。既存 skill を、`skill_jp.md` への日本語集約方針に合わせて見直し、JP/EN guidance と references の同期を整えます。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "JP/EN同期とreferences整理を伴う既存修正として扱えています。"
+            }
+          ]
+        }
+      },
+      "baseline_mean": 0.7368,
+      "legacy_mean": 1.0,
+      "current_mean": 1.0,
       "with_skill_mean": 1.0,
-      "baseline_mean": 1.0,
+      "primary_mean": 1.0,
+      "reference_mean": 1.0,
       "delta": 0.0,
+      "current_vs_legacy_delta": 0.0,
+      "current_vs_baseline_delta": 0.2632,
+      "legacy_vs_baseline_delta": 0.2632,
       "assertion_detail": [
         {
           "type": "contains",
           "value": "sub_skills/improve",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "skill_jp.md",
           "weight": 0.8,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "集約",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/validate",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "llm_grade",
           "value": "JP/EN guidance の同期と reference 整理を伴う既存 skill 修正として扱えているか",
           "weight": 1.0,
+          "results": {
+            "baseline": {
+              "passed": false,
+              "detail": "既存修正の扱いはよいがJP/EN同期と参照整理が不足です。"
+            },
+            "current": {
+              "passed": true,
+              "detail": "JP/EN同期とreferences整理を伴う既存修正として扱えています。"
+            },
+            "legacy": {
+              "passed": true,
+              "detail": "JP/EN同期と参照整理を伴う既存修正として扱えています。"
+            }
+          },
+          "baseline_passed": false,
+          "legacy_passed": true,
+          "current_passed": true,
           "with_skill_passed": true,
-          "baseline_passed": true,
-          "detail": "JP/EN 同期と reference 整理を伴う既存 skill 修正として `sub_skills/improve` を選べている。"
+          "detail": "JP/EN同期と参照整理を伴う既存修正として扱えています。"
         }
       ],
-      "with_skill_snippet": "Route: sub_skills/improve. 既存skill群の方針変更と日本語ドキュメント同期なので improve が適切です。skill_jp.md へ日本語を集約する方針で、関連ファイルを揃えて修正します。",
-      "baseline_snippet": "Route: sub_skills/improve. 既存skillを日本語集約方針に合わせて直す話なので、改善ルートで進めます。skill_jp.md への集約に合わせて関連ファイルの整合も見直します。",
+      "current_snippet": "route: `sub_skills/improve/`。既存 skill を、`skill_jp.md` への日本語集約方針に合わせて見直し、JP/EN guidance と references の同期を整えます。",
+      "with_skill_snippet": "route: `sub_skills/improve/`。既存 skill を、`skill_jp.md` への日本語集約方針に合わせて見直し、JP/EN guidance と references の同期を整えます。",
+      "legacy_snippet": "Route: `sub_skills/improve`。既存 skill の JP/EN 同期改善として、`skill_jp.md` への日本語集約方針を反映し、関連参照もそろえます。",
+      "baseline_snippet": "既存 skill の運用方針修正なので、sub_skills/improve が適切です。skill_jp.md へ日本語を集約する前提で、既存 skill との同期方針を整理して反映するのがよいです。",
       "gap_summary": [],
-      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+      "recommendation": "基準版も十分な回答を生成できています。汎用知識で対応可能なケースです。",
+      "reference_variant": "legacy",
+      "primary_comparison": "current_vs_legacy"
     },
     {
       "case_id": "tc-007",
@@ -378,55 +1612,256 @@
         "naming",
         "near-miss"
       ],
-      "with_skill_mean": 0.3421,
+      "variant_results": {
+        "baseline": {
+          "score": 1.0,
+          "response_snippet": "これは新規作成や改修というより、命名・taxonomy・governance の相談です。4 route に無理に寄せず、skill 名の命名規則と分類原則を先に決めるのが適切です。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.9,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "4 routeに押し込まず命名とtaxonomyの相談だと示せています。"
+            }
+          ]
+        },
+        "legacy": {
+          "score": 1.0,
+          "response_snippet": "これは 4 route に無理に入れず、まず命名規則と taxonomy の相談として扱います。skill- / dotnet- / python- の切り方を、対象ドメインと discoverability 基準で決めるのが次アクションです。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.9,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "4 routeに押し込まずgovernance相談だと明示できています。"
+            }
+          ]
+        },
+        "current": {
+          "score": 1.0,
+          "response_snippet": "この相談は4 routeに無理に入れず、命名と taxonomy の governance として先に整理します。まず prefix 方針と分類原則を決め、その後に各 skill 名へ反映します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.6,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.9,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "4 routeに押し込まず命名とtaxonomyのgovernanceだと示せています。"
+            }
+          ]
+        }
+      },
       "baseline_mean": 1.0,
-      "delta": -0.6579,
+      "legacy_mean": 1.0,
+      "current_mean": 1.0,
+      "with_skill_mean": 1.0,
+      "primary_mean": 1.0,
+      "reference_mean": 1.0,
+      "delta": 0.0,
+      "current_vs_legacy_delta": 0.0,
+      "current_vs_baseline_delta": 0.0,
+      "legacy_vs_baseline_delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
           "value": "命名",
           "weight": 0.6,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "taxonomy",
           "weight": 0.6,
-          "with_skill_passed": false,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/new",
           "weight": 0.9,
-          "with_skill_passed": false,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/improve",
           "weight": 0.7,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "llm_grade",
           "value": "この router の4 route に無理に押し込まず、命名・taxonomy・governance の相談だと明示できているか",
           "weight": 1.0,
-          "with_skill_passed": false,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": "4 routeに押し込まず命名とtaxonomyの相談だと示せています。"
+            },
+            "current": {
+              "passed": true,
+              "detail": "4 routeに押し込まず命名とtaxonomyのgovernanceだと示せています。"
+            },
+            "legacy": {
+              "passed": true,
+              "detail": "4 routeに押し込まずgovernance相談だと明示できています。"
+            }
+          },
           "baseline_passed": true,
-          "detail": "命名・taxonomy の governance 相談を `sub_skills/new` に押し込み、router の外側だと明示できていない。"
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
+          "detail": "4 routeに押し込まずgovernance相談だと明示できています。"
         }
       ],
-      "with_skill_snippet": "Route: sub_skills/new. これは新規作成前の命名方針設計として扱うのが実務的です。skill- を共通接頭辞にするか、dotnet- や python- のように領域先頭にするかを、拡張性と検索性の観点で整理します。",
-      "baseline_snippet": "Route: other-skill. これは新規作成や改修そのものではなく、命名規則や taxonomy の方針相談です。skill-、dotnet-、python- などの粒度を、運用ルールとして先に整理するのがよさそうです。",
+      "current_snippet": "この相談は4 routeに無理に入れず、命名と taxonomy の governance として先に整理します。まず prefix 方針と分類原則を決め、その後に各 skill 名へ反映します。",
+      "with_skill_snippet": "この相談は4 routeに無理に入れず、命名と taxonomy の governance として先に整理します。まず prefix 方針と分類原則を決め、その後に各 skill 名へ反映します。",
+      "legacy_snippet": "これは 4 route に無理に入れず、まず命名規則と taxonomy の相談として扱います。skill- / dotnet- / python- の切り方を、対象ドメインと discoverability 基準で決めるのが次アクションです。",
+      "baseline_snippet": "これは新規作成や改修というより、命名・taxonomy・governance の相談です。4 route に無理に寄せず、skill 名の命名規則と分類原則を先に決めるのが適切です。",
       "gap_summary": [],
-      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+      "recommendation": "基準版も十分な回答を生成できています。汎用知識で対応可能なケースです。",
+      "reference_variant": "legacy",
+      "primary_comparison": "current_vs_legacy"
     },
     {
       "case_id": "tc-008",
@@ -437,47 +1872,214 @@
         "false-positive-guard",
         "git-github"
       ],
-      "with_skill_mean": 1.0,
+      "variant_results": {
+        "baseline": {
+          "score": 1.0,
+          "response_snippet": "今は skill 作成より先に git-init-to-github のような初期化対応が適切です。まず Git と GitHub の土台を整え、その後に skill 作成へ進むのが自然です。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.9,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "GitとGitHub初期化を先に置きskill作成を後段化できています。"
+            }
+          ]
+        },
+        "legacy": {
+          "score": 1.0,
+          "response_snippet": "先に `git-init-to-github` を使うのが適切です。Git/GitHub 初期化を済ませ、その後 に skill 化すべき workflow が固まった段階で新規 skill 作成へ進みます。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.9,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "GitとGitHub初期化を優先しskill作成を後段に整理できています。"
+            }
+          ]
+        },
+        "current": {
+          "score": 1.0,
+          "response_snippet": "まずは `git-init-to-github` に route します。Git/GitHub 初期化を完了し、その後に skill 作成へ進むのが次アクションです。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.9,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "GitとGitHub初期化を優先しskill作成を後段に整理できています。"
+            }
+          ]
+        }
+      },
       "baseline_mean": 1.0,
+      "legacy_mean": 1.0,
+      "current_mean": 1.0,
+      "with_skill_mean": 1.0,
+      "primary_mean": 1.0,
+      "reference_mean": 1.0,
       "delta": 0.0,
+      "current_vs_legacy_delta": 0.0,
+      "current_vs_baseline_delta": 0.0,
+      "legacy_vs_baseline_delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
           "value": "git-init-to-github",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "その後",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/new",
           "weight": 0.9,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "llm_grade",
           "value": "まず Git/GitHub 初期化の実務 skill を優先し、skill 作成は後段だと整理できているか",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": "GitとGitHub初期化を先に置きskill作成を後段化できています。"
+            },
+            "current": {
+              "passed": true,
+              "detail": "GitとGitHub初期化を優先しskill作成を後段に整理できています。"
+            },
+            "legacy": {
+              "passed": true,
+              "detail": "GitとGitHub初期化を優先しskill作成を後段に整理できています。"
+            }
+          },
           "baseline_passed": true,
-          "detail": "まず operational skill を優先し、meta skill authoring を後段に回している。"
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
+          "detail": "GitとGitHub初期化を優先しskill作成を後段に整理できています。"
         }
       ],
-      "with_skill_snippet": "Route: other-skill. 今はskill作成より先に、Git管理とGitHubリポジトリ作成を進めるのが適切です。まずは git-init-to-github や git-initial-setup 系のスキルで土台を整え、その後にskill化を検討しましょう。",
-      "baseline_snippet": "Route: other-skill. 先に必要なのはskill作成ではなく、Git/GitHubの初期化です。まずは git-init-to-github のような実務スキルで土台を整え、その後にskill化を検討するのが自然です。",
+      "current_snippet": "まずは `git-init-to-github` に route します。Git/GitHub 初期化を完了し、その後に skill 作成へ進むのが次アクションです。",
+      "with_skill_snippet": "まずは `git-init-to-github` に route します。Git/GitHub 初期化を完了し、その後に skill 作成へ進むのが次アクションです。",
+      "legacy_snippet": "先に `git-init-to-github` を使うのが適切です。Git/GitHub 初期化を済ませ、その後 に skill 化すべき workflow が固まった段階で新規 skill 作成へ進みます。",
+      "baseline_snippet": "今は skill 作成より先に git-init-to-github のような初期化対応が適切です。まず Git と GitHub の土台を整え、その後に skill 作成へ進むのが自然です。",
       "gap_summary": [],
-      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+      "recommendation": "基準版も十分な回答を生成できています。汎用知識で対応可能なケースです。",
+      "reference_variant": "legacy",
+      "primary_comparison": "current_vs_legacy"
     },
     {
       "case_id": "tc-009",
@@ -487,107 +2089,490 @@
         "false-positive-guard",
         "out-of-scope"
       ],
-      "with_skill_mean": 1.0,
+      "variant_results": {
+        "baseline": {
+          "score": 1.0,
+          "response_snippet": "これは skill router の対象ではなく、PowerPoint 作成支援の別ドメイン依頼です。meta skill の話ではないので out-of-scope として切り分けるのが適切です。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.9,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "meta skillに誤誘導せず別ドメイン依頼として扱えています。"
+            }
+          ]
+        },
+        "legacy": {
+          "score": 1.0,
+          "response_snippet": "これは skill router ではなく out-of-scope です。pptx でのポスター作成支援という別ドメイン依頼として扱い、対応する作業手順や専用 skill を検討します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.9,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "skill語に引かれず別ドメインの依頼として切り分けられています。"
+            }
+          ]
+        },
+        "current": {
+          "score": 1.0,
+          "response_snippet": "これは skill ルーターでは out-of-scope です。pptx のポスター作成支援という別ドメイン依頼として扱います。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.9,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.7,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "meta skillに誤誘導せず別ドメイン依頼として扱えています。"
+            }
+          ]
+        }
+      },
       "baseline_mean": 1.0,
+      "legacy_mean": 1.0,
+      "current_mean": 1.0,
+      "with_skill_mean": 1.0,
+      "primary_mean": 1.0,
+      "reference_mean": 1.0,
       "delta": 0.0,
+      "current_vs_legacy_delta": 0.0,
+      "current_vs_baseline_delta": 0.0,
+      "legacy_vs_baseline_delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
           "value": "out-of-scope",
           "weight": 0.8,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/new",
           "weight": 0.9,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/improve",
           "weight": 0.7,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "llm_grade",
           "value": "『skill』という語だけで meta skill router に誤誘導せず、別ドメイン依頼として扱えているか",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": "meta skillに誤誘導せず別ドメイン依頼として扱えています。"
+            },
+            "current": {
+              "passed": true,
+              "detail": "meta skillに誤誘導せず別ドメイン依頼として扱えています。"
+            },
+            "legacy": {
+              "passed": true,
+              "detail": "skill語に引かれず別ドメインの依頼として切り分けられています。"
+            }
+          },
           "baseline_passed": true,
-          "detail": "『skill』という語だけで meta router に誤誘導せず、対象外の実務依頼として扱えている。"
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
+          "detail": "skill語に引かれず別ドメインの依頼として切り分けられています。"
         }
       ],
-      "with_skill_snippet": "Route: out-of-scope. これはskill自体の作成・改善・検証ではなく、PowerPointで成果物を作る実務依頼です。そのためこのメタskillルーターの対象外で、資料作成用の別スキルまたは通常作業として扱うのが適切です。",
-      "baseline_snippet": "Route: out-of-scope. これはskill作成・改善の依頼ではなく、PowerPointでポスターを作る実務依頼です。meta-skillルーターではなく、資料構成やpptx作成支援として扱うべき内容です。",
+      "current_snippet": "これは skill ルーターでは out-of-scope です。pptx のポスター作成支援という別ドメイン依頼として扱います。",
+      "with_skill_snippet": "これは skill ルーターでは out-of-scope です。pptx のポスター作成支援という別ドメイン依頼として扱います。",
+      "legacy_snippet": "これは skill router ではなく out-of-scope です。pptx でのポスター作成支援という別ドメイン依頼として扱い、対応する作業手順や専用 skill を検討します。",
+      "baseline_snippet": "これは skill router の対象ではなく、PowerPoint 作成支援の別ドメイン依頼です。meta skill の話ではないので out-of-scope として切り分けるのが適切です。",
       "gap_summary": [],
-      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+      "recommendation": "基準版も十分な回答を生成できています。汎用知識で対応可能なケースです。",
+      "reference_variant": "legacy",
+      "primary_comparison": "current_vs_legacy"
     },
     {
       "case_id": "tc-010",
-      "prompt": "このスキルが trigger quality を改善するか、with-skill と baseline で測りたいです。benchmark_summary.json と viewer.html まで見たいです。",
+      "prompt": "このスキルが trigger quality を改善するか、baseline / legacy / current で測りたいです。benchmark_summary.json と viewer.html まで見たいです。",
       "tags": [
         "meta",
         "evaluate",
         "benchmark",
         "behavior"
       ],
-      "with_skill_mean": 1.0,
+      "variant_results": {
+        "baseline": {
+          "score": 1.0,
+          "response_snippet": "これは behavioral evaluation の依頼なので、sub_skills/evaluate が適切です。baseline / legacy / current を比較し、benchmark_summary.json と viewer.html まで確認する流れがよいです。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "評価ルートにつなぎbenchmarkとviewerの流れも示せています。"
+            }
+          ]
+        },
+        "legacy": {
+          "score": 1.0,
+          "response_snippet": "Route: `sub_skills/evaluate`。baseline / legacy / current の同条件比較を設計し、集計後に `benchmark_summary.json` と `viewer.html` を生成して差分を確認します。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "評価ルートにつなぎ生成物までの道筋を示せています。"
+            }
+          ]
+        },
+        "current": {
+          "score": 1.0,
+          "response_snippet": "route: `sub_skills/evaluate/`。baseline / legacy / current を同条件で比較し、`benchmark_summary.json` を集計して `viewer.html` でレビューできる形まで進めます。",
+          "assertions": [
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 1.0,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "contains",
+              "passed": true,
+              "weight": 0.8,
+              "detail": ""
+            },
+            {
+              "type": "not_contains",
+              "passed": true,
+              "weight": 0.5,
+              "detail": ""
+            },
+            {
+              "type": "llm_grade",
+              "passed": true,
+              "weight": 1.0,
+              "detail": "評価ルートにつなぎbenchmarkとviewerの道筋を示せています。"
+            }
+          ]
+        }
+      },
       "baseline_mean": 1.0,
+      "legacy_mean": 1.0,
+      "current_mean": 1.0,
+      "with_skill_mean": 1.0,
+      "primary_mean": 1.0,
+      "reference_mean": 1.0,
       "delta": 0.0,
+      "current_vs_legacy_delta": 0.0,
+      "current_vs_baseline_delta": 0.0,
+      "legacy_vs_baseline_delta": 0.0,
       "assertion_detail": [
         {
           "type": "contains",
           "value": "sub_skills/evaluate",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "benchmark_summary.json",
           "weight": 0.8,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "contains",
           "value": "viewer.html",
           "weight": 0.8,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "not_contains",
           "value": "sub_skills/validate",
           "weight": 0.5,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": ""
+            },
+            "current": {
+              "passed": true,
+              "detail": ""
+            },
+            "legacy": {
+              "passed": true,
+              "detail": ""
+            }
+          },
           "baseline_passed": true,
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
           "detail": ""
         },
         {
           "type": "llm_grade",
           "value": "behavioral evaluation として `sub_skills/evaluate` に接続し、benchmark/viewer 生成の道筋を示せているか",
           "weight": 1.0,
-          "with_skill_passed": true,
+          "results": {
+            "baseline": {
+              "passed": true,
+              "detail": "評価ルートにつなぎbenchmarkとviewerの流れも示せています。"
+            },
+            "current": {
+              "passed": true,
+              "detail": "評価ルートにつなぎbenchmarkとviewerの道筋を示せています。"
+            },
+            "legacy": {
+              "passed": true,
+              "detail": "評価ルートにつなぎ生成物までの道筋を示せています。"
+            }
+          },
           "baseline_passed": true,
-          "detail": "behavioral evaluation として `sub_skills/evaluate` に接続し、benchmark/viewer まで示している。"
+          "legacy_passed": true,
+          "current_passed": true,
+          "with_skill_passed": true,
+          "detail": "評価ルートにつなぎ生成物までの道筋を示せています。"
         }
       ],
-      "with_skill_snippet": "Route: sub_skills/evaluate. これは行動変化の測定なので evaluate に進めるのが適切です。with-skill と baseline を比較し、benchmark_summary.json と viewer.html まで生成して確認します。",
-      "baseline_snippet": "Route: sub_skills/evaluate. これはskillの行動変化を測る評価依頼なので、評価ルートが適切です。with-skill と baseline を比較し、benchmark_summary.json と viewer.html まで確認する前提で進めます。",
+      "current_snippet": "route: `sub_skills/evaluate/`。baseline / legacy / current を同条件で比較し、`benchmark_summary.json` を集計して `viewer.html` でレビューできる形まで進めます。",
+      "with_skill_snippet": "route: `sub_skills/evaluate/`。baseline / legacy / current を同条件で比較し、`benchmark_summary.json` を集計して `viewer.html` でレビューできる形まで進めます。",
+      "legacy_snippet": "Route: `sub_skills/evaluate`。baseline / legacy / current の同条件比較を設計し、集計後に `benchmark_summary.json` と `viewer.html` を生成して差分を確認します。",
+      "baseline_snippet": "これは behavioral evaluation の依頼なので、sub_skills/evaluate が適切です。baseline / legacy / current を比較し、benchmark_summary.json と viewer.html まで確認する流れがよいです。",
       "gap_summary": [],
-      "recommendation": "ベースラインも十分な回答を生成できています。スキル固有ではない汎用知識で対応可能なケースです。"
+      "recommendation": "基準版も十分な回答を生成できています。汎用知識で対応可能なケースです。",
+      "reference_variant": "legacy",
+      "primary_comparison": "current_vs_legacy"
     }
   ],
-  "generated_at": "2026-03-17T17:57:17.518808+00:00"
+  "generated_at": "2026-03-21T00:45:06.690468+00:00",
+  "suite_hash": "eebe1023aec2b1018004ca3bb891ae2aed0854f978026bd30e7bc945d0872655",
+  "variant_metadata": {
+    "baseline": {
+      "source_ref": "no-skill",
+      "skill_snapshot_hash": "NO_SKILL"
+    },
+    "current": {
+      "source_ref": "worktree:feature/baseline-legacy-current-eval@0ca35ef2882e7443514b8e36a6d8ac23602401b1",
+      "skill_snapshot_hash": "8E74F0AC31724946149BB4C98F6DA8C07D6D1F710F9F1B2763C0AD12919A553C"
+    },
+    "legacy": {
+      "source_ref": "git:674fe58^ (skills/skill bilingual snapshot bundle)",
+      "skill_snapshot_hash": "5F1FC6ED30E3B38041D5D9FE86B7708C52371B6875AAE502B39CC379FFDC4E9A"
+    }
+  }
 }
