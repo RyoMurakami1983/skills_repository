@@ -37,6 +37,8 @@
   "run_id": "run-001",
   "mode": "current",
   "variant_id": "current",
+  "source_ref": "worktree:feature/skill-improve",
+  "skill_snapshot_hash": "sha256:...",
   "score": 1.0,
   "assertions": [
     { "type": "contains", "passed": true, "weight": 1.0, "detail": "" }
@@ -54,10 +56,15 @@
 {
   "skill_id": "skill-name",
   "eval_version": "1.0.0",
+  "suite_hash": "sha256:...",
   "variants": {
     "baseline": { "count": 8, "mean": 0.71, "stddev": 0.12, "min": 0.45, "max": 0.9 },
     "legacy": { "count": 8, "mean": 0.80, "stddev": 0.08, "min": 0.60, "max": 0.95 },
     "current": { "count": 8, "mean": 0.92, "stddev": 0.04, "min": 0.85, "max": 1.0 }
+  },
+  "variant_metadata": {
+    "legacy": { "source_ref": "git:abc123", "skill_snapshot_hash": "sha256:..." },
+    "current": { "source_ref": "worktree:feature/skill-improve", "skill_snapshot_hash": "sha256:..." }
   },
   "comparisons": {
     "current_vs_legacy": { "lhs": "current", "rhs": "legacy", "delta": 0.12, "improvement_pct": 15.0, "verdict": "improved" },
@@ -104,6 +111,13 @@ append-only の履歴 ledger です。各行に 1 campaign の集計結果を記
 {"skill_id":"skill-name","campaign_id":"campaign-001","run_id":"run-001","eval_version":"1.0.0","generated_at":"2026-03-15T00:00:00Z","summary":{"delta":0.12,"improvement_pct":15.0,"verdict":"improved","primary_comparison":"current_vs_legacy"},"variants":{"baseline":{"count":8,"mean":0.71},"legacy":{"count":8,"mean":0.80},"current":{"count":8,"mean":0.92}},"comparisons":{"current_vs_legacy":{"lhs":"current","rhs":"legacy","delta":0.12,"improvement_pct":15.0,"verdict":"improved"}}}
 ```
 
+## Promotion Rule
+
+- `baseline` は常に固定の no-skill 基準です。
+- `legacy` は「前回 accept した版」です。
+- `current` を accept したら、次回 campaign ではその snapshot を `legacy` として扱います。
+- 過去の `legacy` は `benchmark_history.jsonl` に残り続けるため、継続改善の trend を失いません。
+
 ## Workspace Layout
 
 想定する artifact 配置は次のとおりです。
@@ -112,8 +126,9 @@ append-only の履歴 ledger です。各行に 1 campaign の集計結果を記
 <skill-name>-workspace/
 ├── iteration-1/
 │   ├── eval-descriptive-name/
-│   │   ├── with_skill/
-│   │   ├── without_skill/
+│   │   ├── baseline/
+│   │   ├── legacy/
+│   │   ├── current/
 │   │   ├── eval_metadata.json
 │   │   ├── grading.json
 │   │   └── timing.json

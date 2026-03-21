@@ -69,6 +69,8 @@ def test_aggregate_supports_baseline_legacy_current_and_history(tmp_path: Path):
                     ],
                     "response_snippet": f"{variant_id} response",
                     "timestamp": "2026-03-20T00:00:00Z",
+                    "source_ref": f"ref:{variant_id}",
+                    "skill_snapshot_hash": f"hash-{variant_id}",
                 },
                 ensure_ascii=False,
             ),
@@ -93,9 +95,20 @@ def test_aggregate_supports_baseline_legacy_current_and_history(tmp_path: Path):
     assert result["case_breakdown"][0]["reference_variant"] == "legacy"
     assert result["case_breakdown"][0]["current_vs_legacy_delta"] == 0.1
     assert result["case_breakdown"][0]["gap_summary"] == []
+    assert result["suite_hash"] is not None
+    assert result["variant_metadata"]["current"]["source_ref"] == "ref:current"
+    assert result["variant_metadata"]["legacy"]["skill_snapshot_hash"] == "hash-legacy"
 
     ledger_path = tmp_path / "benchmark_history.jsonl"
-    mod.append_history_record(ledger_path, {"skill_id": skill_id, "summary": result["summary"]})
+    mod.append_history_record(
+        ledger_path,
+        {
+            "skill_id": skill_id,
+            "summary": result["summary"],
+            "suite_hash": result["suite_hash"],
+            "variant_metadata": result["variant_metadata"],
+        },
+    )
     lines = ledger_path.read_text(encoding="utf-8").splitlines()
     assert len(lines) == 1
     assert json.loads(lines[0])["skill_id"] == skill_id

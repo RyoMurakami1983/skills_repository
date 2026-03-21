@@ -7,6 +7,7 @@ baseline / legacy / current の 3 役を標準の比較軸として扱い、
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import sys
@@ -106,6 +107,17 @@ def load_evals_json(evals_dir: Path, skill_id: str) -> dict[str, dict[str, Any]]
     with open(path, encoding="utf-8") as f:
         data = json.load(f)
     return {case["id"]: case for case in data.get("cases", [])}
+
+
+def compute_file_sha256(path: Path) -> str | None:
+    """ファイル内容の SHA-256 を返す。存在しなければ None。"""
+    if not path.exists():
+        return None
+    digest = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _scores(results: list[dict[str, Any]]) -> list[float]:
@@ -337,6 +349,7 @@ def build_case_breakdown(
                 else None
             ),
             "assertion_detail": assertion_detail,
+            "current_snippet": variant_results.get("current", {}).get("response_snippet", ""),
             "with_skill_snippet": variant_results.get(compat_variant, {}).get("response_snippet", ""),
             "legacy_snippet": variant_results.get("legacy", {}).get("response_snippet", ""),
             "baseline_snippet": variant_results.get("baseline", {}).get("response_snippet", ""),
@@ -359,6 +372,20 @@ def append_history_record(
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
+def collect_variant_metadata(results_by_variant: dict[str, list[dict[str, Any]]]) -> dict[str, dict[str, Any]]:
+    """run result から variant ごとの再現性 metadata を抽出する。"""
+    metadata_by_variant: dict[str, dict[str, Any]] = {}
+    for variant, results in results_by_variant.items():
+        metadata: dict[str, Any] = {}
+        for key in ("source_ref", "skill_snapshot_hash", "commit_sha", "model_id"):
+            value = next((item.get(key) for item in results if item.get(key) is not None), None)
+            if value is not None:
+                metadata[key] = value
+        if metadata:
+            metadata_by_variant[variant] = metadata
+    return metadata_by_variant
+
+
 def aggregate(
     evals_dir: Path,
     skill_id: str,
@@ -371,6 +398,8 @@ def aggregate(
     """run 結果を集計して benchmark summary を作る。"""
     results_by_variant = load_run_results(evals_dir, skill_id, run_id)
     evals_meta = load_evals_json(evals_dir, skill_id)
+    suite_hash = compute_file_sha256(evals_dir / skill_id / "evals.json")
+    variant_metadata = collect_variant_metadata(results_by_variant)
 
     variant_stats = {variant: compute_stats(results) for variant, results in results_by_variant.items()}
     comparisons = {
@@ -409,6 +438,10 @@ def aggregate(
         "case_breakdown": build_case_breakdown(results_by_variant, evals_meta),
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
+    if suite_hash is not None:
+        summary["suite_hash"] = suite_hash
+    if variant_metadata:
+        summary["variant_metadata"] = variant_metadata
 
     if commit_sha is not None:
         summary["commit_sha"] = commit_sha
@@ -482,12 +515,14 @@ def main() -> int:
             "campaign_id": args.campaign_id or args.run_id,
             "run_id": args.run_id,
             "eval_version": args.eval_version,
+            "suite_hash": result.get("suite_hash"),
             "commit_sha": args.commit_sha,
             "model_id": args.model_id,
             "generated_at": result["generated_at"],
             "summary": result["summary"],
             "variants": result["variants"],
             "comparisons": result["comparisons"],
+            "variant_metadata": result.get("variant_metadata", {}),
         },
     )
 

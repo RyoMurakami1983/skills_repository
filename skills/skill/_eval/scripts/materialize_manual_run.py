@@ -131,6 +131,7 @@ def materialize_run(evals_path: Path, manual_path: Path, skill_id: str, evals_di
 
     responses = manual["responses"]
     llm = manual["llm_grade"]
+    variant_meta = manual.get("variant_meta", {})
     compat_mode = is_compat_mode({str(key) for key in responses})
 
     for raw_variant_id, variant_responses in responses.items():
@@ -138,6 +139,7 @@ def materialize_run(evals_path: Path, manual_path: Path, skill_id: str, evals_di
         variant_llm = llm.get(raw_variant_id) or llm.get(variant_id)
         if variant_llm is None:
             raise ValueError(f"Missing llm_grade overrides for variant '{raw_variant_id}'")
+        metadata = variant_meta.get(raw_variant_id) or variant_meta.get(variant_id) or {}
         for case in evals.get("cases", []):
             case_id = case["id"]
             response = variant_responses[case_id]
@@ -152,6 +154,9 @@ def materialize_run(evals_path: Path, manual_path: Path, skill_id: str, evals_di
                 "response_snippet": response[:500],
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             }
+            for key in ("source_ref", "skill_snapshot_hash", "suite_hash", "model_id", "commit_sha"):
+                if key in metadata:
+                    result[key] = metadata[key]
             if compat_mode:
                 out_path = runs_dir / legacy_filename(run_id, case_id, raw_variant_id)
             else:

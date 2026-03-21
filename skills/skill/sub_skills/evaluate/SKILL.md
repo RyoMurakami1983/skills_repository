@@ -1,7 +1,7 @@
 ---
 name: evaluate
 description: >
-  with-skill と baseline を比較し、skill の行動変化を測定する。こんなときに使う:
+  baseline / legacy / current を比較し、skill の行動変化を測定する。こんなときに使う:
   trigger 精度、出力品質、回帰リスクを実証的に確認したいとき。
 compatibility: "_eval/agents/, _eval/scripts/, _eval/schemas/"
 ---
@@ -23,9 +23,9 @@ compatibility: "_eval/agents/, _eval/scripts/, _eval/schemas/"
 
 should-trigger と should-not-trigger を、実際の user request に近い形で作ります。near-miss case は false positive を見つけやすいので、明らかに無関係な prompt より重要です。
 
-### ステップ 2 — 両モードを同条件で実行する
+### ステップ 2 — 3 variant を同条件で実行する
 
-`_eval/agents/runner.md` を使い、各ケースを baseline / legacy / current の両方で実行します。条件が揃っていない比較は信用できません。
+`_eval/agents/runner.md` を使い、各ケースを baseline / legacy / current で実行します。条件が揃っていない比較は信用できません。
 
 ### ステップ 3 — 結果を集計する
 
@@ -37,7 +37,15 @@ should-trigger と should-not-trigger を、実際の user request に近い形�
 
 ### ステップ 5 — 次のアクションを決める
 
-current が legacy より明確に良ければ accept、悪化していれば revise、evidence が薄ければケース追加、回帰が大きければ escalation を選びます。
+current が legacy より明確に良ければ accept、悪化していれば revise、evidence が薄ければケース追加、回帰が大きければ escalation を選びます。accept した current は、次回 campaign では legacy に昇格させます。
+
+## 昇格ルール
+
+- `baseline` は常に no-skill の固定基準です。
+- `legacy` は直前に採用した版です。
+- `current` は今回の候補です。
+- `current` を accept したら、その snapshot を次回の `legacy` にします。
+- 以前の `legacy` は履歴 ledger には残しつつ、active benchmark からは外します。
 
 ## 早見表
 
@@ -59,5 +67,5 @@ current が legacy より明確に良ければ accept、悪化していれば re
 ## 注意点
 
 - **happy path だけで評価しない**: near-miss がないと trigger precision を判断できません。
-- **モード間で prompt を変えない**: 条件がずれた時点で比較の意味が壊れます。
+- **variant 間で prompt を変えない**: 条件がずれた時点で比較の意味が壊れます。
 - **1 回の好結果を証拠にしない**: anecdotal win より、繰り返し観測される evidence を重視します。

@@ -23,6 +23,7 @@
 - `business/pdf` を復旧し、`business/` カテゴリを `.copilot` 同期対象へ追加
 - frontmatter 最小構成方針に合わせて、validation / instructions / skills 周辺の規約を整理
 - `skills/skill/` を pilot に、`SKILL.md` の日本語正本化と `references/SKILL.ja.md` 前提の段階的廃止を進める方針へ切り替え
+- `skills/skill/_eval` を `baseline / legacy / current` 標準へ整理し、trend viewer・append-only history・reproducibility metadata を持つ評価運用へ拡張
 - `README.md` を入口中心に簡素化し、詳細手順を `docs/INSTALL.md` へ分離
 - repo 固有の documentation maintenance ルールを `.github/copilot-instructions.md` に追加
 - `skills-author-skill` などの旧メタスキル群を `skill` へ集約し、validator / generator / eval assets も新配置へ移行
@@ -40,13 +41,13 @@
 - `skills/SKILLS_README.md` と git / github 系 skill の Related Skills を更新し、router 化せずに topology と入口導線が追えるよう整理
 - `evals/github/evals.json` を追加し、`github` 薄い入口 skill の flat vs thin-entry 比較に使う日常運用フレーズ評価ケースを整備
 - `evals/github/corpus_summary.json`、`inventory_matrix.json`、`benchmark_summary.json`、`feedback.json` を追加し、`events.jsonl` の実 prompt corpus に基づく比較評価を残した
-- `evals/skill/evals.json`、`inventory_matrix.json`、`manual_run_20260317_002.json`、`benchmark_summary.json`、`feedback.json` を real-corpus-first に更新し、`skill` meta router が naming/taxonomy 相談で over-trigger して baseline 比で degraded することを可視化した
+- `evals/skill/evals.json`、`manual_run_20260321_003.json`、`benchmark_summary.json`、`benchmark_history.jsonl`、`viewer.html` を更新し、`skill` メタルーターの日本語正本版が legacy 比で neutral・baseline 比で improved であることを可視化した
 - `evals/dotnet/evals.json`、`inventory_matrix.json`、`manual_run_20260317_003.json`、`benchmark_summary.json`、`feedback.json` を追加し、`dotnet` 薄い入口 skill が local corpus では neutral だが Oracle integration routing で revise 余地があることを可視化した
 
 ### Fixed
 
 - リンクチェック、PR review 対応、allowlist / config 周辺の継続修正を実施
-- `skills/skill/sub_skills/` の frontmatter を YAML として有効化し、sub-skill ごとの `references/SKILL.ja.md` を追加
+- `skills/skill/` の user-facing eval 文言を `with-skill` から `baseline / legacy / current` へそろえ、viewer でも同じ語彙で読めるようにした
 
 ## 2026-02
 

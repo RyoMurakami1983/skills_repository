@@ -108,6 +108,16 @@ def test_materialize_run_supports_baseline_legacy_current_layout(tmp_path: Path)
                     "legacy": {"tc-001": []},
                     "current": {"tc-001": []},
                 },
+                "variant_meta": {
+                    "legacy": {
+                        "source_ref": "git:abc123",
+                        "skill_snapshot_hash": "legacy-hash",
+                    },
+                    "current": {
+                        "source_ref": "worktree:feature/test",
+                        "skill_snapshot_hash": "current-hash",
+                    },
+                },
             },
             ensure_ascii=False,
         ),
@@ -120,3 +130,5 @@ def test_materialize_run_supports_baseline_legacy_current_layout(tmp_path: Path)
     result = json.loads((evals_dir / "sample" / "runs" / "run-002__current__tc-001.json").read_text(encoding="utf-8"))
     assert result["variant_id"] == "current"
     assert result["score"] == 1.0
+    assert result["source_ref"] == "worktree:feature/test"
+    assert result["skill_snapshot_hash"] == "current-hash"

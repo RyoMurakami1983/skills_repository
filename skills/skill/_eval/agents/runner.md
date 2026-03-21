@@ -11,6 +11,7 @@
 3. **`current`** — 今回の改善候補を注入する
 
 旧 `with_skill` は互換名として `current` に正規化します。
+accept された `current` は、次回 run では `legacy` として扱います。
 
 生成する grading result は `../schemas/schemas.md` に従う必要があります。
 

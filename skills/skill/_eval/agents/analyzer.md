@@ -34,9 +34,10 @@
 
 `case_breakdown` の各 case について、次を見てください。
 
-1. `with_skill_mean > baseline_mean + 0.1` なら `keep` 候補（そのケースでは skill が効いている）
-2. `with_skill_mean < baseline_mean - 0.1` なら `problem` 候補（そのケースでは skill が悪化要因）
-3. assertion failure を確認し、assertion `type` ごとにまとめて傾向を探す
+1. `current_mean > legacy_mean + 0.1` なら `keep` 候補（今回候補が前回採用版より伸びている）
+2. `current_mean < legacy_mean - 0.1` なら `problem` 候補（今回候補が前回採用版より悪化している）
+3. `legacy_mean > baseline_mean + 0.1` かどうかも見て、そもそも skill 自体が no-skill より効いているかを確認する
+4. assertion failure を確認し、assertion `type` ごとにまとめて傾向を探す
 
 ### Step 3: 所見を KPT に分類する
 

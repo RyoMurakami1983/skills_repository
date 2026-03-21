@@ -35,7 +35,7 @@
     .verdict.degraded { background: #fde8e8; color: #a50000; }
     .stats-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 16px;
       margin-top: 12px;
     }
@@ -49,8 +49,8 @@
     .positive { color: #1a7a42; }
     .negative { color: #a50000; }
     .neutral-text { color: #856404; }
+    .helper-text { font-size: 0.82rem; color: #666; margin-top: 10px; white-space: pre-wrap; }
 
-    /* Summary table */
     table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
     th { background: #f0f2f7; text-align: left; padding: 8px 12px; font-weight: 600; }
     td { padding: 8px 12px; border-bottom: 1px solid #eee; vertical-align: top; }
@@ -58,7 +58,34 @@
     .delta-positive { color: #1a7a42; font-weight: 600; }
     .delta-negative { color: #a50000; font-weight: 600; }
 
-    /* Case detail cards */
+    .chart-svg {
+      width: 100%;
+      height: 260px;
+      background: #fcfcfe;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+    .legend {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      font-size: 0.82rem;
+      color: #555;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
     .case-card {
       background: #fff;
       border-radius: 10px;
@@ -106,8 +133,9 @@
       border-radius: 10px;
       font-weight: 600;
     }
-    .score-pill.skill  { background: #d4f7e0; color: #1a7a42; }
-    .score-pill.base   { background: #fde8e8; color: #a50000; }
+    .score-pill.current { background: #d4f7e0; color: #1a7a42; }
+    .score-pill.legacy  { background: #e0e7ff; color: #3730a3; }
+    .score-pill.base    { background: #fde8e8; color: #a50000; }
     .score-pill.base.ok { background: #fff3cd; color: #856404; }
     .toggle-icon { font-size: 0.8rem; color: #888; }
     .case-body {
@@ -116,7 +144,6 @@
     }
     .case-body.open { display: block; }
 
-    /* Prompt block */
     .prompt-block {
       background: #f8f9fc;
       border-left: 3px solid #6366f1;
@@ -128,7 +155,6 @@
       white-space: pre-wrap;
     }
 
-    /* Tag badges */
     .tags { margin-bottom: 14px; }
     .tag {
       display: inline-block;
@@ -140,7 +166,6 @@
       margin-right: 4px;
     }
 
-    /* Section label */
     .section-label {
       font-size: 0.78rem;
       font-weight: 700;
@@ -150,7 +175,6 @@
       margin: 16px 0 8px;
     }
 
-    /* Assertion table */
     .assertion-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-bottom: 4px; }
     .assertion-table th { background: #f0f2f7; padding: 6px 10px; text-align: left; font-weight: 600; }
     .assertion-table td { padding: 6px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
@@ -170,35 +194,10 @@
     .type-badge.contains     { background: #dbeafe; color: #1e40af; }
     .type-badge.not_contains { background: #fce7f3; color: #9d174d; }
     .type-badge.llm_grade    { background: #ede9fe; color: #6d28d9; }
+    .type-badge.starts_with,
+    .type-badge.ends_with,
+    .type-badge.regex        { background: #ecfccb; color: #3f6212; }
 
-    /* Snippet tabs */
-    .snippet-tabs { display: flex; gap: 0; margin-bottom: 0; }
-    .tab-btn {
-      padding: 6px 18px;
-      font-size: 0.82rem;
-      border: 1px solid #e0e0e0;
-      background: #f8f9fc;
-      cursor: pointer;
-      border-radius: 6px 6px 0 0;
-      font-weight: 500;
-      color: #555;
-    }
-    .tab-btn.active { background: #fff; border-bottom: 1px solid #fff; color: #1a1a2e; font-weight: 700; }
-    .snippet-panel {
-      display: none;
-      background: #fff;
-      border: 1px solid #e0e0e0;
-      border-radius: 0 6px 6px 6px;
-      padding: 12px 14px;
-      font-size: 0.82rem;
-      color: #333;
-      white-space: pre-wrap;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .snippet-panel.active { display: block; }
-
-    /* Gap & Recommendation */
     .gap-box {
       background: #fff7ed;
       border-left: 3px solid #f97316;
@@ -217,7 +216,6 @@
     }
     .rec-box .rec-title { font-size: 0.78rem; font-weight: 700; color: #15803d; margin-bottom: 4px; }
     .rec-box p { margin: 0; font-size: 0.83rem; color: #14532d; }
-
     .footer { font-size: 0.78rem; color: #aaa; margin-top: 32px; text-align: center; }
   </style>
 </head>
@@ -226,31 +224,44 @@
 <h1 id="title">Eval Viewer</h1>
 <p class="meta" id="meta"></p>
 
-<!-- Summary card -->
 <div class="card">
   <h2>サマリー</h2>
   <span class="verdict" id="verdict-badge"></span>
   <div class="stats-grid">
     <div class="stat-box">
-      <div class="label">スキルあり（mean）</div>
-      <div class="value" id="ws-mean">—</div>
+      <div class="label">current（現在候補）mean</div>
+      <div class="value" id="current-mean">—</div>
     </div>
     <div class="stat-box">
-      <div class="label">ベースライン（mean）</div>
-      <div class="value" id="bl-mean">—</div>
+      <div class="label">legacy（前回採用版）mean</div>
+      <div class="value" id="legacy-mean">—</div>
     </div>
     <div class="stat-box">
-      <div class="label">改善差分 (Δ)</div>
-      <div class="value" id="delta">—</div>
+      <div class="label">baseline（no-skill）mean</div>
+      <div class="value" id="baseline-mean">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="label" id="primary-label">主比較 Δ</div>
+      <div class="value" id="primary-delta">—</div>
     </div>
     <div class="stat-box">
       <div class="label">改善率</div>
       <div class="value" id="improvement">—</div>
     </div>
   </div>
+  <div class="helper-text" id="provenance"></div>
 </div>
 
-<!-- Quick overview table -->
+<div class="card" id="trend-card">
+  <h2>継続改善の trend</h2>
+  <p class="helper-text" id="trend-meta">campaign ごとの差分推移を表示します。</p>
+  <svg class="chart-svg" id="trend-chart" viewBox="0 0 720 240" preserveAspectRatio="none"></svg>
+  <div class="legend">
+    <span class="legend-item"><span class="legend-swatch" style="background:#2563eb;"></span>current vs legacy</span>
+    <span class="legend-item"><span class="legend-swatch" style="background:#16a34a;"></span>current vs baseline</span>
+  </div>
+</div>
+
 <div class="card">
   <h2>ケース別スコア概要</h2>
   <table>
@@ -258,16 +269,16 @@
       <tr>
         <th>Case ID</th>
         <th>テスト内容（要約）</th>
-        <th>スキルあり</th>
-        <th>ベースライン</th>
-        <th>Δ</th>
+        <th>current</th>
+        <th>legacy</th>
+        <th>baseline</th>
+        <th>主Δ</th>
       </tr>
     </thead>
     <tbody id="case-table"></tbody>
   </table>
 </div>
 
-<!-- Detailed case cards -->
 <div id="case-details"></div>
 
 <p class="footer" id="footer"></p>
@@ -286,66 +297,79 @@ const DATA = /* __BENCHMARK_DATA__ */null;
   document.getElementById("meta").textContent =
     `eval version: ${d.eval_version}  |  generated: ${new Date(d.generated_at).toLocaleString("ja-JP")}`;
 
-  const verdict = d.summary.verdict;
   const badge = document.getElementById("verdict-badge");
-  badge.textContent = { improved: "✅ Improved", neutral: "⚠️ Neutral", degraded: "❌ Degraded" }[verdict] || verdict;
+  const verdict = d.summary?.verdict || "neutral";
+  badge.textContent = ({ improved: "✅ Improved", neutral: "⚠️ Neutral", degraded: "❌ Degraded" }[verdict] || verdict);
   badge.className = `verdict ${verdict}`;
 
-  const fmt = v => (v == null ? "—" : v.toFixed(4));
-  const pct = v => (v == null ? "—" : `${v > 0 ? "+" : ""}${v.toFixed(1)}%`);
+  document.getElementById("current-mean").textContent = fmt(variantMean(d, "current"));
+  document.getElementById("legacy-mean").textContent = fmt(variantMean(d, "legacy"));
+  document.getElementById("baseline-mean").textContent = fmt(variantMean(d, "baseline"));
+  document.getElementById("primary-label").textContent = `${comparisonLabel(d.summary?.primary_comparison)} Δ`;
 
-  document.getElementById("ws-mean").textContent = fmt(d.runs.with_skill?.mean);
-  document.getElementById("bl-mean").textContent = fmt(d.runs.baseline?.mean);
+  const delta = d.summary?.delta;
+  const primaryDeltaEl = document.getElementById("primary-delta");
+  primaryDeltaEl.textContent = fmtDelta(delta);
+  primaryDeltaEl.className = `value ${delta > 0.05 ? "positive" : delta < -0.05 ? "negative" : "neutral-text"}`;
+  document.getElementById("improvement").textContent = pct(d.summary?.improvement_pct);
+  document.getElementById("provenance").textContent = buildProvenance(d);
 
-  const deltaEl = document.getElementById("delta");
-  const delta = d.summary.delta;
-  deltaEl.textContent = delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta.toFixed(4)}`;
-  deltaEl.className = `value ${delta > 0.05 ? "positive" : delta < -0.05 ? "negative" : "neutral-text"}`;
-  document.getElementById("improvement").textContent = pct(d.summary.improvement_pct);
+  renderTrendChart(d.history || []);
+  renderCaseOverview(d.case_breakdown || []);
+  renderCaseDetails(d.case_breakdown || []);
+  renderHistory(d.history || []);
 
-  const cases = d.case_breakdown || [];
+  document.getElementById("footer").textContent =
+    `skill/_eval  |  ${d.skill_id}  |  ${d.eval_version}  |  suite_hash: ${d.suite_hash || "—"}`;
+})(DATA);
 
-  // Overview table
+function renderCaseOverview(cases) {
   const tbody = document.getElementById("case-table");
   cases.forEach(c => {
     const tr = document.createElement("tr");
-    const cd = c.delta;
-    const dClass = cd == null ? "" : cd > 0.05 ? "delta-positive" : cd < -0.05 ? "delta-negative" : "";
-    const fmtDelta = cd == null ? "—" : `${cd > 0 ? "+" : ""}${cd.toFixed(4)}`;
+    const delta = primaryCaseDelta(c);
     const promptShort = (c.prompt || c.case_id).slice(0, 40) + ((c.prompt || "").length > 40 ? "…" : "");
-
-    [c.case_id, promptShort, fmt(c.with_skill_mean), fmt(c.baseline_mean), fmtDelta]
-      .forEach((val, i) => {
-        const td = document.createElement("td");
-        td.textContent = val;
-        if (i === 4 && dClass) td.className = dClass;
-        tr.appendChild(td);
-      });
+    [
+      c.case_id,
+      promptShort,
+      fmt(caseScore(c, "current")),
+      fmt(caseScore(c, "legacy")),
+      fmt(caseScore(c, "baseline")),
+      fmtDelta(delta),
+    ].forEach((val, index) => {
+      const td = document.createElement("td");
+      td.textContent = val;
+      if (index === 5 && delta != null) {
+        td.className = delta > 0.05 ? "delta-positive" : delta < -0.05 ? "delta-negative" : "";
+      }
+      tr.appendChild(td);
+    });
     tbody.appendChild(tr);
   });
+}
 
-  // Detailed case cards
+function renderCaseDetails(cases) {
   const detailsContainer = document.getElementById("case-details");
-
   cases.forEach((c, idx) => {
     const card = document.createElement("div");
     card.className = "case-card";
 
-    const cd = c.delta;
-    const bsOk = (c.baseline_mean || 0) >= 0.8;
-    const wsScore = c.with_skill_mean != null ? c.with_skill_mean.toFixed(4) : "—";
-    const blScore = c.baseline_mean != null ? c.baseline_mean.toFixed(4) : "—";
-    const deltaStr = cd == null ? "" : ` Δ${cd > 0 ? "+" : ""}${cd.toFixed(2)}`;
+    const delta = primaryCaseDelta(c);
+    const currentScore = caseScore(c, "current");
+    const legacyScore = caseScore(c, "legacy");
+    const baselineScore = caseScore(c, "baseline");
+    const deltaStr = delta == null ? "" : ` Δ${delta > 0 ? "+" : ""}${delta.toFixed(2)}`;
+    const baselineOk = (baselineScore || 0) >= 0.8;
 
-    // Header (clickable)
     const header = document.createElement("div");
     header.className = "case-header";
     header.innerHTML = `
       <span class="case-id-badge">${escHtml(c.case_id)}</span>
-      <span class="case-prompt" title="${escHtml(c.prompt||"")}">${escHtml(c.prompt || c.case_id)}</span>
+      <span class="case-prompt" title="${escHtml(c.prompt || "")}">${escHtml(c.prompt || c.case_id)}</span>
       <span class="case-scores">
-        <span class="score-pill skill">スキルあり ${wsScore}</span>
-        <span class="score-pill base${bsOk ? " ok" : ""}">ベースライン ${blScore}</span>
+        <span class="score-pill current">current ${fmt(currentScore)}</span>
+        <span class="score-pill legacy">legacy ${fmt(legacyScore)}</span>
+        <span class="score-pill base${baselineOk ? " ok" : ""}">baseline ${fmt(baselineScore)}</span>
         <span style="color:#555;font-size:0.82rem;">${deltaStr}</span>
       </span>
       <span class="toggle-icon" id="toggle-icon-${idx}">▼</span>
@@ -355,37 +379,30 @@ const DATA = /* __BENCHMARK_DATA__ */null;
     body.className = "case-body";
     body.id = `case-body-${idx}`;
 
-    // Prompt
     if (c.prompt) {
       body.innerHTML += `<div class="section-label">📝 テストプロンプト</div><div class="prompt-block">${escHtml(c.prompt)}</div>`;
     }
 
-    // Tags
     if (c.tags && c.tags.length) {
-      body.innerHTML += `<div class="tags">${c.tags.map(t => `<span class="tag">${escHtml(t)}</span>`).join("")}</div>`;
+      body.innerHTML += `<div class="tags">${c.tags.map(tag => `<span class="tag">${escHtml(tag)}</span>`).join("")}</div>`;
     }
 
-    // Assertion table
     if (c.assertion_detail && c.assertion_detail.length) {
       let assertHtml = `<div class="section-label">🔍 アサーション詳細</div>
         <table class="assertion-table">
           <thead><tr>
             <th>種別</th><th>期待値 / 評価基準</th><th>重み</th>
-            <th>スキルあり</th><th>ベースライン</th><th>補足</th>
+            <th>current</th><th>legacy</th><th>baseline</th><th>補足</th>
           </tr></thead><tbody>`;
       c.assertion_detail.forEach(a => {
-        const safeType = escHtml(a.type);
-        const typeBadge = `<span class="type-badge ${safeType}">${safeType}</span>`;
-        const wsPass = a.with_skill_passed == null ? '<span class="na">—</span>'
-          : a.with_skill_passed ? '<span class="pass">✅</span>' : '<span class="fail">❌</span>';
-        const blPass = a.baseline_passed == null ? '<span class="na">—</span>'
-          : a.baseline_passed ? '<span class="pass">✅</span>' : '<span class="fail">❌</span>';
+        const typeBadge = `<span class="type-badge ${escHtml(a.type)}">${escHtml(a.type)}</span>`;
         assertHtml += `<tr>
           <td>${typeBadge}</td>
           <td class="value-cell">${escHtml(a.value)}</td>
           <td>${a.weight}</td>
-          <td>${wsPass}</td>
-          <td>${blPass}</td>
+          <td>${renderPass(a.results?.current?.passed)}</td>
+          <td>${renderPass(a.results?.legacy?.passed)}</td>
+          <td>${renderPass(a.results?.baseline?.passed)}</td>
           <td class="detail-cell">${escHtml(a.detail || "")}</td>
         </tr>`;
       });
@@ -393,32 +410,30 @@ const DATA = /* __BENCHMARK_DATA__ */null;
       body.innerHTML += assertHtml;
     }
 
-    // Response snippets (tabbed)
-    const hasWs = c.with_skill_snippet;
-    const hasBl = c.baseline_snippet;
-    if (hasWs || hasBl) {
-      body.innerHTML += `<div class="section-label">💬 回答スニペット</div>
-        <div class="snippet-tabs">
-          <button class="tab-btn active" onclick="switchTab(this,'ws-${idx}','bl-${idx}')">スキルあり</button>
-          <button class="tab-btn" onclick="switchTab(this,'bl-${idx}','ws-${idx}')">ベースライン</button>
-        </div>
-        <div class="snippet-panel active" id="ws-${idx}">${escHtml(hasWs || "(なし)")}</div>
-        <div class="snippet-panel" id="bl-${idx}">${escHtml(hasBl || "(なし)")}</div>`;
+    const snippets = [
+      ["current", c.current_snippet || c.with_skill_snippet],
+      ["legacy", c.legacy_snippet],
+      ["baseline", c.baseline_snippet],
+    ].filter(([, value]) => value);
+    if (snippets.length) {
+      body.innerHTML += `<div class="section-label">💬 回答スニペット</div>`;
+      snippets.forEach(([label, value]) => {
+        body.innerHTML += `<div class="prompt-block"><strong>${escHtml(label)}</strong>\n${escHtml(value || "(なし)")}</div>`;
+      });
     }
 
-    // Gap analysis
     if (c.gap_summary && c.gap_summary.length) {
-      let gapHtml = `<div class="section-label" style="margin-top:16px;">⚠️ ギャップ分析（ベースライン不足点）</div>
-        <div class="gap-box"><div class="gap-title">ベースラインが不足している点</div><ul>`;
-      c.gap_summary.forEach(g => { gapHtml += `<li>${escHtml(g)}</li>`; });
+      const referenceLabel = c.reference_variant || "reference";
+      let gapHtml = `<div class="section-label" style="margin-top:16px;">⚠️ ギャップ分析</div>
+        <div class="gap-box"><div class="gap-title">${escHtml(referenceLabel)} が不足している点</div><ul>`;
+      c.gap_summary.forEach(item => { gapHtml += `<li>${escHtml(item)}</li>`; });
       gapHtml += `</ul></div>`;
       body.innerHTML += gapHtml;
     } else {
       body.innerHTML += `<div class="gap-box" style="margin-top:16px;"><div class="gap-title">ギャップなし</div>
-        <ul><li>ベースラインも全アサーションをクリア。スキル固有の知識を必要としないケースです。</li></ul></div>`;
+        <ul><li>参照比較側にも明確な不足は見えていません。</li></ul></div>`;
     }
 
-    // Recommendation
     if (c.recommendation) {
       body.innerHTML += `<div class="rec-box"><div class="rec-title">💡 改善提案（AI私見）</div>
         <p>${escHtml(c.recommendation)}</p></div>`;
@@ -433,57 +448,163 @@ const DATA = /* __BENCHMARK_DATA__ */null;
     card.appendChild(body);
     detailsContainer.appendChild(card);
   });
+}
 
-  const history = d.history || [];
-  if (history.length) {
-    const historyCard = document.createElement("div");
-    historyCard.className = "card";
-    historyCard.innerHTML = `
-      <h2>履歴</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Campaign</th>
-            <th>Run</th>
-            <th>Primary comparison</th>
-            <th>Δ</th>
-            <th>Verdict</th>
-            <th>Generated</th>
-          </tr>
-        </thead>
-        <tbody id="history-table"></tbody>
-      </table>
-    `;
-    const historyBody = historyCard.querySelector("#history-table");
-    history.slice().reverse().forEach(h => {
-      const tr = document.createElement("tr");
-      const cmp = h.summary?.primary_comparison || "—";
-      const delta = h.summary?.delta;
-      const verdict = h.summary?.verdict || "—";
-      const generated = h.generated_at ? new Date(h.generated_at).toLocaleString("ja-JP") : "—";
-      const deltaText = delta == null ? "—" : `${delta > 0 ? "+" : ""}${delta.toFixed(4)}`;
-      [h.campaign_id || "—", h.run_id || "—", cmp, deltaText, verdict, generated].forEach((val, i) => {
-        const td = document.createElement("td");
-        td.textContent = val;
-        if (i === 3 && delta != null) {
-          td.className = delta > 0.05 ? "delta-positive" : delta < -0.05 ? "delta-negative" : "";
-        }
-        tr.appendChild(td);
-      });
-      historyBody.appendChild(tr);
+function renderHistory(history) {
+  if (!history.length) return;
+  const detailsContainer = document.getElementById("case-details");
+  const historyCard = document.createElement("div");
+  historyCard.className = "card";
+  historyCard.innerHTML = `
+    <h2>履歴</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Campaign</th>
+          <th>Run</th>
+          <th>Primary comparison</th>
+          <th>Δ</th>
+          <th>Verdict</th>
+          <th>Generated</th>
+        </tr>
+      </thead>
+      <tbody id="history-table"></tbody>
+    </table>
+  `;
+  const historyBody = historyCard.querySelector("#history-table");
+  history.slice().reverse().forEach(h => {
+    const tr = document.createElement("tr");
+    const delta = h.summary?.delta;
+    [
+      h.campaign_id || "—",
+      h.run_id || "—",
+      comparisonLabel(h.summary?.primary_comparison || "—"),
+      fmtDelta(delta),
+      h.summary?.verdict || "—",
+      h.generated_at ? new Date(h.generated_at).toLocaleString("ja-JP") : "—",
+    ].forEach((val, index) => {
+      const td = document.createElement("td");
+      td.textContent = val;
+      if (index === 3 && delta != null) {
+        td.className = delta > 0.05 ? "delta-positive" : delta < -0.05 ? "delta-negative" : "";
+      }
+      tr.appendChild(td);
     });
-    detailsContainer.appendChild(historyCard);
+    historyBody.appendChild(tr);
+  });
+  detailsContainer.appendChild(historyCard);
+}
+
+function renderTrendChart(history) {
+  const card = document.getElementById("trend-card");
+  const svg = document.getElementById("trend-chart");
+  const meta = document.getElementById("trend-meta");
+  const points = history.slice().reverse().map((item, index) => ({
+    label: item.campaign_id || item.run_id || `run-${index + 1}`,
+    currentVsLegacy: item.comparisons?.current_vs_legacy?.delta ?? null,
+    currentVsBaseline: item.comparisons?.current_vs_baseline?.delta ?? null,
+  }));
+  const values = points.flatMap(point => [point.currentVsLegacy, point.currentVsBaseline]).filter(value => value != null);
+  if (!values.length) {
+    card.style.display = "none";
+    return;
   }
 
-  document.getElementById("footer").textContent =
-    `skill/_eval  |  ${d.skill_id}  |  ${d.eval_version}`;
-})(DATA);
+  meta.textContent = `${points.length} campaign の履歴から、current の改善差分を可視化しています。`;
+  const width = 720;
+  const height = 240;
+  const padding = { top: 24, right: 24, bottom: 48, left: 48 };
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
+  const minValue = Math.min(0, ...values);
+  const maxValue = Math.max(0, ...values);
+  const range = maxValue - minValue || 1;
+  const xAt = index => padding.left + (points.length === 1 ? innerWidth / 2 : (index / (points.length - 1)) * innerWidth);
+  const yAt = value => padding.top + ((maxValue - value) / range) * innerHeight;
+  const axisY = yAt(0);
 
-function switchTab(btn, showId, hideId) {
-  btn.parentElement.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  document.getElementById(showId).classList.add("active");
-  document.getElementById(hideId).classList.remove("active");
+  const buildPolyline = (seriesKey, color) => {
+    const seriesPoints = points
+      .map((point, index) => ({ x: xAt(index), y: point[seriesKey] == null ? null : yAt(point[seriesKey]), value: point[seriesKey] }))
+      .filter(point => point.y != null);
+    if (!seriesPoints.length) return "";
+    const line = `<polyline fill="none" stroke="${color}" stroke-width="3" points="${seriesPoints.map(point => `${point.x},${point.y}`).join(" ")}" />`;
+    const circles = seriesPoints
+      .map(point => `<circle cx="${point.x}" cy="${point.y}" r="4" fill="${color}"><title>${point.value.toFixed(4)}</title></circle>`)
+      .join("");
+    return line + circles;
+  };
+
+  const labels = points.map((point, index) =>
+    `<text x="${xAt(index)}" y="${height - 18}" text-anchor="middle" font-size="10" fill="#6b7280">${escHtml(point.label)}</text>`
+  ).join("");
+
+  svg.innerHTML = `
+    <line x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}" stroke="#d1d5db" />
+    <line x1="${padding.left}" y1="${axisY}" x2="${width - padding.right}" y2="${axisY}" stroke="#d1d5db" stroke-dasharray="4 4" />
+    <line x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}" stroke="#d1d5db" />
+    <text x="8" y="${padding.top + 8}" font-size="10" fill="#6b7280">${maxValue.toFixed(2)}</text>
+    <text x="8" y="${height - padding.bottom}" font-size="10" fill="#6b7280">${minValue.toFixed(2)}</text>
+    ${buildPolyline("currentVsLegacy", "#2563eb")}
+    ${buildPolyline("currentVsBaseline", "#16a34a")}
+    ${labels}
+  `;
+}
+
+function buildProvenance(data) {
+  const lines = [];
+  lines.push(`suite_hash: ${data.suite_hash || "—"}`);
+  ["current", "legacy", "baseline"].forEach(variant => {
+    const meta = data.variant_metadata?.[variant];
+    if (!meta) return;
+    lines.push(`${variant}: ${meta.source_ref || "—"}  |  snapshot: ${meta.skill_snapshot_hash || "—"}`);
+  });
+  return lines.join("\n");
+}
+
+function variantMean(payload, variant) {
+  return payload?.variants?.[variant]?.mean
+    ?? (variant === "current" ? payload?.runs?.with_skill?.mean : payload?.runs?.[variant]?.mean)
+    ?? null;
+}
+
+function caseScore(caseItem, variant) {
+  return caseItem?.variant_results?.[variant]?.score
+    ?? (variant === "current" ? caseItem?.current_mean ?? caseItem?.with_skill_mean : caseItem?.[`${variant}_mean`])
+    ?? null;
+}
+
+function primaryCaseDelta(caseItem) {
+  const key = caseItem?.primary_comparison || DATA?.summary?.primary_comparison;
+  if (key === "current_vs_legacy") return caseItem.current_vs_legacy_delta ?? caseItem.delta;
+  if (key === "current_vs_baseline") return caseItem.current_vs_baseline_delta ?? caseItem.delta;
+  if (key === "legacy_vs_baseline") return caseItem.legacy_vs_baseline_delta ?? caseItem.delta;
+  return caseItem.delta;
+}
+
+function comparisonLabel(key) {
+  return ({
+    current_vs_legacy: "current vs legacy",
+    current_vs_baseline: "current vs baseline",
+    legacy_vs_baseline: "legacy vs baseline",
+  }[key] || key || "主比較");
+}
+
+function renderPass(value) {
+  if (value == null) return '<span class="na">—</span>';
+  return value ? '<span class="pass">✅</span>' : '<span class="fail">❌</span>';
+}
+
+function fmt(value) {
+  return value == null ? "—" : value.toFixed(4);
+}
+
+function fmtDelta(value) {
+  return value == null ? "—" : `${value > 0 ? "+" : ""}${value.toFixed(4)}`;
+}
+
+function pct(value) {
+  return value == null ? "—" : `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
 }
 
 function escHtml(str) {
