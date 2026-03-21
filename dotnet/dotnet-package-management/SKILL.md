@@ -1,67 +1,66 @@
 ---
 name: dotnet-package-management
 description: >
-  Manage NuGet packages using Central Package Management (CPM) and dotnet CLI commands.
-  Use when: adding, removing, updating, or centralizing NuGet package versions across .NET projects.
+  こんなときに使う: NuGet パッケージを Central Package Management (CPM) と dotnet CLI コマンドで管理。
+  .NET プロジェクト間でパッケージバージョンの追加・削除・更新・一元化を行うときに使用。
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, nuget, cpm, package-management, cli]
   invocable: false
   version: 1.0.0
 ---
+# NuGet パッケージ管理
 
-# NuGet Package Management
+.NET ソリューションにおけるNuGetパッケージ管理のエンドツーエンドワークフロー：Central Package Management (CPM) セットアップ、dotnet CLI 操作、共有バージョン変数、パッケージソース設定、依存関係監査。
 
-End-to-end workflow for managing NuGet packages in .NET solutions: Central Package Management (CPM) setup, dotnet CLI operations, shared version variables, package source configuration, and dependency auditing.
+## こんなときに使う
 
-## When to Use This Skill
+以下の場合にこのスキルを使用してください：
 
-Use this skill when:
-
-- Adding or removing NuGet packages from a .NET project using dotnet CLI commands
-- Setting up Central Package Management (CPM) to unify versions across a solution
-- Organizing related NuGet packages under shared version variables in Directory.Packages.props
-- Configuring private NuGet feeds or solution-specific package sources via NuGet.Config
-- Auditing outdated, vulnerable, or deprecated packages with dotnet list commands
-- Updating NuGet package versions centrally without editing individual .csproj files
-- Troubleshooting package restore failures by clearing caches and reviewing dependency trees
+- dotnet CLI コマンドを使用して .NET プロジェクトに NuGet パッケージを追加または削除するとき
+- Central Package Management (CPM) を設定してソリューション全体のバージョンを統一するとき
+- 関連する NuGet パッケージを Directory.Packages.props の共有バージョン変数で整理するとき
+- プライベート NuGet フィードやソリューション固有のパッケージソースを NuGet.Config で設定するとき
+- dotnet list コマンドで古い・脆弱・非推奨のパッケージを監査するとき
+- 個々の .csproj ファイルを編集せずに NuGet パッケージバージョンを一元的に更新するとき
+- キャッシュクリアと依存関係ツリーの確認でパッケージ復元の失敗をトラブルシュートするとき
 
 ---
 
 ## Related Skills
 
-- **`dotnet-project-structure`** — Solution-level build configuration and Directory.Build.props setup
-- **`dotnet-local-tools`** — Managing local .NET tools with dotnet-tools.json manifest
-- **`dotnet-slopwatch`** — Detecting slop patterns including unnecessary VersionOverride usage
-- **`git-commit-practices`** — Commit each package change as an atomic Conventional Commit
+- **`dotnet-project-structure`** — ソリューションレベルのビルド設定と Directory.Build.props のセットアップ
+- **`dotnet-local-tools`** — dotnet-tools.json マニフェストによるローカル .NET ツール管理
+- **`dotnet-slopwatch`** — 不要な VersionOverride 使用を含むスロップパターンの検出
+- **`git-commit-practices`** — 各パッケージ変更をアトミックな Conventional Commit でコミット
 
 ---
 
 ## Core Principles
 
-1. **CLI-First Operations** — Always use `dotnet add/remove/list` commands instead of editing XML manually; the CLI validates packages, resolves versions, and updates lock files (基礎と型)
-2. **Single Source of Truth** — Centralize all package versions in `Directory.Packages.props` so every project references one authoritative version registry (基礎と型)
-3. **Grouped Version Variables** — Related packages share a single version variable to prevent drift between packages that must stay in sync (継続は力)
-4. **Audit Before Deploy** — Run `dotnet list package --outdated --vulnerable --deprecated` regularly to catch security and compatibility issues early (温故知新)
-5. **Reproducible Restores** — Pin package sources in `NuGet.Config` with `<clear />` and use lock files so every environment produces identical dependency graphs (ニュートラル)
+1. **CLI-First Operations（CLI ファースト操作）** — XML を手動編集する代わりに常に `dotnet add/remove/list` コマンドを使用する。CLI はパッケージの検証、バージョン解決、ロックファイル更新を行う（基礎と型）
+2. **Single Source of Truth（単一の信頼できる情報源）** — すべてのパッケージバージョンを `Directory.Packages.props` に集約し、すべてのプロジェクトが一つの権威あるバージョンレジストリを参照する（基礎と型）
+3. **Grouped Version Variables（グループ化されたバージョン変数）** — 関連パッケージは単一のバージョン変数を共有し、同期が必要なパッケージ間のバージョンドリフトを防止する（継続は力）
+4. **Audit Before Deploy（デプロイ前の監査）** — `dotnet list package --outdated --vulnerable --deprecated` を定期的に実行し、セキュリティと互換性の問題を早期発見する（温故知新）
+5. **Reproducible Restores（再現可能な復元）** — `NuGet.Config` で `<clear />` を使用してパッケージソースを固定し、ロックファイルですべての環境で同一の依存関係グラフを生成する（ニュートラル）
 
 ---
 
 ## Workflow: Manage NuGet Packages
 
-### Step 1 — Enable Central Package Management
+### Step 1 — Central Package Management の有効化
 
-Use when centralizing all NuGet package versions into a single `Directory.Packages.props` file.
+すべての NuGet パッケージバージョンを単一の `Directory.Packages.props` ファイルに集約するときに使用します。
 
-**Prerequisites:**
+**前提条件：**
 
-| Requirement | Minimum Version |
-|-------------|-----------------|
+| 要件 | 最低バージョン |
+|------|----------------|
 | .NET SDK | 6.0.300 |
 | NuGet | 6.2 |
 | Visual Studio | 2022 17.2 |
 
-Create `Directory.Packages.props` at the solution root:
+ソリューションルートに `Directory.Packages.props` を作成します：
 
 ```xml
 <Project>
@@ -77,7 +76,7 @@ Create `Directory.Packages.props` at the solution root:
 </Project>
 ```
 
-**Project files** reference packages without versions:
+**プロジェクトファイル**はバージョンなしでパッケージを参照します：
 
 ```xml
 <!-- src/MyApp/MyApp.csproj -->
@@ -89,51 +88,51 @@ Create `Directory.Packages.props` at the solution root:
 </Project>
 ```
 
-**Why CPM**: Eliminates version drift across projects. Updating one line in `Directory.Packages.props` propagates to every project that consumes the package.
+**なぜ CPM か**: プロジェクト間のバージョンドリフトを排除します。`Directory.Packages.props` の1行を更新するだけで、そのパッケージを使用するすべてのプロジェクトに伝播します。
 
-> **Values**: 基礎と型（single source of truth for all package versions） / ニュートラル
+> **Values**: 基礎と型（すべてのパッケージバージョンの単一の信頼できる情報源） / ニュートラル
 
-### Step 2 — Add and Remove Packages via CLI
+### Step 2 — CLI によるパッケージの追加と削除
 
-Use when installing or uninstalling NuGet packages in a project. Never edit `.csproj` or `Directory.Packages.props` XML by hand.
+プロジェクトに NuGet パッケージをインストールまたはアンインストールするときに使用します。`.csproj` や `Directory.Packages.props` の XML を手動で編集しないでください。
 
-**Adding packages:**
+**パッケージの追加：**
 
 ```bash
-# Add latest stable version
+# 最新の安定版を追加
 dotnet add package Serilog
 
-# Add specific version
+# 特定のバージョンを追加
 dotnet add package Serilog --version 4.0.0
 
-# Add prerelease package
+# プレリリースパッケージを追加
 dotnet add package Serilog --prerelease
 
-# Add to a specific project
+# 特定のプロジェクトに追加
 dotnet add src/MyApp/MyApp.csproj package Serilog
 ```
 
-**With CPM enabled**, `dotnet add package` updates both `Directory.Packages.props` and the project file automatically.
+**CPM 有効時**は、`dotnet add package` が `Directory.Packages.props` とプロジェクトファイルの両方を自動的に更新します。
 
-**Removing packages:**
+**パッケージの削除：**
 
 ```bash
-# Remove from current project
+# 現在のプロジェクトから削除
 dotnet remove package Serilog
 
-# Remove from specific project
+# 特定のプロジェクトから削除
 dotnet remove src/MyApp/MyApp.csproj package Serilog
 ```
 
-**Why CLI-first**: The CLI validates that the package exists on the feed, resolves the correct version, handles transitive dependencies, and updates lock files. Manual XML editing risks typos, missing packages, and malformed markup.
+**なぜ CLI ファーストか**: CLI はフィード上にパッケージが存在することを検証し、正しいバージョンを解決し、推移的依存関係を処理し、ロックファイルを更新します。手動の XML 編集ではタイポ、パッケージの欠落、不正なマークアップのリスクがあります。
 
-> **Values**: 基礎と型（CLI validates what manual edits cannot） / 温故知新
+> **Values**: 基礎と型（CLI は手動編集では検証できないことを検証する） / 温故知新
 
-### Step 3 — Organize with Shared Version Variables
+### Step 3 — 共有バージョン変数による整理
 
-Use when multiple related packages must stay at the same version to avoid runtime incompatibilities.
+複数の関連パッケージが実行時の非互換性を避けるために同じバージョンに揃える必要があるときに使用します。
 
-Define version properties and reference them in `Directory.Packages.props`:
+`Directory.Packages.props` でバージョンプロパティを定義して参照します：
 
 ```xml
 <Project>
@@ -141,14 +140,14 @@ Define version properties and reference them in `Directory.Packages.props`:
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
-  <!-- Shared version variables -->
+  <!-- 共有バージョン変数 -->
   <PropertyGroup Label="SharedVersions">
     <AkkaVersion>1.5.59</AkkaVersion>
     <OpenTelemetryVersion>1.11.0</OpenTelemetryVersion>
     <XunitVersion>2.9.2</XunitVersion>
   </PropertyGroup>
 
-  <!-- Akka.NET packages — all use same version -->
+  <!-- Akka.NET パッケージ — すべて同じバージョン -->
   <ItemGroup Label="Akka.NET">
     <PackageVersion Include="Akka" Version="$(AkkaVersion)" />
     <PackageVersion Include="Akka.Cluster" Version="$(AkkaVersion)" />
@@ -156,14 +155,14 @@ Define version properties and reference them in `Directory.Packages.props`:
     <PackageVersion Include="Akka.Streams" Version="$(AkkaVersion)" />
   </ItemGroup>
 
-  <!-- OpenTelemetry packages -->
+  <!-- OpenTelemetry パッケージ -->
   <ItemGroup Label="OpenTelemetry">
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />
   </ItemGroup>
 
-  <!-- Testing -->
+  <!-- テスト -->
   <ItemGroup Label="Testing">
     <PackageVersion Include="xunit" Version="$(XunitVersion)" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="$(XunitVersion)" />
@@ -172,21 +171,21 @@ Define version properties and reference them in `Directory.Packages.props`:
 </Project>
 ```
 
-**Why version variables**: Update all Akka packages by changing one line. Labeled `<ItemGroup>` elements provide clear organization and prevent accidental version mismatches.
+**なぜバージョン変数か**: 1行を変更するだけですべてのAkkaパッケージを更新できます。ラベル付きの `<ItemGroup>` 要素により明確な整理が可能になり、偶発的なバージョン不一致を防ぎます。
 
-> **Values**: 継続は力（consistent versions compound reliability over time） / 成長の複利
+> **Values**: 継続は力（一貫したバージョンが長期的な信頼性を積み上げる） / 成長の複利
 
-### Step 4 — Configure Package Sources
+### Step 4 — パッケージソースの設定
 
-Use when adding private NuGet feeds or ensuring reproducible restores across machines.
+プライベート NuGet フィードの追加や、マシン間で再現可能な復元を確保するときに使用します。
 
-**List current sources:**
+**現在のソースを確認：**
 
 ```bash
 dotnet nuget list source
 ```
 
-**Add a private feed:**
+**プライベートフィードの追加：**
 
 ```bash
 dotnet nuget add source https://pkgs.dev.azure.com/myorg/_packaging/myfeed/nuget/v3/index.json \
@@ -196,13 +195,13 @@ dotnet nuget add source https://pkgs.dev.azure.com/myorg/_packaging/myfeed/nuget
   --store-password-in-clear-text
 ```
 
-**Solution-specific NuGet.Config** — create at the solution root for reproducible restores:
+**ソリューション固有の NuGet.Config** — 再現可能な復元のためにソリューションルートに作成：
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
-    <!-- Clear inherited machine-level sources -->
+    <!-- 継承されたマシンレベルのソースをクリア -->
     <clear />
     <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
     <add key="MyPrivateFeed" value="https://pkgs.dev.azure.com/myorg/_packaging/myfeed/nuget/v3/index.json" />
@@ -216,58 +215,58 @@ dotnet nuget add source https://pkgs.dev.azure.com/myorg/_packaging/myfeed/nuget
 </configuration>
 ```
 
-**Why `<clear />`**: Removes inherited machine-level NuGet sources so restores produce identical results regardless of developer machine configuration.
+**なぜ `<clear />` か**: 継承されたマシンレベルの NuGet ソースを除去し、開発者のマシン設定に関わらず復元が同一の結果を生成するようにします。
 
-> **Values**: ニュートラル（environment-independent, reproducible restores） / 基礎と型
+> **Values**: ニュートラル（環境に依存しない、再現可能な復元） / 基礎と型
 
-### Step 5 — Audit and Update Dependencies
+### Step 5 — 依存関係の監査と更新
 
-Use when checking for outdated, vulnerable, or deprecated packages before a release.
+リリース前に古い・脆弱・非推奨のパッケージを確認するときに使用します。
 
-**Listing packages:**
+**パッケージの一覧表示：**
 
 ```bash
-# List all packages in solution
+# ソリューション内の全パッケージを表示
 dotnet list package
 
-# Show outdated packages
+# 古いパッケージを表示
 dotnet list package --outdated
 
-# Include transitive dependencies
+# 推移的依存関係を含めて表示
 dotnet list package --include-transitive
 
-# Show vulnerable packages
+# 脆弱なパッケージを表示
 dotnet list package --vulnerable
 
-# Show deprecated packages
+# 非推奨パッケージを表示
 dotnet list package --deprecated
 ```
 
-**Updating packages with CPM:**
+**CPM でのパッケージ更新：**
 
 ```bash
-# Edit the version in Directory.Packages.props, then restore
+# Directory.Packages.props のバージョンを編集後、復元を実行
 dotnet restore
 
-# Or use dotnet-outdated tool for bulk upgrades
+# または dotnet-outdated ツールで一括アップグレード
 dotnet tool install --global dotnet-outdated-tool
 dotnet outdated --upgrade
 ```
 
-**Troubleshooting restore failures:**
+**復元失敗のトラブルシューティング：**
 
 ```bash
-# Clear all local caches
+# すべてのローカルキャッシュをクリア
 dotnet nuget locals all --clear
 
-# Restore with detailed logging
+# 詳細ログで復元
 dotnet restore --verbosity detailed
 
-# Force restore ignoring cache
+# キャッシュを無視して強制復元
 dotnet restore --force
 ```
 
-**Enable lock files** for reproducible builds:
+**ロックファイルの有効化**（再現可能なビルドのため）：
 
 ```xml
 <!-- Directory.Build.props -->
@@ -276,146 +275,142 @@ dotnet restore --force
 </PropertyGroup>
 ```
 
-Commit `packages.lock.json` files to source control.
+`packages.lock.json` ファイルをソース管理にコミットしてください。
 
-**Why regular audits**: Outdated packages accumulate technical debt; vulnerable packages expose security risks. Automated audit catches issues before they reach production.
+**なぜ定期的な監査か**: 古いパッケージは技術的負債を蓄積し、脆弱なパッケージはセキュリティリスクを露呈します。自動化された監査により、本番環境に到達する前に問題を発見できます。
 
-> **Values**: 温故知新（learn from ecosystem updates to stay secure） / 余白の設計
+> **Values**: 温故知新（エコシステムの更新から学びセキュアに保つ） / 余白の設計
 
 ---
 
 ## Good Practices
 
-### 1. Use CLI for Every Package Operation
+### 1. すべてのパッケージ操作に CLI を使用する
 
-**What**: Run `dotnet add package` and `dotnet remove package` instead of editing XML.
+**何を**: XML 編集の代わりに `dotnet add package` と `dotnet remove package` を実行する。
 
-**Why**: The CLI validates package existence, resolves compatible versions, updates lock files, and handles CPM integration automatically.
+**なぜ**: CLI はパッケージの存在を検証し、互換バージョンを解決し、ロックファイルを更新し、CPM との統合を自動的に処理する。
 
-**Values**: 基礎と型（CLI as the reliable foundation for all operations）
+**Values**: 基礎と型（すべての操作の信頼できる基盤としての CLI）
 
-### 2. Label ItemGroups by Domain
+### 2. ItemGroup にドメイン別のラベルを付ける
 
-**What**: Use `Label="Akka.NET"` or `Label="Testing"` on `<ItemGroup>` elements in `Directory.Packages.props`.
+**何を**: `Directory.Packages.props` の `<ItemGroup>` 要素に `Label="Akka.NET"` や `Label="Testing"` を使用する。
 
-**Why**: Clear labels make large dependency files scannable and help reviewers understand package groupings at a glance.
+**なぜ**: 明確なラベルにより大きな依存関係ファイルがスキャンしやすくなり、レビュアーがパッケージのグループ分けを一目で理解できる。
 
-**Values**: 余白の設計（visual structure creates space for comprehension）
+**Values**: 余白の設計（視覚的構造が理解のための余白を生む）
 
-### 3. Commit Lock Files for Reproducible Builds
+### 3. 再現可能なビルドのためにロックファイルをコミットする
 
-**What**: Enable `<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>` and commit `packages.lock.json`.
+**何を**: `<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>` を有効にし、`packages.lock.json` をコミットする。
 
-**Why**: Lock files ensure every developer and CI environment restores exactly the same dependency graph.
+**なぜ**: ロックファイルにより、すべての開発者と CI 環境がまったく同じ依存関係グラフを復元できる。
 
-**Values**: ニュートラル（identical results regardless of environment）
+**Values**: ニュートラル（環境に関わらず同一の結果）
 
 ---
 
 ## Common Pitfalls
 
-### 1. Editing .csproj XML Instead of Using CLI
+### 1. CLI を使わずに .csproj XML を直接編集する
 
-**Problem**: Manually adding `<PackageReference>` elements without CLI validation causes typos, missing packages, and malformed XML.
+**問題**: CLI 検証なしで `<PackageReference>` 要素を手動追加すると、タイポ、パッケージの欠落、不正な XML が発生する。
 
-**Solution**: Always use `dotnet add package <name>` — the CLI validates the package exists and resolves the correct version.
+**解決策**: 常に `dotnet add package <name>` を使用する — CLI はパッケージの存在を検証し、正しいバージョンを解決する。
 
 ```bash
-# ❌ WRONG — manual XML editing
+# ❌ 悪い例 — 手動 XML 編集
 # <PackageReference Include="Typo.Package" Version="1.0.0" />
 
-# ✅ CORRECT — CLI validates the package
+# ✅ 良い例 — CLI がパッケージを検証
 dotnet add package Newtonsoft.Json
 ```
 
-### 2. Specifying Versions in .csproj with CPM Enabled
+### 2. CPM 有効時に .csproj でバージョンを指定する
 
-**Problem**: Adding `Version="x.y.z"` to `<PackageReference>` when CPM is active causes build errors or silently bypasses central management.
+**問題**: CPM がアクティブな状態で `<PackageReference>` に `Version="x.y.z"` を追加すると、ビルドエラーが発生するか、一元管理を暗黙的にバイパスする。
 
-**Solution**: Remove the `Version` attribute from all `.csproj` `<PackageReference>` elements.
+**解決策**: すべての `.csproj` の `<PackageReference>` 要素から `Version` 属性を削除する。
 
 ```xml
-<!-- ❌ WRONG — conflicts with CPM -->
+<!-- ❌ 悪い例 — CPM と競合する -->
 <PackageReference Include="Serilog" Version="4.0.0" />
 
-<!-- ✅ CORRECT — version managed centrally -->
+<!-- ✅ 良い例 — バージョンは一元管理 -->
 <PackageReference Include="Serilog" />
 ```
 
-### 3. Ignoring Transitive Dependency Conflicts
+### 3. 推移的依存関係の競合を無視する
 
-**Problem**: Two packages pull in different versions of a shared transitive dependency, causing runtime failures.
+**問題**: 2つのパッケージが共有する推移的依存関係の異なるバージョンを取り込み、実行時の障害を引き起こす。
 
-**Solution**: Inspect the full dependency tree and pin the conflicting package explicitly.
+**解決策**: 完全な依存関係ツリーを検査し、競合するパッケージを明示的に固定する。
 
 ```bash
-# Identify the conflict
+# 競合を特定
 dotnet list package --include-transitive
 
-# Fix by adding explicit version in Directory.Packages.props
+# Directory.Packages.props で明示的なバージョンを追加して修正
 ```
 
 ---
 
 ## Anti-Patterns
 
-### Mixing Version Management Strategies
+### バージョン管理戦略の混在
 
-**What**: Some packages use CPM versions from `Directory.Packages.props` while others have inline versions in `.csproj` files.
+**何を**: 一部のパッケージは `Directory.Packages.props` の CPM バージョンを使用し、他は `.csproj` ファイルにインラインバージョンを持つ。
 
-**Why It's Wrong**: Creates confusion about which file controls each package version. Developers cannot rely on a single source of truth, and version updates require searching across multiple file types.
+**なぜ悪いか**: どのファイルがどのパッケージバージョンを制御しているか混乱を招く。開発者は単一の信頼できる情報源に依存できず、バージョン更新に複数のファイルタイプを検索する必要がある。
 
-**Better Approach**: Adopt CPM for the entire solution. If a single project requires a different version, use `VersionOverride` sparingly and document the reason.
+**より良いアプローチ**: ソリューション全体で CPM を採用する。単一プロジェクトが異なるバージョンを必要とする場合、`VersionOverride` を控えめに使用し、理由を文書化する。
 
-### Using VersionOverride as a Default Practice
+### VersionOverride のデフォルト使用
 
-**What**: Routinely adding `VersionOverride="x.y.z"` to escape CPM constraints instead of updating the central version.
+**何を**: 中央バージョンを更新する代わりに CPM 制約を回避するために `VersionOverride="x.y.z"` を日常的に追加する。
 
-**Why It's Wrong**: Undermines the purpose of central management. Each override is a design decision that erodes architectural consistency and makes dependency audits unreliable.
+**なぜ悪いか**: 一元管理の目的を損なう。各オーバーライドはアーキテクチャの一貫性を侵食する設計判断であり、依存関係の監査を信頼できなくする。
 
-**Better Approach**: Update the central version in `Directory.Packages.props`. Reserve `VersionOverride` for documented, temporary exceptions only.
+**より良いアプローチ**: `Directory.Packages.props` の中央バージョンを更新する。`VersionOverride` は文書化された一時的な例外にのみ使用する。
 
 ---
 
 ## Quick Reference
 
-| Task | Command |
-|------|---------|
-| Add package | `dotnet add package <name>` |
-| Add specific version | `dotnet add package <name> --version <ver>` |
-| Add prerelease | `dotnet add package <name> --prerelease` |
-| Remove package | `dotnet remove package <name>` |
-| List all packages | `dotnet list package` |
-| Show outdated | `dotnet list package --outdated` |
-| Show vulnerable | `dotnet list package --vulnerable` |
-| Show deprecated | `dotnet list package --deprecated` |
-| Show transitive | `dotnet list package --include-transitive` |
-| Restore packages | `dotnet restore` |
-| Clear cache | `dotnet nuget locals all --clear` |
-| Force restore | `dotnet restore --force` |
-| List sources | `dotnet nuget list source` |
+| タスク | コマンド |
+|--------|----------|
+| パッケージ追加 | `dotnet add package <name>` |
+| 特定バージョン追加 | `dotnet add package <name> --version <ver>` |
+| プレリリース追加 | `dotnet add package <name> --prerelease` |
+| パッケージ削除 | `dotnet remove package <name>` |
+| 全パッケージ表示 | `dotnet list package` |
+| 古いパッケージ表示 | `dotnet list package --outdated` |
+| 脆弱なパッケージ表示 | `dotnet list package --vulnerable` |
+| 非推奨パッケージ表示 | `dotnet list package --deprecated` |
+| 推移的依存関係表示 | `dotnet list package --include-transitive` |
+| パッケージ復元 | `dotnet restore` |
+| キャッシュクリア | `dotnet nuget locals all --clear` |
+| 強制復元 | `dotnet restore --force` |
+| ソース一覧 | `dotnet nuget list source` |
 
-### When NOT to Use CPM — Decision Table
+### CPM を使わない場合 — 判断テーブル
 
-| Scenario | Use CPM? | Reason |
-|----------|----------|--------|
-| New solution with ≥2 projects | ✅ Yes | Prevents version drift from the start |
-| Single-project solution | ✅ Optional | Low overhead, prepares for growth |
-| Legacy solution with many conflicts | ⚠️ Incremental | Migrate project-by-project to avoid big-bang risk |
-| Version ranges required | ❌ No | CPM requires exact versions |
-| .NET SDK < 6.0.300 | ❌ No | CPM not supported on older SDKs |
-| Multi-repo independent builds | ❌ Per-repo | Each repository needs its own Directory.Packages.props |
+| シナリオ | CPM 使用？ | 理由 |
+|----------|------------|------|
+| 2プロジェクト以上の新規ソリューション | ✅ はい | 最初からバージョンドリフトを防止 |
+| 単一プロジェクトのソリューション | ✅ 任意 | 低オーバーヘッド、成長に備える |
+| 競合の多いレガシーソリューション | ⚠️ 段階的 | ビッグバンリスクを避けプロジェクト単位で移行 |
+| バージョン範囲が必要 | ❌ いいえ | CPM は正確なバージョンが必要 |
+| .NET SDK < 6.0.300 | ❌ いいえ | 古い SDK では CPM 非対応 |
+| マルチリポの独立ビルド | ❌ リポ単位 | 各リポジトリに独自の Directory.Packages.props が必要 |
 
 ---
 
 ## Resources
 
-- [Central Package Management](https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management) — Official NuGet CPM documentation
-- [dotnet CLI Reference](https://learn.microsoft.com/en-us/dotnet/core/tools/) — Complete dotnet command reference
-- [NuGet.Config Reference](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file) — Package source configuration
-- [dotnet-outdated Tool](https://github.com/dotnet-outdated/dotnet-outdated) — Bulk package update tool
+- [Central Package Management](https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management) — NuGet CPM 公式ドキュメント
+- [dotnet CLI リファレンス](https://learn.microsoft.com/en-us/dotnet/core/tools/) — dotnet コマンドの完全なリファレンス
+- [NuGet.Config リファレンス](https://learn.microsoft.com/en-us/nuget/reference/nuget-config-file) — パッケージソース設定
+- [dotnet-outdated ツール](https://github.com/dotnet-outdated/dotnet-outdated) — 一括パッケージ更新ツール
 
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

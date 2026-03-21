@@ -1,65 +1,66 @@
 ---
 name: dotnet-wpf-employee-input
 description: >
-  Add employee number (社員番号) input dialog to WPF apps with DPAPI-encrypted storage.
-  Use when: building employee ID configuration.
+  こんなときに使う: Add employee number (社員番号) input dialog to WPF apps with DPAPI-encrypted storage.
+  Use when building employee ID configuration.
 license: MIT
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, wpf, csharp, mvvm, employee, dpapi, configuration]
   invocable: false
 ---
+<!-- このドキュメントは dotnet-wpf-employee-input の日本語版です。英語版: ../SKILL.md -->
 
-# Add Employee Number Input Dialog to WPF Applications
+# WPFアプリケーションへの社員番号入力ダイアログ追加
 
-End-to-end workflow for adding an employee number (社員番号) input dialog to .NET WPF applications: 4-digit validation, DPAPI-encrypted storage via `SecureConfigService`, MVVM settings UI, and menu bar integration.
+WPFアプリケーションに社員番号（社員番号）入力ダイアログを追加するためのエンドツーエンドワークフロー：4桁バリデーション、`SecureConfigService`によるDPAPI暗号化保存、MVVM設定UI、メニューバー統合。
 
-## When to Use This Skill
+## こんなときに使う
 
-Use this skill when:
-- Adding an employee number configuration dialog to a WPF application
-- Storing employee IDs securely with DPAPI encryption (not plaintext)
-- Building a settings dialog that validates fixed-length numeric input
-- Providing a user-facing UI to set, update, and reset employee numbers
-- Integrating employee identification into Dify API calls or other services
+以下の場合にこのスキルを使用してください：
+- WPFアプリケーションに社員番号設定ダイアログを追加するとき
+- 社員IDをDPAPI暗号化で安全に保存するとき（平文保存は不可）
+- 固定長数値入力を検証する設定ダイアログを構築するとき
+- 社員番号の設定・更新・リセット用ユーザー向けUIを提供するとき
+- Dify API呼び出しやその他サービスに社員識別を統合するとき
 
 ---
 
 ## Related Skills
 
-- **`dotnet-wpf-secure-config`** — Required: DPAPI encryption foundation (apply first)
-- **`dotnet-wpf-dify-api-integration`** — Uses employee number as `user` field in Dify API calls
-- **`dotnet-oracle-wpf-integration`** — Shares SecureConfigService when used in the same app
-- **`tdd-standard-practice`** — Test generated code with Red-Green-Refactor
-- **`git-commit-practices`** — Commit each step as an atomic change
+- **`dotnet-wpf-secure-config`** — 必須：DPAPI暗号化基盤（先に適用）
+- **`dotnet-wpf-dify-api-integration`** — Dify API呼び出しの`user`フィールドに社員番号を使用
+- **`dotnet-oracle-wpf-integration`** — 同じアプリでSecureConfigServiceを共有
+- **`tdd-standard-practice`** — Red-Green-Refactorで生成コードをテスト
+- **`git-commit-practices`** — 各ステップをアトミックな変更としてコミット
 
 ---
 
 ## Core Principles
 
-1. **Security by Default** — Employee numbers stored via DPAPI; never in plaintext settings files (ニュートラル)
-2. **MVVM Discipline** — ViewModel drives all save/load/reset logic; minimal code-behind (基礎と型)
-3. **Validate Before Persist** — Format validation happens in ViewModel before calling SecureConfigService (基礎と型)
-4. **Progressive Integration** — Prerequisites → ViewModel → View → Wiring → Menu, one layer at a time (継続は力)
-5. **Reusable Pattern** — Dialog pattern applies to any single-field secure config input (成長の複利)
+1. **デフォルトでセキュア** — 社員番号はDPAPIで保存。平文設定ファイルには保存しない（ニュートラル）
+2. **MVVM規律** — ViewModelがすべての保存/読み込み/リセットロジックを駆動。code-behindは最小限（基礎と型）
+3. **永続化前にバリデーション** — SecureConfigService呼び出し前にViewModelでフォーマット検証を実施（基礎と型）
+4. **段階的な統合** — 前提条件 → ViewModel → View → 配線 → メニュー、一層ずつ確実に（継続は力）
+5. **再利用可能なパターン** — ダイアログパターンは任意の単一フィールドセキュア設定入力に適用可能（成長の複利）
 
 ---
 
 ## Workflow: Add Employee Number Dialog to WPF
 
-### Step 1 — Set Up Prerequisites
+### Step 1 — 前提条件のセットアップ
 
-Use when adding employee number files to a project that already has `dotnet-wpf-secure-config` applied.
+`dotnet-wpf-secure-config` 適用済みプロジェクトに社員番号ファイルを追加するときに使用します。
 
-**Prerequisites** (must be completed first):
-- `dotnet-wpf-secure-config` skill applied
-- `Infrastructure/Configuration/` folder exists with:
+**前提条件**（先に完了必須）:
+- `dotnet-wpf-secure-config` スキル適用済み
+- `Infrastructure/Configuration/` フォルダに以下が存在:
   - `DpapiEncryptor.cs`
   - `SecureConfigService.cs`
   - `ISecureConfigService.cs`
   - `AppConfigModel.cs`
 
-**Files to add** (employee-number-specific):
+**追加するファイル**（社員番号固有）:
 
 ```
 Presentation/
@@ -70,7 +71,7 @@ Presentation/
     └── EmployeeNumberConfigDialog.xaml.cs 🆕
 ```
 
-**NuGet packages** (if not already installed):
+**NuGetパッケージ**（未インストールの場合）:
 
 ```powershell
 Install-Package CommunityToolkit.Mvvm
@@ -79,11 +80,11 @@ Install-Package Microsoft.Extensions.DependencyInjection
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 2 — Create ViewModel
+### Step 2 — ViewModelの作成
 
-Use when implementing the employee number input logic with validation, save, and reset.
+バリデーション、保存、リセット機能を持つ社員番号入力ロジックを実装するときに使用します。
 
-Create `EmployeeNumberConfigViewModel` with format validation, load on open, save, and reset functionality. The ViewModel delegates all persistence to `ISecureConfigService`.
+フォーマット検証、オープン時の読み込み、保存、リセット機能を持つ`EmployeeNumberConfigViewModel`を作成します。ViewModelはすべての永続化を`ISecureConfigService`に委譲します。
 
 **EmployeeNumberConfigViewModel.cs**:
 
@@ -138,15 +139,15 @@ public partial class EmployeeNumberConfigViewModel : ObservableObject
 }
 ```
 
-**Why validate in ViewModel**: Keeps View free of logic; validation is testable without a running WPF window. The `IsValidEmployeeNumber` method is `static` so it can be unit-tested in isolation.
+**ViewModelでバリデーションを行う理由**: Viewをロジックフリーに保ち、実行中のWPFウィンドウなしでバリデーションをテスト可能にします。`IsValidEmployeeNumber`メソッドは`static`なので単体テストで分離テストできます。
 
 > **Values**: 基礎と型 / ニュートラル
 
-### Step 3 — Create XAML Dialog
+### Step 3 — XAMLダイアログの作成
 
-Use when building the WPF window for employee number entry.
+社員番号入力用のWPFウィンドウを構築するときに使用します。
 
-Create a compact modal dialog with input field, status message, and action buttons. All controls bind to ViewModel properties — no `x:Name` manipulation.
+入力フィールド、ステータスメッセージ、アクションボタンを持つコンパクトなモーダルダイアログを作成します。すべてのコントロールはViewModelプロパティにバインド — `x:Name`操作は不要です。
 
 **EmployeeNumberConfigDialog.xaml**:
 
@@ -200,15 +201,15 @@ Create a compact modal dialog with input field, status message, and action butto
 </Window>
 ```
 
-**Why `UpdateSourceTrigger=PropertyChanged`**: Without it, WPF updates the binding only on focus loss. Real-time validation requires character-by-character updates to the ViewModel.
+**`UpdateSourceTrigger=PropertyChanged`を使う理由**: これがないと、WPFはフォーカス喪失時のみバインディングを更新します。リアルタイムバリデーションにはViewModelへの文字単位の更新が必要です。
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 4 — Wire Code-Behind
+### Step 4 — code-behindの配線
 
-Use when connecting the dialog window to the ViewModel with minimal code-behind.
+最小限のcode-behindでダイアログウィンドウをViewModelに接続するときに使用します。
 
-Code-behind handles only two things: loading config on `Window_Loaded` and closing the window. All business logic stays in the ViewModel.
+code-behindは2つのことだけを処理します：`Window_Loaded`での設定読み込みとウィンドウのクローズ。すべてのビジネスロジックはViewModelに残ります。
 
 **EmployeeNumberConfigDialog.xaml.cs**:
 
@@ -229,24 +230,24 @@ public partial class EmployeeNumberConfigDialog : Window
 }
 ```
 
-**Why `Window_Loaded` for config load**: Loading in the constructor blocks the UI thread and delays window rendering. `Window_Loaded` fires after the window is displayed, allowing async load without visual delay.
+**`Window_Loaded`で設定を読み込む理由**: コンストラクタでの読み込みはUIスレッドをブロックし、ウィンドウ描画を遅延させます。`Window_Loaded`はウィンドウ表示後に発火するため、視覚的な遅延なく非同期読み込みが可能です。
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 5 — Integrate with Menu Bar
+### Step 5 — メニューバーとの統合
 
-Use when adding a menu item to launch the employee number dialog from MainWindow.
+MainWindowから社員番号ダイアログを起動するメニュー項目を追加するときに使用します。
 
-Register the ViewModel in DI and launch the dialog from a menu command.
+ViewModelをDIに登録し、メニューコマンドからダイアログを起動します。
 
-**App.xaml.cs** — Add DI registration:
+**App.xaml.cs** — DI登録の追加:
 
 ```csharp
 // App.xaml.cs — add to OnStartup
 services.AddTransient<EmployeeNumberConfigViewModel>();
 ```
 
-**MainWindow menu** — Add menu item:
+**MainWindowメニュー** — メニュー項目の追加:
 
 ```xml
 <MenuItem Header="Settings">
@@ -255,7 +256,7 @@ services.AddTransient<EmployeeNumberConfigViewModel>();
 </MenuItem>
 ```
 
-**MainViewModel** — Add launch command:
+**MainViewModel** — 起動コマンドの追加:
 
 ```csharp
 [RelayCommand]
@@ -269,23 +270,23 @@ private void OpenEmployeeNumberConfig()
 
 > **Values**: 成長の複利 / 継続は力
 
-### Step 6 — Customize for Your Application
+### Step 6 — アプリケーション固有のカスタマイズ
 
-Use when adapting the employee number format to your organization's requirements.
+組織の要件に合わせて社員番号フォーマットを調整するときに使用します。
 
-⚠️ **Ask the user** what digit count and validation rules to use for their employee ID format.
+⚠️ **ユーザーに確認** — 社員IDフォーマットに使用する桁数とバリデーションルールを確認してください。
 
-Replace these defaults based on organizational requirements:
+組織の要件に基づいてこれらのデフォルトを置き換えてください：
 
-| Item | File | Default | What to Change |
-|------|------|---------|----------------|
-| Digit count | `IsValidEmployeeNumber` | 4 digits | Adjust `Length == 4` to match format |
-| Validation rules | `IsValidEmployeeNumber` | Digits only | Add prefix/suffix rules if needed |
-| Storage location | `DifyConfigModel` | `EmployeeNumber` property | Change property name if needed |
-| Field label | `Dialog.xaml` | "Employee Number" | Localize or rename |
-| Window title | `Dialog.xaml` | "Employee Number Settings" | Match your app's naming |
+| 項目 | ファイル | デフォルト | 変更内容 |
+|------|---------|-----------|---------|
+| 桁数 | `IsValidEmployeeNumber` | 4桁 | フォーマットに合わせて`Length == 4`を調整 |
+| バリデーションルール | `IsValidEmployeeNumber` | 数字のみ | 必要に応じてプレフィックス/サフィックスルールを追加 |
+| 保存場所 | `DifyConfigModel` | `EmployeeNumber`プロパティ | 必要に応じてプロパティ名を変更 |
+| フィールドラベル | `Dialog.xaml` | "Employee Number" | ローカライズまたはリネーム |
+| ウィンドウタイトル | `Dialog.xaml` | "Employee Number Settings" | アプリの命名規則に合わせる |
 
-**Customization examples**:
+**カスタマイズ例**:
 
 ```csharp
 // 6-digit employee number
@@ -306,27 +307,27 @@ private static bool IsValidEmployeeNumber(string number)
 
 ## Good Practices
 
-### 1. Validate Format Before Saving
+### 1. 保存前にフォーマットを検証
 
-**What**: Check digit count and character type in the ViewModel before calling `SaveDifyConfigAsync`.
+**What**: `SaveDifyConfigAsync`呼び出し前に、ViewModelで桁数と文字種をチェックします。
 
-**Why**: Prevents invalid data from reaching the config file; provides immediate user feedback.
+**Why**: 無効なデータが設定ファイルに到達するのを防ぎ、ユーザーに即座にフィードバックを提供します。
 
 **Values**: 基礎と型（バリデーションを型として定着）
 
-### 2. Load Existing Value on Dialog Open
+### 2. ダイアログオープン時に既存値を読み込み
 
-**What**: Call `LoadConfigAsync()` in `Window_Loaded` to populate the TextBox with the saved value.
+**What**: `Window_Loaded`で`LoadConfigAsync()`を呼び出し、保存済みの値でTextBoxを表示します。
 
-**Why**: Users see their current setting and can verify or update it; avoids blank-field confusion.
+**Why**: ユーザーが現在の設定を確認・更新できます。空フィールドによる混乱を回避します。
 
 **Values**: 継続は力（既存設定の継続性を保つ）
 
-### 3. Provide Reset Functionality
+### 3. リセット機能の提供
 
-**What**: Include a Reset button that clears the stored value via `SecureConfigService`.
+**What**: `SecureConfigService`経由で保存値をクリアするリセットボタンを含めます。
 
-**Why**: Users can remove their employee number without manually editing config files.
+**Why**: ユーザーが設定ファイルを手動編集せずに社員番号を削除できます。
 
 **Values**: ニュートラル（安全なリセット手段を標準提供）
 
@@ -334,11 +335,11 @@ private static bool IsValidEmployeeNumber(string number)
 
 ## Common Pitfalls
 
-### 1. Not Loading Config on Window_Loaded
+### 1. Window_Loadedで設定を読み込まない
 
-**Problem**: Dialog opens with an empty TextBox even though a value is already saved.
+**Problem**: 値が既に保存されているにもかかわらず、ダイアログが空のTextBoxで開きます。
 
-**Solution**: Always call `LoadConfigAsync()` in the `Window_Loaded` event, not in the constructor.
+**Solution**: コンストラクタではなく、必ず`Window_Loaded`イベントで`LoadConfigAsync()`を呼び出します。
 
 ```csharp
 // ❌ WRONG — Blocks UI thread, may miss async completion
@@ -354,11 +355,11 @@ private async void Window_Loaded(object sender, RoutedEventArgs e)
     => await ((EmployeeNumberConfigViewModel)DataContext).LoadConfigAsync();
 ```
 
-### 2. Missing UpdateSourceTrigger=PropertyChanged
+### 2. UpdateSourceTrigger=PropertyChangedの未設定
 
-**Problem**: Validation only triggers when the TextBox loses focus, not on each keystroke.
+**Problem**: バリデーションがキーストロークごとではなく、TextBoxのフォーカス喪失時にのみトリガーされます。
 
-**Solution**: Set `UpdateSourceTrigger=PropertyChanged` on the `TextBox` binding.
+**Solution**: `TextBox`バインディングに`UpdateSourceTrigger=PropertyChanged`を設定します。
 
 ```xml
 <!-- ❌ WRONG — Updates only on LostFocus -->
@@ -368,11 +369,11 @@ private async void Window_Loaded(object sender, RoutedEventArgs e)
 <TextBox Text="{Binding EmployeeNumber, UpdateSourceTrigger=PropertyChanged}"/>
 ```
 
-### 3. Forgetting to Persist via SecureConfigService
+### 3. SecureConfigService経由の永続化を忘れる
 
-**Problem**: Updating the ViewModel property but not saving to `config.json`.
+**Problem**: ViewModelプロパティを更新したが、`config.json`に保存していない。
 
-**Solution**: Always call `SaveDifyConfigAsync()` after modifying the config model.
+**Solution**: 設定モデル変更後は必ず`SaveDifyConfigAsync()`を呼び出します。
 
 ```csharp
 // ❌ WRONG — Property updated but not persisted
@@ -388,70 +389,68 @@ await _configService.SaveDifyConfigAsync(config);
 
 ## Anti-Patterns
 
-### Storing Employee Number in Plaintext Settings File
+### 社員番号を平文設定ファイルに保存
 
-**What**: Writing the employee number to `appsettings.json` or a custom `.txt` file.
+**What**: 社員番号を`appsettings.json`やカスタム`.txt`ファイルに書き込む。
 
-**Why It's Wrong**: Plaintext files are readable by anyone with filesystem access; no encryption at rest.
+**Why It's Wrong**: 平文ファイルはファイルシステムにアクセスできる誰でも読み取り可能。保存時の暗号化がない。
 
-**Better Approach**: Use `SecureConfigService` with DPAPI encryption to store in `%LOCALAPPDATA%`.
+**Better Approach**: `SecureConfigService`とDPAPI暗号化を使用して`%LOCALAPPDATA%`に保存。
 
-### Using Code-Behind for Save Logic
+### code-behindに保存ロジックを記述
 
-**What**: Putting save/validate/reset logic directly in `.xaml.cs` event handlers.
+**What**: 保存/バリデーション/リセットロジックを`.xaml.cs`のイベントハンドラに直接記述。
 
-**Why It's Wrong**: Untestable without a running WPF window; violates MVVM separation; logic scattered across files.
+**Why It's Wrong**: 実行中のWPFウィンドウなしではテスト不可能。MVVM分離に違反。ロジックがファイル間に散在。
 
-**Better Approach**: Delegate all logic to ViewModel via `[RelayCommand]` and data binding. Code-behind handles only `Window_Loaded` and `Close_Click`.
+**Better Approach**: `[RelayCommand]`とデータバインディングですべてのロジックをViewModelに委譲。code-behindは`Window_Loaded`と`Close_Click`のみを処理。
 
 ---
 
 ## Quick Reference
 
-### Implementation Checklist
+### 実装チェックリスト
 
-- [ ] `dotnet-wpf-secure-config` skill applied (prerequisite)
-- [ ] `AppConfigModel` has `EmployeeNumber` field (via `DifyConfigModel` or dedicated model)
-- [ ] Create `EmployeeNumberConfigViewModel.cs` with Load / Save / Reset (Step 2)
-- [ ] Create `EmployeeNumberConfigDialog.xaml` with bound controls (Step 3)
-- [ ] Create `EmployeeNumberConfigDialog.xaml.cs` with minimal code-behind (Step 4)
-- [ ] Register ViewModel in DI container (Step 5)
-- [ ] Add menu item to launch dialog (Step 5)
-- [ ] Customize digit count and validation for your format (Step 6)
-- [ ] Test: save → close → reopen → verify value loads
-- [ ] Test: enter invalid input → verify error message appears
-- [ ] Test: reset → verify value cleared in both UI and config file
+- [ ] `dotnet-wpf-secure-config` スキル適用済み（前提条件）
+- [ ] `AppConfigModel`に`EmployeeNumber`フィールドあり（`DifyConfigModel`または専用モデル経由）
+- [ ] `EmployeeNumberConfigViewModel.cs`を作成（Load / Save / Reset）（Step 2）
+- [ ] `EmployeeNumberConfigDialog.xaml`をバインドされたコントロールで作成（Step 3）
+- [ ] `EmployeeNumberConfigDialog.xaml.cs`を最小限のcode-behindで作成（Step 4）
+- [ ] DIコンテナにViewModelを登録（Step 5）
+- [ ] ダイアログ起動用メニュー項目を追加（Step 5）
+- [ ] 桁数とバリデーションをフォーマットに合わせてカスタマイズ（Step 6）
+- [ ] テスト: 保存 → 閉じる → 再オープン → 値が読み込まれることを確認
+- [ ] テスト: 無効な入力 → エラーメッセージが表示されることを確認
+- [ ] テスト: リセット → UIと設定ファイルの両方で値がクリアされることを確認
 
-### Validation Decision Table
+### バリデーション判定表
 
-| Format | Validation Rule | Example |
-|--------|----------------|---------|
-| 4-digit numeric | `Length == 4 && All(IsDigit)` | `1234` |
-| 6-digit numeric | `Length == 6 && All(IsDigit)` | `001234` |
-| Alphanumeric prefix | `Regex(@"^EMP-\d{4}$")` | `EMP-1234` |
-| Free-form | `!IsNullOrWhiteSpace` | Any non-empty string |
+| フォーマット | バリデーションルール | 例 |
+|------------|-------------------|-----|
+| 4桁数値 | `Length == 4 && All(IsDigit)` | `1234` |
+| 6桁数値 | `Length == 6 && All(IsDigit)` | `001234` |
+| 英数字プレフィックス | `Regex(@"^EMP-\d{4}$")` | `EMP-1234` |
+| フリーフォーム | `!IsNullOrWhiteSpace` | 任意の非空文字列 |
 
 ---
 
 ## Resources
 
-- `dotnet-wpf-secure-config` — DPAPI encryption foundation used by this skill
-- `dotnet-wpf-dify-api-integration` — Uses employee number as Dify API `user` field
-- [CommunityToolkit.Mvvm Docs](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/)
+- `dotnet-wpf-secure-config` — このスキルが使用するDPAPI暗号化基盤
+- `dotnet-wpf-dify-api-integration` — Dify APIの`user`フィールドに社員番号を使用
+- [CommunityToolkit.Mvvm ドキュメント](https://learn.microsoft.com/ja-jp/dotnet/communitytoolkit/mvvm/)
 - [Microsoft: Data Protection API (DPAPI)](https://docs.microsoft.com/windows/win32/seccng/data-protection-api)
 
 ---
 
 ## Changelog
 
-### Version 1.0.0 (2026-02-15)
-- Initial release: employee number input dialog skill
-- 6-step workflow: Prerequisites → ViewModel → XAML → Code-Behind → Menu → Customize
-- DPAPI-encrypted storage via SecureConfigService
-- 4-digit validation with customization guidance
-- MVVM pattern with CommunityToolkit.Mvvm
+### バージョン 1.0.0 (2026-02-15)
+- 初回リリース: 社員番号入力ダイアログスキル
+- 6ステップワークフロー: 前提条件 → ViewModel → XAML → code-behind → メニュー → カスタマイズ
+- SecureConfigServiceによるDPAPI暗号化保存
+- カスタマイズガイダンス付き4桁バリデーション
+- CommunityToolkit.MvvmによるMVVMパターン
 
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->
+<!-- 英語版は ../SKILL.md を参照してください -->
+

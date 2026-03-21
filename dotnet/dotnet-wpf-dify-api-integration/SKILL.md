@@ -1,80 +1,79 @@
 ---
 name: dotnet-wpf-dify-api-integration
-description: Add Dify API to WPF apps with DPAPI config and SSE streaming. Use when: building Dify integration.
+description: こんなときに使う: WPFアプリにDify APIを追加。DPAPI設定とSSEストリーミング対応。Dify連携構築時に使用。
 license: MIT
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, wpf, dify, csharp, mvvm]
   invocable: false
 ---
+# WPFアプリケーションへのDify API連携追加
 
-# Add Dify API Integration to WPF Applications
+WPFアプリケーションにDify API連携を追加するためのエンドツーエンドワークフロー：DPAPIによるセキュア設定、MVVM設定UI、ファイルアップロード、SSEベースのワークフローストリーミング。
 
-End-to-end workflow for adding Dify API integration to .NET WPF applications: secure configuration with DPAPI, MVVM settings UI, file upload, and SSE-based workflow streaming.
+## こんなときに使う
 
-## When to Use This Skill
-
-Use this skill when:
-- Adding Dify API integration to an existing WPF application
-- Creating a new WPF project that calls Dify workflows via SSE streaming
-- Generating DPAPI-encrypted API key storage for Dify configuration
-- Building an MVVM settings dialog for Dify API connection management
-- Implementing file upload and streaming workflow execution with real-time progress
+以下の場合にこのスキルを使用してください：
+- 既存のWPFアプリケーションにDify API連携を追加するとき
+- SSEストリーミング経由でDifyワークフローを呼び出す新規WPFプロジェクトを作成するとき
+- Dify設定用のDPAPI暗号化APIキー保存を生成するとき
+- Dify API接続管理用のMVVM設定ダイアログを構築するとき
+- リアルタイム進捗表示付きのファイルアップロードとストリーミングワークフロー実行を実装するとき
 
 ---
 
 ## Related Skills
 
-- **`dotnet-wpf-secure-config`** — Required: DPAPI encryption foundation (apply first)
-- **`dotnet-oracle-wpf-integration`** — Shares SecureConfigService when used in the same app
-- **`tdd-standard-practice`** — Test generated code with Red-Green-Refactor
-- **`git-commit-practices`** — Commit each step as an atomic change
-- **`skill`** — Validate or improve this skill's quality
+- **`dotnet-wpf-secure-config`** — 必須：DPAPI暗号化基盤（先に適用）
+- **`dotnet-oracle-wpf-integration`** — 同じアプリでSecureConfigServiceを共有
+- **`tdd-standard-practice`** — Red-Green-Refactorで生成コードをテスト
+- **`git-commit-practices`** — 各ステップをアトミックな変更としてコミット
+- **`skill`** — このスキルの品質を検証・改善
 
 ---
 
 ## Core Principles
 
-1. **Layered Architecture** — Separate Presentation, Infrastructure, and Domain concerns (基礎と型)
-2. **Security by Default** — DPAPI encryption for API keys; never store plaintext (ニュートラル)
-3. **Progressive Integration** — Config → Client → UI, one layer at a time (継続は力)
-4. **MVVM Discipline** — ViewModel drives all UI logic; minimal code-behind (基礎と型)
-5. **Reusable Components** — Each class works independently across WPF projects (成長の複利)
+1. **階層化アーキテクチャ** — Presentation、Infrastructure、Domainの関心事を分離（基礎と型）
+2. **デフォルトでセキュア** — APIキーはDPAPI暗号化。平文保存は禁止（ニュートラル）
+3. **段階的な統合** — 設定 → クライアント → UI、一層ずつ確実に（継続は力）
+4. **MVVM規律** — ViewModelがすべてのUIロジックを駆動。code-behindは最小限（基礎と型）
+5. **再利用可能なコンポーネント** — 各クラスがWPFプロジェクト間で独立して動作（成長の複利）
 
 ---
 
 ## Workflow: Integrate Dify API into WPF
 
-### Step 1 — Verify Prerequisites and Add Dify Files
+### Step 1 — 前提条件確認とDify固有ファイル追加
 
-Use when adding Dify-specific files to a project that already has `dotnet-wpf-secure-config` applied.
+`dotnet-wpf-secure-config` 適用済みプロジェクトにDify固有ファイルを追加するときに使用します。
 
-**Prerequisites** (must be completed first):
-- `dotnet-wpf-secure-config` skill applied
-- `Infrastructure/Configuration/` folder exists with:
+**前提条件**（先に完了必須）:
+- `dotnet-wpf-secure-config` スキル適用済み
+- `Infrastructure/Configuration/` フォルダに以下が存在:
   - `DpapiEncryptor.cs`
   - `SecureConfigService.cs`
   - `ISecureConfigService.cs`
   - `AppConfigModel.cs`
 
-**Files to add** (Dify-specific):
+**追加するファイル**（Dify固有）:
 
 ```
 YourApp/
 ├── Infrastructure/
 │   ├── Configuration/
-│   │   └── DifyConfigModel.cs          # 🆕 Add this
-│   └── Difys/                           # 🆕 Create this folder
-│       └── DifyApiService.cs            # 🆕 Add this
+│   │   └── DifyConfigModel.cs           # 🆕 追加
+│   └── Difys/                            # 🆕 フォルダ作成
+│       └── DifyApiService.cs             # 🆕 追加
 └── Presentation/
     ├── ViewModels/
-    │   └── DifyConfigViewModel.cs       # 🆕 Add this
+    │   └── DifyConfigViewModel.cs        # 🆕 追加
     └── Views/
-        ├── DifyConfigDialog.xaml        # 🆕 Add this
-        └── DifyConfigDialog.xaml.cs     # 🆕 Add this
+        ├── DifyConfigDialog.xaml         # 🆕 追加
+        └── DifyConfigDialog.xaml.cs      # 🆕 追加
 ```
 
-**NuGet packages** (if not already installed):
+**NuGetパッケージ**（未インストールの場合）:
 
 ```powershell
 Install-Package CommunityToolkit.Mvvm
@@ -83,20 +82,20 @@ Install-Package Microsoft.Extensions.DependencyInjection
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 2 — Add Dify Config Model
+### Step 2 — Dify設定モデルの追加
 
-Use when defining the Dify API configuration with DPAPI-encrypted API key.
+DPAPI暗号化APIキー付きのDify API設定を定義するときに使用します。
 
-**Prerequisite**: Apply `dotnet-wpf-secure-config` first to set up `DpapiEncryptor`, `SecureConfigService`, and `AppConfigModel`.
+**前提条件**：先に`dotnet-wpf-secure-config`を適用して`DpapiEncryptor`、`SecureConfigService`、`AppConfigModel`をセットアップしてください。
 
-**DifyConfigModel.cs** — Dify-specific setting data (add to `Infrastructure/Configuration/`):
+**DifyConfigModel.cs** — Dify固有の設定データ（`Infrastructure/Configuration/`に追加）：
 
 ```csharp
 public class DifyConfigModel
 {
     public string BaseUrl { get; set; } = string.Empty;
     public string ApiKeyEncrypted { get; set; } = string.Empty;
-    // ✅ Use employee ID for Dify logs (not Windows username — avoids PII leak)
+    // ✅ Difyログ用に社員番号を使用（Windows ユーザー名はPII漏洩リスク）
     public string EmployeeId { get; set; } = string.Empty;
 
     public string GetDecryptedApiKey()
@@ -111,25 +110,25 @@ public class DifyConfigModel
 }
 ```
 
-**Update AppConfigModel** (add Dify property):
+**AppConfigModelを更新**（Difyプロパティを追加）：
 
 ```csharp
 public class AppConfigModel
 {
-    public DifyConfigModel DifyApi { get; set; } = new();  // 🆕 Add this
-    // public OracleConfigModel OracleDb { get; set; } = new();  // Added by Oracle skill
+    public DifyConfigModel DifyApi { get; set; } = new();  // 🆕 追加
+    // public OracleConfigModel OracleDb { get; set; } = new();  // Oracleスキルが追加
     public string Version { get; set; } = "1.0";
 }
 ```
 
-**Update ISecureConfigService and SecureConfigService** (add Dify methods):
+**ISecureConfigServiceとSecureConfigServiceを更新**（Difyメソッドを追加）：
 
 ```csharp
-// ISecureConfigService — add:
+// ISecureConfigService — 追加:
 Task<DifyConfigModel> LoadDifyConfigAsync();
 Task SaveDifyConfigAsync(DifyConfigModel config);
 
-// SecureConfigService — implement:
+// SecureConfigService — 実装:
 public async Task<DifyConfigModel> LoadDifyConfigAsync()
 {
     var appConfig = await LoadAppConfigAsync();
@@ -144,17 +143,19 @@ public async Task SaveDifyConfigAsync(DifyConfigModel config)
 }
 ```
 
-For `DpapiEncryptor`, `SecureConfigService` framework, and `AppConfigModel` base — see `dotnet-wpf-secure-config`.
+`DpapiEncryptor`、`SecureConfigService`フレームワーク、`AppConfigModel`ベースについては`dotnet-wpf-secure-config`を参照してください。
 
 > **Values**: 基礎と型 / ニュートラル
 
-### Step 3 — Implement API Client (Upload + SSE)
+### Step 3 — APIクライアントの実装（アップロード + SSE）
 
-Use when connecting to Dify API for file upload and workflow execution.
+Dify APIへのファイルアップロードとワークフロー実行を接続するときに使用します。
 
-Create `DifyApiService` with file upload and streaming workflow execution. Examples use `using var client = new HttpClient()` for simplicity — in production, prefer `IHttpClientFactory` (registered in DI) to avoid socket exhaustion.
+ファイルアップロードとストリーミングワークフロー実行を持つ`DifyApiService`を作成します。
 
-**File upload** (`/v1/files/upload`):
+> **注意**: サンプルでは簡潔さのため`using var client = new HttpClient()`を使用しています。本番環境ではソケット枯渇を防ぐため、DIに登録した`IHttpClientFactory`の使用を推奨します。
+
+**ファイルアップロード** (`/v1/files/upload`)：
 
 ```csharp
 public class DifyApiService
@@ -174,7 +175,7 @@ public class DifyApiService
         client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
 
         using var form = new MultipartFormDataContent();
-        // ✅ Use employee ID — avoids leaking Windows username to external service
+        // ✅ 社員番号を使用 — Windowsユーザー名の外部サービスへの漏洩を防止
         form.Add(new StringContent(config.EmployeeId), "user");
         var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
         fileContent.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
@@ -188,7 +189,7 @@ public class DifyApiService
 }
 ```
 
-**Workflow execution with SSE** (`/v1/workflows/run`):
+**SSE付きワークフロー実行** (`/v1/workflows/run`)：
 
 ```csharp
 public async Task<string> RunWorkflowStreamingAsync(
@@ -199,14 +200,14 @@ public async Task<string> RunWorkflowStreamingAsync(
     string apiKey = config.GetDecryptedApiKey();
     string baseUrl = config.BaseUrl.TrimEnd('/');
 
-    // 5-minute timeout for long-running workflows
+    // 長時間実行ワークフロー用に5分タイムアウト
     using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(300) };
     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
 
     inputs["pdf_file"] = new {
         transfer_method = "local_file", upload_file_id = uploadFileId, type = "document"
     };
-    // ✅ Use employee ID for Dify logs (identifiable but not exploitable)
+    // ✅ Difyログ用に社員番号を使用（追跡可能だが悪用不可）
     var body = new { inputs, response_mode = "streaming",
         user = config.EmployeeId };
 
@@ -215,24 +216,24 @@ public async Task<string> RunWorkflowStreamingAsync(
     using var req = new HttpRequestMessage(HttpMethod.Post,
         $"{baseUrl}/v1/workflows/run") { Content = content };
 
-    // ResponseHeadersRead avoids buffering the entire SSE stream
+    // ResponseHeadersReadでSSEストリーム全体のバッファリングを回避
     var res = await client.SendAsync(req, HttpCompletionOption.ResponseHeadersRead);
     res.EnsureSuccessStatusCode();
     return await ReadSseStreamAsync(res, progress);
 }
 ```
 
-**SSE stream reader** — Parses `data:` lines and routes `workflow_started` / `node_started` / `node_finished` / `workflow_finished` events to `IProgress<string>`. See [references/detailed-patterns.md](references/detailed-patterns.md#sse-stream-reader) for full implementation.
+**SSEストリームリーダー** — `data:`行を解析し、`workflow_started` / `node_started` / `node_finished` / `workflow_finished`イベントを`IProgress<string>`にルーティングします。完全な実装は[references/detailed-patterns.md](detailed-patterns.md#sse-stream-reader)を参照してください。
 
 > **Values**: 継続は力 / 温故知新
 
-### Step 4 — Build MVVM Settings UI
+### Step 4 — MVVM設定UIの構築
 
-Use when creating or updating the Dify API settings dialog.
+Dify API設定ダイアログを作成・更新するときに使用します。
 
-Create ViewModel and XAML dialog for Dify API configuration.
+Dify API設定用のViewModelとXAMLダイアログを作成します。
 
-**DifyConfigViewModel.cs**:
+**DifyConfigViewModel.cs**：
 
 ```csharp
 public partial class DifyConfigViewModel : ObservableObject
@@ -259,9 +260,9 @@ public partial class DifyConfigViewModel : ObservableObject
         }
         catch (CryptographicException)
         {
-            // DPAPI decryption fails if user profile or machine changed
+            // ユーザープロファイルやマシンが変更された場合、DPAPI復号化に失敗
             ApiKey = string.Empty;
-            StatusMessage = "Failed to decrypt stored API key. Please re-enter.";
+            StatusMessage = "保存されたAPIキーの復号化に失敗しました。再入力してください。";
         }
     }
 
@@ -269,7 +270,7 @@ public partial class DifyConfigViewModel : ObservableObject
     private async Task SaveAsync()
     {
         if (string.IsNullOrWhiteSpace(BaseUrl) || string.IsNullOrWhiteSpace(ApiKey))
-        { StatusMessage = "Base URL and API Key are required."; return; }
+        { StatusMessage = "ベースURLとAPIキーは必須です。"; return; }
 
         IsSaving = true;
         try
@@ -278,11 +279,11 @@ public partial class DifyConfigViewModel : ObservableObject
                 { BaseUrl = BaseUrl, EmployeeId = EmployeeId };
             config.SetApiKey(ApiKey);
             await _configService.SaveDifyConfigAsync(config);
-            StatusMessage = "Saved.";
+            StatusMessage = "保存しました。";
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Save failed: {ex.Message}";
+            StatusMessage = $"保存に失敗しました: {ex.Message}";
         }
         finally
         {
@@ -292,7 +293,7 @@ public partial class DifyConfigViewModel : ObservableObject
 }
 ```
 
-**DifyConfigDialog.xaml.cs** — Minimal code-behind (PasswordBox bridging only):
+**DifyConfigDialog.xaml.cs** — 最小限のcode-behind（PasswordBoxブリッジのみ）：
 
 ```csharp
 public partial class DifyConfigDialog : Window
@@ -301,7 +302,7 @@ public partial class DifyConfigDialog : Window
     {
         InitializeComponent();
         DataContext = viewModel;
-        // PasswordBox does not support two-way binding natively
+        // PasswordBoxはネイティブで双方向バインディングをサポートしない
         Loaded += async (_, _) => await viewModel.LoadConfigAsync();
         viewModel.PropertyChanged += (_, e) =>
         { if (e.PropertyName == nameof(viewModel.ApiKey)) ApiKeyBox.Password = viewModel.ApiKey; };
@@ -313,11 +314,11 @@ public partial class DifyConfigDialog : Window
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 5 — Wire DI and Launch
+### Step 5 — DI配線と起動
 
-Use when registering services and launching the settings dialog for the first time.
+サービスを登録し、設定ダイアログを初めて起動するときに使用します。
 
-Register services in `App.xaml.cs` and connect the settings dialog.
+`App.xaml.cs`でサービスを登録し、設定ダイアログを接続します。
 
 ```csharp
 // App.xaml.cs
@@ -333,26 +334,26 @@ protected override void OnStartup(StartupEventArgs e)
 ```
 
 ```csharp
-// Launch from any window
+// 任意のウィンドウから起動
 var vm = _serviceProvider.GetRequiredService<DifyConfigViewModel>();
 new DifyConfigDialog(vm).ShowDialog();
 ```
 
 > **Values**: 成長の複利 / 継続は力
 
-### Step 6 — Customize for Your Application
+### Step 6 — アプリケーション固有のカスタマイズ
 
-Use when preparing the generated code for production deployment.
+生成されたコードを本番デプロイ用に準備するときに使用します。
 
-Replace these placeholders before shipping:
+出荷前にこれらのプレースホルダーを置き換えてください：
 
-| Item | File | What to Change |
-|------|------|----------------|
-| App name | `SecureConfigService.cs` | `"YourAppName"` in config path |
-| Salt | `DpapiEncryptor.cs` | `Entropy` byte array value |
-| Namespace | All `.cs` files | `YourApp` → actual namespace |
-| Workflow inputs | `DifyApiService.cs` | `inputs` dictionary keys |
-| Employee ID | `DifyConfigDialog.xaml` | Add TextBox for employee ID |
+| 項目 | ファイル | 変更内容 |
+|------|---------|---------|
+| アプリ名 | `SecureConfigService.cs` | 設定パス内の`"YourAppName"` |
+| ソルト値 | `DpapiEncryptor.cs` | `Entropy`バイト配列の値 |
+| 名前空間 | 全`.cs`ファイル | `YourApp` → 実際の名前空間 |
+| ワークフロー入力 | `DifyApiService.cs` | `inputs`辞書のキー |
+| 社員番号 | `DifyConfigDialog.xaml` | 社員番号入力用TextBox追加 |
 
 > **Values**: ニュートラル / 基礎と型
 
@@ -360,27 +361,27 @@ Replace these placeholders before shipping:
 
 ## Good Practices
 
-### 1. Validate BaseUrl Scheme Before Saving
+### 1. 保存前にBaseUrlスキームを検証
 
-**What**: Reject non-HTTPS URLs in the ViewModel's `SaveAsync` method.
+**What**: ViewModelの`SaveAsync`メソッドでHTTPS以外のURLを拒否します。
 
-**Why**: API keys travel over the wire; HTTP exposes them to interception.
+**Why**: APIキーはネットワーク上を流れるため、HTTPでは傍受のリスクがあります。
 
 **Values**: ニュートラル（セキュリティを標準化）
 
-### 2. Set Explicit Timeouts per Operation
+### 2. 操作ごとに明示的なタイムアウトを設定
 
-**What**: 300s for workflow, 30s for upload, 10s for connection test.
+**What**: ワークフロー300秒、アップロード30秒、接続テスト10秒。
 
-**Why**: Prevents indefinite hangs and improves user experience.
+**Why**: 無限ハングを防止し、ユーザー体験を改善します。
 
 **Values**: 継続は力（安定した動作を継続）
 
-### 3. Use IProgress<string> for All Long Operations
+### 3. すべての長時間操作でIProgress<string>を使用
 
-**What**: Report progress at each SSE event, not just start and finish.
+**What**: 開始と終了だけでなく、各SSEイベントで進捗をレポートします。
 
-**Why**: Users see node-level progress instead of a frozen screen.
+**Why**: ユーザーは固まった画面ではなく、ノードレベルの進捗を確認できます。
 
 **Values**: 成長の複利（UXの知見がチームに蓄積）
 
@@ -388,103 +389,104 @@ Replace these placeholders before shipping:
 
 ## Common Pitfalls
 
-### 1. Storing API Keys in appsettings.json
+### 1. appsettings.jsonにAPIキーを保存
 
-**Problem**: Plaintext API keys in source-controlled config files.
+**Problem**: ソース管理される設定ファイルに平文のAPIキー。
 
-**Solution**: Use `DpapiEncryptor` + `SecureConfigService` from Step 2.
+**Solution**: Step 2の`DpapiEncryptor` + `SecureConfigService`を使用します。
 
 ```csharp
-// ❌ WRONG - Plaintext in config
+// ❌ 間違い - 設定ファイルに平文
 { "DifyApi": { "ApiKey": "app-xxxxxxxxxxxx" } }
 
-// ✅ CORRECT - DPAPI encrypted
+// ✅ 正しい - DPAPIで暗号化
 { "DifyApi": { "ApiKeyEncrypted": "AQAAANCMnd8B..." } }
 ```
 
-### 2. Blocking UI Thread During SSE Streaming
+### 2. SSEストリーミング中にUIスレッドをブロック
 
-**Problem**: Using `.Result` or `.Wait()` on async SSE calls freezes the UI.
+**Problem**: 非同期SSE呼び出しに`.Result`や`.Wait()`を使用するとUIがフリーズ。
 
-**Solution**: Use `await` with `IProgress<string>` for non-blocking updates.
+**Solution**: `await`と`IProgress<string>`でノンブロッキング更新を行います。
 
 ```csharp
-// ❌ WRONG
+// ❌ 間違い
 var result = difyService.RunWorkflowStreamingAsync(...).Result;
 
-// ✅ CORRECT
+// ✅ 正しい
 var result = await difyService.RunWorkflowStreamingAsync(..., progress);
 ```
 
-### 3. Ignoring CryptographicException on Load
+### 3. CryptographicExceptionを無視
 
-**Problem**: DPAPI data encrypted by user A cannot be decrypted by user B.
+**Problem**: ユーザーAが暗号化したDPAPIデータはユーザーBでは復号化できない。
 
-**Solution**: Catch the exception and prompt the user to re-enter credentials.
+**Solution**: 例外をキャッチし、ユーザーに認証情報の再入力を促します。
 
-### 4. Hardcoding BaseUrl Without Configuration
+### 4. BaseUrlを設定なしでハードコード
 
-**Problem**: `https://api.dify.ai` embedded in source code; cannot change per environment.
+**Problem**: `https://api.dify.ai`がソースコードに埋め込まれ、環境ごとの変更が不可能。
 
-**Solution**: Always read from `SecureConfigService`; let the settings dialog handle changes.
+**Solution**: 常に`SecureConfigService`から読み取り、設定ダイアログで変更を管理します。
 
 ---
 
 ## Anti-Patterns
 
-### Business Logic in Code-Behind
+### code-behindにビジネスロジック
 
-**What**: Writing save/load logic directly in `.xaml.cs` event handlers.
+**What**: `.xaml.cs`のイベントハンドラに保存/読み込みロジックを直接記述。
 
-**Why It's Wrong**: Untestable without a running WPF window; violates MVVM separation.
+**Why It's Wrong**: 実行中のWPFウィンドウなしではテスト不可能。MVVM分離に違反。
 
-**Better Approach**: Delegate all logic to ViewModel via `[RelayCommand]` and data binding.
+**Better Approach**: `[RelayCommand]`とデータバインディングですべてのロジックをViewModelに委譲。
 
-### Single HttpClient with No Timeout
+### タイムアウトなしの単一HttpClient
 
-**What**: Creating `new HttpClient()` without setting `Timeout` for SSE calls.
+**What**: SSE呼び出しに`Timeout`を設定せずに`new HttpClient()`を作成。
 
-**Why It's Wrong**: Default timeout (100s) kills long workflows; no timeout means infinite hang.
+**Why It's Wrong**: デフォルトタイムアウト（100秒）は長時間ワークフローを中断。タイムアウトなしは無限ハング。
 
-**Better Approach**: Set explicit timeout per operation type; consider `IHttpClientFactory` for pooling.
+**Better Approach**: 操作タイプごとに明示的なタイムアウトを設定。プーリングには`IHttpClientFactory`を検討。
 
 ---
 
 ## Quick Reference
 
-### Implementation Checklist
+### 実装チェックリスト
 
-- [ ] Install NuGet: `CommunityToolkit.Mvvm`, `Microsoft.Extensions.DependencyInjection`
-- [ ] Create `Infrastructure/Configuration/` with 4 files (Step 2)
-- [ ] Create `Infrastructure/Difys/DifyApiService.cs` (Step 3)
-- [ ] Create `Presentation/ViewModels/DifyConfigViewModel.cs` (Step 4)
-- [ ] Create `Presentation/Views/DifyConfigDialog.xaml` + `.xaml.cs` (Step 4)
-- [ ] Register services in `App.xaml.cs` (Step 5)
-- [ ] Replace all `YourApp` / `YourAppName` placeholders (Step 6)
-- [ ] Test: save config → reload → verify decryption
-- [ ] Test: upload file → run workflow → check SSE progress
+- [ ] NuGetインストール: `CommunityToolkit.Mvvm`、`Microsoft.Extensions.DependencyInjection`
+- [ ] `Infrastructure/Configuration/`に4ファイル作成（Step 2）
+- [ ] `Infrastructure/Difys/DifyApiService.cs`作成（Step 3）
+- [ ] `Presentation/ViewModels/DifyConfigViewModel.cs`作成（Step 4）
+- [ ] `Presentation/Views/DifyConfigDialog.xaml` + `.xaml.cs`作成（Step 4）
+- [ ] `App.xaml.cs`でサービス登録（Step 5）
+- [ ] すべての`YourApp` / `YourAppName`プレースホルダーを置換（Step 6）
+- [ ] テスト: 設定保存 → リロード → 復号化確認
+- [ ] テスト: ファイルアップロード → ワークフロー実行 → SSE進捗確認
 
 ---
 
 ## Resources
 
-- `local_docs/DifyAPI実装ガイド.md` — Full implementation reference (internal doc, not tracked in this repo)
-- `local_docs/共通セキュリティコンポーネント.md` — DPAPI details (internal doc, not tracked in this repo)
-- [CommunityToolkit.Mvvm Docs](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/)
-- [Dify API Documentation](https://docs.dify.ai/)
+- `local_docs/DifyAPI実装ガイド.md` — 完全な実装リファレンス（社内限定ドキュメント、本リポジトリ外）
+- `local_docs/共通セキュリティコンポーネント.md` — DPAPI詳細（社内限定ドキュメント、本リポジトリ外）
+- [CommunityToolkit.Mvvm ドキュメント](https://learn.microsoft.com/ja-jp/dotnet/communitytoolkit/mvvm/)
+- [Dify APIドキュメント](https://docs.dify.ai/)
 
 ---
 
 ## Changelog
 
-### Version 1.0.0 (2026-02-15)
-- Initial release: single-workflow Dify API integration guide
-- 6-step workflow: Structure → Config → Client → UI → DI → Customize
-- DPAPI encryption with CurrentUser scope
-- SSE streaming with real-time progress reporting
-- CommunityToolkit.Mvvm integration
+### バージョン 1.0.0 (2026-02-15)
+- 初回リリース: 単一ワークフローDify API連携ガイド
+- 6ステップワークフロー: 構造 → 設定 → クライアント → UI → DI → カスタマイズ
+- CurrentUserスコープでのDPAPI暗号化
+- リアルタイム進捗レポート付きSSEストリーミング
+- CommunityToolkit.Mvvm統合
 
 <!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
+English version: ../SKILL.md
+英語版: ../SKILL.md
 -->
+

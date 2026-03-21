@@ -1,377 +1,409 @@
 ---
 name: evidence-response
 description: >
-  Build a reusable evidence-response system for recurring business inquiries — audits,
-  questionnaires, compliance surveys — using historical evidence archives and structured
-  workflows. Use when: your organization repeatedly receives the same structured inquiries,
-  you need to leverage past responses instead of starting from scratch, or you are setting
-  up a new operational domain response capability.
+  こんなときに使う: 繰り返し発生する業務問い合わせ（監査、アンケート、コンプライアンス調査）に対して、
+  過去の回答実績とエビデンスを活用して回答するためのテンプレートスキル。
+  再利用可能な7ステップワークフローとスキャフォールディングファイルを提供する。
+metadata:
+  author: RyoMurakami1983
+  tags: [business, evidence, questionnaire, audit, compliance, template, knowledge-management]
+  invocable: true
+  version: 1.0.0
+  last_reviewed: "2026-03-09"
+  freshness_check_interval_days: 365
+  language: [en, ja]
+  model_recommendation: "Claude（GitHub Copilot経由） — 長文コンテキストの知識検索と構造化推論に最適化"
+values_alignment:
+  - "基礎と型の追求: 7ステップワークフローが型。一度習得すれば、どの業務領域でも応用可能"
+  - "余白の設計: テンプレートは構造を提供し、ドメイン知識は意図的に空白。使う人が埋める"
+  - "温故知新: 過去の回答実績を使って新しい質問に対応する。このスキルの核心"
+  - "成長の複利: 回答するたびにナレッジベースが充実し、複利的に価値が増大する"
+  - "継続は力: 鮮度管理プロトコルにより、放置されず毎年メンテナンスされる仕組み"
+trigger:
+  - 繰り返し発生する外部アンケートや調査を受領した
+  - 監査準備でエビデンスに基づく回答が必要になった
+  - 顧客・規制当局・認証機関からのコンプライアンス問い合わせを受けた
+  - 新しい業務領域でエビデンスベース回答システムを構築する必要がある
+---
+# エビデンスベース業務回答スキル
+
+業務領域で**エビデンスに基づく回答システム**を構築するためのテンプレートスキル。組織が繰り返し構造化された問い合わせ — 監査、アンケート、コンプライアンス調査 — を受ける場合に、過去の実績とエビデンスを活用して正確に回答するための**再利用可能なワークフローパターン**と**スキャフォールディングファイル**を提供する。
+
+## こんなときに使う
+
+- **繰り返し発生する**構造化された問い合わせに体系的に回答する
+- **過去の回答実績を活用**してゼロから書かずに対応する
+- **新しいドメインで**エビデンスベース回答システムを構築する
+- **再利用可能なテンプレートを作成**してドメイン知識と履歴を整理する
+
+**使わない場合：**
+
+- ❌ 繰り返しパターンのない一回限りの特殊な依頼
+- ❌ エビデンスや過去実績の参照が不要な回答
+- ❌ ドメイン特化のスキルが既にある場合 — そちらを使う
+
 ---
 
-# Evidence Response
+## 判断テーブル
 
-A template skill for building **evidence-based response systems** in operational domains. When your organization repeatedly receives structured inquiries — audits, questionnaires, compliance surveys — this skill provides the **reusable workflow pattern** and **scaffolding files** to respond accurately using historical evidence.
-
-## When to Use This Skill
-
-- **Responding** to recurring structured inquiries systematically
-- **Leveraging** past responses as references instead of starting from scratch
-- **Setting up** an evidence-based response system for a new domain
-- **Building** a reusable template for domain knowledge and history
-
-**Do NOT use when:**
-
-- ❌ Handling a one-time unique request with no recurring pattern
-- ❌ Responding without needing evidence or historical references
-- ❌ A domain-specific skill already exists — use it instead
-
----
-
-## Decision Table
-
-| Current situation | Action | Start at |
+| 現在の状況 | アクション | 開始箇所 |
 |---|---|---|
-| **First time** setting up evidence-response | Copy templates, define taxonomy | Setup Checklist |
-| **New inquiry** received for existing domain | Run the 7-step workflow | Step 1 |
-| **Similar question** answered before | Search response index first | Step 4 |
-| **Annual review** date reached | Run freshness protocol | Freshness Management |
-| **New domain** to add | Create new instance from templates | Scaffolding Files |
-| **One-off inquiry** with no recurring pattern | ❌ Do NOT use this skill | — |
+| エビデンス回答を**初めて**構築する | テンプレートをコピーし、タクソノミーを定義 | セットアップチェックリスト |
+| 既存ドメインで**新しい問い合わせ**を受領 | 7ステップワークフローを実行 | ステップ1 |
+| **類似の質問**に過去に回答済み | まず回答履歴インデックスを検索 | ステップ4 |
+| **年次レビュー**日が到来 | 鮮度管理プロトコルを実行 | 鮮度管理 |
+| **新しいドメイン**を追加 | テンプレートから新しいインスタンスを作成 | スキャフォールディングファイル |
+| 繰り返しパターンのない**一回限りの問い合わせ** | ❌ このスキルを使わない | — |
 
 ---
 
-## Related Skills
+## なぜこのテンプレートが有用か
 
-- **`knowledge-capture`** — Structured capture and anonymization of domain knowledge before building evidence archives
-- **`git-commit-practices`** — Version-controlled evidence archive management with meaningful commit history
-- **`furikaeri-practice`** — Post-response retrospective to improve the response process
+### 型としての価値
+
+空手の「型」のように、このスキルは**一度身につけたら様々な場面に応用できるワークフローパターン**を提供する。具体的な業務知識（技の細部）は使う人がドメインに合わせて埋める。型があることで：
+
+1. **ゼロから始めなくて良い**: 新しい業務領域でも、ワークフローとファイル構造はすでに定義されている
+2. **品質が安定する**: 7ステップの型に従えば、抜け漏れが減る
+3. **チームで共有できる**: 暗黙知を形式知化する構造が用意されている
+
+### 複利効果
+
+| 年数 | ナレッジベースの状態 | 回答にかかる工数 |
+|------|---------------------|-----------------|
+| 1年目 | 初期構築中。過去実績が少なく、調査工数が大きい | 高い |
+| 3年目 | 主要な質問パターンに前例がある。類似回答を参照できる | 中程度 |
+| 5年目以降 | 豊富なアーカイブ。ほぼ全ての質問に前例がある | 低い（確認作業中心） |
+
+回答するたびにナレッジベースが充実し、次の回答が楽になる — これが「成長の複利」。
 
 ---
 
-## Core Principles
+## コア原則
 
-1. **Evidence over Memory** — Document responses; recall is unreliable
-2. **Structured Classification** — Categorize inquiries for consistent handling
-3. **Intentional Blank Space** — Structure provided; domain knowledge is yours to fill
-4. **Cumulative Knowledge** — Each response compounds the archive's value
-5. **Annual Freshness** — Scheduled review prevents knowledge decay
+1. **記憶よりエビデンス** — 回答を文書化する。記憶は信頼できない
+2. **構造化された分類** — 問い合わせを分類し、一貫した対応を可能にする
+3. **意図的な空白** — 構造を提供する。ドメイン知識はあなたが埋める
+4. **知識の蓄積** — 各回答がアーカイブの価値を複利的に高める
+5. **年次の鮮度管理** — 定期レビューが知識の陳腐化を防ぐ
 
-| Principle | Value Alignment | Why It Matters |
+| 原則 | 価値観 | 重要な理由 |
+|------|--------|-----------|
+| 記憶よりエビデンス | 温故知新 | 過去に文書化された回答は、記憶に頼るよりも信頼性が高い |
+| 構造化された分類 | 基礎と型 | 分類が再現可能な一貫した回答を可能にする |
+| 意図的な空白 | 余白の設計 | テンプレートは構造を提供し、ドメイン知識はユーザーが埋める |
+| 知識の蓄積 | 成長の複利 | 各回答が次の回答をより速く正確にする |
+| 年次の鮮度管理 | 継続は力 | 定期レビューが知識の陳腐化を防ぐ |
+
+---
+
+## 依存関係
+
+| 依存関係 | 目的 |
+|---|---|
+| **Git** | ナレッジベースと回答履歴のバージョン管理 |
+| **GitHub Copilot**（Claude推奨） | 長文コンテキストの知識検索と構造化推論 |
+| **`knowledge-base-template.md`** | ドメイン知識の構造（`references/` に同梱） |
+| **`response-index-template.md`** | 回答履歴アーカイブ（`references/` に同梱） |
+
+---
+
+## スキャフォールディングファイル
+
+| ファイル | 目的 |
+|---|---|
+| [`knowledge-base-template.md`](knowledge-base-template.md) | ドメイン知識 — コピーして要件を記入 |
+| [`response-index-template.md`](response-index-template.md) | 回答アーカイブ — コピーして全回答を記録 |
+
+### セットアップチェックリスト
+
+1. ✅ テンプレートファイルを `.github/skills/<your-domain>/references/` にコピー
+2. ✅ 問い合わせ**分類タクソノミー**を定義（ステップ1）
+3. ✅ **ドメイン要件**をエビデンス文書にマッピング
+4. ✅ **最初の回答**を回答履歴インデックスに記録
+5. ✅ **年次鮮度管理**レビュー日を設定
+
+---
+
+## ワークフロー: エビデンスベース回答生成
+
+### ステップ1: 受領と分類
+
+> 新しい問い合わせを受領したときに使用する。理由: 分類が下流の一貫した対応を可能にする。
+
+ドメインのタクソノミーに基づいて問い合わせを分類する。**繰り返し発生するタイプ**を特定してタクソノミーを定義：
+
+| 項目 | 説明 | 例 |
 |---|---|---|
-| Evidence over Memory | 温故知新 (Onko Chishin) | Past documented responses beat recalled answers |
-| Structured Classification | 基礎と型 (Kiso to Kata) | Categorizing enables repeatable responses |
-| Intentional Blank Space | 余白の設計 (Yohaku no Sekkei) | Template provides structure; you fill the gaps |
-| Cumulative Knowledge | 成長の複利 (Seicho no Fukuri) | Each response makes the next one faster |
-| Annual Freshness | 継続は力 (Keizoku wa Chikara) | Scheduled review prevents knowledge decay |
+| タイプID | 短い大文字識別子 | `AUDIT`, `SURVEY`, `CERT-CHECK` |
+| 名称 | 説明的な名前 | 外部システム監査 |
+| 送信元 | 典型的な送信者 | 認証機関 |
+| 複雑度 | 低 / 中 / 高 | 回答工数に基づく |
 
----
+```
+# 理由: 全ての問い合わせが正確に1つのタイプに分類される必要がある
+新しい問い合わせ受領
+  ├─ 正式な監査か？         → AUDIT
+  ├─ アンケート・調査票か？ → SURVEY
+  ├─ 証明書の要求か？       → CERT-CHECK
+  ├─ コンプライアンス問い合わせか？ → COMPLIANCE
+  └─ どれにも当てはまらない？ → タクソノミー拡張を検討
+```
 
-## Dependencies
+- ❌ **悪い例**: ドラフト後に分類 — 構造が一貫しなくなる
+- ✅ **良い例**: 先に分類、次にドラフト — タクソノミーが回答形式を決定
 
-| Dependency | Purpose |
+> **価値観**: 基礎と型 — 分類は基礎。これなしでは回答がアドホックになる。
+
+### ステップ2: 分解と要件マッピング
+
+> 問い合わせに複数の質問が含まれるときに使用する。理由: マッピングにより漏れを防ぎ、共有エビデンスを発見できる。
+
+問い合わせを個々の質問に分解する。各質問を要件フレームワーク — ISO（国際標準化機構）規格、IATF（国際自動車産業特別委員会）条項、社内手順など — にマッピングする。
+
+```markdown
+<!-- 理由: 質問ごとの状態追跡が最終回答のギャップを防ぐ -->
+| Q# | 要約 | 要件参照 | エビデンス | 状態 |
+|----|------|---------|----------|------|
+| Q1 | 「手順を説明してください」 | ISO 9001 §7.1.5 | 手順書 Rev.N | ✅ 最新 |
+| Q2 | 「トレーサビリティの証拠を提示」 | IATF 16949 §7.1.5.3 | 記録 FY2025 | ⚠️ 更新必要 |
+```
+
+`knowledge-base.md` を使ってマッピングする。マッピングできない質問は調査対象としてフラグ。
+
+- ❌ **悪い例**: 受領順に質問に回答し、マッピングしない
+- ✅ **良い例**: 全質問を先にマッピングし、共有エビデンスを特定
+
+> **価値観**: 温故知新 — ナレッジベースは蓄積された知恵。
+
+### ステップ3: ナレッジベースからの回答ドラフト
+
+> 質問が要件にマッピングされたときに使用する。理由: エビデンス引用付きドラフトが意見ベースの回答を防ぐ。
+
+マッピングされた各質問に対して、ナレッジベースの内容を使って回答を作成する。
+
+```markdown
+<!-- 理由: 一貫した構造が全回答の品質レビューを可能にする -->
+**質問**: [原文の質問テキスト]
+**分類**: [タイプID] — [要件参照]
+**回答**:
+[特定の文書とバージョンを参照したエビデンスベースの回答]
+
+**エビデンス**: [文書名, バージョン, 日付]
+**確信度**: 高 / 中 / 低
+```
+
+- **高**: 直接的なエビデンスあり、文書は最新
+- **中**: エビデンスはあるが更新が必要な可能性
+- **低**: 直接的なエビデンスなし — レビュー対象としてフラグ
+
+> **価値観**: 基礎と型 — 一貫した回答構造が品質レビューを可能にする。
+
+### ステップ4: 過去の回答参照を検索
+
+> 回答をドラフトするときに使用する。理由: 過去の回答は検証済みの表現を提供し、矛盾を防ぐ。
+
+回答履歴インデックスで類似質問への過去の回答を検索する。
+
+**検索戦略** — この順序でチェック：
+
+1. **問い合わせタイプ**で — 同じ分類の過去回答を検索
+2. **質問キーワード**で — 全タイプから類似質問を検索
+3. **送信者**で — 同じ組織への過去回答との一貫性を確認
+4. **日付**で — 参照として最近の回答を優先
+
+```markdown
+<!-- 理由: 過去回答とのリンクが一貫性の検証を可能にする -->
+**過去参照**: [年]-[月] | [送信者] | [タイプ]
+**元ファイル**: [フォルダパスとファイル名]
+**関連性**: [この過去回答が現在の質問に該当する理由]
+```
+
+> **価値観**: 温故知新 — 過去の回答は最も価値ある資産。
+
+### ステップ5: エビデンスの鮮度確認
+
+> 回答ドラフトを最終化するときに使用する。理由: 古いエビデンスは信頼性を損ない、コンプライアンス問題を引き起こす可能性がある。
+
+参照する全エビデンス文書が最新であることを確認する。
+
+```markdown
+<!-- 理由: 鮮度確認が古いエビデンスの送付を防ぐ -->
+| 文書 | 期待バージョン | 実際バージョン | 状態 |
+|------|--------------|--------------|------|
+| 手順書 A | Rev.5 (KB) | Rev.5 (確認済) | ✅ 最新 |
+| トレーサビリティ記録 | FY2025 (KB) | FY2024 (実際) | ❌ 古い |
+| 証明書 | 2025-01 | 2025-01 | ✅ 最新 |
+```
+
+**不合格時のアクション：**
+
+| チェック | アクション |
 |---|---|
-| **Git** | Version control for knowledge base and response index |
-| **GitHub Copilot** (Claude recommended) | Long-context knowledge retrieval and structured reasoning |
-| **`knowledge-base-template.md`** | Domain knowledge structure (included in `references/`) |
-| **`response-index-template.md`** | Response history archive (included in `references/`) |
+| バージョン不一致 | ナレッジベースを最新バージョンに更新 |
+| 鮮度期間超過 | レビュー対象としてフラグ、回答にギャップを注記 |
+| 規格が廃止 | 後継規格を確認 |
+| 手順が変更 | 文書管理者に確認 |
 
----
+- ❌ **悪い例**: 「明らかな」回答は鮮度チェックをスキップ — 古いエビデンスが残存
+- ✅ **良い例**: 毎回、全ての参照文書を確認 — 例外なし
 
-## Scaffolding Files
+> **価値観**: 継続は力 — エビデンスの鮮度は譲れない。
 
-| File | Purpose |
-|---|---|
-| [`knowledge-base-template.md`](references/knowledge-base-template.md) | Domain knowledge — copy and fill with your requirements |
-| [`response-index-template.md`](references/response-index-template.md) | Response archive — copy and record every response |
+### ステップ6: 機密情報マスキングの適用
 
-### Setup Checklist
+> 外部共有用の回答を準備するときに使用する。理由: 機密情報の保護が法的・業務リスクを防ぐ。
 
-1. ✅ Copy template files to `.github/skills/<your-domain>/references/`
-2. ✅ Define inquiry **classification taxonomy** (Step 1)
-3. ✅ Map **domain requirements** to evidence documents
-4. ✅ Record **first response** in the response index
-5. ✅ Set **annual freshness** review date
-
----
-
-## Workflow: Evidence-Based Response Generation
-
-### Step 1: Receive and Classify
-
-> Use when a new inquiry arrives. Why: Classification enables consistent downstream handling.
-
-Classify the inquiry using your domain's taxonomy. Define taxonomy by identifying **recurring types**:
-
-| Field | Description | Example |
-|---|---|---|
-| Type ID | Short uppercase identifier | `AUDIT`, `SURVEY`, `CERT-CHECK` |
-| Name | Descriptive name | External System Audit |
-| Source | Typical sender | Certification body |
-| Complexity | Low / Medium / High | Based on response effort |
-
-```
-# Why: Every inquiry must map to exactly one type for consistent handling
-New inquiry received
-  ├─ Formal audit?           → AUDIT
-  ├─ Questionnaire/survey?   → SURVEY
-  ├─ Certificate request?    → CERT-CHECK
-  ├─ Compliance inquiry?     → COMPLIANCE
-  └─ No match?               → Flag for taxonomy expansion
-```
-
-- ❌ **Bad**: Classify later after drafting — leads to inconsistent structure
-- ✅ **Good**: Classify first, then draft — taxonomy drives the response format
-
-> **Values**: Kiso to Kata — Classification is the foundation. Without it, responses are ad-hoc.
-
-### Step 2: Decompose and Map to Requirements
-
-> Use when inquiry contains multiple questions. Why: Mapping ensures no question is missed and reveals shared evidence.
-
-Break the inquiry into individual questions. Map each to your requirement framework — e.g., ISO (International Organization for Standardization) standards, IATF (International Automotive Task Force) clauses, or internal procedures.
+外部に回答を共有する前に、組織の機密情報ルールを適用する。マスキングルールはナレッジベースに定義。
 
 ```markdown
-<!-- Why: Per-question status tracking prevents gaps in the final response -->
-| Q# | Summary | Requirement | Evidence | Status |
-|----|---------|-------------|----------|--------|
-| Q1 | "Describe calibration procedure" | ISO 9001 §7.1.5 | Procedure Rev.N | ✅ Current |
-| Q2 | "Provide traceability evidence" | IATF 16949 §7.1.5.3 | Record FY2025 | ⚠️ Needs update |
+<!-- 理由: 一貫したマスキングが偶発的な情報漏洩を防ぐ -->
+| カテゴリ | ルール | マスク前 | マスク後 |
+|---------|--------|---------|---------|
+| 顧客固有の用語 | 汎用化 | 「顧客Xのフォーマット」 | 「お客様のフォーマット」 |
+| 社内帳票 | 伏字化 | 「帳票 K-1234」 | 「社内帳票」 |
+| 担当者名 | 名前削除 | 「田中がレビュー」 | 「権限のある担当者がレビュー」 |
+| 独自手法 | 要約 | 「当社のXYZ工程...」 | 「確立された工程...」 |
 ```
 
-Use `knowledge-base.md` for the mapping. Flag unmapped questions for investigation.
+公的規格への参照 — ISO、IATF、JIS（日本産業規格）等 — や、外部共有が承認された一般的な手順説明は**マスクしない**。
 
-- ❌ **Bad**: Answer questions in received order without mapping
-- ✅ **Good**: Map all questions first, then identify shared evidence
+> **価値観**: 余白の設計 — 機密情報ルールが意図的な境界を作る。
 
-> **Values**: Onko Chishin — The knowledge base is your accumulated wisdom.
+### ステップ7: レビューと最終化
 
-### Step 3: Draft Responses from Knowledge Base
+> 全ての回答がドラフト・マスキング済みのときに使用する。理由: 最終品質ゲートが受領者へのエラー到達を防ぐ。
 
-> Use when questions are mapped to requirements. Why: Evidence-cited drafts prevent opinion-based answers.
-
-For each mapped question, draft a response using knowledge base content.
+提出前の最終品質チェックを実行する。
 
 ```markdown
-<!-- Why: Consistent structure enables quality review across all responses -->
-**Question**: [Original question text]
-**Classification**: [Type ID] — [Requirement reference]
-**Response**:
-[Evidence-based answer referencing specific documents and versions]
-
-**Evidence**: [Document name, version, date]
-**Confidence**: High / Medium / Low
+<!-- 理由: チェックリストが最終回答での一般的な漏れを防ぐ -->
+## 最終レビュー
+- [ ] 全ての質問に回答がある（空欄なし）
+- [ ] エビデンス文書がバージョンと日付付きで引用
+- [ ] 該当する場合、過去回答の参照を記載
+- [ ] 機密情報マスキングが一貫して適用
+- [ ] 回答のトーンが問い合わせの公式度に合致
+- [ ] スコープ外の主張なし（フラグ付き項目はエスカレーション）
+- [ ] 回答履歴インデックスにこの新エントリを追加済み
 ```
 
-- **High**: Direct evidence exists, document is current
-- **Medium**: Evidence exists but may need updating
-- **Low**: No direct evidence — flag for review
+**スコープ外プロトコル** — 質問がドメイン外の場合：
 
-> **Values**: Kiso to Kata — Consistent response structure enables quality review.
+1. **明確にフラグ** — 回答を試みない
+2. **評価** — 隣接領域か、完全に無関係か
+3. **エスカレーション** — 責任部門にルーティング
+4. **絶対に捏造しない** — 「スコープ外」は推測より常に良い
 
-### Step 4: Locate Historical References
-
-> Use when drafting responses. Why: Past answers provide tested language and prevent contradictions.
-
-Search the response index for past answers to similar questions.
-
-**Search strategy** — check in this order:
-
-1. By **inquiry type** — find past responses of same classification
-2. By **question keyword** — find similar questions across all types
-3. By **sender** — check consistency with previous responses to same organization
-4. By **date** — prefer recent responses as references
-
-```markdown
-<!-- Why: Linking to past responses enables consistency verification -->
-**Historical reference**: [Year]-[Month] | [Sender] | [Type]
-**Source file**: [Folder path and filename]
-**Relevance**: [Why this past response applies to the current question]
-```
-
-> **Values**: Onko Chishin — Past responses are your most valuable asset.
-
-### Step 5: Verify Evidence Currency
-
-> Use when finalizing response drafts. Why: Outdated evidence damages credibility and may cause compliance issues.
-
-Verify that all referenced evidence documents are still current.
-
-```markdown
-<!-- Why: Currency verification prevents sending outdated evidence -->
-| Document | Expected ver. | Actual ver. | Status |
-|----------|--------------|-------------|--------|
-| Procedure A | Rev.5 (KB) | Rev.5 (verified) | ✅ Current |
-| Traceability Record | FY2025 (KB) | FY2024 (actual) | ❌ Outdated |
-| Calibration Cert | 2025-01 | 2025-01 | ✅ Current |
-```
-
-**Action on failure:**
-
-| Check | Action |
-|---|---|
-| Version mismatch | Update knowledge base to latest version |
-| Beyond freshness period | Flag for review; note gap in response |
-| Standard superseded | Check for replacement standard |
-| Procedure changed | Verify with document owner |
-
-- ❌ **Bad**: Skip currency check for "obvious" answers — outdated evidence persists
-- ✅ **Good**: Verify every referenced document, every time — no exceptions
-
-> **Values**: Keizoku wa Chikara — Evidence currency is non-negotiable.
-
-### Step 6: Apply Confidentiality Masking
-
-> Use when preparing responses for external sharing. Why: Protecting confidential information prevents legal and business risk.
-
-Apply your organization's confidentiality rules before sharing externally. Define masking rules in your knowledge base.
-
-```markdown
-<!-- Why: Consistent masking prevents accidental disclosure -->
-| Category | Rule | Before | After |
-|----------|------|--------|-------|
-| Customer terms | Generalize | "Customer X's format" | "the customer's format" |
-| Internal forms | Redact | "Form K-1234" | "internal form" |
-| Personnel | Remove names | "Reviewed by Tanaka" | "Reviewed by authorized personnel" |
-| Proprietary methods | Summarize | "Our XYZ process..." | "An established process..." |
-```
-
-**Do NOT mask** references to public standards — ISO, IATF, JIS (Japanese Industrial Standards), etc. — or general procedure descriptions approved for external use.
-
-> **Values**: Yohaku no Sekkei — Confidentiality rules create intentional boundaries.
-
-### Step 7: Review and Finalize
-
-> Use when all responses are drafted and masked. Why: Final quality gate prevents errors from reaching the recipient.
-
-Run the final quality check before submission.
-
-```markdown
-<!-- Why: Checklist prevents common omissions in final responses -->
-## Final Review
-- [ ] Every question has a response (no blanks)
-- [ ] Evidence documents cited with version and date
-- [ ] Historical references noted where applicable
-- [ ] Confidentiality masking applied consistently
-- [ ] Response tone matches inquiry formality
-- [ ] No out-of-scope claims (flagged items escalated)
-- [ ] Response index updated with this new entry
-```
-
-**Out-of-scope protocol** — if a question falls outside your domain:
-
-1. **Flag** clearly — do not attempt to answer
-2. **Assess** — adjacent to your domain or completely unrelated?
-3. **Escalate** — route to the responsible department
-4. **Never fabricate** — "outside our scope" beats a guess every time
-
-> **Values**: Kiso to Kata — Quality gates prevent errors from propagating.
+> **価値観**: 基礎と型 — 品質ゲートがエラーの伝播を防ぐ。
 
 ---
 
-## Freshness Management
+## 鮮度管理
 
-**Trigger conditions** (any one triggers a review):
+**トリガー条件**（いずれか1つでレビューを開始）：
 
-1. ✅ Freshness interval (default: 365 days) elapsed since last update
-2. ✅ A referenced standard or regulation has been revised
-3. ✅ Internal procedures significantly updated
-4. ✅ A response revealed a knowledge gap
+1. ✅ 鮮度管理間隔（デフォルト: 365日）が最終更新から経過
+2. ✅ 参照する規格・規制が改定された
+3. ✅ 社内手順が大幅に更新された
+4. ✅ 回答中にナレッジギャップが発見された
 
-**Annual review checklist:**
+**年次レビューチェックリスト：**
 
-- [ ] All evidence documents in knowledge base are current
-- [ ] Response index includes all inquiries from the past year
-- [ ] Classification taxonomy covers incoming inquiry types
-- [ ] Masking rules match current confidentiality requirements
-- [ ] New recurring patterns added as types
-- [ ] `metadata.created` date refreshed in frontmatter
+- [ ] ナレッジベースの全エビデンス文書が最新
+- [ ] 回答履歴インデックスに過去1年の全問い合わせが含まれる
+- [ ] 分類タクソノミーが受信する問い合わせタイプをカバー
+- [ ] マスキングルールが現在の機密情報要件に適合
+- [ ] 新しい繰り返しパターンがタイプとして追加済み
+- [ ] フロントマターの `metadata.created` 日付を更新
 
-> **Values**: Keizoku wa Chikara — Annual maintenance prevents knowledge decay.
-
----
-
-## Best Practices
-
-- ✅ **Start with one domain** — get it working, then expand
-- ✅ **Record every response** in the index, even quick ones. Why: Compound value requires completeness
-- ✅ **Use Claude** for knowledge retrieval. Why: Long-context structured reasoning matches this workflow
-- ✅ **Keep files in `.github/skills/`** — use `git-ops-folder-init` for directory-based tracking
-- ✅ **Review with your team annually**. Why: Multiple perspectives strengthen the knowledge base
-- ✅ **Link template to domain implementations** — the template is the form; each domain is a concrete application
+> **価値観**: 継続は力 — 年次メンテナンスがナレッジの陳腐化を防ぐ。
 
 ---
 
-## Common Pitfalls
+## ベストプラクティス
 
-| Pitfall | Impact | Fix |
-|---------|--------|-----|
-| Updating knowledge base but not the response index | Responses reference outdated entries | ✅ Update both simultaneously |
-| Using knowledge base as the only search target | Miss relevant answers in response history | ✅ Search both knowledge base AND response index |
-| Mixing classification types in a single response | Inconsistent format confuses reviewers | ✅ One response per type; split if needed |
-| Masking too aggressively | Response becomes uninformative | ✅ Mask only what confidentiality rules require |
-| Skipping currency check for "obvious" answers | Outdated evidence persists undetected | ✅ Verify every document, every time |
-
----
-
-## Anti-Patterns
-
-| ❌ Don't | ✅ Do Instead | Why |
-|----------|--------------|-----|
-| Copy-paste old responses without checking currency | Verify evidence versions before reuse | Outdated evidence damages credibility |
-| Skip the response index for "quick" replies | Record every response, however brief | Compound value depends on completeness |
-| Answer questions outside your scope | Flag, escalate, and document the gap | Fabricated answers create liability |
-| Store knowledge only in someone's head | Document in `knowledge-base.md` with links | Tacit knowledge doesn't survive personnel changes |
-| Create types for one-off inquiries | Only add types for recurring patterns (3+) | Over-classification adds noise |
-| Ignore the annual freshness review | Schedule it and complete the checklist | Knowledge decay is invisible until a wrong answer ships |
+- ✅ **1つのドメインから始める** — まず機能させてから拡大する
+- ✅ **全ての回答を記録** — 短い回答でもインデックスに。理由: 複利効果は完全性から生まれる
+- ✅ **Claudeを使用** — 長文コンテキストの構造化推論がこのワークフローに最適
+- ✅ **ファイルは `.github/skills/` に配置** — `git-ops-folder-init` でディレクトリベースの追跡を設定
+- ✅ **チームで年次レビュー**。理由: 複数の視点がナレッジベースを強化する
+- ✅ **テンプレートとドメイン実装をリンク** — テンプレートは型、各ドメインは具体的な適用
 
 ---
 
-## Implementation Example
+## よくある落とし穴
 
-An IATF 16949 internal laboratory questionnaire response skill demonstrates this template applied to calibration quality management:
+| 落とし穴 | 影響 | 修正 |
+|---------|------|------|
+| ナレッジベースを更新したが回答履歴を更新しない | 回答が古いエントリを参照 | ✅ 両方を同時に更新 |
+| ナレッジベースだけを検索対象にする | 回答履歴の関連する回答を見逃す | ✅ ナレッジベースと回答履歴の両方を検索 |
+| 1つの回答に複数の分類タイプを混在 | 形式の不一致がレビュアーを混乱させる | ✅ タイプごとに1回答、必要なら分割 |
+| 過度にマスキング | 回答が無意味になる | ✅ 機密情報ルールが要求する範囲のみマスク |
+| 「明らかな」回答の鮮度チェックをスキップ | 古いエビデンスが検知されず残存 | ✅ 毎回、全文書を確認 |
 
-- ✅ 5-type classification taxonomy (AUDIT, CAL-EVAL, CAL-CERT, IATF-GEN, STD-SAMPLE)
-- ✅ Knowledge base mapped to IATF 16949 §7.1.5.3 sub-requirements
-- ✅ Response index with 37+ historical entries spanning 8 years
-- ✅ 3-tier confidentiality masking (internal, external, audit)
-- ✅ Annual freshness management aligned with audit cycles
+---
 
-Use it as a reference when creating your own domain-specific implementation.
+## アンチパターン
+
+| ❌ やってはいけない | ✅ 代わりにやること | 理由 |
+|-------------------|-------------------|------|
+| 鮮度を確認せずに過去回答をコピペ | 再利用前にエビデンスのバージョンを確認 | 古いエビデンスは信頼性を損なう |
+| 「簡単な」回答は回答履歴をスキップ | どんなに短くても全回答を記録 | 複利効果は完全性に依存 |
+| スコープ外の質問に回答 | フラグ、エスカレーション、ギャップを文書化 | 捏造された回答は責任問題を生む |
+| ナレッジを誰かの頭の中にだけ保管 | `knowledge-base.md` にリンク付きで文書化 | 暗黙知は人事異動で消える |
+| 一回限りの問い合わせにタイプを作成 | 繰り返しパターン（3回以上）のみタイプ追加 | 過剰分類はノイズを増やす |
+| 年次の鮮度管理レビューを無視 | スケジュールしてチェックリストを完了 | 陳腐化は誤回答を送るまで気づかない |
+
+---
+
+## 実装例
+
+IATF 16949 内部試験所アンケート回答スキルが、校正品質管理にこのテンプレートを適用した例を示す：
+
+- ✅ 5タイプの分類タクソノミー（AUDIT, CAL-EVAL, CAL-CERT, IATF-GEN, STD-SAMPLE）
+- ✅ IATF 16949 §7.1.5.3 のサブ要件にマッピングされたナレッジベース
+- ✅ 8年間にわたる37件以上の回答履歴
+- ✅ 3段階の機密情報マスキング（社内用、社外用、監査用）
+- ✅ 監査サイクルに合わせた年次鮮度管理
+
+自分のドメイン固有の実装を作成する際の参考として活用できる。
 
 ---
 
 ## FAQ
 
-**Q: How many responses before this template becomes useful?**
-A: Even 1 recorded response has reference value. Compound benefit becomes obvious after 10+.
+**Q: 何件の回答があればこのテンプレートが有用になるか？**
+A: 1件の記録でも参照としての価値がある。10件以上で複利効果が明確になる。
 
-**Q: Can I use this for non-audit inquiries?**
-A: Yes. Any recurring structured inquiry — customer surveys, regulatory questionnaires, internal audits — fits.
+**Q: 監査以外の問い合わせにも使えるか？**
+A: はい。繰り返し発生する構造化された問い合わせ — 顧客調査、規制アンケート、内部監査 — 全て適用可能。
 
-**Q: What if my domain has no formal standards?**
-A: Use internal procedures or policies as the requirement framework. External standards are not required.
+**Q: マッピングすべき正式な規格がないドメインの場合は？**
+A: 社内手順やポリシーを要件フレームワークとして使用する。外部規格は必須ではない。
 
-**Q: How do I handle multilingual inquiries?**
-A: Record the original language in the response index. Maintain the knowledge base in your primary working language.
+**Q: 複数言語の問い合わせをどう扱うか？**
+A: 回答履歴インデックスに原文の言語を記録する。ナレッジベースは主要な業務言語で維持。
 
-**Q: Should I version-control these files?**
-A: Yes. Use `git-ops-folder-init` for directory-based tracking with change history and rollback.
+**Q: ファイルをバージョン管理すべきか？**
+A: はい。`git-ops-folder-init` でディレクトリベースのgit追跡を設定する。変更履歴とロールバック機能が得られる。
 
 ---
 
-## Quick Reference
+## クイックリファレンス
 
-### Response Workflow (7 Steps)
+### 回答ワークフロー（7ステップ）
 
-1. **Receive & Classify** → inquiry type assigned
-2. **Decompose & Map** → requirement references identified
-3. **Draft from Knowledge Base** → evidence-cited responses
-4. **Search Response Index** → historical precedents found
-5. **Verify Evidence Currency** → document versions confirmed
-6. **Apply Confidentiality Masking** → external-safe content
-7. **Review & Finalize** → quality gate passed, index updated
+1. **受領・分類** → 問い合わせタイプを割り当て
+2. **分解・マッピング** → 要件参照を特定
+3. **ナレッジベースからドラフト** → エビデンス引用付き回答
+4. **回答履歴検索** → 過去の前例を発見
+5. **エビデンス鮮度確認** → 文書バージョンを確認
+6. **機密情報マスキング適用** → 外部共有可能な内容
+7. **レビュー・最終化** → 品質ゲート通過、インデックス更新
 
-### Scaffolding Files
+### スキャフォールディングファイル
 
-- `knowledge-base-template.md` → domain knowledge + evidence registry + masking rules
-- `response-index-template.md` → response archive + taxonomy + statistics
+- `knowledge-base-template.md` → ドメイン知識 + エビデンス管理台帳 + マスキングルール
+- `response-index-template.md` → 回答アーカイブ + タクソノミー + 統計
+

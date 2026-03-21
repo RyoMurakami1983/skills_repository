@@ -1,71 +1,69 @@
 ---
 name: dotnet-local-tools
 description: >
-  Managing local .NET tools with dotnet-tools.json for consistent, version-pinned tooling
-  across development environments and CI/CD pipelines. Use when: setting up or maintaining
-  per-repository CLI tools.
+  こんなときに使う: dotnet-tools.json によるローカル .NET ツールの管理。開発環境と CI/CD パイプライン全体で
+  バージョン固定された一貫したツール環境を構築。リポジトリ単位の CLI ツール管理時に使用。
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, cli-tools, dotnet-tools-json, ci-cd, devops]
   invocable: false
   version: 1.0.0
 ---
+# .NET ローカルツール
 
-# .NET Local Tools
+`.config/dotnet-tools.json` によるリポジトリ単位の CLI ツール管理：マニフェスト初期化、ツールインストール、バージョン固定、CI/CD 統合、ライフサイクル管理。
 
-Per-repository CLI tool management with `.config/dotnet-tools.json`: manifest initialization, tool installation, version pinning, CI/CD integration, and lifecycle maintenance.
+## こんなときに使う
 
-## When to Use This Skill
+以下の場合にこのスキルを使用してください：
 
-Use this skill when:
-
-- Setting up consistent CLI tooling across a development team via a shared manifest
-- Ensuring CI/CD pipelines restore and use the same tool versions as local development
-- Installing project-specific tools such as docfx, dotnet-ef, csharpier, or reportgenerator
-- Avoiding global tool version conflicts between multiple projects on one machine
-- Migrating from globally installed tools to per-repository local tool management
-- Configuring Dependabot or Renovate to automate local tool version updates
-- Troubleshooting tool-not-found errors after running dotnet tool restore
+- 共有マニフェストで開発チーム全体に一貫した CLI ツール環境を構築するとき
+- CI/CD パイプラインでローカル開発と同じツールバージョンを復元・使用するとき
+- docfx、dotnet-ef、csharpier、reportgenerator などプロジェクト固有ツールをインストールするとき
+- 1台のマシン上の複数プロジェクト間でグローバルツールのバージョン競合を回避するとき
+- グローバルインストールされたツールからリポジトリ単位のローカルツール管理に移行するとき
+- Dependabot や Renovate でローカルツールのバージョン更新を自動化するとき
+- dotnet tool restore 実行後のツール未検出エラーをトラブルシューティングするとき
 
 ---
 
 ## Related Skills
 
-- **`dotnet-project-structure`** — Solution setup with .slnx, Directory.Build.props, and global.json
-- **`git-commit-practices`** — Commit each tool addition as an atomic change
-- **`tdd-standard-practice`** — Validate tool outputs with automated tests
+- **`dotnet-project-structure`** — .slnx、Directory.Build.props、global.json によるソリューション構築
+- **`git-commit-practices`** — 各ツール追加をアトミックな変更としてコミット
+- **`tdd-standard-practice`** — ツール出力を自動テストで検証
 
 ---
 
 ## Core Principles
 
-1. **Per-Repository Isolation** — Each project owns its toolset; no global state leaks between repositories (基礎と型)
-2. **Reproducible Tooling** — Exact versions are pinned in the manifest so every environment restores identical tools (基礎と型)
-3. **Single Restore Command** — `dotnet tool restore` replaces N individual install commands in CI/CD (成長の複利)
-4. **Progressive Adoption** — Start with one tool, add more as needed; the manifest grows incrementally (継続は力)
-5. **Transparent Configuration** — `dotnet-tools.json` is human-readable JSON committed to source control (温故知新)
+1. **Per-Repository Isolation（リポジトリ単位の分離）** — 各プロジェクトが独自のツールセットを所有し、グローバル状態がリポジトリ間で漏れない（基礎と型）
+2. **Reproducible Tooling（再現可能なツール環境）** — マニフェストに正確なバージョンを固定し、すべての環境で同一のツールを復元（基礎と型）
+3. **Single Restore Command（単一の復元コマンド）** — `dotnet tool restore` が CI/CD での個別インストールコマンドを置き換える（成長の複利）
+4. **Progressive Adoption（段階的な採用）** — 1つのツールから始め、必要に応じて追加。マニフェストは漸進的に成長（継続は力）
+5. **Transparent Configuration（透明な設定）** — `dotnet-tools.json` はソースコントロールにコミットされる人間が読める JSON（温故知新）
 
 ---
 
 ## Workflow: Manage .NET Local Tools
 
-### Step 1 — Initialize the Tool Manifest
+### Step 1 — ツールマニフェストの初期化
 
-Use when creating a new repository or adding local tool support to an existing project.
+新しいリポジトリの作成時、または既存プロジェクトへのローカルツールサポートの追加時に使用します。
 
 ```bash
-# Create .config/dotnet-tools.json
+# .config/dotnet-tools.json を作成
 dotnet new tool-manifest
 ```
 
-This creates the manifest directory structure:
+マニフェストのディレクトリ構造が作成されます：
 
 ```
 .config/
 └── dotnet-tools.json
 ```
 
-**Initial manifest content:**
+**初期マニフェスト内容:**
 
 ```json
 {
@@ -75,50 +73,50 @@ This creates the manifest directory structure:
 }
 ```
 
-| Field | Description | Default |
-|-------|-------------|---------|
-| `version` | Manifest schema version | `1` |
-| `isRoot` | Prevents searching parent directories | `true` |
-| `tools` | Dictionary of tool configurations | `{}` |
+| フィールド | 説明 | デフォルト |
+|-----------|------|-----------|
+| `version` | マニフェストスキーマバージョン | `1` |
+| `isRoot` | 親ディレクトリへのマニフェスト検索を防止 | `true` |
+| `tools` | ツール設定のディクショナリ | `{}` |
 
-**Why `isRoot: true`**: Without this flag, MSBuild walks up the directory tree looking for additional manifests, causing unexpected tool resolution.
+**なぜ `isRoot: true` か**: このフラグがないと、MSBuild がディレクトリツリーを上方に走査して追加のマニフェストを探し、予期しないツール解決が発生します。
 
-> **Values**: 基礎と型（manifest provides the structural foundation for all tooling） / 余白の設計
+> **Values**: 基礎と型（マニフェストがすべてのツール管理の構造的基盤を提供） / 余白の設計
 
-### Step 2 — Install Tools Locally
+### Step 2 — ツールのローカルインストール
 
-Use when adding project-specific CLI tools to the repository manifest.
+リポジトリマニフェストにプロジェクト固有の CLI ツールを追加するときに使用します。
 
 ```bash
-# Install a tool locally (latest version)
+# ツールをローカルにインストール（最新バージョン）
 dotnet tool install docfx
 
-# Install a specific version
+# 特定のバージョンをインストール
 dotnet tool install docfx --version 2.78.3
 
-# Install from a private feed
+# プライベートフィードからインストール
 dotnet tool install MyTool --add-source https://pkgs.dev.azure.com/org/_packaging/feed/nuget/v3/index.json
 ```
 
-**Common tools for .NET projects:**
+**.NET プロジェクトで一般的なツール:**
 
-| Tool | Package Name | Command | Purpose |
-|------|-------------|---------|---------|
-| DocFX | `docfx` | `dotnet docfx` | API documentation generation |
-| EF Core CLI | `dotnet-ef` | `dotnet ef` | Database migrations |
-| ReportGenerator | `dotnet-reportgenerator-globaltool` | `dotnet reportgenerator` | Code coverage reports |
-| CSharpier | `csharpier` | `dotnet csharpier` | Opinionated C# formatting |
-| Incrementalist | `incrementalist.cmd` | `incrementalist` | Build only changed projects |
+| ツール | パッケージ名 | コマンド | 用途 |
+|--------|-------------|---------|------|
+| DocFX | `docfx` | `dotnet docfx` | API ドキュメント生成 |
+| EF Core CLI | `dotnet-ef` | `dotnet ef` | データベースマイグレーション |
+| ReportGenerator | `dotnet-reportgenerator-globaltool` | `dotnet reportgenerator` | コードカバレッジレポート |
+| CSharpier | `csharpier` | `dotnet csharpier` | C# コードフォーマット |
+| Incrementalist | `incrementalist.cmd` | `incrementalist` | 変更プロジェクトのみビルド |
 
-Each `dotnet tool install` command automatically updates `dotnet-tools.json`.
+各 `dotnet tool install` コマンドが `dotnet-tools.json` を自動的に更新します。
 
-> **Values**: 継続は力（add tools one at a time, building the manifest incrementally） / 基礎と型
+> **Values**: 継続は力（ツールを1つずつ追加し、マニフェストを漸進的に構築） / 基礎と型
 
-### Step 3 — Configure Version Pinning
+### Step 3 — バージョン固定の設定
 
-Use when ensuring reproducible tool versions across all environments.
+すべての環境で再現可能なツールバージョンを保証するときに使用します。
 
-**Example manifest with pinned versions:**
+**バージョン固定されたマニフェストの例:**
 
 ```json
 {
@@ -149,19 +147,19 @@ Use when ensuring reproducible tool versions across all environments.
 }
 ```
 
-| Field | Description | Recommended |
-|-------|-------------|-------------|
-| `tools.<name>.version` | Exact version to install | Pin explicitly |
-| `tools.<name>.commands` | CLI commands the tool provides | From NuGet |
-| `tools.<name>.rollForward` | Allow newer versions | `false` |
+| フィールド | 説明 | 推奨 |
+|-----------|------|------|
+| `tools.<name>.version` | インストールする正確なバージョン | 明示的に固定 |
+| `tools.<name>.commands` | ツールが提供する CLI コマンド | NuGet から取得 |
+| `tools.<name>.rollForward` | 新しいバージョンを許可 | `false` |
 
-**Why `rollForward: false`**: Ensures every developer and CI agent uses the exact same tool version, preventing "works on my machine" issues.
+**なぜ `rollForward: false` か**: すべての開発者と CI エージェントが完全に同じツールバージョンを使用し、「自分のマシンでは動く」問題を防止します。
 
-> **Values**: 基礎と型（version pinning eliminates environment drift） / ニュートラルな視点
+> **Values**: 基礎と型（バージョン固定が環境ドリフトを排除） / ニュートラルな視点
 
-### Step 4 — Integrate with CI/CD
+### Step 4 — CI/CD との統合
 
-Use when configuring automated pipelines to restore and use local tools.
+自動化パイプラインでローカルツールを復元・使用するように設定するときに使用します。
 
 **GitHub Actions:**
 
@@ -208,41 +206,41 @@ steps:
     displayName: 'Build and test'
 ```
 
-**Why restore before use**: Local tools are not available until `dotnet tool restore` runs. Skipping this step causes "command not found" errors in CI.
+**なぜ使用前に復元するのか**: ローカルツールは `dotnet tool restore` を実行するまで使用できません。このステップを省略すると CI で「コマンドが見つかりません」エラーが発生します。
 
-> **Values**: 成長の複利（CI automation compounds quality across every build） / 基礎と型
+> **Values**: 成長の複利（CI 自動化がすべてのビルドで品質を複利的に向上） / 基礎と型
 
-### Step 5 — Maintain Tool Versions
+### Step 5 — ツールバージョンの管理
 
-Use when updating, listing, or removing tools from the repository manifest.
+リポジトリマニフェストのツールを更新、一覧表示、または削除するときに使用します。
 
-**Update tools:**
+**ツールの更新:**
 
 ```bash
-# Update to latest version
+# 最新バージョンに更新
 dotnet tool update docfx
 
-# Update to specific version
+# 特定のバージョンに更新
 dotnet tool update docfx --version 2.79.0
 ```
 
-**List installed tools:**
+**インストール済みツールの一覧:**
 
 ```bash
-# List local tools and versions
+# ローカルツールとバージョンを一覧
 dotnet tool list
 
-# Check for outdated tools
+# 更新可能なツールをチェック
 dotnet tool list --outdated
 ```
 
-**Remove a tool:**
+**ツールの削除:**
 
 ```bash
 dotnet tool uninstall docfx
 ```
 
-**Automate updates with Dependabot:**
+**Dependabot で更新を自動化:**
 
 ```yaml
 # .github/dependabot.yml
@@ -254,146 +252,142 @@ updates:
       interval: "weekly"
 ```
 
-Dependabot automatically detects `.config/dotnet-tools.json` and creates pull requests for tool version updates.
+Dependabot が `.config/dotnet-tools.json` を自動検出し、ツールバージョン更新のプルリクエストを作成します。
 
-> **Values**: 継続は力（regular updates keep tooling current） / 余白の設計
+> **Values**: 継続は力（定期的な更新でツールを最新に保つ） / 余白の設計
 
 ---
 
 ## Good Practices
 
-### 1. Restore Tools as the First CI Step
+### 1. CI の最初のステップでツールを復元
 
-**What**: Run `dotnet tool restore` immediately after SDK setup, before any build or test step.
+**What**: SDK セットアップ直後、ビルドやテストステップの前に `dotnet tool restore` を実行します。
 
-- Use `dotnet tool restore` as the first step after SDK setup
-- Avoid invoking tools before restore completes
+- Use `dotnet tool restore` を SDK セットアップ後の最初のステップとして使用
+- Avoid ツール復元完了前のツール呼び出しを避ける
 
-**Why**: Local tools are unavailable until restored; later steps that invoke tools will fail silently or with cryptic errors.
+**Why**: ローカルツールは復元されるまで使用不可。後続のツール呼び出しステップがサイレントに失敗するか、分かりにくいエラーが発生します。
 
-**Values**: 基礎と型（reliable CI starts with a complete environment）
+**Values**: 基礎と型（信頼性の高い CI は完全な環境から始まる）
 
-### 2. Run Format Checks in CI
+### 2. CI でフォーマットチェックを実行
 
-**What**: Use `dotnet csharpier --check .` in CI to enforce consistent formatting without modifying files.
+**What**: CI で `dotnet csharpier --check .` を使用して、ファイルを変更せずに一貫したフォーマットを強制します。
 
-- Apply formatting checks in CI before merge
-- Consider `--check` mode to avoid modifying files in pipelines
+- Apply マージ前に CI でフォーマットチェックを適用
+- Consider パイプラインでファイル変更を避ける `--check` モードを検討
 
-**Why**: Catches formatting drift early and keeps code reviews focused on logic rather than style.
+**Why**: フォーマットのドリフトを早期にキャッチし、コードレビューをスタイルではなくロジックに集中させます。
 
-**Values**: 成長の複利（automated formatting compounds code consistency）
+**Values**: 成長の複利（自動フォーマットがコードの一貫性を複利的に向上）
 
-### 3. Document Tool Requirements in README
+### 3. README にツール要件を記載
 
-**What**: Add a "Development Setup" section listing `dotnet tool restore` as a prerequisite.
+**What**: 「開発セットアップ」セクションに `dotnet tool restore` を前提条件として記載します。
 
-- Define setup steps in README for new contributors
-- Use a single restore command to simplify onboarding
+- Define 新しいコントリビューター向けにセットアップ手順を README に定義
+- Use 単一の復元コマンドでオンボーディングを簡素化
 
-**Why**: New team members can set up their environment with a single command instead of hunting for tool installation instructions.
+**Why**: 新しいチームメンバーがツールインストール手順を探す代わりに、単一のコマンドで環境を構築できます。
 
-**Values**: ニュートラルな視点（universally accessible onboarding）
+**Values**: ニュートラルな視点（誰でもアクセスできるオンボーディング）
 
 ---
 
 ## Common Pitfalls
 
-### 1. Running Tools from a Subdirectory
+### 1. サブディレクトリからのツール実行
 
-**Problem**: Invoking a local tool from a subdirectory where the manifest is not found.
+**Problem**: マニフェストが見つからないサブディレクトリからローカルツールを呼び出す。
 
-**Solution**: Always run local tool commands from the repository root where `.config/dotnet-tools.json` exists.
+**Solution**: `.config/dotnet-tools.json` が存在するリポジトリルートからツールコマンドを実行してください。
 
 ```bash
-# ❌ WRONG — running from subdirectory
+# ❌ WRONG — サブディレクトリから実行
 cd src/MyApp
-dotnet docfx  # Error: tool not found
+dotnet docfx  # エラー: ツールが見つかりません
 
-# ✅ CORRECT — run from solution root
+# ✅ CORRECT — ソリューションルートから実行
 cd ../..
 dotnet docfx docs/docfx.json
 ```
 
-### 2. Version Conflicts with Global Tools
+### 2. グローバルツールとのバージョン競合
 
-**Problem**: A globally installed tool shadows the local version, causing unexpected behavior.
+**Problem**: グローバルにインストールされたツールがローカルバージョンを隠蔽し、予期しない動作を引き起こす。
 
-**Solution**: Check for global tool conflicts with `dotnet tool list -g` and uninstall the global version.
+**Solution**: `dotnet tool list -g` でグローバルツールの競合を確認し、グローバルバージョンをアンインストールしてください。
 
 ```bash
-# ❌ WRONG — global and local versions coexist
-dotnet tool install -g docfx           # global v2.77.0
-dotnet tool install docfx --version 2.78.3  # local v2.78.3
+# ❌ WRONG — グローバルとローカルのバージョンが共存
+dotnet tool install -g docfx           # グローバル v2.77.0
+dotnet tool install docfx --version 2.78.3  # ローカル v2.78.3
 
-# ✅ CORRECT — remove global, use local only
+# ✅ CORRECT — グローバルを削除し、ローカルのみ使用
 dotnet tool uninstall -g docfx
 dotnet tool restore
 ```
 
-### 3. Forgetting Tool Restore in CI
+### 3. CI でのツール復元の忘れ
 
-**Problem**: CI pipeline invokes tools without restoring them first, causing "command not found" errors.
+**Problem**: CI パイプラインがツールを復元せずに呼び出し、「コマンドが見つかりません」エラーが発生。
 
-**Solution**: Add `dotnet tool restore` as an explicit step before any tool usage.
+**Solution**: ツール使用前に `dotnet tool restore` を明示的なステップとして追加してください。
 
 ---
 
 ## Anti-Patterns
 
-### Using Global Tools for Project-Specific Tooling
+### プロジェクト固有ツールにグローバルツールを使用
 
-**What**: Installing all CLI tools globally with `dotnet tool install -g` instead of using the local manifest.
+**What**: ローカルマニフェストの代わりに `dotnet tool install -g` ですべての CLI ツールをグローバルにインストール。
 
-**Why It's Wrong**: Global tools create version conflicts between projects, cannot be version-controlled, and require manual installation on every developer machine and CI agent.
+**Why It's Wrong**: グローバルツールはプロジェクト間でバージョン競合を生み、バージョン管理ができず、すべての開発者マシンと CI エージェントで手動インストールが必要。
 
-**Better Approach**: Use `dotnet new tool-manifest` and `dotnet tool install` (without `-g`) to create a per-repository manifest that is committed to source control.
+**Better Approach**: `dotnet new tool-manifest` と `dotnet tool install`（`-g` なし）を使用して、ソースコントロールにコミットされるリポジトリ単位のマニフェストを作成。
 
-### Allowing Version Roll-Forward
+### バージョンのロールフォワードを許可
 
-**What**: Setting `"rollForward": true` or omitting the field to allow automatic version upgrades.
+**What**: `"rollForward": true` に設定するかフィールドを省略して、自動バージョンアップグレードを許可。
 
-**Why It's Wrong**: Different environments may resolve different tool versions, breaking build reproducibility and causing intermittent CI failures.
+**Why It's Wrong**: 異なる環境で異なるツールバージョンが解決され、ビルドの再現性が損なわれ、断続的な CI 障害の原因に。
 
-**Better Approach**: Always set `"rollForward": false` and update versions explicitly with `dotnet tool update`.
+**Better Approach**: 常に `"rollForward": false` を設定し、`dotnet tool update` で明示的にバージョンを更新。
 
 ---
 
 ## Quick Reference
 
-### Local vs Global Tools Decision Table
+### ローカルツール vs グローバルツール判断テーブル
 
-| Aspect | Global Tools | Local Tools |
-|--------|-------------|-------------|
-| Installation | `dotnet tool install -g` | `dotnet tool restore` |
-| Scope | Machine-wide | Per-repository |
-| Version control | Manual tracking | `.config/dotnet-tools.json` |
-| CI/CD setup | Install each tool individually | Single `dotnet tool restore` |
-| Version conflicts | Possible between projects | Isolated per project |
-| Recommendation | Avoid for projects | ✅ Use for all project tools |
+| 観点 | グローバルツール | ローカルツール |
+|------|-----------------|---------------|
+| インストール | `dotnet tool install -g` | `dotnet tool restore` |
+| スコープ | マシン全体 | リポジトリ単位 |
+| バージョン管理 | 手動追跡 | `.config/dotnet-tools.json` |
+| CI/CD セットアップ | 各ツールを個別にインストール | 単一の `dotnet tool restore` |
+| バージョン競合 | プロジェクト間で発生の可能性 | プロジェクトごとに分離 |
+| 推奨 | プロジェクトには避ける | ✅ すべてのプロジェクトツールに使用 |
 
-### Common Commands
+### よく使うコマンド
 
-| Command | Purpose | When to Use |
-|---------|---------|-------------|
-| `dotnet new tool-manifest` | Initialize manifest | New repository setup |
-| `dotnet tool install <name>` | Add tool to manifest | Adding a new tool |
-| `dotnet tool restore` | Restore all tools | After clone or CI start |
-| `dotnet tool update <name>` | Update tool version | Version bump needed |
-| `dotnet tool list` | List installed tools | Audit current tools |
-| `dotnet tool list --outdated` | Check for updates | Periodic maintenance |
-| `dotnet tool uninstall <name>` | Remove tool | Tool no longer needed |
+| コマンド | 用途 | 使用タイミング |
+|---------|------|---------------|
+| `dotnet new tool-manifest` | マニフェストの初期化 | 新リポジトリのセットアップ |
+| `dotnet tool install <name>` | マニフェストにツールを追加 | 新しいツールの追加 |
+| `dotnet tool restore` | マニフェストからすべてのツールを復元 | クローン後または CI 開始時 |
+| `dotnet tool update <name>` | ツールバージョンの更新 | バージョン更新が必要な時 |
+| `dotnet tool list` | インストール済みツールの一覧 | 現在のツールの監査 |
+| `dotnet tool list --outdated` | 更新可能なツールのチェック | 定期的なメンテナンス |
+| `dotnet tool uninstall <name>` | マニフェストからツールを削除 | ツールが不要になった時 |
 
 ---
 
 ## Resources
 
-- [.NET Local Tools Overview](https://learn.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use) — Official local tools documentation
-- [dotnet tool install](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-tool-install) — Tool installation reference
-- [dotnet-tools.json Schema](https://learn.microsoft.com/en-us/dotnet/core/tools/local-tools-how-to-use#tool-manifest-file) — Manifest file format
-- [Dependabot for .NET](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file) — Automated tool version updates
+- [.NET ローカルツール概要](https://learn.microsoft.com/ja-jp/dotnet/core/tools/local-tools-how-to-use) — 公式ローカルツールドキュメント
+- [dotnet tool install](https://learn.microsoft.com/ja-jp/dotnet/core/tools/dotnet-tool-install) — ツールインストールリファレンス
+- [dotnet-tools.json スキーマ](https://learn.microsoft.com/ja-jp/dotnet/core/tools/local-tools-how-to-use#tool-manifest-file) — マニフェストファイル形式
+- [Dependabot for .NET](https://docs.github.com/ja/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file) — ツールバージョン自動更新
 
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->

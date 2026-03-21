@@ -1,49 +1,48 @@
 ---
 name: dotnet-generic-matching
-description: Use when: you need generic weighted field matching with scoring in a .NET Domain layer.
+description: こんなときに使う: .NETドメイン層で汎用的な重み付きフィールドマッチングとスコアリングを実装。
 license: MIT
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, csharp, ddd, matching, domain-layer, generics, specification-pattern]
   invocable: false
 ---
-
 # Implement Generic Weighted Field Matching with Scoring
 
-End-to-end workflow for building a generic, reusable field matching system in the Domain layer (Domain-Driven Design (DDD)): value objects for comparison results and scores, similarity utilities (Levenshtein, numeric), a generic `FieldMatchingService<TSource, TCandidate>`, and the Specification pattern for quality thresholds.
+ドメイン層で汎用的かつ再利用可能なフィールドマッチングシステムを構築するためのエンドツーエンドワークフロー：比較結果とスコアの値オブジェクト、類似度ユーティリティ（レーベンシュタイン距離、数値比較）、汎用 `FieldMatchingService<TSource, TCandidate>`、および品質閾値のためのSpecificationパターン。
 
-## When to Use This Skill
+## こんなときに使う
 
-Use this skill when:
-- Matching OCR-extracted records to candidates by comparing multiple weighted fields
-- Building a scoring model that yields an explainable % score and field-by-field breakdown
-- Implementing fuzzy string matching (Levenshtein distance) with normalization for OCR noise
-- Creating a reusable `FieldMatchingService<TSource, TCandidate>` across multiple use-cases
-- Applying the Specification pattern to enforce a configurable quality threshold on results
+以下の場合にこのスキルを使用してください：
+- 複数のフィールドを比較して2つの異なるデータソースからレコードをマッチングするとき
+- フィールドごとに異なる重要度を持つ重み付きスコアリングシステムを構築するとき
+- レーベンシュタイン距離を使ったファジー文字列マッチングを実装するとき
+- ジェネリクスを使用して任意のエンティティ型で動作する再利用可能なマッチングサービスを作成するとき
+- マッチング結果に品質閾値を適用するためにSpecificationパターンを適用するとき
 
-**Prerequisites**:
-- Domain layer with DDD structure (use-case based organization)
-- Understanding of C# generics and value objects
+**前提条件**：
+- DDD構造のドメイン層（ユースケースベースの構成）
+- C#ジェネリクスと値オブジェクトの理解
 
 ---
 
 ## Related Skills
 
-- **`dotnet-ocr-matching-workflow`** — Uses this matching foundation for OCR-to-database record matching
-- **`dotnet-oracle-wpf-integration`** — Provides candidate data from Oracle for matching
-- **`dotnet-wpf-comparison-view`** — Displays matching results in a WPF comparison UI
-- **`tdd-standard-practice`** — Test generated code with Red-Green-Refactor
-- **`git-commit-practices`** — Commit each step as an atomic change
+- **`dotnet-ocr-matching-workflow`** — このマッチング基盤をOCR-データベースレコードマッチングに使用
+- **`dotnet-oracle-wpf-integration`** — マッチング用の候補データをOracleから提供
+- **`dotnet-wpf-comparison-view`** — マッチング結果をWPF比較UIで表示
+- **`tdd-standard-practice`** — Red-Green-Refactorで生成コードをテスト
+- **`git-commit-practices`** — 各ステップをアトミックな変更としてコミット
 
 ---
 
 ## Core Principles
 
-1. **Domain Purity** — All matching logic lives in the Domain layer with zero infrastructure dependencies (基礎と型)
-2. **Generic Reusability** — `FieldMatchingService<TSource, TCandidate>` works with any entity pair (成長の複利)
-3. **Weighted Scoring** — Each field contributes proportionally to the overall match score (ニュートラル)
-4. **Decimal for Money** — Use `decimal` type for all monetary values; never `float` or `double` (基礎と型)
-5. **Specification Pattern** — Quality thresholds are first-class domain objects, not magic numbers (継続は力)
+1. **ドメインの純粋性** — すべてのマッチングロジックはインフラ依存ゼロでドメイン層に配置（基礎と型）
+2. **汎用的な再利用性** — `FieldMatchingService<TSource, TCandidate>` は任意のエンティティペアで動作（成長の複利）
+3. **重み付きスコアリング** — 各フィールドが全体のマッチスコアに比例して貢献（ニュートラル）
+4. **金額にはdecimal** — すべての金額値に `decimal` 型を使用。`float` や `double` は禁止（基礎と型）
+5. **Specificationパターン** — 品質閾値はマジックナンバーではなくファーストクラスのドメインオブジェクト（継続は力）
 
 ---
 
@@ -51,11 +50,11 @@ Use this skill when:
 
 ### Step 1 — Create Value Objects (Domain Layer)
 
-Use when defining the immutable result types for field comparison, scoring, and match results.
+フィールド比較、スコアリング、マッチング結果の不変な結果型を定義するときに使用します。
 
-Create value objects in the Domain layer under the matching use-case directory (e.g., `Mercury.Domain/Matching/`).
+マッチングユースケースディレクトリ配下のドメイン層に値オブジェクトを作成します（例：`Mercury.Domain/Matching/`）。
 
-**FieldComparison.cs** — Single field comparison result:
+**FieldComparison.cs** — 単一フィールドの比較結果：
 
 ```csharp
 namespace Mercury.Domain.Matching
@@ -80,7 +79,7 @@ namespace Mercury.Domain.Matching
 }
 ```
 
-**MatchingScore.cs** — Weighted score aggregation:
+**MatchingScore.cs** — 重み付きスコア集計：
 
 ```csharp
 namespace Mercury.Domain.Matching
@@ -108,7 +107,7 @@ namespace Mercury.Domain.Matching
 }
 ```
 
-**MatchingResult.cs** — Generic result binding source to best candidate:
+**MatchingResult.cs** — ソースと最良候補を紐付ける汎用結果：
 
 ```csharp
 namespace Mercury.Domain.Matching
@@ -136,37 +135,90 @@ namespace Mercury.Domain.Matching
 
 ### Step 2 — Implement Similarity Utilities
 
-Use when building string and numeric comparison functions for field matching.
+文字列および数値の比較関数をフィールドマッチング用に構築するときに使用します。
 
-Create static utility in the Domain layer. Supports Levenshtein distance (normalized 0.0–1.0), exact decimal comparison for monetary values, and tolerance-based double comparison for dimensions.
+ドメイン層に静的ユーティリティを作成します。レーベンシュタイン距離（0.0〜1.0に正規化）、金額値の厳密なdecimal比較、寸法のための許容範囲ベースのdouble比較をサポートします。
 
-**SimilarityCalculator.cs** (pseudocode excerpt):
+**SimilarityCalculator.cs**：
 
 ```csharp
-// Keep this utility in the Domain layer.
-// Full example implementation: references/SimilarityCalculator.full.md
-public static class SimilarityCalculator
+namespace Mercury.Domain.Matching
 {
-    public static double StringSimilarity(string? s1, string? s2)
-        => /* Normalize + LevenshteinDistance + normalize to 0.0–1.0 */ 0.0;
+    public static class SimilarityCalculator
+    {
+        /// <summary>
+        /// Normalized Levenshtein similarity (0.0 = completely different, 1.0 = identical).
+        /// Strings are normalized before comparison (lowercase, whitespace removed).
+        /// </summary>
+        public static double StringSimilarity(string? s1, string? s2)
+        {
+            var a = Normalize(s1);
+            var b = Normalize(s2);
+            if (a.Length == 0 && b.Length == 0) return 1.0;
+            if (a.Length == 0 || b.Length == 0) return 0.0;
+            int maxLen = Math.Max(a.Length, b.Length);
+            int distance = LevenshteinDistance(a, b);
+            return 1.0 - (double)distance / maxLen;
+        }
 
-    // Critical: Use decimal for money (unit price, total price).
-    public static double NumericSimilarityDecimal(decimal a, decimal b)
-        => a == b ? 1.0 : 0.0;
+        /// <summary>
+        /// Exact match for monetary values. Use decimal to avoid floating-point errors.
+        /// Returns 1.0 if equal, 0.0 otherwise.
+        /// </summary>
+        public static double NumericSimilarityDecimal(decimal a, decimal b)
+            => a == b ? 1.0 : 0.0;
+
+        /// <summary>
+        /// Tolerance-based comparison for dimensions (width, height, weight).
+        /// Parses strings to double; returns similarity based on relative difference.
+        /// </summary>
+        public static double NumericSimilarityDouble(string? s1, string? s2)
+        {
+            if (!double.TryParse(Normalize(s1), out var a)
+                || !double.TryParse(Normalize(s2), out var b))
+                return 0.0;
+
+            if (a == 0 && b == 0) return 1.0;
+            double maxVal = Math.Max(Math.Abs(a), Math.Abs(b));
+            if (maxVal == 0) return 1.0;
+            double diff = Math.Abs(a - b) / maxVal;
+            return Math.Max(0.0, 1.0 - diff);
+        }
+
+        private static string Normalize(string? value)
+            => (value ?? string.Empty).Trim().Replace(" ", "").Replace("　", "").ToLowerInvariant();
+
+        private static int LevenshteinDistance(string s1, string s2)
+        {
+            int m = s1.Length, n = s2.Length;
+            var dp = new int[m + 1, n + 1];
+            for (int i = 0; i <= m; i++) dp[i, 0] = i;
+            for (int j = 0; j <= n; j++) dp[0, j] = j;
+            for (int i = 1; i <= m; i++)
+                for (int j = 1; j <= n; j++)
+                {
+                    int cost = s1[i - 1] == s2[j - 1] ? 0 : 1;
+                    dp[i, j] = Math.Min(
+                        Math.Min(dp[i - 1, j] + 1, dp[i, j - 1] + 1),
+                        dp[i - 1, j - 1] + cost);
+                }
+            return dp[m, n];
+        }
+    }
 }
 ```
 
-⚠️ **Critical**: Use `decimal` for monetary values (unit price, total price). Never use `float` or `double` for money — floating-point rounding errors cause false mismatches.
+⚠️ **重要**: 金額値（単価、合計金額）には `decimal` を使用してください。金額に `float` や `double` を使用しないでください — 浮動小数点の丸め誤差が誤った不一致を引き起こします。
 
 > **Values**: 基礎と型 / ニュートラル
 
 ### Step 3 — Create Matching Service
 
-Use when building the generic matching service that compares a source against candidates.
+ソースを候補と比較する汎用マッチングサービスを構築するときに使用します。
 
-Create `FieldMatchingService<TSource, TCandidate>` with configurable field definitions. Each field definition specifies how to extract values and which comparison function to use.
+設定可能なフィールド定義を持つ `FieldMatchingService<TSource, TCandidate>` を作成します。各フィールド定義は、値の抽出方法と使用する比較関数を指定します。
 
-**FieldDefinition.cs** — Describes one matchable field:
+**FieldDefinition.cs** — マッチング可能な1つのフィールドを記述：
 
 ```csharp
 namespace Mercury.Domain.Matching
@@ -183,7 +235,7 @@ namespace Mercury.Domain.Matching
 }
 ```
 
-**FieldMatchingService.cs** — Generic matching engine:
+**FieldMatchingService.cs** — 汎用マッチングエンジン：
 
 ```csharp
 namespace Mercury.Domain.Matching
@@ -239,17 +291,17 @@ namespace Mercury.Domain.Matching
 }
 ```
 
-**Ask the user**: What fields to match, what weights to assign, and what comparison type (string/numeric/exact) for each field.
+**ユーザーに確認**: マッチングするフィールド、割り当てる重み、各フィールドの比較タイプ（文字列/数値/厳密一致）を確認してください。
 
 > **Values**: 成長の複利 / 基礎と型
 
 ### Step 4 — Implement Specification Pattern (Quality Threshold)
 
-Use when enforcing quality constraints on matching results as a first-class domain concept.
+マッチング結果に対する品質制約をファーストクラスのドメイン概念として適用するときに使用します。
 
-Create a Specification that validates whether a set of matching results meets minimum quality thresholds. This keeps threshold logic in the Domain layer rather than scattering magic numbers across the Application layer.
+マッチング結果のセットが最低品質閾値を満たしているかどうかを検証するSpecificationを作成します。これにより閾値ロジックがアプリケーション層にマジックナンバーとして散在するのではなく、ドメイン層に保持されます。
 
-**ISpecification.cs**:
+**ISpecification.cs**：
 
 ```csharp
 namespace Mercury.Domain.Matching
@@ -261,7 +313,7 @@ namespace Mercury.Domain.Matching
 }
 ```
 
-**HighQualityMatchingSpecification.cs**:
+**HighQualityMatchingSpecification.cs**：
 
 ```csharp
 namespace Mercury.Domain.Matching
@@ -286,7 +338,7 @@ namespace Mercury.Domain.Matching
 }
 ```
 
-**Usage**:
+**使用例**：
 
 ```csharp
 var spec = new HighQualityMatchingSpecification<OrderSheet, SofRecord>(minimumScorePercent: 80.0);
@@ -297,9 +349,9 @@ bool allHighQuality = spec.IsSatisfiedBy(matchingResults);
 
 ### Step 5 — Integrate with Application Layer
 
-Use when creating a use case that orchestrates the matching service.
+マッチングサービスをオーケストレーションするユースケースを作成するときに使用します。
 
-The Application layer use case coordinates loading candidates, running the matching service, and returning results. It does **not** contain matching logic — that stays in the Domain layer.
+アプリケーション層のユースケースが候補の読み込み、マッチングサービスの実行、結果の返却を調整します。マッチングロジックは含まず — それはドメイン層に留まります。
 
 ```csharp
 namespace Mercury.Application.UseCases.Matching
@@ -333,9 +385,54 @@ namespace Mercury.Application.UseCases.Matching
 
 ### Step 6 — Customize Field Definitions
 
-Use when configuring the matching service for a specific domain (e.g., order-to-SOF matching).
+特定のドメイン（例：注文書-SOFマッチング）用にマッチングサービスを設定するときに使用します。
 
-Define `FieldDefinition` entries with extractors, comparison functions, and weights for your domain entities. See [references/detailed-patterns.md](references/detailed-patterns.md) for the full weight table and configuration example.
+ドメインエンティティに対して抽出関数、比較関数、重みを持つフィールド定義を定義します：
+
+| フィールド | 比較タイプ | 重み | 理由 |
+|-----------|-----------|------|------|
+| 品名 | `StringSimilarity` | 3.0 | 主要識別子。OCRエラーが発生しやすい |
+| 単価 | `NumericSimilarityDecimal` | 2.0 | 金額は厳密一致が必要 |
+| 数量 | `NumericSimilarityDouble` | 1.5 | 許容範囲付きの数値比較 |
+| 得意先コード | `StringSimilarity` | 2.0 | 主要な紐付けフィールド |
+| 寸法 | `NumericSimilarityDouble` | 1.0 | 補助フィールド |
+
+**設定例**：
+
+```csharp
+var fields = new List<FieldDefinition<OrderSheet, SofRecord>>
+{
+    new()
+    {
+        FieldName = "ProductName",
+        SourceExtractor = o => o.ProductName,
+        CandidateExtractor = s => s.ProductName,
+        CompareFunction = SimilarityCalculator.StringSimilarity,
+        Weight = 3.0
+    },
+    new()
+    {
+        FieldName = "UnitPrice",
+        SourceExtractor = o => o.UnitPrice.ToString(),
+        CandidateExtractor = s => s.UnitPrice.ToString(),
+        CompareFunction = (a, b) =>
+            decimal.TryParse(a, out var da) && decimal.TryParse(b, out var db)
+                ? SimilarityCalculator.NumericSimilarityDecimal(da, db)
+                : 0.0,
+        Weight = 2.0
+    },
+    new()
+    {
+        FieldName = "Quantity",
+        SourceExtractor = o => o.Quantity.ToString(),
+        CandidateExtractor = s => s.Quantity.ToString(),
+        CompareFunction = SimilarityCalculator.NumericSimilarityDouble,
+        Weight = 1.5
+    }
+};
+
+var service = new FieldMatchingService<OrderSheet, SofRecord>(fields, successThreshold: 70.0);
+```
 
 > **Values**: 継続は力 / 成長の複利
 
@@ -345,17 +442,17 @@ Define `FieldDefinition` entries with extractors, comparison functions, and weig
 
 ### 1. Use decimal for Money Comparisons
 
-✅ Always use `decimal` for monetary field comparison (unit price, total price). Floating-point types (`float`, `double`) introduce rounding errors that cause false mismatches on exact values.
+✅ 金額フィールドの比較（単価、合計金額）には必ず `decimal` を使用してください。浮動小数点型（`float`、`double`）は丸め誤差を引き起こし、厳密値での誤った不一致の原因になります。
 
 ```csharp
-// ✅ CORRECT — Exact comparison for money
+// ✅ 正しい — 金額の厳密比較
 public static double NumericSimilarityDecimal(decimal a, decimal b)
     => a == b ? 1.0 : 0.0;
 ```
 
 ### 2. Normalize Strings Before Comparison
 
-✅ Remove whitespace (including full-width spaces), convert to lowercase before computing similarity. This prevents false low scores from formatting differences.
+✅ 類似度計算前に空白（全角スペースを含む）を除去し、小文字に変換してください。書式の違いによるスコア低下を防ぎます。
 
 ```csharp
 private static string Normalize(string? value)
@@ -364,7 +461,7 @@ private static string Normalize(string? value)
 
 ### 3. Make Weights Configurable, Not Hardcoded
 
-✅ Pass weights via `FieldDefinition` configuration. Different matching scenarios (order matching vs. inventory matching) may need different weight distributions.
+✅ `FieldDefinition` の設定で重みを渡してください。異なるマッチングシナリオ（注文マッチング vs 在庫マッチング）では異なる重み配分が必要になる場合があります。
 
 ---
 
@@ -372,33 +469,33 @@ private static string Normalize(string? value)
 
 ### 1. Using float/double for Monetary Field Comparison
 
-**Problem**: `double` arithmetic produces rounding errors (e.g., `0.1 + 0.2 != 0.3`), causing exact-match monetary comparisons to fail.
+**Problem**: `double` の演算は丸め誤差を生じ（例：`0.1 + 0.2 != 0.3`）、厳密一致の金額比較が失敗します。
 
-**Solution**: Use `decimal` for all monetary values and `NumericSimilarityDecimal` for comparison.
+**Solution**: すべての金額値に `decimal` を使用し、比較には `NumericSimilarityDecimal` を使用してください。
 
 ```csharp
-// ❌ WRONG — Floating-point comparison for money
+// ❌ 間違い — 金額に浮動小数点比較
 double price1 = 1234.56;
 double price2 = 1234.56;
-bool match = Math.Abs(price1 - price2) < 0.01; // Fragile
+bool match = Math.Abs(price1 - price2) < 0.01; // 脆弱
 
-// ✅ CORRECT — Decimal exact comparison
+// ✅ 正しい — decimalの厳密比較
 decimal price1 = 1234.56m;
 decimal price2 = 1234.56m;
-bool match = price1 == price2; // Reliable
+bool match = price1 == price2; // 信頼性が高い
 ```
 
 ### 2. Hardcoding Field Names in Matching Service
 
-**Problem**: Embedding field names like `"ProductName"` directly in the matching loop makes the service non-reusable.
+**Problem**: `"ProductName"` のようなフィールド名をマッチングループに直接埋め込むと、サービスが再利用できなくなります。
 
-**Solution**: Use `FieldDefinition<TSource, TCandidate>` with configurable extractors and names.
+**Solution**: 設定可能な抽出関数と名前を持つ `FieldDefinition<TSource, TCandidate>` を使用してください。
 
 ### 3. Not Handling Empty Candidate Lists
 
-**Problem**: Calling `FindBestMatch` with zero candidates causes `NullReferenceException` or incorrect "100% match" results.
+**Problem**: 候補ゼロで `FindBestMatch` を呼び出すと `NullReferenceException` や誤った「100%一致」結果が発生します。
 
-**Solution**: Return a zero-score `MatchingResult` when the candidate list is empty.
+**Solution**: 候補リストが空の場合はスコアゼロの `MatchingResult` を返してください。
 
 ```csharp
 if (candidateList.Count == 0)
@@ -412,25 +509,25 @@ if (candidateList.Count == 0)
 
 ### Putting Matching Logic in ViewModel
 
-**What**: Computing similarity scores or running the matching loop inside a WPF ViewModel.
+**What**: WPF ViewModelで類似度スコアの計算やマッチングループを実行すること。
 
-**Why It's Wrong**: Violates DDD layering. Matching is domain logic and should be testable without UI dependencies.
+**Why It's Wrong**: DDDのレイヤリングに違反します。マッチングはドメインロジックであり、UI依存なしでテスト可能であるべきです。
 
-**Better Approach**: Keep all matching in the Domain layer (`FieldMatchingService`). The ViewModel only calls the Application layer use case and binds results.
+**Better Approach**: すべてのマッチングをドメイン層（`FieldMatchingService`）に保持してください。ViewModelはアプリケーション層のユースケースを呼び出し、結果をバインドするだけです。
 
 ### Using String Comparison for Numeric Fields
 
-**What**: Comparing `"1234.56"` and `"1234.560"` as strings instead of parsing to numbers.
+**What**: 数値をパースせずに `"1234.56"` と `"1234.560"` を文字列として比較すること。
 
-**Why It's Wrong**: String comparison treats `"1234.56"` and `"1234.560"` as different (Levenshtein distance = 1), even though they represent the same value.
+**Why It's Wrong**: 文字列比較では `"1234.56"` と `"1234.560"` は異なるものとして扱われます（レーベンシュタイン距離 = 1）が、同じ値を表しています。
 
-**Better Approach**: Use `NumericSimilarityDecimal` for monetary values and `NumericSimilarityDouble` for dimensional values.
+**Better Approach**: 金額値には `NumericSimilarityDecimal`、寸法値には `NumericSimilarityDouble` を使用してください。
 
 ```csharp
-// ❌ WRONG — String comparison for numbers
-SimilarityCalculator.StringSimilarity("1234.56", "1234.560"); // ~0.93, not 1.0
+// ❌ 間違い — 数値に文字列比較
+SimilarityCalculator.StringSimilarity("1234.56", "1234.560"); // ~0.93、1.0ではない
 
-// ✅ CORRECT — Numeric comparison
+// ✅ 正しい — 数値比較
 SimilarityCalculator.NumericSimilarityDecimal(1234.56m, 1234.560m); // 1.0
 ```
 
@@ -440,50 +537,51 @@ SimilarityCalculator.NumericSimilarityDecimal(1234.56m, 1234.560m); // 1.0
 
 ### Implementation Checklist
 
-- [ ] Create `FieldComparison` value object (Step 1)
-- [ ] Create `MatchingScore` with weighted calculation (Step 1)
-- [ ] Create `MatchingResult<TSource, TCandidate>` generic result (Step 1)
-- [ ] Implement `SimilarityCalculator` with Levenshtein, decimal, and double comparisons (Step 2)
-- [ ] Create `FieldDefinition<TSource, TCandidate>` configuration class (Step 3)
-- [ ] Implement `FieldMatchingService<TSource, TCandidate>` (Step 3)
-- [ ] Add `ISpecification<T>` and `HighQualityMatchingSpecification` (Step 4)
-- [ ] Create Application layer use case (Step 5)
-- [ ] Configure field definitions with appropriate weights (Step 6)
-- [ ] Verify: empty candidate list returns zero-score result
-- [ ] Verify: monetary fields use `decimal` comparison
+- [ ] `FieldComparison` 値オブジェクトを作成（Step 1）
+- [ ] 重み付き計算を持つ `MatchingScore` を作成（Step 1）
+- [ ] `MatchingResult<TSource, TCandidate>` 汎用結果を作成（Step 1）
+- [ ] レーベンシュタイン、decimal、double比較を持つ `SimilarityCalculator` を実装（Step 2）
+- [ ] `FieldDefinition<TSource, TCandidate>` 設定クラスを作成（Step 3）
+- [ ] `FieldMatchingService<TSource, TCandidate>` を実装（Step 3）
+- [ ] `ISpecification<T>` と `HighQualityMatchingSpecification` を追加（Step 4）
+- [ ] アプリケーション層のユースケースを作成（Step 5）
+- [ ] 適切な重みでフィールド定義を設定（Step 6）
+- [ ] 検証: 空の候補リストがスコアゼロの結果を返すこと
+- [ ] 検証: 金額フィールドが `decimal` 比較を使用していること
 
 ### Comparison Type Decision Table
 
-| Data Type | Comparison Function | Returns | Use For |
-|-----------|-------------------|---------|---------|
-| Text (names, codes) | `StringSimilarity` | 0.0–1.0 (Levenshtein) | Product names, customer codes |
-| Money (prices, totals) | `NumericSimilarityDecimal` | 0.0 or 1.0 (exact) | Unit price, total amount |
-| Dimensions (size, weight) | `NumericSimilarityDouble` | 0.0–1.0 (tolerance) | Width, height, weight |
+| データ型 | 比較関数 | 戻り値 | 用途 |
+|---------|---------|--------|------|
+| テキスト（名前、コード） | `StringSimilarity` | 0.0〜1.0（レーベンシュタイン） | 品名、得意先コード |
+| 金額（価格、合計） | `NumericSimilarityDecimal` | 0.0 または 1.0（厳密一致） | 単価、合計金額 |
+| 寸法（サイズ、重量） | `NumericSimilarityDouble` | 0.0〜1.0（許容範囲） | 幅、高さ、重量 |
 
 ### Weight Assignment Guidelines
 
-| Priority | Weight Range | Example Fields |
-|----------|-------------|----------------|
-| 🆕 Primary identifier | 2.5–3.0 | Product name, order number |
-| ✅ Key linking field | 1.5–2.5 | Customer code, unit price |
-| Supplementary | 0.5–1.5 | Dimensions, quantity |
-| ❌ Low confidence | 0.1–0.5 | Free-text remarks |
+| 優先度 | 重み範囲 | フィールド例 |
+|-------|---------|------------|
+| 🆕 主要識別子 | 2.5〜3.0 | 品名、注文番号 |
+| ✅ 主要紐付けフィールド | 1.5〜2.5 | 得意先コード、単価 |
+| 補助 | 0.5〜1.5 | 寸法、数量 |
+| ❌ 低信頼度 | 0.1〜0.5 | 自由記述の備考 |
 
 ---
 
 ## Resources
 
-- `dotnet-ocr-matching-workflow` — Complete OCR-to-database matching workflow using this skill
-- `dotnet-wpf-comparison-view` — WPF UI for displaying matching results
-- [Levenshtein Distance (Wikipedia)](https://en.wikipedia.org/wiki/Levenshtein_distance)
-- [Specification Pattern (Martin Fowler)](https://martinfowler.com/apsupp/spec.pdf)
+- `dotnet-ocr-matching-workflow` — このスキルを使用した完全なOCR-データベースマッチングワークフロー
+- `dotnet-wpf-comparison-view` — マッチング結果表示用のWPF UI
+- [レーベンシュタイン距離（Wikipedia）](https://ja.wikipedia.org/wiki/%E3%83%AC%E3%83%BC%E3%83%99%E3%83%B3%E3%82%B7%E3%83%A5%E3%82%BF%E3%82%A4%E3%83%B3%E8%B7%9D%E9%9B%A2)
+- [Specificationパターン（Martin Fowler）](https://martinfowler.com/apsupp/spec.pdf)
 
 ---
 
 ## Changelog
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | 2025-07-13 | 🆕 Initial release — generic matching with weighted scoring |
+| バージョン | 日付 | 変更内容 |
+|-----------|------|---------|
+| 1.0.0 | 2025-07-13 | 🆕 初回リリース — 重み付きスコアリング付き汎用マッチング |
 
-<!-- Japanese version available at references/SKILL.ja.md -->
+<!-- 英語版は ../SKILL.md を参照してください -->
+

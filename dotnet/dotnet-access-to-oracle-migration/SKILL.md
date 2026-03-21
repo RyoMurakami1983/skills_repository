@@ -1,252 +1,227 @@
 ---
 name: dotnet-access-to-oracle-migration
 description: >
-  Migrate Access SQL to Oracle, generate .NET C# code.
-  Use when: converting Access queries to Oracle.
+  こんなときに使う: Migrate Access SQL to Oracle, generate .NET C# code.
+  Use when converting Access queries to Oracle.
 license: MIT
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, oracle, access, csharp, database-migration]
   invocable: false
 ---
+<!-- このドキュメントは dotnet-access-to-oracle-migration の日本語版です。英語版: ../SKILL.md -->
 
-# Migrate Access SQL to Oracle
+# Access SQLからOracle移行
 
-End-to-end workflow for migrating Access database queries to Oracle and generating .NET (C#) IOracle implementation classes. Covers TNS resolution, VIEW/SYNONYM detection, SQL conversion, and record count validation.
+AccessデータベースクエリをOracleに移行し、.NET（C#）IOracle実装クラスを生成するためのエンドツーエンドワークフロー。TNS解決、VIEW/SYNONYM検出、SQL変換、レコード数検証をカバー。
 
-## When to Use This Skill
+## こんなときに使う
 
-Use this skill when:
-- Migrating Access database queries to Oracle for .NET applications
-- Converting Access SQL syntax to Oracle-compatible SQL with proper quoting
-- Generating C# IOracle implementation classes from validated Oracle queries
-- Detecting VIEW/SYNONYM structures that Access links don't reveal
-- Validating Oracle connections with tnsping and EZ Connect format
-- Ensuring data consistency between Access and Oracle with Near Equal validation
+以下の場合にこのスキルを使用してください：
+- .NETアプリケーション向けにAccessデータベースクエリをOracleに移行する場合
+- Access SQLをOracle互換SQLに変換する場合（適切なクォート処理付き）
+- 検証済みOracle SQLからC# IOracle実装クラスを生成する場合
+- Accessリンクテーブルが隠すVIEW/SYNONYM構造を検出する場合
+- tnspingとEZ Connect形式でOracle接続を検証する場合
+- AccessとOracle間のデータ整合性をNear Equal検証で確認する場合
 
 ## Related Skills
 
-- **`skill`** — Validate or improve this skill before publishing
-- **`skill-writing-guide`** — Learn skill writing best practices
+- **`skill`** — 公開前のスキル検証・改善
+- **`skill-writing-guide`** — スキル作成のベストプラクティス
 
 ---
 
 ## Core Principles
 
-1. **Error-Driven Approach** — Learn from ORA-* errors to correct DSN, authentication, and schema issues (基礎と型)
-2. **Structural Awareness** — Detect VIEW/SYNONYM instead of assuming TABLE (ニュートラル)
-3. **Access Naming Translation** — Reverse `.` → `_` conversion for Oracle format (基礎と型)
-4. **Progressive Validation** — Connect → Detect → Validate → Convert → Generate (継続は力)
-5. **Near Equal Tolerance** — Accept ±5 record difference due to timing/data refresh (成長の複利)
+1. **Error-Driven Approach** — ORA-*エラーからDSN・認証・スキーマの問題を学ぶ（基礎と型）
+2. **Structural Awareness** — TABLEと決めつけずVIEW/SYNONYMを検出する（ニュートラル）
+3. **Access Naming Translation** — `.` → `_`変換を逆転してOracle形式に戻す（基礎と型）
+4. **Progressive Validation** — 接続 → 検出 → 検証 → 変換 → 生成（継続は力）
+5. **Near Equal Tolerance** — タイミング/データ更新による±5件差を許容（成長の複利）
 
 ---
 
 ## Dependencies
 
-- **.NET 6.0+** with Oracle.ManagedDataAccess.Core (NuGet)
-- **Oracle Instant Client** for `tnsping` command
-- **Access Database** with linked Oracle tables
+- **.NET 6.0+** + Oracle.ManagedDataAccess.Core（NuGet）
+- **Oracle Instant Client**（`tnsping`コマンド用）
+- **Accessデータベース**（リンクテーブル付き）
 
 ---
 
-## Workflow: Migrate Access SQL to Oracle
+## Workflow: Access SQLからOracle移行
 
-### Step 1 — Collect Information
+### Step 1 — 情報収集
 
-Gather all required information upfront before attempting Oracle connection.
+Oracle接続を試行する前に、必要な情報をすべて事前に収集する。
 
-Collect from user:
-1. **Access SQL**: Complete query (Access syntax)
-2. **Record count**: Number of records from Access
-3. **TNS/DSN name**: Example: PROD_DSN
-4. **Oracle credentials**: Username and password
+ユーザーから収集する項目：
+1. **Access SQL**: 完全なクエリ（Access構文）
+2. **レコード数**: Accessからの件数
+3. **TNS/DSN名**: 例：PROD_DSN
+4. **Oracle認証情報**: ユーザー名とパスワード
 
-**Why**: Without upfront information, you risk multiple round-trips (wrong TNS → re-ask, missing credentials → re-ask). Collecting everything first enables a single-pass migration.
+**Why**: 事前に情報を集めないと、複数回の往復が発生する（TNS名違い → 再確認、認証情報不足 → 再確認）。一括収集により1パスで移行完了できる。
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 2 — Resolve TNS Name with tnsping
+### Step 2 — tnspingでTNS名を解決
 
-Run `tnsping` to convert TNS/DSN names to EZ Connect format that Oracle.ManagedDataAccess.Core requires.
+`tnsping`を実行して、TNS/DSN名をOracle.ManagedDataAccess.Coreが必要とするEZ Connect形式に変換する。
 
 ```powershell
-# ✅ CORRECT — Resolve TNS name to EZ Connect format
-# Oracle.ManagedDataAccess.Core cannot use ODBC DSN or TNS names directly
+# ✅ 正解 — TNS名をEZ Connect形式に解決
 tnsping PROD_DSN
 ```
 
-**Extract** from output:
+**出力から抽出**:
 - HOST: `192.0.2.10`, PORT: `1521`, SERVICE_NAME: `prod_service`
 - **EZ Connect**: `192.0.2.10:1521/prod_service`
 
-**Why**: Oracle.ManagedDataAccess.Core requires EZ Connect format. Guessing the format leads to ORA-50201 errors that waste debugging time.
+**Why**: Oracle.ManagedDataAccess.CoreはEZ Connect形式を要求する。形式を推測するとORA-50201エラーが発生し、デバッグ時間を浪費する。
 
 > **Values**: 基礎と型 / ニュートラル
 
-### Step 3 — Test Connection and Handle Errors
+### Step 3 — 接続テストとエラー処理
 
-Use ORA-* error codes as learning signals to fix DSN, authentication, or network issues.
+ORA-*エラーコードを学習シグナルとして活用し、DSN・認証・ネットワークの問題を修正する。
 
 ```powershell
-# ✅ CORRECT — Test connection with error handling
+# ✅ 正解 — エラーハンドリング付き接続テスト
 Add-Type -Path "Oracle.ManagedDataAccess.dll"
 $conn = New-Object Oracle.ManagedDataAccess.Client.OracleConnection
 $conn.ConnectionString = "User Id=SCHEMA_A;Password=your_password;Data Source=192.0.2.10:1521/prod_service"
 
 try {
     $conn.Open()
-    Write-Host "✓ Connection successful"
-    $conn.Close()  # Important: release connection to pool immediately
+    Write-Host "✓ 接続成功"
+    $conn.Close()
 } catch {
     Write-Host "Error: $($_.Exception.Message)"
-    # ORA-* error codes reveal root cause — use decision table below
 }
 ```
 
 | Error Code | Cause | Solution |
 |------------|-------|----------|
-| ORA-50201 | DSN format invalid | Use EZ Connect with `tnsping` |
-| ORA-01017 | Wrong credentials | Re-check username/password |
-| ORA-12154/12545 | TNS/network issue | Use EZ Connect or check firewall |
+| ORA-50201 | DSN形式不正 | `tnsping`でEZ Connect取得 |
+| ORA-01017 | 認証情報誤り | ユーザー名/パスワード再確認 |
+| ORA-12154/12545 | TNS/ネットワーク問題 | EZ Connectまたはファイアウォール確認 |
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 4 — Convert Access Table Names
+### Step 4 — Accessテーブル名の変換
 
-Reverse Access's `.` → `_` conversion: `SCHEMA_A_production_info` → `SCHEMA_A."production_info"`.
+Accessの `.` → `_` 変換を逆転：`SCHEMA_A_production_info` → `SCHEMA_A."production_info"`
 
 ```csharp
-// ✅ CORRECT — Split at FIRST underscore only
-// Access converts OWNER.TABLE → OWNER_TABLE (cannot use '.' in table names)
+// ✅ 正解 — 最初のアンダースコアでのみ分割
 var parts = "SCHEMA_A_production_info".Split('_', 2);
 string oracleFormat = $"{parts[0]}.\"{parts[1]}\"";  // SCHEMA_A."production_info"
 ```
 
-**Why**: Access silently replaces `.` with `_` in linked table names. Without reversing this, all Oracle queries fail with "table not found".
+**Why**: Accessはリンクテーブル名の`.`を暗黙的に`_`に変換する。これを逆転しなければ、すべてのOracleクエリが「テーブルが見つからない」エラーになる。
 
 > **Values**: 基礎と型
 
-### Step 5 — Detect VIEW/SYNONYM Structure
+### Step 5 — VIEW/SYNONYM構造の検出
 
-Check object types before assuming TABLE. Access shows all linked objects as "tables", hiding Oracle's real structure.
+TABLEと決めつけずオブジェクトタイプを確認する。Accessはすべてのリンクオブジェクトを「テーブル」として表示し、Oracleの実際の構造を隠す。
 
 ```sql
--- ✅ CORRECT — Check object type before assuming TABLE
+-- ✅ 正解 — TABLEと決めつけずオブジェクトタイプを確認
 SELECT owner, object_name, object_type
 FROM all_objects
-WHERE object_name IN ('production_info', 'detasheet_info', 'sales_order_info')
-  AND owner IN ('SCHEMA_A', 'SCHEMA_B', 'SCHEMA_C', 'PUBLIC')
+WHERE object_name IN ('production_info', 'detasheet_info')
+  AND owner IN ('SCHEMA_A', 'SCHEMA_B', 'PUBLIC')
 ORDER BY owner, object_name;
 ```
 
-**Typical result**: Objects appear as SYNONYM in `SCHEMA_A`, with real TABLE in `SCHEMA_B`.
-
-**Why**: Skipping this step causes cascading errors in column queries and SQL conversion.
+**Why**: このステップを飛ばすと、カラムクエリとSQL変換で連鎖的なエラーが発生する。
 
 > **Values**: ニュートラル / 基礎と型
 
-> 📚 **Advanced**: SYNONYM referent resolution and multi-owner scenarios → See [references/advanced-examples-part2.md](references/advanced-examples-part2.md#pattern-5-advanced---synonym-resolution)
+### Step 6 — カラム存在検証
 
-### Step 6 — Validate Column Existence
-
-Query `all_tab_columns` with the **actual table owner** (not synonym owner) to get exact column names.
+**実際のテーブル所有者**（SYNONYM所有者ではない）で`all_tab_columns`を照会し、正確なカラム名を取得する。
 
 ```sql
--- ✅ CORRECT — Query columns from actual table owner
+-- ✅ 正解 — 実際のテーブル所有者からカラムを照会
 SELECT column_id, column_name, data_type, data_length
 FROM all_tab_columns
 WHERE table_name = 'production_info'
-  AND owner = 'SCHEMA_B'  -- Use actual table owner, not synonym owner
+  AND owner = 'SCHEMA_B'  -- SYNONYM所有者ではなく実際の所有者
 ORDER BY column_id;
 ```
 
-| Column Name | Exists? | Notes |
-|-------------|---------|-------|
-| `destination` / `destination_code` | ✅ Both | Different columns! |
-| `DESTINATION` (uppercase) | ❌ | Case-sensitive! |
-
-**Why**: Column names in Oracle are case-sensitive. A missing or misspelled column causes silent data loss or query errors.
+**Why**: Oracleのカラム名は大文字小文字を区別する。カラムの欠落やスペルミスはサイレントなデータ損失やクエリエラーの原因になる。
 
 > **Values**: 基礎と型 / 継続は力
 
-> 📚 **Advanced**: Batch column verification → See [references/advanced-examples-part2.md](references/advanced-examples-part2.md#pattern-6-advanced---batch-column-verification)
+### Step 7 — SQL構文変換（3ルール）
 
-### Step 7 — Convert SQL Syntax (3 Rules)
+3つのルールを一貫して適用し、Access SQLをOracle SQLに変換する。
 
-Transform Access SQL to Oracle SQL using 3 rules consistently.
-
-**Rule 1**: Table names — `SCHEMA_A_production_info` → `SCHEMA_A."production_info"`
-**Rule 2**: Column names — `ship_date` → `"ship_date"`
-**Rule 3**: String literals — `"202601"` → `'202601'`
+**Rule 1**: テーブル名 — `SCHEMA_A_production_info` → `SCHEMA_A."production_info"`
+**Rule 2**: カラム名 — `ship_date` → `"ship_date"`
+**Rule 3**: 文字列リテラル — `"202601"` → `'202601'`
 
 ```sql
--- ❌ WRONG — Access SQL
+-- ❌ 誤り — Access SQL
 SELECT SCHEMA_A_production_info.ship_date
 FROM SCHEMA_A_production_info
 WHERE SCHEMA_A_production_info.ship_date >= "202601"
 
--- ✅ CORRECT — Oracle SQL with proper quoting
+-- ✅ 正解 — 適切なクォートを使用したOracle SQL
 SELECT s."ship_date"
 FROM SCHEMA_A."production_info" s
 WHERE s."ship_date" >= '202601'
 ```
 
-**Why**: Access and Oracle use opposite quoting conventions. Applying all 3 rules consistently prevents the most common SQL conversion failures.
+**Why**: AccessとOracleは逆のクォート規則を使用する。3ルールを一貫して適用することで、最も一般的なSQL変換エラーを防止できる。
 
 > **Values**: 基礎と型 / ニュートラル
 
-> 📚 **Advanced**: Multi-table JOIN conversion → See [references/advanced-examples.md](references/advanced-examples.md)
+### Step 8 — Near Equal検証
 
-### Step 8 — Validate with Near Equal
-
-Execute converted SQL in Oracle and compare record count to Access count. Accept ±5 difference.
+変換したSQLをOracleで実行し、レコード数をAccess件数と比較する。±5件差を許容。
 
 ```powershell
-# ✅ CORRECT — Count Oracle records and compare
+# ✅ 正解 — Oracleレコード数を取得して比較
 $cmd = $conn.CreateCommand()
 $cmd.CommandText = 'SELECT COUNT(*) FROM SCHEMA_A."production_info" s WHERE s."ship_date" >= ''202601'''
 $oracleCount = [int]$cmd.ExecuteScalar()
-$accessCount = 178  # From user
+$accessCount = 178
 
-# ±5 tolerance: data refresh timing, concurrent transactions, cached views
 $diff = [Math]::Abs($oracleCount - $accessCount)
 if ($diff -le 5) {
     Write-Host "✓ Near Equal: Access=$accessCount, Oracle=$oracleCount (diff=$diff)"
 } else {
-    Write-Host "⚠ Difference too large: Access=$accessCount, Oracle=$oracleCount (diff=$diff)"
+    Write-Host "⚠ Difference too large (diff=$diff)"
 }
 ```
 
-| Scenario | Action | Why |
-|----------|--------|-----|
-| Diff ≤ 5 | ✅ Proceed | Acceptable timing/refresh difference |
-| Diff > 20 | ❌ Stop | Likely SQL conversion error |
-
-**Why**: Exact count matches are rare because Access and Oracle query at different times. Near Equal validates correctness without requiring identical snapshots.
+**Why**: 正確な件数一致は稀である（AccessとOracleは異なるタイミングでクエリを実行するため）。Near Equalは同一スナップショットを要求せずに正確性を検証する。
 
 > **Values**: 成長の複利 / 継続は力
 
-### Step 9 — Generate C# IOracle Implementation
+### Step 9 — C# IOracle実装の生成
 
-Create C# class implementing IOracle interface with validated Oracle SQL.
+検証済みOracle SQLを使用して、IOracleインターフェースを実装するC#クラスを作成する。
 
 ```csharp
-// ✅ CORRECT — IOracle implementation template
+// ✅ 正解 — IOracle実装テンプレート
 using System;
 
 namespace OracleApp
 {
     internal class SampleDataExtractor : IOracle
     {
-        // Environment variables allow runtime configuration without recompiling
         string IOracle.User => Environment.GetEnvironmentVariable("ORA_USER") ?? "SCHEMA_A";
         string IOracle.Password => Environment.GetEnvironmentVariable("ORA_PW") ?? "your_password";
-
-        // DSN must use EZ Connect format for Oracle.ManagedDataAccess.Core
         string IOracle.Dsn => Environment.GetEnvironmentVariable("ORA_DSN") ?? "192.0.2.10:1521/prod_service";
 
         // C# verbatim strings (@"") require doubling internal quotes
-        // Oracle: s."ship_date" → C#: s.""ship_date""
         public string Sql => @"
 SELECT
    s.""ship_date"",
@@ -257,39 +232,37 @@ WHERE s.""ship_date"" >= '202601'";
 }
 ```
 
-**C# String Escaping Rule**: Oracle `"ship_date"` → C# `@""ship_date""` (double the quotes!)
+**C#文字列エスケープルール**: Oracle `"ship_date"` → C# `@""ship_date""`（引用符を二重にする！）
 
-**Why**: Code generation is the final step. Generating code before SQL validation leads to runtime errors harder to debug than SQL-level failures.
+**Why**: コード生成は最終ステップ。SQL検証前にコードを生成すると、SQLレベルの失敗より追跡が困難なランタイムエラーが発生する。
 
 > **Values**: 継続は力 / 成長の複利
-
-> 📚 **Advanced**: Full 3-table JOIN with resource disposal → See [references/advanced-examples.md](references/advanced-examples.md#pattern-9-advanced---production-grade-c-ioracle-with-full-3-table-join)
 
 ---
 
 ## Good Practices
 
-### 1. Always Use tnsping for Connection Resolution
+### 1. 接続解決にはtnspingを必ず使用
 
-**What**: Run `tnsping` to resolve TNS/DSN names to EZ Connect format before connecting.
+**What**: 接続前に`tnsping`を実行してTNS/DSN名をEZ Connect形式に解決する。
 
-**Why**: Eliminates ORA-50201 errors; provides authoritative HOST/PORT/SERVICE_NAME.
+**Why**: ORA-50201エラーを排除し、正確なHOST/PORT/SERVICE_NAMEを取得できる。
 
 **Values**: 基礎と型（再現可能な型）
 
-### 2. Detect Object Type Before Querying
+### 2. クエリ前にオブジェクトタイプを検出
 
-**What**: Check `all_objects` and `all_synonyms` before querying columns or data.
+**What**: カラムやデータをクエリする前に`all_objects`と`all_synonyms`を確認する。
 
-**Why**: Access hides Oracle's VIEW/SYNONYM structure; assuming TABLE causes cascading errors.
+**Why**: AccessはOracleのVIEW/SYNONYM構造を隠す。TABLEと決めつけると連鎖的なエラーが発生する。
 
 **Values**: ニュートラル（偏らない検証）/ 基礎と型
 
-### 3. Validate Columns Before SQL Conversion
+### 3. SQL変換前にカラムを検証
 
-**What**: Confirm all Access columns exist in Oracle with exact spelling before converting SQL.
+**What**: SQL変換前にすべてのAccessカラムがOracleに正確なスペルで存在することを確認する。
 
-**Why**: Case-sensitive column names cause silent data loss; early validation prevents late failures.
+**Why**: 大文字小文字区別のカラム名はサイレントなデータ損失を引き起こす。早期検証が遅い失敗を防ぐ。
 
 **Values**: 継続は力（段階的検証）
 
@@ -297,65 +270,65 @@ WHERE s.""ship_date"" >= '202601'";
 
 ## Common Pitfalls
 
-### 1. Using ODBC DSN Directly
+### 1. ODBC DSNを直接使用
 
-**Problem**: Passing `Data Source=PROD_DSN` to Oracle.ManagedDataAccess.Core.
+**Problem**: Oracle.ManagedDataAccess.Coreに`Data Source=PROD_DSN`を渡す。
 
 ```csharp
-// ❌ WRONG — ODBC DSN name causes ORA-50201
+// ❌ 誤り — ODBC DSN名はORA-50201の原因
 var connStr = "User Id=SCHEMA_A;Password=your_password;Data Source=PROD_DSN";
 ```
 
-**Solution**: Use `tnsping` to get EZ Connect format.
+**Solution**: `tnsping`でEZ Connect形式を取得する。
 
 ```csharp
-// ✅ CORRECT — EZ Connect format
+// ✅ 正解 — EZ Connect形式
 var connStr = "User Id=SCHEMA_A;Password=your_password;Data Source=192.0.2.10:1521/prod_service";
 ```
 
-### 2. Assuming Tables Instead of Detecting Type
+### 2. タイプ検出せずテーブルと決めつけ
 
-**Problem**: Querying `all_tab_columns` with `owner = 'SCHEMA_A'` when real tables are in `SCHEMA_B`.
+**Problem**: 実際のテーブルが`SCHEMA_B`にあるのに`owner = 'SCHEMA_A'`で`all_tab_columns`をクエリ。
 
-**Solution**: Check `all_objects` first, then `all_synonyms` to get actual table owner.
+**Solution**: まず`all_objects`を確認し、次に`all_synonyms`で実際のテーブル所有者を取得。
 
-### 3. Forgetting to Escape Double Quotes in C#
+### 3. C#でダブルクォートのエスケープ忘れ
 
-**Problem**: Copy-paste Oracle SQL into C# without doubling quotes.
+**Problem**: Oracle SQLをC#にコピー＆ペーストする際に引用符を二重にしない。
 
-**Solution**: Double every `"` inside C# `@""` strings: `s."ship_date"` → `s.""ship_date""`.
+**Solution**: C# `@""`文字列内のすべての`"`を二重にする: `s."ship_date"` → `s.""ship_date""`
 
 ---
 
 ## Anti-Patterns
 
-### Skipping tnsping and Guessing EZ Connect
+### tnspingを省略してEZ Connectを推測
 
-**What**: Assuming `Data Source=PROD_DSN` means `Data Source=someserver:1521/PROD_DSN`.
+**What**: `Data Source=PROD_DSN`が`Data Source=someserver:1521/PROD_DSN`を意味すると仮定する。
 
-**Why It's Wrong**: TNS names don't follow predictable patterns; hostnames can be IPs, DNS names, or aliases; service names may differ from TNS names.
+**Why It's Wrong**: TNS名は予測可能なパターンに従わない。ホスト名はIP、DNS名、エイリアスの場合がある。
 
-**Better Approach**: Always run `tnsping` to get authoritative HOST/PORT/SERVICE_NAME.
+**Better Approach**: 常に`tnsping`を実行して正確なHOST/PORT/SERVICE_NAMEを取得する。
 
 ---
 
 ## Quick Reference
 
-### Migration Checklist
+### 移行チェックリスト
 
-- [ ] Collect: Access SQL, record count, TNS name, credentials
-- [ ] Resolve TNS → `tnsping` → EZ Connect format
-- [ ] Test connection → Handle ORA-* errors
-- [ ] Convert Access table names → `SCHEMA."table_name"` format
-- [ ] Detect structure → `all_objects` (VIEW/SYNONYM/TABLE)
-- [ ] Validate columns → `all_tab_columns` with actual owner
-- [ ] Convert SQL → 3 rules (table/column/literal quoting)
-- [ ] Validate → COUNT(*) ≈ Access count (±5)
-- [ ] Generate C# → IOracle implementation with `""` escaping
+- [ ] 収集: Access SQL、レコード数、TNS名、認証情報
+- [ ] TNS解決 → `tnsping` → EZ Connect形式
+- [ ] 接続テスト → ORA-*エラー対応
+- [ ] Accessテーブル名変換 → `SCHEMA."table_name"`形式
+- [ ] 構造検出 → `all_objects`（VIEW/SYNONYM/TABLE）
+- [ ] カラム検証 → `all_tab_columns`（実際の所有者で）
+- [ ] SQL変換 → 3ルール（テーブル/カラム/リテラルのクォート）
+- [ ] 検証 → COUNT(*) ≈ Access件数（±5）
+- [ ] C#生成 → IOracle実装（`""`エスケープ付き）
 
-### Conversion Cheat Sheet
+### 変換チートシート
 
-| Access | Oracle | C# @"" String |
+| Access | Oracle | C# @"" 文字列 |
 |--------|--------|---------------|
 | `SCHEMA_A_production_info` | `SCHEMA_A."production_info"` | `SCHEMA_A.""production_info""` |
 | `ship_date` | `"ship_date"` | `""ship_date""` |
@@ -365,20 +338,20 @@ var connStr = "User Id=SCHEMA_A;Password=your_password;Data Source=192.0.2.10:15
 
 ## Resources
 
-- [references/advanced-examples.md](references/advanced-examples.md) — Production-grade examples
-- [references/advanced-examples-part2.md](references/advanced-examples-part2.md) — Additional examples
-- [references/SKILL.ja.md](references/SKILL.ja.md) — 日本語版
+- [references/advanced-examples.md](references/advanced-examples.md) — 本番レベルの例
+- [references/advanced-examples-part2.md](references/advanced-examples-part2.md) — 追加例
 
 ---
 
 ## Changelog
 
 ### Version 2.0.0 (2026-02-15)
-- **Breaking**: Converted from Pattern format to single Workflow format
-- Add Values integration to Core Principles and all Steps
-- Add Good Practices, Common Pitfalls, Anti-Patterns sections
-- Add Dependencies section and Migration Checklist
+- **Breaking**: パターン形式からワークフロー形式に変換
+- Core PrinciplesとすべてのステップにValues統合を追加
+- Good Practices、Common Pitfalls、Anti-Patternsセクションを追加
+- 依存関係セクションと移行チェックリストを追加
 
 ### Version 1.0.0 (2026-02-12)
-- Initial release (Pattern format)
-- 9 patterns covering full migration workflow
+- 初期リリース（パターン形式）
+- 完全な移行ワークフローをカバーする9パターン
+
