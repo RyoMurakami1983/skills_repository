@@ -17,6 +17,7 @@
 - `skills/dotnet/` を追加し、広い `.NET` / `C#` / `WPF` 相談を既存 dotnet skill へ振り分ける薄い入口 skill を導入
 - `skills/github/` を追加し、PR / review / issue 系の広い GitHub 依頼を既存 workflow skill へ案内する薄い入口 skill を導入
 - `business/` と `dotnet/` の skill を日本語 `SKILL.md` 正本へ移行し、`references/SKILL.ja.md` 依存を廃止した
+- `dotnet-modern-csharp-coding-standards` を日本語正本へ移行し、`references/SKILL.ja.md` を廃止した
 
 ### Changed
 
@@ -26,6 +27,7 @@
 - `skills/skill/` を pilot に、`SKILL.md` の日本語正本化と `references/SKILL.ja.md` 前提の段階的廃止を進める方針へ切り替え
 - `skills/skill/` で確立した型を `skills/` の残り skill へ横展開し、`references/SKILL.ja.md` を root `SKILL.md` へ統合したうえで frontmatter を最小構成へ正規化した
 - `business/` と `dotnet/` の既存 skill を日本語正本へ移行し、`references/SKILL.ja.md` を廃止した
+- `dotnet-modern-csharp-coding-standards` を日本語正本へ移行し、技術識別子を英語のまま保った
 - `skills/skill/_eval` を `baseline / legacy / current` 標準へ整理し、trend viewer・append-only history・reproducibility metadata を持つ評価運用へ拡張
 - `README.md` を入口中心に簡素化し、詳細手順を `docs/INSTALL.md` へ分離
 - repo 固有の documentation maintenance ルールを `.github/copilot-instructions.md` に追加

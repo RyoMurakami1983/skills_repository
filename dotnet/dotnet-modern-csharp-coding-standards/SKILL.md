@@ -1,9 +1,9 @@
 ---
 name: dotnet-modern-csharp-coding-standards
 description: >
-  Write modern, high-performance C# code using records, pattern matching, composition,
-  and Result-type error handling. Use when: writing new C# code, designing APIs,
-  or refactoring to C# 12+ idioms.
+  モダン C#（12+）で record、パターンマッチング、合成、Result 型エラーハンドリングを使った
+  慣用的で高性能なコードを書く。こんなときに使う: 新規 C# コードの作成、API 設計、
+  または C# 12+ イディオムへのリファクタリング。
 license: MIT
 metadata:
   author: RyoMurakami1983
@@ -11,57 +11,58 @@ metadata:
   invocable: false
 ---
 
-# Modern C# Coding Standards
+# モダン C# コーディング標準
 
-A concise guardrail for writing idiomatic, modern C# (12+). Covers data modelling with records, pattern matching, composition-first design, and railway-oriented error handling. Requires .NET 8+ and C# 12+. No external dependencies — uses only BCL (Base Class Library) types.
+モダン C#（12+）で慣用的なコードを書くための簡潔なガードレール。record によるデータモデリング、パターンマッチング、合成優先の設計、Railway 指向のエラーハンドリングをカバーします。.NET 8+ と C# 12+ を前提にし、外部依存は使いません。
 
-**Acronyms**: DTO (Data Transfer Object), API (Application Programming Interface), DI (Dependency Injection), BCL (Base Class Library), GC (Garbage Collector).
+**略語**: DTO (Data Transfer Object), API (Application Programming Interface), DI (Dependency Injection), BCL (Base Class Library), GC (Garbage Collector).
 
-## When to Use This Skill
+## こんなときに使う
 
-- Writing new C# code or refactoring existing code to modern idioms
-- Designing domain models with strong typing and immutability
-- Choosing between `record`, `record struct`, `class`, or `struct`
-- Applying pattern matching for cleaner control flow
-- Implementing error handling with `Result<T, TError>` instead of exceptions
-- Reviewing C# code for anti-patterns (mutable DTOs, deep inheritance, reflection mapping)
+- 新規 C# コードの作成、または既存コードのモダンなイディオムへのリファクタリング
+- 強い型付けと不変性を持つドメインモデルの設計
+- `record`、`record struct`、`class`、`struct` の使い分け判断
+- パターンマッチングによる制御フローの簡潔化
+- 例外の代わりに `Result<T, TError>` でエラーハンドリング
+- C# コードのアンチパターン（可変 DTO、深い継承、リフレクション マッピング）のレビュー
 
-## Related Skills
+## 関連スキル
 
 | Skill | Scope |
 |-------|-------|
-| `dotnet-type-design-performance` | Span\<T\>, Memory\<T\>, ArrayPool, zero-allocation patterns |
-| `dotnet-csharp-api-design` | API parameter/return type contracts, method signatures |
-| `dotnet-csharp-concurrency-patterns` | Async/await best practices, CancellationToken, IAsyncEnumerable |
+| `dotnet-type-design-performance` | Span\<T\>、Memory\<T\>、ArrayPool、ゼロアロケーションパターン |
+| `dotnet-csharp-api-design` | API パラメータ/戻り値の型契約、メソッドシグネチャ |
+| `dotnet-csharp-concurrency-patterns` | async/await ベストプラクティス、CancellationToken、IAsyncEnumerable |
 
-## Core Principles
+## 基本原則
 
-1. **Immutability by Default** — Use `record` types and `init`-only properties. Why: mutable state is the root cause of most concurrency and logic bugs.
-2. **Type Safety** — Leverage nullable reference types, value objects as `readonly record struct`, and strongly-typed IDs. Why: catch errors at compile time instead of runtime.
-3. **Modern Pattern Matching** — Replace `if`/`else` chains with `switch` expressions and relational/property/list patterns. Why: exhaustive matching prevents missed cases.
-4. **Composition Over Inheritance** — Prefer interfaces + composition over abstract base classes. Why: flat structures are easier to test, extend, and reason about.
-5. **Railway Error Handling + Explicit Mapping** — Use `Result<T, TError>` for expected errors; use explicit mapping methods instead of reflection-based libraries. Why: compile-time safety and visibility beat convenience.
+1. **Immutability by Default** — `record` 型と `init` 専用プロパティを使用。可変状態は並行処理バグとロジックバグの最大の原因。
+2. **Type Safety** — nullable 参照型、`readonly record struct` による値オブジェクト、強く型付けされた ID を活用し、コンパイル時にエラーを検出。
+3. **Modern Pattern Matching** — `if`/`else` チェーンを `switch` 式とリレーショナル/プロパティ/リストパターンに置き換え、表現力豊かで網羅的な分岐を実現。
+4. **Composition Over Inheritance** — 抽象基底クラスよりインターフェース＋合成を優先。フラットな構造はテスト、拡張、理解が容易。
+5. **Railway Error Handling** — 予期されるエラー（バリデーション、ビジネスルール）には `Result<T, TError>` を使用。例外は本当に予期しない障害にのみ。
+6. **Explicit Over Magic** — リフレクションベースのライブラリ（AutoMapper、Mapster）よりコンパイル時チェック可能な明示的マッピングを優先。可視性は利便性に勝る。
 
 > **Values**: 基礎と型の追求（最小形式で最大可能性を生む設計思想）, 温故知新（C# の進化を活かしつつ堅実な原則を守る）
 
-## Workflow: Write Modern C#
+## ワークフロー: モダン C# を書く
 
-### Step 1: Model Data with Records
+### Step 1: レコードでデータを表現する
 
-Apply `record` for DTO types, messages, and domain entities. Apply `readonly record struct` for value objects. Choose the right type based on the decision guide below.
+DTO、メッセージ、ドメインエンティティには `record` を使用。値オブジェクトには `readonly record struct` を使用。
 
 ```csharp
-// Immutable DTO
+// 不変 DTO
 public record CustomerDto(string Id, string Name, string Email);
 
-// Value object — always readonly record struct
+// 値オブジェクト — 常に readonly record struct
 public readonly record struct OrderId(Guid Value)
 {
     public static OrderId New() => new(Guid.NewGuid());
     public override string ToString() => Value.ToString();
 }
 
-// Value object with validation
+// バリデーション付き値オブジェクト
 public readonly record struct Money(decimal Amount, string Currency)
 {
     public Money(decimal amount, string currency) : this(
@@ -72,25 +73,25 @@ public readonly record struct Money(decimal Amount, string Currency)
 }
 ```
 
-**Decision guide:**
+**使い分けガイド：**
 
-| Type | When to use |
-|------|-------------|
-| `record class` | Entities, DTOs, aggregates with multiple properties |
-| `readonly record struct` | Value objects, strongly-typed IDs, small immutable values |
-| `class` | Mutable services, framework-required base classes |
-| `struct` | Performance-critical, tiny data (≤16 bytes), no identity |
+| 型 | 使用場面 |
+|----|----------|
+| `record class` | エンティティ、DTO、複数プロパティを持つ集約 |
+| `readonly record struct` | 値オブジェクト、強く型付けされた ID、小さな不変値 |
+| `class` | 可変サービス、フレームワーク要求の基底クラス |
+| `struct` | パフォーマンスクリティカル、小データ（≤16 バイト）、ID なし |
 
-> ⚠️ **NO implicit conversions** on value objects — they defeat compile-time safety. See [references/language-patterns.md](references/language-patterns.md) for full examples.
+> ⚠️ **値オブジェクトに暗黙的変換は禁止** — コンパイル時の型安全性を無効化します。詳細は [language-patterns.md](language-patterns.md) を参照。
 
 > **Values**: 基礎と型の追求（型で不変条件を守り、コンパイラを味方にする）
 
-### Step 2: Apply Pattern Matching & Nullable Types
+### Step 2: パターンマッチングと Nullable 型を適用する
 
-Apply `switch` expressions for branching logic. Enable `<Nullable>enable</Nullable>` project-wide. Why: exhaustive pattern matching eliminates entire classes of bugs that `if`/`else` chains miss.
+分岐ロジックには `switch` 式を使用。プロジェクト全体で `<Nullable>enable</Nullable>` を有効化。
 
 ```csharp
-// Switch expression with property patterns
+// プロパティパターンによる switch 式
 public decimal CalculateDiscount(Order order) => order switch
 {
     { Total: > 1000m } => order.Total * 0.15m,
@@ -99,7 +100,7 @@ public decimal CalculateDiscount(Order order) => order switch
     _ => 0m
 };
 
-// Relational + logical patterns
+// リレーショナル + logical patterns
 public string ClassifyTemperature(int temp) => temp switch
 {
     < 0            => "Freezing",
@@ -108,7 +109,7 @@ public string ClassifyTemperature(int temp) => temp switch
     >= 30          => "Hot"
 };
 
-// Null-safe patterns
+// null 安全なパターン
 public decimal GetDiscount(Customer? customer) => customer switch
 {
     null                   => 0m,
@@ -118,21 +119,21 @@ public decimal GetDiscount(Customer? customer) => customer switch
 };
 ```
 
-See [references/language-patterns.md](references/language-patterns.md) for list patterns, tuple patterns, and nullable handling details.
+リストパターン、タプルパターン、nullable 処理の詳細は [language-patterns.md](language-patterns.md) を参照。
 
 > **Values**: 成長の複利（パターンマッチングの習得が、あらゆる分岐ロジックの品質を底上げする）
 
-### Step 3: Prefer Composition Over Inheritance
+### Step 3: 継承より合成を優先する
 
 ```csharp
-// ❌ Abstract base class hierarchy
+// ❌ 抽象基底クラス階層
 public abstract class PaymentProcessor
 {
     public abstract Task<PaymentResult> ProcessAsync(Money amount);
     protected async Task<bool> ValidateAsync(Money amount) { /* ... */ }
 }
 
-// ✅ Composition with interfaces
+// ✅ インターフェースによる合成
 public interface IPaymentProcessor
 {
     Task<PaymentResult> ProcessAsync(Money amount, CancellationToken ct);
@@ -152,22 +153,22 @@ public sealed class CreditCardProcessor(
 }
 ```
 
-**When inheritance is acceptable:**
-- Framework requirements (e.g., `ControllerBase` in ASP.NET Core)
-- Library integration (e.g., custom exceptions from `Exception`)
-- These should be **rare** in application code
+**継承が許容される場面：**
+- フレームワーク要件（例：ASP.NET Core の `ControllerBase`）
+- ライブラリ統合（例：`Exception` からのカスタム例外）
+- アプリケーションコードでは **まれ** であるべき
 
 > **Values**: 余白の設計（合成可能な小さな部品が、将来の変化に対応する余白を生む）
 
-### Step 4: Handle Errors with Result Types
+### Step 4: Result 型でエラーを扱う
 
-Apply `Result<T, TError>` for expected errors. Reserve exceptions for unexpected failures. Why: Result types make error paths explicit in the type system, preventing silent failures.
+予期されるエラーには `Result<T, TError>` を使用。予期しない障害には例外を使用。
 
 ```csharp
-// Error type
+// エラー型
 public readonly record struct OrderError(string Code, string Message);
 
-// Service returning Result
+// Result を返すサービス
 public async Task<Result<Order, OrderError>> CreateOrderAsync(
     CreateOrderRequest request, CancellationToken ct)
 {
@@ -180,7 +181,7 @@ public async Task<Result<Order, OrderError>> CreateOrderAsync(
     return Result<Order, OrderError>.Success(order);
 }
 
-// Pattern matching on Result
+// Result のパターンマッチング
 return result.Match(
     onSuccess: order => new OkObjectResult(order),
     onFailure: error => error.Code switch
@@ -191,38 +192,38 @@ return result.Match(
     });
 ```
 
-| Situation | Use |
-|-----------|-----|
-| Validation failure, business rule violation, "not found" | `Result<T, TError>` |
-| Network failure, null-ref, out-of-memory, programming bug | Exception |
+| 状況 | 使用するもの |
+|------|------------|
+| バリデーション失敗、ビジネスルール違反、見つからない | `Result<T, TError>` |
+| ネットワーク障害、null 参照、OOM、プログラミングバグ | Exception |
 
-See [references/error-handling-patterns.md](references/error-handling-patterns.md) for full `Result<T, TError>` implementation and railway composition.
+完全な `Result<T, TError>` 実装と Railway 合成は [error-handling-patterns.md](error-handling-patterns.md) を参照。
 
 > **Values**: ニュートラルな視点（例外と Result を状況に応じて使い分け、偏りのない設計を保つ）
 
-### Step 5: Organize Code Files
+### Step 5: コードファイルを整理する
 
-Adopt a consistent namespace and file layout. Why: predictable structure accelerates code navigation and onboarding.
+一貫した名前空間とファイルレイアウトに従います：
 
 ```
 Domain/
   Orders/
-    Order.cs          # Primary domain type + related records
-    OrderService.cs   # Domain logic
+    Order.cs          # 主要ドメイン型 + 関連 record
+    OrderService.cs   # ドメインロジック
     IOrderRepository.cs
 ```
 
-**File ordering within a type file:**
-1. Primary domain type (record/class)
-2. Enums for state
-3. Related records (items, events)
-4. Value objects
-5. Error types
+**型ファイル内の順序：**
+1. 主要ドメイン型（record/class）
+2. 状態の enum
+3. 関連 record（アイテム、イベント）
+4. 値オブジェクト（readonly record struct）
+5. エラー型
 
 ```csharp
 namespace MyApp.Domain.Orders;
 
-// 1. Primary type
+// 1. 主要型
 public record Order(OrderId Id, CustomerId CustomerId, Money Total, IReadOnlyList<OrderItem> Items)
 {
     public bool IsCompleted => Status is OrderStatus.Completed;
@@ -231,47 +232,47 @@ public record Order(OrderId Id, CustomerId CustomerId, Money Total, IReadOnlyLis
 // 2. Enum
 public enum OrderStatus { Draft, Submitted, Processing, Completed, Cancelled }
 
-// 3. Related record
+// 3. 関連 record
 public record OrderItem(ProductId ProductId, Quantity Quantity, Money UnitPrice)
 {
     public Money Total => new(UnitPrice.Amount * Quantity.Value, UnitPrice.Currency);
 }
 
-// 4. Value object
+// 4. 値オブジェクト
 public readonly record struct OrderId(Guid Value)
 {
     public static OrderId New() => new(Guid.NewGuid());
 }
 
-// 5. Error
+// 5. エラー
 public readonly record struct OrderError(string Code, string Message);
 ```
 
 > **Values**: 継続は力（一貫したファイル構成が、日々のコードリーディングを高速化する）
 
-## Good Practices
+## 良い実践
 
-- ✅ Use `record` for DTOs, messages, and domain entities
-- ✅ Use `readonly record struct` for value objects and strongly-typed IDs
-- ✅ Leverage pattern matching with `switch` expressions over `if`/`else`
-- ✅ Enable and respect nullable reference types (`<Nullable>enable</Nullable>`)
-- ✅ Accept `CancellationToken` in all async methods
-- ✅ Return `IReadOnlyList<T>` from APIs instead of `List<T>`
-- ✅ Use `Result<T, TError>` for expected errors (validation, business rules)
-- ✅ Prefer composition and interfaces over inheritance hierarchies
-- ✅ Use explicit mapping methods instead of reflection-based mappers
-- ✅ Use primary constructors (C# 12+) for simple service classes
+- ✅ DTO、メッセージ、ドメインエンティティには `record` を使用
+- ✅ 値オブジェクトと強く型付けされた ID には `readonly record struct` を使用
+- ✅ `if`/`else` より `switch` 式によるパターンマッチングを活用
+- ✅ nullable 参照型を有効にし、警告を尊重（`<Nullable>enable</Nullable>`）
+- ✅ すべての非同期メソッドで `CancellationToken` を受け取る
+- ✅ API からは `List<T>` ではなく `IReadOnlyList<T>` を返す
+- ✅ 予期されるエラーには `Result<T, TError>` を使用
+- ✅ 継承階層よりインターフェースと合成を優先
+- ✅ リフレクションベースのマッパーではなく明示的なマッピングメソッドを使用
+- ✅ シンプルなサービスクラスにはプライマリコンストラクタ（C# 12+）を使用
 
-## Common Pitfalls
+## よくある落とし穴
 
-1. **Blocking on async** — Calling `.Result` or `.Wait()` causes deadlocks. Use `async` all the way.
-2. **Mutable DTOs** — Using `class` with `{ get; set; }` instead of `record`. Leads to accidental mutation.
-3. **Implicit conversions on value objects** — `implicit operator` defeats compile-time type safety.
-4. **Deep inheritance** — `Entity → AggregateRoot → Order → CustomerOrder`. Use flat composition instead.
-5. **Swallowing nulls** — Ignoring nullable warnings instead of handling them with pattern matching.
-6. **Throwing for expected errors** — Using exceptions for validation/not-found instead of `Result<T, TError>`.
+1. **async のブロッキング** — `.Result` や `.Wait()` の呼び出しはデッドロックを引き起こす。最後まで `async` を貫く。
+2. **可変 DTO** — `record` の代わりに `{ get; set; }` を持つ `class` を使用。意図しない変更につながる。
+3. **値オブジェクトの暗黙的変換** — `implicit operator` はコンパイル時の型安全性を無効化する。
+4. **深い継承** — `Entity → AggregateRoot → Order → CustomerOrder`。フラットな合成を使用する。
+5. **null の無視** — パターンマッチングで処理する代わりに nullable 警告を無視する。
+6. **予期されるエラーへの throw** — バリデーション/見つからないケースに `Result<T, TError>` ではなく例外を使用。
 
-## Anti-Patterns
+## アンチパターン
 
 ### ❌ Mutable DTOs → ✅ Immutable Records
 
@@ -285,9 +286,9 @@ public record CustomerDto(string Id, string Name);
 ### ❌ Class Value Objects → ✅ Readonly Record Structs
 
 ```csharp
-// ❌ BAD — heap allocation, reference equality
+// ❌ BAD — ヒープ割り当て、参照等価
 public class OrderId { public string Value { get; } }
-// ✅ GOOD — stack allocation, value equality
+// ✅ GOOD — スタック割り当て、値等価
 public readonly record struct OrderId(string Value);
 ```
 
@@ -306,70 +307,70 @@ public record Order(OrderId Id, CustomerId CustomerId) : IEntity { Guid IEntity.
 ### ❌ Reflection Mapping → ✅ Explicit Methods
 
 ```csharp
-// ❌ BAD — runtime failure, hidden mapping
+// ❌ BAD — ランタイムエラー、隠れたマッピング
 var dto = _mapper.Map<UserDto>(entity);
-// ✅ GOOD — compile-time checked, debuggable
+// ✅ GOOD — コンパイル時チェック、デバッグ可能
 public static UserDto ToDto(this UserEntity e) => new(e.Id.ToString(), e.FullName, e.EmailAddress);
 ```
 
-See [references/anti-reflection-patterns.md](references/anti-reflection-patterns.md) for details on source generators and UnsafeAccessor.
+詳細はソースジェネレータと UnsafeAccessor について [anti-reflection-patterns.md](anti-reflection-patterns.md) を参照。
 
 ### ❌ Returning Mutable Collections
 
 ```csharp
-// ❌ BAD — exposes internal list
+// ❌ BAD — 内部リストを公開
 public List<Order> GetOrders() => _orders;
-// ✅ GOOD — read-only view
+// ✅ GOOD — 読み取り専用ビュー
 public IReadOnlyList<Order> GetOrders() => _orders;
 ```
 
 ### ❌ Blocking on Async
 
 ```csharp
-// ❌ BAD — deadlock risk
+// ❌ BAD — デッドロックの危険
 public Order GetOrder(OrderId id) => GetOrderAsync(id).Result;
-// ✅ GOOD — async all the way
+// ✅ GOOD — 最後まで async
 public async Task<Order> GetOrderAsync(OrderId id, CancellationToken ct = default)
     => await _repository.GetAsync(id, ct);
 ```
 
-## Quick Reference
+## 早見表
 
 ### When to Use record vs class vs struct
 
-| Need | Type | Reason |
-|------|------|--------|
-| DTO / message / event | `record` | Immutable, value equality, `with` support |
-| Domain entity | `record` | Same + computed properties |
-| Value object / typed ID | `readonly record struct` | Stack-allocated, value semantics |
-| Mutable service with DI | `class` (sealed) | Needs mutable state / lifecycle |
-| Tiny math data (≤16 bytes) | `struct` | Perf-critical, no identity |
+| 必要なもの | 型 | 理由 |
+|-----------|------|------|
+| DTO / メッセージ / イベント | `record` | 不変、値等価、`with` サポート |
+| ドメインエンティティ | `record` | 同上 + 計算プロパティ |
+| 値オブジェクト / 型付き ID | `readonly record struct` | スタック割り当て、値セマンティクス |
+| DI 付き可変サービス | `class`（sealed） | 可変状態 / ライフサイクルが必要 |
+| 小さな数学データ（≤16 バイト） | `struct` | パフォーマンスクリティカル、ID なし |
 
 ### When to Use Result vs Exception
 
-| Situation | Mechanism | Why |
-|-----------|-----------|-----|
-| Validation failure | `Result<T, TError>` | Expected, caller must handle |
-| Business rule violation | `Result<T, TError>` | Part of normal flow |
-| Entity not found | `Result<T, TError>` | Expected query outcome |
-| Network / I/O failure | Exception | Unexpected, infrastructure error |
-| Null reference / OOM | Exception | Programming bug / system error |
+| 状況 | 仕組み | 理由 |
+|------|--------|------|
+| バリデーション失敗 | `Result<T, TError>` | 予期される、呼び出し元が処理すべき |
+| ビジネスルール違反 | `Result<T, TError>` | 通常のフローの一部 |
+| エンティティが見つからない | `Result<T, TError>` | 予期されるクエリ結果 |
+| ネットワーク / I/O 障害 | Exception | 予期しないインフラエラー |
+| null 参照 / OOM | Exception | プログラミングバグ / システムエラー |
 
 ### File Ordering in a Type File
 
 ```
-1. Primary domain type (record/class)
-2. Enums
-3. Related records
-4. Value objects (readonly record struct)
-5. Error types
+1. 主要ドメイン型（record/class）
+2. Enum
+3. 関連 record
+4. 値オブジェクト（readonly record struct）
+5. エラー型
 ```
 
-## Resources
+## リソース
 
 - [C# Language Reference](https://learn.microsoft.com/en-us/dotnet/csharp/)
 - [Pattern Matching](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/functional/pattern-matching)
 - [Nullable Reference Types](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references)
-- [references/language-patterns.md](references/language-patterns.md) — Full record, pattern matching, and nullable examples
-- [references/error-handling-patterns.md](references/error-handling-patterns.md) — Result\<T, TError\> implementation and railway patterns
-- [references/anti-reflection-patterns.md](references/anti-reflection-patterns.md) — Source generators, UnsafeAccessor, explicit mapping
+- [language-patterns.md](language-patterns.md) — record、パターンマッチング、nullable の完全な例
+- [error-handling-patterns.md](error-handling-patterns.md) — Result\<T, TError\> 実装と Railway パターン
+- [anti-reflection-patterns.md](anti-reflection-patterns.md) — ソースジェネレータ、UnsafeAccessor、明示的マッピング
