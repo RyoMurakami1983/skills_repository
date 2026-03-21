@@ -1,16 +1,14 @@
 ---
 name: dotnet-wpf-employee-input
 description: >
-  こんなときに使う: Add employee number (社員番号) input dialog to WPF apps with DPAPI-encrypted storage.
-  Use when building employee ID configuration.
+  こんなときに使う: WPFアプリケーションに社員番号入力ダイアログを追加し、
+  DPAPIで暗号化された設定として社員IDを安全に保存したいとき。
 license: MIT
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, wpf, csharp, mvvm, employee, dpapi, configuration]
   invocable: false
 ---
-<!-- このドキュメントは dotnet-wpf-employee-input の日本語版です。英語版: ../SKILL.md -->
-
 # WPFアプリケーションへの社員番号入力ダイアログ追加
 
 WPFアプリケーションに社員番号（社員番号）入力ダイアログを追加するためのエンドツーエンドワークフロー：4桁バリデーション、`SecureConfigService`によるDPAPI暗号化保存、MVVM設定UI、メニューバー統合。
@@ -453,4 +451,3 @@ await _configService.SaveDifyConfigAsync(config);
 - CommunityToolkit.MvvmによるMVVMパターン
 
 <!-- 英語版は ../SKILL.md を参照してください -->
-
