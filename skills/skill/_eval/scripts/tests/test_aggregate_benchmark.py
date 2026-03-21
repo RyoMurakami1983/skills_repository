@@ -112,3 +112,47 @@ def test_aggregate_supports_baseline_legacy_current_and_history(tmp_path: Path):
     lines = ledger_path.read_text(encoding="utf-8").splitlines()
     assert len(lines) == 1
     assert json.loads(lines[0])["skill_id"] == skill_id
+
+
+def test_load_run_results_skips_prefix_collisions(tmp_path: Path):
+    mod = load_module()
+    evals_dir = tmp_path / "evals"
+    skill_id = "sample"
+    runs_dir = evals_dir / skill_id / "runs"
+    runs_dir.mkdir(parents=True, exist_ok=True)
+
+    (runs_dir / "run-003__current__tc-001.json").write_text(
+        json.dumps(
+            {
+                "run_id": "run-003",
+                "case_id": "tc-001",
+                "variant_id": "current",
+                "mode": "current",
+                "score": 1.0,
+                "assertions": [],
+                "response_snippet": "ok",
+                "timestamp": "2026-03-21T00:00:00Z",
+            }
+        ),
+        encoding="utf-8",
+    )
+    (runs_dir / "run-0039__current__tc-999.json").write_text(
+        json.dumps(
+            {
+                "run_id": "run-0039",
+                "case_id": "tc-999",
+                "variant_id": "current",
+                "mode": "current",
+                "score": 0.0,
+                "assertions": [],
+                "response_snippet": "wrong",
+                "timestamp": "2026-03-21T00:00:00Z",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    results = mod.load_run_results(evals_dir, skill_id, "run-003")
+
+    assert list(results) == ["current"]
+    assert [item["case_id"] for item in results["current"]] == ["tc-001"]

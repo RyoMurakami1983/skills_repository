@@ -38,7 +38,7 @@
   "mode": "current",
   "variant_id": "current",
   "source_ref": "worktree:feature/skill-improve",
-  "skill_snapshot_hash": "sha256:...",
+  "skill_snapshot_hash": "0123abcd...",
   "score": 1.0,
   "assertions": [
     { "type": "contains", "passed": true, "weight": 1.0, "detail": "" }
@@ -56,15 +56,15 @@
 {
   "skill_id": "skill-name",
   "eval_version": "1.0.0",
-  "suite_hash": "sha256:...",
+  "suite_hash": "89ab0123...",
   "variants": {
     "baseline": { "count": 8, "mean": 0.71, "stddev": 0.12, "min": 0.45, "max": 0.9 },
     "legacy": { "count": 8, "mean": 0.80, "stddev": 0.08, "min": 0.60, "max": 0.95 },
     "current": { "count": 8, "mean": 0.92, "stddev": 0.04, "min": 0.85, "max": 1.0 }
   },
   "variant_metadata": {
-    "legacy": { "source_ref": "git:abc123", "skill_snapshot_hash": "sha256:..." },
-    "current": { "source_ref": "worktree:feature/skill-improve", "skill_snapshot_hash": "sha256:..." }
+    "legacy": { "source_ref": "git:abc123", "skill_snapshot_hash": "4567cdef..." },
+    "current": { "source_ref": "worktree:feature/skill-improve", "skill_snapshot_hash": "0123abcd..." }
   },
   "comparisons": {
     "current_vs_legacy": { "lhs": "current", "rhs": "legacy", "delta": 0.12, "improvement_pct": 15.0, "verdict": "improved" },

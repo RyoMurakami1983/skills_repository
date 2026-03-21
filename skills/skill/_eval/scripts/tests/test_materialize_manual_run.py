@@ -132,3 +132,100 @@ def test_materialize_run_supports_baseline_legacy_current_layout(tmp_path: Path)
     assert result["score"] == 1.0
     assert result["source_ref"] == "worktree:feature/test"
     assert result["skill_snapshot_hash"] == "current-hash"
+
+
+def test_materialize_run_supports_starts_with_and_ends_with(tmp_path: Path):
+    mod = load_module()
+    evals_path = tmp_path / "evals.json"
+    manual_path = tmp_path / "manual.json"
+    evals_dir = tmp_path / "evals"
+
+    evals_path.write_text(
+        json.dumps(
+            {
+                "skill_id": "sample",
+                "cases": [
+                    {
+                        "id": "tc-010",
+                        "prompt": "check edges",
+                        "assertions": [
+                            {"type": "starts_with", "value": "Route:", "weight": 1.0},
+                            {"type": "ends_with", "value": "done", "weight": 1.0},
+                        ],
+                    }
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    manual_path.write_text(
+        json.dumps(
+            {
+                "run_id": "run-010",
+                "responses": {
+                    "current": {"tc-010": "   Route: check done   "},
+                },
+                "llm_grade": {
+                    "current": {"tc-010": []},
+                },
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    mod.materialize_run(evals_path, manual_path, "sample", evals_dir)
+    result = json.loads((evals_dir / "sample" / "runs" / "run-010__current__tc-010.json").read_text(encoding="utf-8"))
+
+    assert result["score"] == 1.0
+    assert [item["passed"] for item in result["assertions"]] == [True, True]
+
+
+def test_materialize_run_raises_for_invalid_regex(tmp_path: Path):
+    mod = load_module()
+    evals_path = tmp_path / "evals.json"
+    manual_path = tmp_path / "manual.json"
+    evals_dir = tmp_path / "evals"
+
+    evals_path.write_text(
+        json.dumps(
+            {
+                "skill_id": "sample",
+                "cases": [
+                    {
+                        "id": "tc-011",
+                        "prompt": "bad regex",
+                        "assertions": [
+                            {"type": "regex", "value": "(", "weight": 1.0},
+                        ],
+                    }
+                ],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    manual_path.write_text(
+        json.dumps(
+            {
+                "run_id": "run-011",
+                "responses": {
+                    "current": {"tc-011": "anything"},
+                },
+                "llm_grade": {
+                    "current": {"tc-011": []},
+                },
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    try:
+        mod.materialize_run(evals_path, manual_path, "sample", evals_dir)
+    except ValueError as exc:
+        assert "Invalid regex pattern for case tc-011" in str(exc)
+    else:
+        raise AssertionError("Expected ValueError for invalid regex")

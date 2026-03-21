@@ -47,6 +47,7 @@ score = Σ(assertion.weight * (passed ? 1 : 0)) / Σ(assertion.weight)
   "case_id": "<case.id>",
   "run_id": "<run_id>",
   "mode": "<baseline|legacy|current>",
+  "variant_id": "<baseline|legacy|current>",
   "score": 0.8750,
   "assertions": [
     {

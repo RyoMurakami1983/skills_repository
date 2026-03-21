@@ -61,7 +61,7 @@ def load_run_results(evals_dir: Path, skill_id: str, run_id: str) -> dict[str, l
 
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
-    for path in sorted(run_dir.glob(f"{run_id}*.json")):
+    for path in sorted(run_dir.glob("*.json")):
         try:
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
@@ -69,11 +69,21 @@ def load_run_results(evals_dir: Path, skill_id: str, run_id: str) -> dict[str, l
             print(f"WARNING: Skipping malformed JSON in {path}: {exc}", file=sys.stderr)
             data = {}
 
+        embedded_run_id = str(data.get("run_id") or "")
+        inferred_variant_id, inferred_case_id = parse_result_filename(path, run_id)
+        if embedded_run_id and embedded_run_id != run_id:
+            print(
+                f"WARNING: Skipping run result with mismatched run_id in {path}: {embedded_run_id}",
+                file=sys.stderr,
+            )
+            continue
+        if not embedded_run_id and inferred_variant_id is None:
+            continue
+
         variant_id = str(data.get("variant_id") or data.get("mode") or "")
         case_id = str(data.get("case_id") or "")
 
         if not variant_id or not case_id:
-            inferred_variant_id, inferred_case_id = parse_result_filename(path, run_id)
             variant_id = variant_id or (inferred_variant_id or "")
             case_id = case_id or (inferred_case_id or "")
 

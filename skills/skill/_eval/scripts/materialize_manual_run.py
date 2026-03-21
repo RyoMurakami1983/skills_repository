@@ -86,9 +86,15 @@ def evaluate_assertions(case: dict, response: str, llm_overrides: list[dict]) ->
             continue
 
         if assertion_type == "regex":
+            try:
+                passed = re.search(value, response) is not None
+            except re.error as exc:
+                raise ValueError(
+                    f"Invalid regex pattern for case {case['id']}: {value!r} ({exc})"
+                ) from exc
             details.append({
                 "type": assertion_type,
-                "passed": re.search(value, response) is not None,
+                "passed": passed,
                 "weight": weight,
                 "detail": "",
             })

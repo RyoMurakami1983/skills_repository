@@ -35,14 +35,29 @@ def load_history(evals_dir: Path, skill_id: str) -> list[dict]:
         return []
 
     records: list[dict] = []
-    for line in path.read_text(encoding="utf-8").splitlines():
+    skipped = 0
+    for lineno, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        line = raw_line.strip()
         line = line.strip()
         if not line:
             continue
         try:
             records.append(json.loads(line))
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as exc:
+            skipped += 1
+            summary = raw_line.strip()
+            if len(summary) > 200:
+                summary = summary[:200] + "..."
+            print(
+                f"WARNING: Malformed JSON in {path} at line {lineno}: {exc} | {summary}",
+                file=sys.stderr,
+            )
             continue
+    if skipped:
+        print(
+            f"WARNING: Skipped {skipped} malformed JSON line(s) while reading {path}",
+            file=sys.stderr,
+        )
     return records
 
 
