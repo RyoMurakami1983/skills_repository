@@ -189,7 +189,7 @@ def normalize_sub_skill_item(item: str | dict[str, Any]) -> dict[str, str]:
         name = item
         return {
             "name": name,
-            "description": f"{name.replace('-', ' ')} に関する流れを扱う。Use when: この router 内でそのルートを磨きたいとき。",
+            "description": f"{name.replace('-', ' ')} に関する流れを扱う。こんなときに使う: この router 内でそのルートを磨きたいとき。",
             "title": default_title(name),
             "compatibility": "_foundation/",
         }
@@ -203,7 +203,7 @@ def normalize_sub_skill_item(item: str | dict[str, Any]) -> dict[str, str]:
         "description": str(
             item.get(
                 "description",
-                f"{name.replace('-', ' ')} に関する流れを扱う。Use when: この router 内でそのルートを磨きたいとき。",
+                f"{name.replace('-', ' ')} に関する流れを扱う。こんなときに使う: この router 内でそのルートを磨きたいとき。",
             )
         ),
         "title": str(item.get("title", default_title(name))),
@@ -414,7 +414,7 @@ def main() -> int:
             {
                 "name": args.add_sub_skill,
                 "description": args.description
-                or f"{args.add_sub_skill.replace('-', ' ')} に関する流れを扱う。Use when: この router 内でそのルートを磨きたいとき。",
+                or f"{args.add_sub_skill.replace('-', ' ')} に関する流れを扱う。こんなときに使う: この router 内でそのルートを磨きたいとき。",
                 "title": args.title or default_title(args.add_sub_skill),
                 "compatibility": args.compatibility or "_foundation/",
             },

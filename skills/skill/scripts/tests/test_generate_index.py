@@ -22,7 +22,7 @@ def test_extract_frontmatter_supports_folded_description(tmp_path: Path):
         """---
 name: folded-skill
 description: >
-  既存スキルを evidence ベースで改善する。Use when:
+  既存スキルを evidence ベースで改善する。こんなときに使う:
   公開済みスキルを見直したいとき。
 compatibility: pytest
 ---
@@ -33,7 +33,7 @@ compatibility: pytest
     frontmatter = mod.extract_frontmatter(skill_path)
 
     assert frontmatter["description"] == (
-        "既存スキルを evidence ベースで改善する。Use when: 公開済みスキルを見直したいとき。"
+        "既存スキルを evidence ベースで改善する。こんなときに使う: 公開済みスキルを見直したいとき。"
     )
 
 
@@ -45,7 +45,7 @@ def test_build_index_uses_folded_description_snippet(tmp_path: Path):
         """---
 name: folded-skill
 description: >
-  既存スキルを evidence ベースで改善する。Use when:
+  既存スキルを evidence ベースで改善する。こんなときに使う:
   公開済みスキルを見直したいとき。
 ---
 
@@ -56,4 +56,4 @@ description: >
 
     index = mod.build_index(tmp_path)
 
-    assert "- `folded-skill`: 既存スキルを evidence ベースで改善する。Use when: 公開済みスキルを見直したいとき。" in index
+    assert "- `folded-skill`: 既存スキルを evidence ベースで改善する。こんなときに使う: 公開済みスキルを見直したいとき。" in index

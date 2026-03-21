@@ -1,62 +1,69 @@
 ---
 name: dotnet-wpf-comparison-view
-description: Use when: building a side-by-side comparison view in WPF for matching results with mismatch highlighting and checkbox verification.
+description: こんなときに使う: WPFでサイドバイサイド比較ビューを構築。不一致ハイライトとチェックボックス検証付きのマッチング結果表示。
 license: MIT
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, wpf, csharp, mvvm, comparison-view, matching, community-toolkit]
   invocable: false
 ---
+<!-- このドキュメントは dotnet-wpf-comparison-view の日本語版です。英語版: ../SKILL.md -->
 
-# Build a Side-by-Side Comparison View in WPF
+# WPFでサイドバイサイド比較ビューを構築
 
-End-to-end workflow for building a comparison view that displays matching results side-by-side in **Windows Presentation Foundation (WPF)** using **Model-View-ViewModel (MVVM)**: a comparison item ViewModel with score tracking, 3-column XAML layout (field name / Source A / Source B), mismatch highlighting with background colors, editable fields with live score recalculation, and checkbox-based user verification before export.
+マッチング結果をサイドバイサイドで表示する比較ビュー構築のエンドツーエンドワークフロー：スコア追跡付き比較項目ViewModel、3カラムXAMLレイアウト（フィールド名 / ソースA / ソースB）、背景色による不一致ハイライト、ライブスコア再計算付き編集可能フィールド、エクスポート前のチェックボックスベースのユーザー検証。
 
-## When to Use This Skill
+## こんなときに使う
 
-Use this skill when:
-- Displaying matching results from two data sources in a side-by-side comparison UI
-- Building a verification workflow where users review and confirm each matched field
-- Highlighting mismatched fields with color-coded backgrounds (pink for mismatch, green for verified)
-- Implementing editable fields that trigger live score recalculation
-- Creating an export gate that requires all items to be checked and scored above a threshold
+以下の場合にこのスキルを使用してください：
+- 2つのデータソースからのマッチング結果をサイドバイサイド比較UIで表示するとき
+- ユーザーが各マッチングフィールドを確認・承認する検証ワークフローを構築するとき
+- 不一致フィールドを色分け背景でハイライトするとき（ピンク＝不一致、グリーン＝検証済み）
+- ライブスコア再計算をトリガーする編集可能フィールドを実装するとき
+- すべての項目のチェックとスコア閾値超過を必須とするエクスポートゲートを作成するとき
 
-**Prerequisites**:
-- WPF application with `CommunityToolkit.Mvvm` installed
-- Matching results from a matching service (e.g., `dotnet-generic-matching`)
-- MVVM architecture with ObservableObject-based ViewModels
+**前提条件**:
+- `CommunityToolkit.Mvvm`がインストール済みのWPFアプリケーション
+- マッチングサービスからのマッチング結果（例：`dotnet-generic-matching`）
+- ObservableObjectベースのViewModelを使用するMVVMアーキテクチャ
 
 ---
 
 ## Related Skills
 
-- **`dotnet-generic-matching`** — Provides the matching results that this view displays
-- **`dotnet-wpf-pdf-preview`** — PDF preview panel alongside the comparison view
-- **`dotnet-oracle-wpf-integration`** — Loads Source A candidate data from Oracle
-- **`dotnet-wpf-dify-api-integration`** — Extracts Source B data via AI OCR
-- **`git-commit-practices`** — Commit each step as an atomic change
+- **`dotnet-generic-matching`** — このビューで表示するマッチング結果を提供
+- **`dotnet-wpf-pdf-preview`** — 比較ビューと並べて表示するPDFプレビューパネル
+- **`dotnet-oracle-wpf-integration`** — OracleからソースA候補データを読み込み
+- **`dotnet-wpf-dify-api-integration`** — AI OCR経由でソースBデータを抽出
+- **`git-commit-practices`** — 各ステップをアトミックな変更としてコミット
+
+---
 
 ## Dependencies
 
-- .NET + WPF (Windows Presentation Foundation)
-- `CommunityToolkit.Mvvm` (ObservableObject, `[ObservableProperty]`, `[RelayCommand]`)
-- Matching results from your Domain/Application layer (e.g., `dotnet-generic-matching`)
+- .NET + WPF（Windows Presentation Foundation）
+- `CommunityToolkit.Mvvm`（ObservableObject、`[ObservableProperty]`、`[RelayCommand]`）
+- ドメイン/アプリケーション層からのマッチング結果（例：`dotnet-generic-matching`）
+
+---
 
 ## Core Principles
 
-1. **MVVM Binding Only** — All UI updates via data binding; never manipulate controls by `x:Name` (基礎と型)
-2. **Visual Feedback First** — Background colors (#F8D7DA pink, #BBF7D0 green) give instant mismatch/verified status (ニュートラル)
-3. **Live Recalculation** — Score updates immediately when editable fields change (継続は力)
-4. **Gated Export** — All checkboxes checked + all scores ≥ threshold before export is allowed (基礎と型)
-5. **Separation of Concerns** — Comparison logic stays in ViewModel; View only renders bindings (成長の複利)
+1. **MVVMバインディングのみ** — すべてのUI更新はデータバインディング経由；`x:Name`でのコントロール操作は禁止（基礎と型）
+2. **視覚フィードバック優先** — 背景色（#F8D7DA ピンク、#BBF7D0 グリーン）で不一致/検証済みステータスを即座に表示（ニュートラル）
+3. **ライブ再計算** — 編集可能フィールドの変更時にスコアを即座に更新（継続は力）
+4. **ゲート付きエクスポート** — すべてのチェックボックスがチェック済み ＋ すべてのスコアが閾値以上でエクスポート許可（基礎と型）
+5. **関心の分離** — 比較ロジックはViewModelに配置；Viewはバインディングの描画のみ（成長の複利）
+
+---
 
 ## Workflow: Build Comparison View
 
-### Step 1 — Create Comparison Item ViewModel
+### Step 1 — 比較項目ViewModelの作成
 
-Use when defining the ViewModel that represents a single comparison row with score, source fields, backgrounds, and checkboxes.
+スコア、ソースフィールド、背景色、チェックボックスを持つ単一の比較行を表すViewModelを定義するときに使用します。
 
-Create a `ComparisonItemViewModel` inheriting from `ObservableObject`. Each instance holds one matched pair: Source A fields (e.g., database record), Source B fields (e.g., OCR-extracted data), background colors for mismatch highlighting, and checkbox properties for user verification.
+`ObservableObject`を継承した`ComparisonItemViewModel`を作成します。各インスタンスは1つのマッチングペアを保持：ソースAフィールド（例：データベースレコード）、ソースBフィールド（例：OCR抽出データ）、不一致ハイライト用の背景色、ユーザー検証用のチェックボックスプロパティ。
 
 ```
 YourApp/
@@ -67,77 +74,247 @@ YourApp/
     └── ComparisonView.xaml          # 🆕 3-column layout
 ```
 
-**ComparisonItemViewModel.cs** — Core structure (excerpt):
+**ComparisonItemViewModel.cs** — コア構造：
 
 ```csharp
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace YourApp.ViewModels;
-
-public partial class ComparisonItemViewModel : ObservableObject
+namespace YourApp.ViewModels
 {
-    [ObservableProperty] private double scorePercent;
-
-    [ObservableProperty] private string sourceAField1 = "";
-    [ObservableProperty] private string sourceBField1 = "";
-
-    [ObservableProperty] private bool isField1Checked;
-    [ObservableProperty] private string sourceBField1Background = "Transparent";
-
-    partial void OnIsField1CheckedChanged(bool value) => UpdateMismatchBackgrounds();
-
-    public void UpdateMismatchBackgrounds()
+    public partial class ComparisonItemViewModel : ObservableObject
     {
-        // Pink (#F8D7DA) for mismatch, Green (#BBF7D0) when checked.
+        // === Score ===
+        [ObservableProperty] private int index;
+        [ObservableProperty] private double scorePercent;
+        [ObservableProperty] private bool isSuccessful;
+        [ObservableProperty] private string scoreColor = "Black";
+
+        // === Source A fields (read-only, e.g., database record) ===
+        [ObservableProperty] private string sourceAField1 = "";
+        [ObservableProperty] private string sourceAField2 = "";
+        [ObservableProperty] private string sourceAField3 = "";
+
+        // === Source B fields (e.g., OCR-extracted data) ===
+        [ObservableProperty] private string sourceBField1 = "";
+        [ObservableProperty] private string sourceBField2 = "";
+        [ObservableProperty] private string sourceBField3 = "";
+
+        // === Background colors for mismatch highlighting ===
+        [ObservableProperty] private string sourceBField1Background = "Transparent";
+        [ObservableProperty] private string sourceBField2Background = "Transparent";
+        [ObservableProperty] private string sourceBField3Background = "Transparent";
+
+        // === Checkbox verification per field ===
+        [ObservableProperty] private bool isField1Checked;
+        [ObservableProperty] private bool isField2Checked;
+        [ObservableProperty] private bool isField3Checked;
+
+        // === Editable fields (trigger recalculation) ===
+        [ObservableProperty] private decimal editableUnitPrice;
+        [ObservableProperty] private string editableDeliveryDate = "";
+        [ObservableProperty] private bool isModified = false;
+
+        // === Editable field backgrounds ===
+        [ObservableProperty] private string editableUnitPriceBackground = "White";
+
+        partial void OnEditableUnitPriceChanged(decimal value)
+        {
+            IsModified = true;
+            UpdateMismatchBackgrounds();
+            RecalculateMatchingScore();
+        }
+
+        partial void OnIsField1CheckedChanged(bool value)
+        {
+            UpdateMismatchBackgrounds();
+        }
+
+        /// <summary>
+        /// Update backgrounds: pink (#F8D7DA) for mismatch, green (#BBF7D0) when checked, Transparent otherwise.
+        /// </summary>
+        public void UpdateMismatchBackgrounds()
+        {
+            SourceBField1Background = IsField1Checked ? "#BBF7D0"
+                : IsMismatch(SourceAField1, SourceBField1) ? "#F8D7DA"
+                : "Transparent";
+
+            SourceBField2Background = IsField2Checked ? "#BBF7D0"
+                : IsMismatch(SourceAField2, SourceBField2) ? "#F8D7DA"
+                : "Transparent";
+
+            SourceBField3Background = IsField3Checked ? "#BBF7D0"
+                : IsMismatch(SourceAField3, SourceBField3) ? "#F8D7DA"
+                : "Transparent";
+        }
+
+        private static bool IsMismatch(string? a, string? b)
+            => (a ?? string.Empty) != (b ?? string.Empty);
+
+        /// <summary>
+        /// Count visible fields that have not been checked by the user.
+        /// </summary>
+        public int GetUncheckedVisibleCount()
+        {
+            int count = 0;
+            if (HasDisplayValue(SourceAField1) && !IsField1Checked) count++;
+            if (HasDisplayValue(SourceAField2) && !IsField2Checked) count++;
+            if (HasDisplayValue(SourceAField3) && !IsField3Checked) count++;
+            return count;
+        }
+
+        /// <summary>
+        /// Recalculate matching score after editable field changes.
+        /// Delegate to domain matching service with updated values.
+        /// </summary>
+        private void RecalculateMatchingScore()
+        {
+            // Re-run matching with updated values via domain service
+            // ScorePercent = newResult.Score.ScorePercent;
+            // IsSuccessful = ScorePercent >= 80.0;
+            // ScoreColor = IsSuccessful ? "Green" : "Red";
+        }
+
+        public void UpdateScoreColor()
+        {
+            ScoreColor = IsSuccessful ? "Green" : (ScorePercent >= 60 ? "Orange" : "Red");
+        }
+
+        // === Visibility (HasDisplayValue pattern) ===
+        public bool IsField1Visible => HasDisplayValue(SourceAField1);
+        public bool IsField2Visible => HasDisplayValue(SourceAField2);
+        public bool IsField3Visible => HasDisplayValue(SourceAField3);
+
+        private static bool HasDisplayValue(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return false;
+            return value.Trim() != "-";
+        }
+
+        partial void OnSourceAField1Changed(string value)
+        {
+            OnPropertyChanged(nameof(IsField1Visible));
+        }
     }
 }
 ```
 
-Full example: `references/ComparisonItemViewModel.full.md`
-
-**Key patterns from Mercury's `MatchingResultItemViewModel`**:
-- `partial void OnXxxChanged()` hooks for change tracking and recalculation
-- `HasDisplayValue()` filters out empty/dash values from visibility
-- Background color uses string binding (`"Transparent"`, `"#F8D7DA"`, `"#BBF7D0"`)
-- `GetUncheckedVisibleCount()` validates all visible fields are checked before export
+**Mercuryの`MatchingResultItemViewModel`からの主要パターン**：
+- `partial void OnXxxChanged()`フックによる変更追跡と再計算
+- `HasDisplayValue()`で空値/ダッシュ値を表示から除外
+- 背景色は文字列バインディングを使用（`"Transparent"`、`"#F8D7DA"`、`"#BBF7D0"`）
+- `GetUncheckedVisibleCount()`でエクスポート前にすべての表示フィールドがチェック済みか検証
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 2 — Build 3-Column XAML Layout
+### Step 2 — 3カラムXAMLレイアウトの構築
 
-Use when creating the ItemsControl-based comparison view with field name, Source A, and Source B columns.
+フィールド名、ソースA、ソースBの列を持つItemsControlベースの比較ビューを作成するときに使用します。
 
-Create a scrollable `ItemsControl` with a `DataTemplate` containing a 3-column Grid. Each matching result is rendered as a bordered card with a score header and field rows.
+スクロール可能な`ItemsControl`と、3カラムGridを含む`DataTemplate`を作成します。各マッチング結果はスコアヘッダーとフィールド行を持つボーダー付きカードとして描画されます。
 
-**ComparisonView.xaml** — Layout template (excerpt):
+**ComparisonView.xaml** — レイアウトテンプレート：
 
 ```xml
 <UserControl x:Class="YourApp.Views.ComparisonView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <ScrollViewer>
-        <ItemsControl ItemsSource="{Binding ComparisonItems}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <!-- 3 columns: Field | Source A | Source B -->
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </ScrollViewer>
+
+    <UserControl.Resources>
+        <Style x:Key="FieldNameStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="Background" Value="#F5F5F5"/>
+        </Style>
+        <Style x:Key="ValueStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" FontSize="16" FontWeight="Bold"
+                   Text="Comparison Results" Margin="0,0,0,10"/>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding ComparisonItems}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#CCCCCC" BorderThickness="1"
+                                Margin="0,0,0,15" Padding="10"
+                                Background="#FAFAFA" CornerRadius="5">
+                            <StackPanel>
+                                <!-- Score Header -->
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" FontSize="14" FontWeight="Bold"
+                                               Text="{Binding Index, StringFormat='#{0}'}"/>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <TextBlock Text="Score: " FontSize="12"/>
+                                        <TextBlock Text="{Binding ScorePercent, StringFormat={}{0:F1}%}"
+                                                   FontSize="12" FontWeight="Bold"
+                                                   Foreground="{Binding ScoreColor}"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Separator Margin="0,0,0,10"/>
+
+                                <!-- 3-Column Comparison Grid -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140"/> <!-- Field Name -->
+                                        <ColumnDefinition Width="*"/>   <!-- Source A -->
+                                        <ColumnDefinition Width="*"/>   <!-- Source B -->
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Column Headers -->
+                                    <TextBlock Grid.Column="0" Grid.Row="0"
+                                               Text="Field" FontWeight="Bold" FontSize="11"/>
+                                    <TextBlock Grid.Column="1" Grid.Row="0"
+                                               Text="Source A" FontWeight="Bold" FontSize="11"/>
+                                    <TextBlock Grid.Column="2" Grid.Row="0"
+                                               Text="Source B" FontWeight="Bold" FontSize="11"/>
+
+                                    <!-- Field Row Example -->
+                                    <TextBlock Grid.Column="0" Grid.Row="1"
+                                               Text="Field 1" Style="{StaticResource FieldNameStyle}"/>
+                                    <TextBlock Grid.Column="1" Grid.Row="1"
+                                               Text="{Binding SourceAField1}"
+                                               Style="{StaticResource ValueStyle}"/>
+                                    <TextBlock Grid.Column="2" Grid.Row="1"
+                                               Text="{Binding SourceBField1}"
+                                               Background="{Binding SourceBField1Background}"
+                                               Style="{StaticResource ValueStyle}"/>
+
+                                    <!-- Add Grid.RowDefinitions and more rows per field... -->
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
 </UserControl>
 ```
 
-Full example: `references/ComparisonView.full.md`
-
-**Why ItemsControl over DataGrid**: DataGrid adds selection, sorting, and editing chrome that conflicts with the custom comparison layout. `ItemsControl` gives full control over the per-item `DataTemplate`.
+**DataGridではなくItemsControlを使う理由**：DataGridは選択、ソート、編集用のUIクロムを追加し、カスタム比較レイアウトと競合します。`ItemsControl`はアイテムごとの`DataTemplate`を完全に制御できます。
 
 > **Values**: 基礎と型 / ニュートラル
 
-### Step 3 — Add Score Color Converter
+### Step 3 — スコアカラーコンバーターの追加
 
-Use when applying color-coded styling to score values based on thresholds.
+閾値に基づいてスコア値に色分けスタイルを適用するときに使用します。
 
-Implement score color logic in the ViewModel (not as an `IValueConverter`) for testability. The ViewModel exposes a `ScoreColor` string property that XAML binds to `Foreground`.
+スコア色ロジックをViewModel内に実装します（`IValueConverter`としてではなく）。これによりテスト容易性が向上します。ViewModelは`ScoreColor`文字列プロパティを公開し、XAMLが`Foreground`にバインドします。
 
 ```csharp
 // In ComparisonItemViewModel
@@ -157,15 +334,15 @@ public void UpdateScoreColor()
 <TextBlock Foreground="{Binding ScorePercent, Converter={StaticResource ScoreColorConverter}}"/>
 ```
 
-**Why ViewModel property over IValueConverter**: The 3-tier threshold logic (Green/Orange/Red) is domain-meaningful. Keeping it in the ViewModel makes it testable without XAML infrastructure.
+**IValueConverterではなくViewModelプロパティを使う理由**：3段階の閾値ロジック（Green/Orange/Red）はドメイン的に意味があります。ViewModelに配置することで、XAMLインフラなしでテスト可能になります。
 
 > **Values**: 基礎と型 / ニュートラル
 
-### Step 4 — Implement Editable Fields
+### Step 4 — 編集可能フィールドの実装
 
-Use when adding TextBox bindings for fields that users can modify, with yellow background and live recalculation.
+ユーザーが変更可能なTextBoxバインディングを追加し、黄色背景とライブ再計算を実現するときに使用します。
 
-Use `TwoWay` binding with `UpdateSourceTrigger=PropertyChanged` for immediate feedback. Editable fields have a distinct background (yellow `#FFFFCC` or white) to visually distinguish them from read-only fields.
+即座のフィードバックのために`TwoWay`バインディングと`UpdateSourceTrigger=PropertyChanged`を使用します。編集可能フィールドは読み取り専用フィールドと視覚的に区別するため、独自の背景色（黄色`#FFFFCC`または白）を持ちます。
 
 ```xml
 <!-- ✅ Editable field with TwoWay binding and yellow background -->
@@ -182,7 +359,7 @@ Use `TwoWay` binding with `UpdateSourceTrigger=PropertyChanged` for immediate fe
            Style="{StaticResource ValueStyle}"/>
 ```
 
-**ViewModel change handler** — Trigger recalculation on edit:
+**ViewModelの変更ハンドラー** — 編集時に再計算をトリガー：
 
 ```csharp
 partial void OnEditableUnitPriceChanged(decimal value)
@@ -193,18 +370,18 @@ partial void OnEditableUnitPriceChanged(decimal value)
 }
 ```
 
-**Key points**:
-- Use `decimal` for monetary fields (never `float` or `double`)
-- `UpdateSourceTrigger=PropertyChanged` fires on every keystroke for live updates
-- `IsModified` flag tracks whether any editable field has been changed
+**主要ポイント**：
+- 金額フィールドには`decimal`を使用（`float`や`double`は使用禁止）
+- `UpdateSourceTrigger=PropertyChanged`はキーストロークごとに発火しライブ更新を実現
+- `IsModified`フラグで編集可能フィールドの変更を追跡
 
 > **Values**: 継続は力 / 基礎と型
 
-### Step 5 — Add Checkbox Verification
+### Step 5 — チェックボックス検証の追加
 
-Use when adding per-field CheckBoxes that users must tick to confirm they have reviewed a field.
+ユーザーがフィールドを確認したことを示すために、フィールドごとのチェックボックスを追加するときに使用します。
 
-Add a `CheckBox` column (or inline CheckBox) for fields that require manual verification. When checked, the background changes to green (#BBF7D0). The `GetUncheckedVisibleCount()` method validates all visible fields are checked before export.
+手動検証が必要なフィールドに`CheckBox`列（またはインラインCheckBox）を追加します。チェック時に背景がグリーン（#BBF7D0）に変わります。`GetUncheckedVisibleCount()`メソッドで、エクスポート前にすべての表示フィールドがチェック済みか検証します。
 
 ```xml
 <!-- Checkbox column (between Source A and Source B, or after Source B) -->
@@ -213,7 +390,7 @@ Add a `CheckBox` column (or inline CheckBox) for fields that require manual veri
           VerticalAlignment="Center" HorizontalAlignment="Center"/>
 ```
 
-**ViewModel — CheckBox triggers background update**:
+**ViewModel — チェックボックスが背景更新をトリガー**：
 
 ```csharp
 partial void OnIsField1CheckedChanged(bool value)
@@ -230,23 +407,23 @@ public void UpdateMismatchBackgrounds()
 }
 ```
 
-**Color legend**:
+**色の凡例**：
 
-| Color | Hex Code | Meaning |
-|-------|----------|---------|
-| 🆕 Pink | `#F8D7DA` | Mismatch detected between Source A and Source B |
-| ✅ Green | `#BBF7D0` | User has verified and checked the field |
-| Transparent | `Transparent` | Fields match (no action needed) |
+| 色 | 16進コード | 意味 |
+|------|----------|---------|
+| 🆕 ピンク | `#F8D7DA` | ソースAとソースBの間で不一致を検出 |
+| ✅ グリーン | `#BBF7D0` | ユーザーがフィールドを検証・チェック済み |
+| 透明 | `Transparent` | フィールドが一致（対応不要） |
 
 > **Values**: ニュートラル / 基礎と型
 
-### Step 6 — Wire Results and Export
+### Step 6 — 結果の接続とエクスポート
 
-Use when connecting the comparison view to the parent ViewModel, populating results, and implementing export gating.
+比較ビューを親ViewModelに接続し、結果を展開し、エクスポートゲートを実装するときに使用します。
 
-Create a parent `ComparisonTabViewModel` with an `ObservableCollection<ComparisonItemViewModel>` and a `SetResults` method. Subscribe to each item's `PropertyChanged` for live preview updates. Gate export on all-checked + all-scores-above-threshold.
+`ObservableCollection<ComparisonItemViewModel>`と`SetResults`メソッドを持つ親`ComparisonTabViewModel`を作成します。各アイテムの`PropertyChanged`をサブスクライブしてライブプレビュー更新を実現します。全チェック済み＋全スコア閾値超過でエクスポートをゲートします。
 
-**ComparisonTabViewModel.cs**:
+**ComparisonTabViewModel.cs**：
 
 ```csharp
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -335,7 +512,7 @@ namespace YourApp.ViewModels
 }
 ```
 
-**Why two export gates**: Gate 1 (checkboxes) ensures the user has visually reviewed every field. Gate 2 (score threshold) ensures data quality. Both must pass — this mirrors Mercury's `ResultTabViewModel.ExportRpaData` pattern.
+**2つのエクスポートゲートを設ける理由**：ゲート1（チェックボックス）はユーザーがすべてのフィールドを目視確認したことを保証します。ゲート2（スコア閾値）はデータ品質を保証します。両方を通過する必要があります — これはMercuryの`ResultTabViewModel.ExportRpaData`パターンに倣っています。
 
 > **Values**: 基礎と型 / 継続は力
 
@@ -343,35 +520,54 @@ namespace YourApp.ViewModels
 
 ## Good Practices
 
-### 1. Use Background Colors for Visual Matching Feedback
+### 1. マッチングフィードバックに背景色を使用
 
-✅ Apply `#F8D7DA` (pink) for mismatched fields, `#BBF7D0` (green) for verified fields, and `Transparent` for matching fields. Bind background to a ViewModel string property — see Step 5 for implementation.
+✅ 不一致フィールドに`#F8D7DA`（ピンク）、検証済みフィールドに`#BBF7D0`（グリーン）、一致フィールドに`Transparent`を適用します。背景をViewModelの文字列プロパティにバインドします。
+
+```csharp
+// ✅ CORRECT — ViewModel drives background color via binding
+SourceBField1Background = IsField1Checked ? "#BBF7D0"
+    : IsMismatch(SourceAField1, SourceBField1) ? "#F8D7DA"
+    : "Transparent";
+```
 
 **Values**: ニュートラル（即座の視覚フィードバック）
 
-### 2. Recalculate Score on Editable Field Change
+### 2. 編集可能フィールドの変更時にスコアを再計算
 
-✅ Use `partial void OnXxxChanged()` hooks to trigger `RecalculateMatchingScore()` immediately when the user edits a field — see Step 4 for implementation.
+✅ `partial void OnXxxChanged()`フックを使用して、ユーザーがフィールドを編集した際に即座に`RecalculateMatchingScore()`をトリガーします。これにより、編集がマッチングを改善したかどうかの即座のフィードバックが得られます。
+
+```csharp
+partial void OnEditableUnitPriceChanged(decimal value)
+{
+    IsModified = true;
+    UpdateMismatchBackgrounds();
+    RecalculateMatchingScore();
+}
+```
 
 **Values**: 継続は力（リアルタイム再計算）
 
-### 3. Validate All Checkboxes Before Export
+### 3. エクスポート前にすべてのチェックボックスを検証
 
-✅ Use `GetUncheckedVisibleCount()` to ensure every visible field has been reviewed. Only count fields where `HasDisplayValue` returns true — see Step 6 for implementation.
+✅ `GetUncheckedVisibleCount()`を使用して、すべての表示フィールドが確認済みであることを保証します。`HasDisplayValue`がtrueを返すフィールドのみカウントし、空値やプレースホルダー値はスキップします。
+
+```csharp
+var unchecked = ComparisonItems.Sum(i => i.GetUncheckedVisibleCount());
+if (unchecked > 0) { /* Block export */ }
+```
 
 **Values**: 基礎と型（品質ゲート）
-
-> Code examples: `references/detailed-patterns.md`
 
 ---
 
 ## Common Pitfalls
 
-### 1. Not Subscribing to PropertyChanged for Live Preview Updates
+### 1. ライブプレビュー更新のためのPropertyChangedサブスクライブ漏れ
 
-**Problem**: Export preview does not update when the user edits a field or checks a checkbox, because the parent ViewModel is not listening to child item changes.
+**問題**：ユーザーがフィールドを編集したりチェックボックスをチェックしても、エクスポートプレビューが更新されない。親ViewModelが子アイテムの変更をリッスンしていないことが原因。
 
-**Solution**: Subscribe to each `ComparisonItemViewModel.PropertyChanged` in `SetResults()`.
+**解決策**：`SetResults()`内で各`ComparisonItemViewModel.PropertyChanged`をサブスクライブします。
 
 ```csharp
 // ❌ WRONG — No subscription, preview is stale
@@ -382,11 +578,11 @@ item.PropertyChanged += (s, e) => UpdateExportPreview();
 ComparisonItems.Add(item);
 ```
 
-### 2. Hardcoding Colors Instead of Using Background Binding
+### 2. 背景バインディングの代わりにハードコードされた色を使用
 
-**Problem**: Setting background colors directly in XAML with static values. Mismatch highlighting never updates when data changes.
+**問題**：XAMLで静的な値で背景色を直接設定。データ変更時に不一致ハイライトが更新されない。
 
-**Solution**: Bind `Background` to a ViewModel string property that `UpdateMismatchBackgrounds()` updates dynamically.
+**解決策**：`Background`を`UpdateMismatchBackgrounds()`が動的に更新するViewModelの文字列プロパティにバインドします。
 
 ```xml
 <!-- ❌ WRONG — Static background, never updates -->
@@ -396,11 +592,11 @@ ComparisonItems.Add(item);
 <TextBlock Background="{Binding SourceBField1Background}" Text="{Binding SourceBField1}"/>
 ```
 
-### 3. Forgetting to Reset State on New Data Load
+### 3. 新規データ読み込み時の状態リセット漏れ
 
-**Problem**: Previous matching results remain visible when the user loads a new dataset, causing confusion with stale data.
+**問題**：ユーザーが新しいデータセットを読み込んだ際に以前のマッチング結果が残り、古いデータで混乱を招く。
 
-**Solution**: Call `ComparisonItems.Clear()` at the start of `SetResults()` and reset all quality messages.
+**解決策**：`SetResults()`の先頭で`ComparisonItems.Clear()`を呼び出し、すべての品質メッセージをリセットします。
 
 ```csharp
 public void SetResults(IEnumerable<MatchingResultData> results)
@@ -416,81 +612,98 @@ public void SetResults(IEnumerable<MatchingResultData> results)
 
 ## Anti-Patterns
 
-### Direct UI Manipulation from ViewModel
+### ViewModelからの直接UI操作
 
-**What**: Using `x:Name` to directly set TextBlock colors or backgrounds from code-behind instead of data binding.
+**What**：データバインディングの代わりに`x:Name`を使用してcode-behindからTextBlockの色や背景を直接設定。
 
-**Why It's Wrong**: Violates MVVM. The ViewModel cannot be unit tested if it depends on UI controls.
+**Why It's Wrong**：MVVM違反。ViewModelがUIコントロールに依存するとユニットテストができません。背景色ロジックがテストから見えなくなります。
 
-**Better Approach**: Expose color as a string `[ObservableProperty]` in the ViewModel. Bind `Background="{Binding FieldBackground}"` in XAML.
+**Better Approach**：ViewModelで色を文字列プロパティとして公開。XAMLで`Background="{Binding FieldBackground}"`にバインド。ViewModelプロパティを直接テスト。
 
-### Putting Comparison Logic in View Layer
+```csharp
+// ❌ WRONG — Direct UI manipulation
+Field1TextBlock.Background = new SolidColorBrush(Colors.Pink);
 
-**What**: Computing mismatch status or score in XAML triggers, code-behind, or value converters.
+// ✅ CORRECT — ViewModel property with binding
+[ObservableProperty] private string sourceBField1Background = "Transparent";
+```
 
-**Why It's Wrong**: Comparison logic is domain logic. Placing it in the View makes it untestable.
+### View層に比較ロジックを配置
 
-**Better Approach**: Keep `IsMismatch()`, `UpdateMismatchBackgrounds()`, and `RecalculateMatchingScore()` in the ViewModel.
+**What**：XAMLトリガー、code-behind、またはバリューコンバーターで不一致ステータスやスコアを計算。
 
-> Code examples: `references/detailed-patterns.md`
+**Why It's Wrong**：比較ロジックはアプリケーション/ドメインロジックです。View層に配置するとテスト不能になり、ビジネスルールがUIフレームワークに結合されます。
+
+**Better Approach**：`IsMismatch()`、`UpdateMismatchBackgrounds()`、`RecalculateMatchingScore()`をViewModelに配置。Viewは結果のプロパティにバインドするのみ。
+
+```csharp
+// ❌ WRONG — Mismatch check in IValueConverter
+public object Convert(object[] values, ...) =>
+    values[0]?.ToString() != values[1]?.ToString() ? Brushes.Pink : Brushes.Transparent;
+
+// ✅ CORRECT — Mismatch check in ViewModel
+private static bool IsMismatch(string? a, string? b)
+    => (a ?? string.Empty) != (b ?? string.Empty);
+```
 
 ---
 
 ## Quick Reference
 
-### Implementation Checklist
+### 実装チェックリスト
 
-- [ ] Create `ComparisonItemViewModel` with score, source A/B fields, backgrounds (Step 1)
-- [ ] Add `UpdateMismatchBackgrounds()` with pink/green/transparent logic (Step 1)
-- [ ] Add `GetUncheckedVisibleCount()` for export validation (Step 1)
-- [ ] Add `HasDisplayValue` visibility pattern for conditional field display (Step 1)
-- [ ] Build 3-column XAML layout with `ItemsControl` and `DataTemplate` (Step 2)
-- [ ] Add `FieldNameStyle` and `ValueStyle` resource styles (Step 2)
-- [ ] Implement `UpdateScoreColor()` with Green/Orange/Red thresholds (Step 3)
-- [ ] Add editable `TextBox` fields with `TwoWay` + `UpdateSourceTrigger=PropertyChanged` (Step 4)
-- [ ] Wire `partial void OnXxxChanged()` to `RecalculateMatchingScore()` (Step 4)
-- [ ] Add `CheckBox` per verifiable field, bound to `IsFieldXChecked` (Step 5)
-- [ ] Create parent ViewModel with `ObservableCollection` and `SetResults()` (Step 6)
-- [ ] Subscribe to `PropertyChanged` on each item for live preview (Step 6)
-- [ ] Implement dual export gate: all-checked + all-scores-above-threshold (Step 6)
-- [ ] Verify: `ComparisonItems.Clear()` called before loading new data
+- [ ] スコア、ソースA/Bフィールド、背景色を持つ`ComparisonItemViewModel`を作成（Step 1）
+- [ ] ピンク/グリーン/透明ロジックの`UpdateMismatchBackgrounds()`を追加（Step 1）
+- [ ] エクスポート検証用の`GetUncheckedVisibleCount()`を追加（Step 1）
+- [ ] 条件付きフィールド表示の`HasDisplayValue`可視性パターンを追加（Step 1）
+- [ ] `ItemsControl`と`DataTemplate`による3カラムXAMLレイアウトを構築（Step 2）
+- [ ] `FieldNameStyle`と`ValueStyle`リソーススタイルを追加（Step 2）
+- [ ] Green/Orange/Red閾値の`UpdateScoreColor()`を実装（Step 3）
+- [ ] `TwoWay` + `UpdateSourceTrigger=PropertyChanged`の編集可能`TextBox`フィールドを追加（Step 4）
+- [ ] `partial void OnXxxChanged()`を`RecalculateMatchingScore()`に接続（Step 4）
+- [ ] 検証対象フィールドごとに`IsFieldXChecked`にバインドした`CheckBox`を追加（Step 5）
+- [ ] `ObservableCollection`と`SetResults()`を持つ親ViewModelを作成（Step 6）
+- [ ] ライブプレビュー用に各アイテムの`PropertyChanged`をサブスクライブ（Step 6）
+- [ ] デュアルエクスポートゲートを実装：全チェック済み＋全スコア閾値超過（Step 6）
+- [ ] 確認：新データ読み込み前に`ComparisonItems.Clear()`が呼ばれること
 
-### File Structure
+### ファイル構成
 
-| File | Purpose | Layer |
+| ファイル | 目的 | レイヤー |
 |------|---------|-------|
-| `ComparisonItemViewModel.cs` | Single comparison row with score + backgrounds | ViewModel |
-| `ComparisonTabViewModel.cs` | Parent collection + export gating | ViewModel |
-| `ComparisonView.xaml` | 3-column layout with ItemsControl | View |
+| `ComparisonItemViewModel.cs` | スコア＋背景色付き単一比較行 | ViewModel |
+| `ComparisonTabViewModel.cs` | 親コレクション＋エクスポートゲート | ViewModel |
+| `ComparisonView.xaml` | ItemsControl付き3カラムレイアウト | View |
 
-### Color Reference
+### 色リファレンス
 
-| Color | Hex | When Applied |
-|-------|-----|--------------|
-| 🆕 Pink | `#F8D7DA` | Mismatch: Source A ≠ Source B |
-| ✅ Green | `#BBF7D0` | User checked the verification checkbox |
-| ❌ Red | `Red` | Score < 60% |
-| Orange | `Orange` | Score 60–79% |
-| Green | `Green` | Score ≥ 80% |
-| Transparent | `Transparent` | Fields match (no highlighting) |
-| Yellow | `#FFFFCC` | Editable field background |
+| 色 | 16進 | 適用タイミング |
+|------|-----|--------------|
+| 🆕 ピンク | `#F8D7DA` | 不一致：ソースA ≠ ソースB |
+| ✅ グリーン | `#BBF7D0` | ユーザーが検証チェックボックスをチェック |
+| ❌ レッド | `Red` | スコア < 60% |
+| オレンジ | `Orange` | スコア 60–79% |
+| グリーン | `Green` | スコア ≥ 80% |
+| 透明 | `Transparent` | フィールドが一致（ハイライトなし） |
+| イエロー | `#FFFFCC` | 編集可能フィールドの背景 |
 
 ---
 
 ## Resources
 
-- [CommunityToolkit.Mvvm Documentation](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/)
-- [WPF ItemsControl and DataTemplate](https://learn.microsoft.com/dotnet/desktop/wpf/controls/itemscontrol)
-- [ObservableObject and Source Generators](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/observableobject)
-- `dotnet-generic-matching` — Matching service that produces the results this view displays
-- `dotnet-wpf-pdf-preview` — PDF preview panel to show alongside comparison results
+- [CommunityToolkit.Mvvm ドキュメント](https://learn.microsoft.com/ja-jp/dotnet/communitytoolkit/mvvm/)
+- [WPF ItemsControlとDataTemplate](https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/controls/itemscontrol)
+- [ObservableObjectとソースジェネレーター](https://learn.microsoft.com/ja-jp/dotnet/communitytoolkit/mvvm/observableobject)
+- `dotnet-generic-matching` — このビューで表示する結果を生成するマッチングサービス
+- `dotnet-wpf-pdf-preview` — 比較結果と並べて表示するPDFプレビューパネル
 
 ---
 
 ## Changelog
 
-| Version | Date | Changes |
+| バージョン | 日付 | 変更内容 |
 |---------|------|---------|
-| 1.0.0 | 2025-07-13 | 🆕 Initial release — side-by-side comparison view with mismatch highlighting |
+| 1.0.0 | 2025-07-13 | 🆕 初回リリース — 不一致ハイライト付きサイドバイサイド比較ビュー |
 
-<!-- Japanese version available at references/SKILL.ja.md -->
+<!-- 英語版は ../SKILL.md を参照してください -->
+

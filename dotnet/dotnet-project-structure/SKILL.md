@@ -1,89 +1,88 @@
 ---
 name: dotnet-project-structure
 description: >
-  Modern .NET project structure with .slnx, Directory.Build.props, central package management,
-  SourceLink, version management, and SDK pinning. Use when: setting up or modernizing a .NET solution.
+  こんなときに使う: モダン .NET プロジェクト構造（.slnx、Directory.Build.props、Central Package Management、
+  SourceLink、バージョン管理、SDK固定）。.NETソリューションのセットアップ・近代化時に使用。
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, msbuild, nuget, slnx, sourcelink, project-structure]
   invocable: false
   version: 1.0.0
 ---
+# .NET プロジェクト構造とビルド設定
 
-# .NET Project Structure and Build Configuration
+モダン .NET ソリューションのセットアップに関するエンドツーエンドワークフロー：.slnx移行、ビルドプロパティの集約、Central Package Management (CPM)、SourceLinkデバッグ、RELEASE_NOTES駆動バージョニング、global.jsonによるSDK固定。
 
-End-to-end workflow for setting up a modern .NET solution: .slnx migration, centralized build properties, Central Package Management (CPM), SourceLink debugging, RELEASE_NOTES-driven versioning, and SDK pinning with global.json.
+## こんなときに使う
 
-## When to Use This Skill
+以下の場合にこのスキルを使用してください：
 
-Use this skill when:
-
-- Setting up a new .NET solution from scratch with modern project structure conventions
-- Migrating an existing .sln solution file to the modern XML-based .slnx format
-- Configuring centralized build properties across multiple projects via Directory.Build.props
-- Implementing central NuGet package version management with Directory.Packages.props
-- Adding SourceLink support to enable step-through debugging of published NuGet packages
-- Automating version management by parsing RELEASE_NOTES.md during the build process
-- Pinning the .NET SDK version across all developer machines and CI/CD environments
+- モダンなプロジェクト構造規約で新しい .NET ソリューションをゼロから構築するとき
+- 既存の .sln ソリューションファイルをモダンな XML ベースの .slnx 形式に移行するとき
+- Directory.Build.props で複数プロジェクトのビルドプロパティを集約設定するとき
+- Directory.Packages.props で NuGet パッケージバージョンの一元管理を導入するとき
+- 公開 NuGet パッケージのステップスルーデバッグのため SourceLink を追加するとき
+- ビルドプロセスで RELEASE_NOTES.md を解析してバージョン管理を自動化するとき
+- すべての開発者マシンと CI/CD 環境で .NET SDK バージョンを固定するとき
 
 ---
 
 ## Related Skills
 
-- **`dotnet-local-tools`** — Managing local .NET tools with dotnet-tools.json
-- **`microsoft-extensions-configuration`** — Configuration validation patterns
-- **`git-commit-practices`** — Commit each step as an atomic change
-- **`tdd-standard-practice`** — Test generated code with Red-Green-Refactor
+- **`dotnet-local-tools`** — dotnet-tools.json によるローカル .NET ツール管理
+- **`microsoft-extensions-configuration`** — 設定バリデーションパターン
+- **`git-commit-practices`** — 各ステップをアトミックな変更としてコミット
+- **`tdd-standard-practice`** — Red-Green-Refactor で生成コードをテスト
 
 ---
 
 ## Core Principles
 
-1. **Single Source of Truth** — Each configuration concern lives in exactly one file; no duplication across projects (基礎と型)
-2. **Reproducible Builds** — SDK version and package versions are pinned so every environment produces identical output (基礎と型)
-3. **Human-Readable Configuration** — .slnx XML and Directory.Build.props replace cryptic GUIDs and scattered settings (温故知新)
-4. **Progressive Modernization** — Migrate one concern at a time: solution → build props → packages → SourceLink → versioning → SDK (継続は力)
-5. **Debuggability by Default** — SourceLink and symbol packages ship with every NuGet package for step-through debugging (成長の複利)
+1. **Single Source of Truth（単一の信頼できる情報源）** — 各設定項目は1つのファイルにのみ存在し、プロジェクト間で重複しない（基礎と型）
+2. **Reproducible Builds（再現可能なビルド）** — SDKバージョンとパッケージバージョンを固定し、すべての環境で同一の出力を生成（基礎と型）
+3. **Human-Readable Configuration（人間が読める設定）** — .slnx XMLとDirectory.Build.propsが暗号的なGUIDや分散した設定を置き換える（温故知新）
+4. **Progressive Modernization（段階的な近代化）** — ソリューション → ビルドプロパティ → パッケージ → SourceLink → バージョニング → SDKと一つずつ移行（継続は力）
+5. **Debuggability by Default（デフォルトでデバッグ可能）** — SourceLinkとシンボルパッケージをすべてのNuGetパッケージに同梱しステップスルーデバッグを実現（成長の複利）
 
 ---
 
 ## Workflow: Set Up Modern .NET Project
 
-### Step 1 — Migrate to .slnx Format
+### Step 1 — .slnx 形式への移行
 
-Use when converting an existing .sln solution to the modern XML-based .slnx format introduced in .NET 9.
+.NET 9 で導入されたモダンな XML ベースの .slnx 形式に既存の .sln ソリューションを変換するときに使用します。
 
-**Version requirements:**
+**バージョン要件:**
 
-| Tool | Minimum Version |
-|------|-----------------|
+| ツール | 最低バージョン |
+|--------|---------------|
 | .NET SDK | 9.0.200 |
 | Visual Studio | 17.13 |
 
-**Migrate an existing solution:**
+**既存ソリューションの移行:**
 
 ```bash
-# Migrate a specific solution file
+# 特定のソリューションファイルを移行
 dotnet sln MySolution.sln migrate
 
-# If only one .sln exists in the directory
+# ディレクトリに .sln が1つだけの場合
 dotnet sln migrate
 ```
 
-**Create a new .slnx solution:**
+**新規 .slnx ソリューションの作成:**
 
 ```bash
-# .NET 10+: Creates .slnx by default
+# .NET 10+: デフォルトで .slnx を作成
 dotnet new sln --name MySolution
 
-# .NET 9: Specify the format explicitly
+# .NET 9: 形式を明示的に指定
 dotnet new sln --name MySolution --format slnx
 
-# Add projects
+# プロジェクトを追加
 dotnet sln add src/MyApp/MyApp.csproj
 ```
 
-**Example .slnx file:**
+**.slnx ファイルの例:**
 
 ```xml
 <Solution>
@@ -101,31 +100,31 @@ dotnet sln add src/MyApp/MyApp.csproj
 </Solution>
 ```
 
-**Why .slnx**: No random GUIDs, clean XML diffs in pull requests, editable in any text editor. Starting with .NET 10, `dotnet new sln` creates `.slnx` by default.
+**なぜ .slnx か**: ランダムなGUIDがなく、プルリクエストでクリーンなXML差分が可能。任意のテキストエディタで編集可能。.NET 10 からは `dotnet new sln` がデフォルトで `.slnx` を生成します。
 
-⚠️ **Important**: Delete the old `.sln` after migration. Keeping both causes automatic solution detection issues.
+⚠️ **重要**: 移行後は古い `.sln` を削除してください。両方を残すとソリューション自動検出に問題が発生します。
 
-> **Values**: 温故知新（modern format replaces legacy conventions） / 基礎と型
+> **Values**: 温故知新（モダンな形式がレガシー規約を置き換える） / 基礎と型
 
-### Step 2 — Configure Directory.Build.props
+### Step 2 — Directory.Build.props の設定
 
-Use when centralizing build properties that apply to all projects in the solution tree.
+ソリューションツリー内のすべてのプロジェクトに適用されるビルドプロパティを集約するときに使用します。
 
-Place `Directory.Build.props` at the solution root. All projects inherit these settings automatically.
+`Directory.Build.props` をソリューションルートに配置します。すべてのプロジェクトがこれらの設定を自動的に継承します。
 
 ```xml
 <Project>
-  <!-- Metadata -->
+  <!-- メタデータ -->
   <PropertyGroup>
     <Authors>Your Team</Authors>
     <Company>Your Company</Company>
-    <!-- Dynamic copyright year — updates automatically at build time -->
+    <!-- 動的著作権年 — ビルド時に自動更新 -->
     <Copyright>Copyright © 2020-$([System.DateTime]::Now.Year) Your Company</Copyright>
     <RepositoryUrl>https://github.com/yourorg/yourrepo</RepositoryUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
-  <!-- C# Language Settings -->
+  <!-- C# 言語設定 -->
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -133,13 +132,13 @@ Place `Directory.Build.props` at the solution root. All projects inherit these s
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
-  <!-- Version Management -->
+  <!-- バージョン管理 -->
   <PropertyGroup>
     <VersionPrefix>1.0.0</VersionPrefix>
     <PackageReleaseNotes>See RELEASE_NOTES.md</PackageReleaseNotes>
   </PropertyGroup>
 
-  <!-- Reusable Target Framework Properties -->
+  <!-- 再利用可能なターゲットフレームワークプロパティ -->
   <PropertyGroup>
     <NetLibVersion>net8.0</NetLibVersion>
     <NetTestVersion>net9.0</NetTestVersion>
@@ -147,17 +146,17 @@ Place `Directory.Build.props` at the solution root. All projects inherit these s
 </Project>
 ```
 
-**Why reusable framework properties**: Define `<NetLibVersion>` once, reference `$(NetLibVersion)` in every `.csproj`. Upgrading target frameworks requires changing a single line.
+**再利用可能なフレームワークプロパティの理由**: `<NetLibVersion>` を一度定義し、すべての `.csproj` で `$(NetLibVersion)` を参照します。ターゲットフレームワークのアップグレードは1行の変更で完了します。
 
-**Why dynamic copyright**: `$([System.DateTime]::Now.Year)` inserts the current year at build time — no manual updates needed.
+**動的著作権の理由**: `$([System.DateTime]::Now.Year)` がビルド時に現在の年を挿入 — 手動更新は不要です。
 
-> **Values**: 基礎と型（centralize once, reference everywhere） / 成長の複利
+> **Values**: 基礎と型（一度集約し、どこからでも参照） / 成長の複利
 
-### Step 3 — Set Up Central Package Management
+### Step 3 — Central Package Management のセットアップ
 
-Use when consolidating all NuGet package versions into a single Directory.Packages.props file.
+すべての NuGet パッケージバージョンを単一の Directory.Packages.props ファイルに統合するときに使用します。
 
-Create `Directory.Packages.props` at the solution root:
+ソリューションルートに `Directory.Packages.props` を作成：
 
 ```xml
 <Project>
@@ -183,28 +182,28 @@ Create `Directory.Packages.props` at the solution root:
 </Project>
 ```
 
-**Consuming packages** — no version attribute needed in `.csproj`:
+**パッケージの使用** — `.csproj` にバージョン属性は不要：
 
 ```xml
-<!-- In MyApp.csproj -->
+<!-- MyApp.csproj 内 -->
 <ItemGroup>
   <PackageReference Include="Akka" />
   <PackageReference Include="Microsoft.Extensions.Hosting" />
 </ItemGroup>
 ```
 
-**Why CPM**: Eliminates version drift across projects, groups related packages with version variables, and makes dependency updates a single-line change.
+**なぜ CPM か**: プロジェクト間のバージョンドリフトを排除し、関連パッケージをバージョン変数でグループ化し、依存関係の更新を1行の変更にします。
 
-> **Values**: 基礎と型（single source of truth for versions） / ニュートラル
+> **Values**: 基礎と型（バージョンの単一の信頼できる情報源） / ニュートラル
 
-### Step 4 — Configure SourceLink
+### Step 4 — SourceLink の設定
 
-Use when enabling step-through debugging for published NuGet packages.
+公開 NuGet パッケージのステップスルーデバッグを有効にするときに使用します。
 
-Add SourceLink configuration to `Directory.Build.props`:
+`Directory.Build.props` に SourceLink 設定を追加：
 
 ```xml
-<!-- SourceLink Configuration -->
+<!-- SourceLink 設定 -->
 <PropertyGroup>
   <PublishRepositoryUrl>true</PublishRepositoryUrl>
   <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -213,13 +212,13 @@ Add SourceLink configuration to `Directory.Build.props`:
 </PropertyGroup>
 
 <ItemGroup>
-  <!-- Choose the provider matching your source control -->
+  <!-- ソースコントロールに合ったプロバイダーを選択 -->
   <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
-  <!-- Or: Microsoft.SourceLink.AzureRepos.Git -->
-  <!-- Or: Microsoft.SourceLink.GitLab -->
+  <!-- または: Microsoft.SourceLink.AzureRepos.Git -->
+  <!-- または: Microsoft.SourceLink.GitLab -->
 </ItemGroup>
 
-<!-- NuGet Package Assets -->
+<!-- NuGet パッケージアセット -->
 <ItemGroup>
   <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" />
 </ItemGroup>
@@ -229,15 +228,15 @@ Add SourceLink configuration to `Directory.Build.props`:
 </PropertyGroup>
 ```
 
-**Why SourceLink**: Consumers can step into your library source code during debugging without downloading the repository. Symbol packages (`.snupkg`) are automatically uploaded to NuGet.org.
+**なぜ SourceLink か**: 利用者がリポジトリをダウンロードせずにライブラリのソースコードにステップインしてデバッグできます。シンボルパッケージ（`.snupkg`）は NuGet.org に自動的にアップロードされます。
 
-> **Values**: 成長の複利（debugging experience compounds across consumers） / 基礎と型
+> **Values**: 成長の複利（デバッグ体験が利用者全体に複利的に波及） / 基礎と型
 
-### Step 5 — Set Up Version Management
+### Step 5 — バージョン管理のセットアップ
 
-Use when automating version bumps by parsing a RELEASE_NOTES.md file during the build process.
+ビルドプロセスで RELEASE_NOTES.md を解析してバージョン更新を自動化するときに使用します。
 
-**RELEASE_NOTES.md format:**
+**RELEASE_NOTES.md 形式:**
 
 ```markdown
 #### 1.2.0 January 15th 2025 ####
@@ -250,10 +249,10 @@ Use when automating version bumps by parsing a RELEASE_NOTES.md file during the 
 - Initial release
 ```
 
-**Build script** parses the latest version and updates `Directory.Build.props`:
+**ビルドスクリプト**が最新バージョンを解析し `Directory.Build.props` を更新：
 
 ```powershell
-# build.ps1 — parse release notes and update VersionPrefix
+# build.ps1 — リリースノートを解析してVersionPrefixを更新
 $content = Get-Content -Path "RELEASE_NOTES.md" -Raw
 $sections = $content -split "####"
 $version = ($sections[1].Trim() -split " ", 2)[0]
@@ -265,7 +264,7 @@ $xml.Save("Directory.Build.props")
 Write-Output "Updated to version $version"
 ```
 
-**CI/CD integration** (GitHub Actions):
+**CI/CD 統合**（GitHub Actions）:
 
 ```yaml
 - name: Update version
@@ -276,15 +275,15 @@ Write-Output "Updated to version $version"
   run: dotnet pack -c Release /p:PackageVersion=${{ github.ref_name }}
 ```
 
-**Why RELEASE_NOTES.md**: Human-readable changelog that doubles as the version source. Developers update one markdown file and the build script handles the rest.
+**なぜ RELEASE_NOTES.md か**: バージョンソースを兼ねる人間が読める変更履歴。開発者がMarkdownファイルを1つ更新すれば、ビルドスクリプトが残りを処理します。
 
-See `references/advanced-examples.md` for the full modular PowerShell scripts (`getReleaseNotes.ps1`, `bumpVersion.ps1`).
+完全なモジュール化された PowerShell スクリプト（`getReleaseNotes.ps1`、`bumpVersion.ps1`）は `references/advanced-examples.md` を参照してください。
 
-> **Values**: 継続は力（release notes accumulate project history） / 余白の設計
+> **Values**: 継続は力（リリースノートがプロジェクト履歴を蓄積） / 余白の設計
 
-### Step 6 — Pin SDK with global.json
+### Step 6 — global.json で SDK を固定
 
-Use when ensuring all developers and CI environments use the same .NET SDK version.
+すべての開発者と CI 環境が同じ .NET SDK バージョンを使用することを保証するときに使用します。
 
 ```json
 {
@@ -295,149 +294,147 @@ Use when ensuring all developers and CI environments use the same .NET SDK versi
 }
 ```
 
-**Roll forward policies:**
+**ロールフォワードポリシー:**
 
-| Policy | Behavior | Use Case |
-|--------|----------|----------|
-| `disable` | Exact version required | Strict reproducibility |
-| `patch` | Same major.minor, latest patch | Security fixes only |
-| `latestFeature` | Same major, latest feature band | ✅ Recommended default |
-| `major` | Latest SDK available | Not recommended |
+| ポリシー | 動作 | ユースケース |
+|----------|------|-------------|
+| `disable` | 正確なバージョンが必要 | 厳密な再現性 |
+| `patch` | 同じmajor.minor、最新パッチ | セキュリティ修正のみ |
+| `latestFeature` | 同じmajor、最新フィーチャーバンド | ✅ 推奨デフォルト |
+| `major` | 利用可能な最新SDK | 非推奨 |
 
-**Why `latestFeature`**: Allows automatic patch updates for security fixes while preventing breaking changes from major SDK upgrades.
+**なぜ `latestFeature` か**: メジャーSDKアップグレードによる破壊的変更を防ぎつつ、セキュリティ修正のための自動パッチ更新を許可します。
 
-> **Values**: 基礎と型（SDK pinning prevents environment drift） / ニュートラル
+> **Values**: 基礎と型（SDK固定が環境ドリフトを防止） / ニュートラル
 
 ---
 
 ## Good Practices
 
-### 1. Use Version Variables for Related Packages
+### 1. 関連パッケージにバージョン変数を使用
 
-**What**: Group related NuGet packages under a single version variable in `Directory.Packages.props`.
+**What**: `Directory.Packages.props` で関連する NuGet パッケージを単一のバージョン変数でグループ化します。
 
-**Why**: Prevents version mismatches between packages that must stay in sync (e.g., all Akka packages at the same version).
+**Why**: 同期を保つ必要があるパッケージ間のバージョン不一致を防ぎます（例：すべての Akka パッケージを同じバージョンに）。
 
-**Values**: 基礎と型（version consistency as a structural constraint）
+**Values**: 基礎と型（構造的制約としてのバージョン整合性）
 
-### 2. Clear Package Sources in NuGet.Config
+### 2. NuGet.Config でパッケージソースをクリア
 
-**What**: Use `<clear />` before defining package sources to remove inherited defaults.
+**What**: パッケージソースを定義する前に `<clear />` を使用して継承されたデフォルトを削除します。
 
-**Why**: Ensures reproducible restores regardless of machine-level NuGet configuration.
+**Why**: マシンレベルの NuGet 設定に関係なく、再現可能なリストアを保証します。
 
-**Values**: ニュートラル（environment-independent builds）
+**Values**: ニュートラル（環境に依存しないビルド）
 
-### 3. Define Reusable Target Framework Properties
+### 3. 再利用可能なターゲットフレームワークプロパティを定義
 
-**What**: Create properties like `<NetLibVersion>net8.0</NetLibVersion>` and reference `$(NetLibVersion)` in `.csproj` files.
+**What**: `<NetLibVersion>net8.0</NetLibVersion>` のようなプロパティを作成し、`.csproj` ファイルで `$(NetLibVersion)` を参照します。
 
-**Why**: Upgrading the target framework for all projects requires changing a single line in `Directory.Build.props`.
+**Why**: すべてのプロジェクトのターゲットフレームワークのアップグレードが `Directory.Build.props` の1行変更で済みます。
 
-**Values**: 成長の複利（one change propagates to all projects）
+**Values**: 成長の複利（1つの変更がすべてのプロジェクトに伝播）
 
 ---
 
 ## Common Pitfalls
 
-### 1. Keeping Both .sln and .slnx Files
+### 1. .sln と .slnx の両方を残す
 
-**Problem**: Both files exist in the repository after migration, causing tool confusion.
+**Problem**: 移行後にリポジトリに両方のファイルが存在し、ツールの混乱を招きます。
 
-**Solution**: Delete the old `.sln` file immediately after running `dotnet sln migrate`.
+**Solution**: `dotnet sln migrate` 実行後、直ちに古い `.sln` ファイルを削除してください。
 
 ```bash
-# ❌ WRONG — Both files coexist
-# MySolution.sln + MySolution.slnx in same directory
+# ❌ WRONG — 両方のファイルが共存
+# MySolution.sln + MySolution.slnx が同じディレクトリに
 
-# ✅ CORRECT — Only .slnx remains
+# ✅ CORRECT — .slnx のみが残る
 dotnet sln MySolution.sln migrate
 Remove-Item MySolution.sln
 ```
 
-### 2. Specifying Version in .csproj with CPM Enabled
+### 2. CPM 有効時に .csproj でバージョンを指定
 
-**Problem**: Adding `Version="x.y.z"` to `<PackageReference>` when Central Package Management is active causes build errors.
+**Problem**: Central Package Management が有効なときに `<PackageReference>` に `Version="x.y.z"` を追加するとビルドエラーになります。
 
-**Solution**: Remove the `Version` attribute from all `.csproj` `<PackageReference>` elements.
+**Solution**: すべての `.csproj` の `<PackageReference>` 要素から `Version` 属性を削除してください。
 
 ```xml
-<!-- ❌ WRONG — Version conflicts with CPM -->
+<!-- ❌ WRONG — バージョンが CPM と競合 -->
 <PackageReference Include="Akka" Version="1.5.35" />
 
-<!-- ✅ CORRECT — Version managed centrally -->
+<!-- ✅ CORRECT — バージョンは一元管理 -->
 <PackageReference Include="Akka" />
 ```
 
-### 3. Missing global.json in Repository Root
+### 3. リポジトリルートに global.json がない
 
-**Problem**: Different developers use different SDK versions, causing inconsistent build behavior.
+**Problem**: 異なる開発者が異なるSDKバージョンを使用し、ビルド動作が不整合になります。
 
-**Solution**: Always commit `global.json` at the repository root with a pinned SDK version and `rollForward` policy.
+**Solution**: 固定SDKバージョンと `rollForward` ポリシーを持つ `global.json` を常にリポジトリルートにコミットしてください。
 
 ---
 
 ## Anti-Patterns
 
-### Scattering Build Properties Across .csproj Files
+### ビルドプロパティを .csproj ファイルに分散
 
-**What**: Duplicating `<LangVersion>`, `<Nullable>`, and metadata in every `.csproj` file.
+**What**: `<LangVersion>`、`<Nullable>`、メタデータをすべての `.csproj` ファイルに複製。
 
-**Why It's Wrong**: Changes require editing every project file; properties drift apart over time; increases merge conflict surface.
+**Why It's Wrong**: 変更にすべてのプロジェクトファイルの編集が必要。プロパティが時間とともに乖離。マージコンフリクトの表面積が増加。
 
-**Better Approach**: Define shared properties once in `Directory.Build.props` at the solution root.
+**Better Approach**: ソリューションルートの `Directory.Build.props` で共有プロパティを一度だけ定義。
 
-### Hardcoding Version Numbers in Directory.Build.props
+### Directory.Build.props にバージョン番号をハードコーディング
 
-**What**: Manually editing `<VersionPrefix>` before every release instead of automating from RELEASE_NOTES.md.
+**What**: RELEASE_NOTES.md からの自動化ではなく、リリースごとに `<VersionPrefix>` を手動編集。
 
-**Why It's Wrong**: Error-prone, easy to forget, version and changelog can desynchronize.
+**Why It's Wrong**: エラーが起きやすく、忘れやすい。バージョンとチェンジログが非同期になる可能性。
 
-**Better Approach**: Use a build script that parses `RELEASE_NOTES.md` and updates `Directory.Build.props` automatically.
+**Better Approach**: `RELEASE_NOTES.md` を解析して `Directory.Build.props` を自動更新するビルドスクリプトを使用。
 
 ---
 
 ## Quick Reference
 
-### Project Structure Overview
+### プロジェクト構造概要
 
 ```
 MySolution/
-├── Directory.Build.props           # Centralized build config
-├── Directory.Packages.props        # Central package versions
-├── MySolution.slnx                 # Modern solution file
-├── global.json                     # SDK version pinning
-├── NuGet.Config                    # Package source config
-├── build.ps1                       # Build orchestration
-├── RELEASE_NOTES.md                # Version history
+├── Directory.Build.props           # 集約ビルド設定
+├── Directory.Packages.props        # 一元パッケージバージョン
+├── MySolution.slnx                 # モダンソリューションファイル
+├── global.json                     # SDKバージョン固定
+├── NuGet.Config                    # パッケージソース設定
+├── build.ps1                       # ビルドオーケストレーション
+├── RELEASE_NOTES.md                # バージョン履歴
 ├── src/
 │   └── MyApp/MyApp.csproj
 └── tests/
     └── MyApp.Tests/MyApp.Tests.csproj
 ```
 
-### File Decision Table
+### ファイル判断テーブル
 
-| File | Purpose | When to Create |
-|------|---------|----------------|
-| `MySolution.slnx` | Modern XML solution file | Always — replaces .sln |
-| `Directory.Build.props` | Shared build properties | Always — centralize metadata and settings |
-| `Directory.Packages.props` | Central NuGet versions | When ≥2 projects share packages |
-| `global.json` | SDK version pinning | Always — ensures reproducible builds |
-| `NuGet.Config` | Package source config | When using `<clear />` or private feeds |
-| `RELEASE_NOTES.md` | Version changelog | When publishing NuGet packages |
+| ファイル | 目的 | 作成タイミング |
+|----------|------|---------------|
+| `MySolution.slnx` | モダンXMLソリューションファイル | 常に — .sln を置き換え |
+| `Directory.Build.props` | 共有ビルドプロパティ | 常に — メタデータと設定を集約 |
+| `Directory.Packages.props` | 一元NuGetバージョン | 2つ以上のプロジェクトがパッケージ共有時 |
+| `global.json` | SDKバージョン固定 | 常に — 再現可能なビルドを保証 |
+| `NuGet.Config` | パッケージソース設定 | `<clear />` またはプライベートフィード使用時 |
+| `RELEASE_NOTES.md` | バージョン変更履歴 | NuGetパッケージ公開時 |
 
 ---
 
 ## Resources
 
-- [.slnx Format Documentation](https://learn.microsoft.com/en-us/visualstudio/ide/solution-file) — Modern solution format reference
-- [Central Package Management](https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management) — NuGet CPM documentation
-- [SourceLink](https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink) — Source debugging configuration
-- [global.json Overview](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json) — SDK version pinning reference
-- See `references/advanced-examples.md` for full PowerShell version management scripts and NuGet.Config templates
+- [.slnx 形式ドキュメント](https://learn.microsoft.com/ja-jp/visualstudio/ide/solution-file) — モダンソリューション形式リファレンス
+- [Central Package Management](https://learn.microsoft.com/ja-jp/nuget/consume-packages/central-package-management) — NuGet CPM ドキュメント
+- [SourceLink](https://learn.microsoft.com/ja-jp/dotnet/standard/library-guidance/sourcelink) — ソースデバッグ設定
+- [global.json 概要](https://learn.microsoft.com/ja-jp/dotnet/core/tools/global-json) — SDKバージョン固定リファレンス
+- 完全な PowerShell バージョン管理スクリプトと NuGet.Config テンプレートは `references/advanced-examples.md` を参照
 
-<!--
-Japanese version available at references/SKILL.ja.md
-日本語版は references/SKILL.ja.md を参照してください
--->
+<!-- 英語版は ../SKILL.md を参照してください -->
+

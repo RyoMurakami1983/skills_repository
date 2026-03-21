@@ -1,35 +1,34 @@
 ---
 name: dotnet-wpf-ocr-parameter-input
-description: Build an OCR execution parameter input UI tab in WPF with progress display. Use when: adding OCR processing tabs with configurable input fields.
+description: こんなときに使う: WPFにOCR実行パラメータ入力UIタブを構築。進捗表示付き。OCR処理タブに設定可能な入力フィールドを追加する際に使用。
 license: MIT
 metadata:
   author: RyoMurakami1983
   tags: [dotnet, wpf, csharp, mvvm, ocr, progress, tab]
   invocable: false
 ---
+# OCR実行パラメータ入力タブの構築（進捗表示付き）
 
-# Build OCR Execution Parameter Input Tab with Progress Display
+.NET WPFアプリケーションにOCR実行パラメータ入力UIタブを追加するエンドツーエンドワークフロー：設定可能な入力フィールド（ComboBox、TextBox、CheckBox）、`IProgress<T>`による非同期OCR実行、リアルタイム進捗バーとログ表示、イベントベースの結果ハンドオフ（親ViewModelへの受け渡し）。
 
-End-to-end workflow for adding an OCR execution parameter input UI tab to .NET WPF applications: configurable input fields (ComboBox, TextBox, CheckBox), async OCR execution with `IProgress<T>`, real-time progress bar and log display, and event-based result handoff to parent ViewModel.
+## こんなときに使う
 
-## When to Use This Skill
-
-Use this skill when:
-- Adding an OCR processing tab with user-configurable input parameters
-- Building a progress display (bar + log) for long-running OCR operations
-- Creating a tab UI that collects selection fields, text fields, and toggles before execution
-- Implementing async OCR execution with real-time progress reporting
-- Wiring OCR completion events to parent ViewModels for result handling
+以下の場合にこのスキルを使用してください：
+- ユーザー設定可能な入力パラメータ付きOCR処理タブを追加するとき
+- 長時間実行されるOCR処理に進捗表示（バー＋ログ）を構築するとき
+- 実行前に選択フィールド、テキストフィールド、トグルを収集するタブUIを作成するとき
+- リアルタイム進捗レポート付きの非同期OCR実行を実装するとき
+- OCR完了イベントを親ViewModelに接続して結果を処理するとき
 
 ---
 
 ## Related Skills
 
-- **`dotnet-wpf-pdf-preview`** — PDF upload and WebView2 preview (provides the PDF path input)
-- **`dotnet-wpf-dify-api-integration`** — Dify API integration for OCR extraction backend
-- **`dotnet-oracle-wpf-integration`** — Store OCR results in Oracle database
-- **`dotnet-wpf-comparison-view`** — Display OCR results alongside original PDF for comparison
-- **`git-commit-practices`** — Commit each step as an atomic change
+- **`dotnet-wpf-pdf-preview`** — PDFアップロードとWebView2プレビュー（PDFパス入力を提供）
+- **`dotnet-wpf-dify-api-integration`** — OCR抽出バックエンド用Dify API連携
+- **`dotnet-oracle-wpf-integration`** — OCR結果をOracleデータベースに保存
+- **`dotnet-wpf-comparison-view`** — OCR結果を元のPDFと並べて比較表示
+- **`git-commit-practices`** — 各ステップをアトミックな変更としてコミット
 
 ---
 
@@ -37,34 +36,34 @@ Use this skill when:
 
 - .NET + WPF (Windows Presentation Foundation)
 - `CommunityToolkit.Mvvm` (ObservableObject, `[ObservableProperty]`, `[RelayCommand]`)
-- An OCR execution use case interface (e.g., `IOcrUseCase`) and an OCR backend (Dify, etc.)
+- OCR実行ユースケースインターフェース（例：`IOcrUseCase`）とOCRバックエンド（Dify等）
 
 ---
 
 ## Core Principles
 
-1. **Ask First, Build Second** — Input fields vary per use case; always ask the user what fields they need before generating code (ニュートラル)
-2. **MVVM Discipline** — ViewModel owns all input state and OCR execution logic; View is purely declarative XAML (基礎と型)
-3. **Async Progress Reporting** — Use `IProgress<T>` for thread-safe progress updates from async OCR operations (継続は力)
-4. **Event-Based Handoff** — OCR results flow to parent ViewModel via events, not direct coupling (ニュートラル)
-5. **Reusable Skeleton** — The tab pattern (input → progress → result) applies to any long-running process, not just OCR (成長の複利)
+1. **まず聞く、次に作る** — 入力フィールドはユースケースごとに異なるため、コード生成前に必ずユーザーに必要なフィールドを確認する（ニュートラル）
+2. **MVVM規律** — ViewModelがすべての入力状態とOCR実行ロジックを所有し、Viewは純粋な宣言的XAML（基礎と型）
+3. **非同期進捗レポート** — 非同期OCR操作からのスレッドセーフな進捗更新に`IProgress<T>`を使用（継続は力）
+4. **イベントベースのハンドオフ** — OCR結果は直接結合ではなくイベント経由で親ViewModelに流れる（ニュートラル）
+5. **再利用可能なスケルトン** — タブパターン（入力→進捗→結果）はOCRだけでなく、あらゆる長時間処理に適用可能（成長の複利）
 
 ---
 
 ## Workflow: Add OCR Parameter Input Tab to WPF
 
-### Step 1 — Define Input Field Requirements
+### Step 1 — 入力フィールド要件の定義
 
-Use when determining what input fields the OCR tab needs before writing any code.
+コード作成前にOCRタブに必要な入力フィールドを決定するときに使用します。
 
-⚠️ **Ask the user** what input fields they need. The specific fields vary per use case — do not assume. Gather requirements first, then generate code.
+⚠️ **ユーザーに確認してください** — 必要な入力フィールドを確認します。具体的なフィールドはユースケースにより異なるため、仮定しないでください。まず要件を収集し、それからコードを生成します。
 
-**Common field types**:
-- **Selection fields** (ComboBox) — e.g., classification categories, document types
-- **Text fields** (TextBox) — e.g., additional instructions, remarks, reference numbers
-- **Toggle fields** (CheckBox) — e.g., domestic/export selection, priority flags
+**一般的なフィールドタイプ**：
+- **選択フィールド**（ComboBox） — 例：分類カテゴリ、ドキュメントタイプ
+- **テキストフィールド**（TextBox） — 例：追加指示、備考、参照番号
+- **トグルフィールド**（CheckBox） — 例：国内/輸出選択、優先フラグ
 
-**Field definition template**:
+**フィールド定義テンプレート**：
 
 ```csharp
 public class OcrInputField
@@ -75,94 +74,209 @@ public class OcrInputField
 }
 ```
 
-**Example requirements gathering**:
+**要件収集の例**：
 
-| Field Name | Type | Options | Required |
-|-----------|------|---------|----------|
-| Category | ComboBox | Ask user | ✅ |
-| Document Type | ComboBox | Ask user | ✅ |
-| Remarks | TextBox | Free-form | ❌ |
-| Export Flag | CheckBox | On/Off | ❌ |
+| フィールド名 | タイプ | オプション | 必須 |
+|-------------|--------|-----------|------|
+| カテゴリ | ComboBox | ユーザーに確認 | ✅ |
+| ドキュメントタイプ | ComboBox | ユーザーに確認 | ✅ |
+| 備考 | TextBox | 自由入力 | ❌ |
+| 輸出フラグ | CheckBox | オン/オフ | ❌ |
 
 ```
 YourApp/
 ├── Views/
-│   └── OcrProcessTabView.xaml          # 🆕 Tab UI with input fields + progress
-│   └── OcrProcessTabView.xaml.cs       # 🆕 Minimal code-behind
+│   └── OcrProcessTabView.xaml          # 🆕 入力フィールド＋進捗付きタブUI
+│   └── OcrProcessTabView.xaml.cs       # 🆕 最小限のcode-behind
 ├── ViewModels/
-│   └── OcrProcessTabViewModel.cs       # 🆕 Input state + OCR execution + progress
+│   └── OcrProcessTabViewModel.cs       # 🆕 入力状態＋OCR実行＋進捗
 └── Models/
-    └── ProgressLogItem.cs              # 🆕 Progress log entry model
+    └── ProgressLogItem.cs              # 🆕 進捗ログエントリモデル
 ```
 
 > **Values**: ニュートラル / 基礎と型
 
-### Step 2 — Create Tab ViewModel
+### Step 2 — タブViewModelの作成
 
-Use when implementing the ViewModel that manages input fields, OCR execution, and progress tracking.
+入力フィールド、OCR実行、進捗追跡を管理するViewModelを実装するときに使用します。
 
-Create `OcrProcessTabViewModel` with `CommunityToolkit.Mvvm`. Input field properties should be customized per use case (Step 1 results). Progress tracking and OCR execution follow a fixed pattern.
+`CommunityToolkit.Mvvm`を使用して`OcrProcessTabViewModel`を作成します。入力フィールドのプロパティはユースケースごとにカスタマイズします（Step 1の結果）。進捗追跡とOCR実行は固定パターンに従います。
 
 ```csharp
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
-namespace YourApp.ViewModels;
-
-public partial class OcrProcessTabViewModel : ObservableObject
+namespace YourApp.ViewModels
 {
-    [ObservableProperty] private bool canStartOcr;
-    [ObservableProperty] private int progressValue;
-
-    public event EventHandler<IEnumerable<object>>? OcrCompleted;
-
-    [RelayCommand(CanExecute = nameof(CanStartOcr))]
-    private async Task StartOcrAsync()
+    public partial class OcrProcessTabViewModel : ObservableObject
     {
-        // Collect inputs → call use case → report progress → raise OcrCompleted.
-    }
+        private readonly IOcrUseCase _useCase;
 
-    public void OnPdfUploaded(string pdfPath)
-    {
-        CanStartOcr = !string.IsNullOrWhiteSpace(pdfPath);
-        StartOcrCommand.NotifyCanExecuteChanged();
+        // --- Input fields (customize per use case from Step 1) ---
+        [ObservableProperty] private string selectedCategory = "";
+        [ObservableProperty] private string selectedType = "";
+        [ObservableProperty] private string remarks = "";
+
+        // --- Progress tracking (fixed pattern) ---
+        [ObservableProperty] private int progressValue;
+        [ObservableProperty] private string progressMessage = "";
+        [ObservableProperty] private bool isProcessing;
+        [ObservableProperty] private bool canStartOcr;
+
+        // --- Collections ---
+        public ObservableCollection<string> CategoryItems { get; } = new();
+        public ObservableCollection<string> TypeItems { get; } = new();
+        public ObservableCollection<ProgressLogItem> ProgressItems { get; } = new();
+
+        /// <summary>
+        /// Raised when OCR completes. Parent ViewModel subscribes to handle results.
+        /// </summary>
+        public event EventHandler<IEnumerable<object>>? OcrCompleted;
+
+        public OcrProcessTabViewModel(IOcrUseCase useCase)
+            => _useCase = useCase;
+
+        [RelayCommand(CanExecute = nameof(CanStartOcr))]
+        private async Task StartOcrAsync()
+        {
+            IsProcessing = true;
+            ProgressValue = 0;
+            ProgressItems.Clear();
+
+            var progress = new Progress<(int percent, string message)>(p =>
+            {
+                ProgressValue = p.percent;
+                ProgressMessage = p.message;
+                ProgressItems.Add(new ProgressLogItem(DateTime.Now, "🔄", p.message, "Running"));
+            });
+
+            try
+            {
+                var results = await _useCase.ExecuteAsync(/* params */, progress);
+                ProgressItems.Add(new ProgressLogItem(DateTime.Now, "✅", "OCR completed", "Done"));
+                ProgressValue = 100;
+                OcrCompleted?.Invoke(this, results);
+            }
+            catch (Exception ex)
+            {
+                ProgressItems.Add(new ProgressLogItem(DateTime.Now, "❌", ex.Message, "Error"));
+            }
+            finally
+            {
+                IsProcessing = false;
+            }
+        }
+
+        /// <summary>
+        /// Called by parent ViewModel when a PDF is uploaded.
+        /// Enables the Start button.
+        /// </summary>
+        public void OnPdfUploaded(string pdfPath)
+        {
+            CanStartOcr = true;
+            StartOcrCommand.NotifyCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Resets all progress state for re-execution.
+        /// </summary>
+        public void Reset()
+        {
+            ProgressItems.Clear();
+            ProgressValue = 0;
+            ProgressMessage = "";
+            CanStartOcr = false;
+            StartOcrCommand.NotifyCanExecuteChanged();
+        }
     }
 }
 ```
 
-Full example: `references/OcrProcessTabViewModel.full.md`
-
-**Why `CanExecute` on the command**: The Start button is disabled until a PDF is uploaded. `NotifyCanExecuteChanged()` refreshes the button state when `CanStartOcr` changes.
+**`CanExecute`をコマンドに使用する理由**: PDFがアップロードされるまでStartボタンは無効化されます。`CanStartOcr`が変更されたとき、`NotifyCanExecuteChanged()`がボタンの状態を更新します。
 
 > **Values**: 基礎と型 / 継続は力
 
-### Step 3 — Build XAML Tab View
+### Step 3 — XAMLタブViewの構築
 
-Use when creating the tab UI with input fields, progress bar, progress log, and Start button.
+入力フィールド、進捗バー、進捗ログ、Startボタンを持つタブUIを作成するときに使用します。
 
-Tab layout uses a 4-row Grid: input fields section, progress bar with percentage overlay, scrollable progress log (ListView with GridView columns), and a Start button that enables after PDF upload.
+タブレイアウトは4行Gridを使用：入力フィールドセクション、パーセンテージオーバーレイ付き進捗バー、スクロール可能な進捗ログ（GridViewカラム付きListView）、PDFアップロード後に有効化されるStartボタン。
 
 ```xml
 <UserControl x:Class="YourApp.Views.OcrProcessTabView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
-        <!-- Inputs → Progress bar → Log list → Start button -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- Input Fields -->
+            <RowDefinition Height="Auto"/>  <!-- Progress Bar -->
+            <RowDefinition Height="*"/>     <!-- Progress Log -->
+            <RowDefinition Height="Auto"/>  <!-- Start Button -->
+        </Grid.RowDefinitions>
+
+        <!-- Input Fields (customize per use case) -->
+        <StackPanel Grid.Row="0" Margin="10">
+            <TextBlock Text="Category" FontWeight="Bold"/>
+            <ComboBox ItemsSource="{Binding CategoryItems}"
+                      SelectedItem="{Binding SelectedCategory}"
+                      Margin="0,4,0,10"/>
+
+            <TextBlock Text="Document Type" FontWeight="Bold"/>
+            <ComboBox ItemsSource="{Binding TypeItems}"
+                      SelectedItem="{Binding SelectedType}"
+                      Margin="0,4,0,10"/>
+
+            <TextBlock Text="Remarks" FontWeight="Bold"/>
+            <TextBox Text="{Binding Remarks, UpdateSourceTrigger=PropertyChanged}"
+                     AcceptsReturn="True" Height="60"
+                     Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Progress Bar with Percentage Overlay -->
+        <Grid Grid.Row="1" Margin="10,5">
+            <ProgressBar Value="{Binding ProgressValue}" Maximum="100" Height="20"/>
+            <TextBlock Text="{Binding ProgressValue, StringFormat='{}{0}%'}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       FontWeight="Bold"/>
+        </Grid>
+
+        <!-- Progress Log -->
+        <ListView Grid.Row="2" ItemsSource="{Binding ProgressItems}" Margin="10,5">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Time" Width="80"
+                        DisplayMemberBinding="{Binding Timestamp, StringFormat='{}{0:HH:mm:ss}'}"/>
+                    <GridViewColumn Header="" Width="30"
+                        DisplayMemberBinding="{Binding Icon}"/>
+                    <GridViewColumn Header="Message" Width="200"
+                        DisplayMemberBinding="{Binding Message}"/>
+                    <GridViewColumn Header="Status" Width="80"
+                        DisplayMemberBinding="{Binding Status}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <!-- Start Button (enabled after PDF upload) -->
+        <Button Grid.Row="3" Content="Start OCR"
+                Command="{Binding StartOcrCommand}"
+                Background="#4CAF50" Foreground="White" FontWeight="Bold"
+                Margin="10" Padding="15,8" FontSize="14"/>
     </Grid>
 </UserControl>
 ```
 
-Full example: `references/OcrProcessTabView.full.md`
-
-**Why UserControl, not Window**: Tabs are embedded in a parent `TabControl`. `UserControl` integrates naturally; `Window` would require separate window management.
+**WindowではなくUserControlを使用する理由**: タブは親の`TabControl`に埋め込まれます。`UserControl`は自然に統合されますが、`Window`は別ウィンドウ管理が必要になります。
 
 > **Values**: 基礎と型 / ニュートラル
 
-### Step 4 — Create Progress Log Item Model
+### Step 4 — 進捗ログアイテムモデルの作成
 
-Use when defining the data model for individual progress log entries displayed in the ListView.
+ListViewに表示される個々の進捗ログエントリのデータモデルを定義するときに使用します。
 
-Create a simple immutable model for each row in the progress log. The constructor enforces all fields are set on creation.
+進捗ログの各行に対するシンプルなイミュータブルモデルを作成します。コンストラクタにより、作成時にすべてのフィールドが設定されることを保証します。
 
 ```csharp
 namespace YourApp.Models
@@ -185,31 +299,31 @@ namespace YourApp.Models
 }
 ```
 
-**Icon conventions**:
+**アイコン規約**：
 
-| Icon | Meaning |
-|------|---------|
-| 🔄 | Processing / in progress |
-| ✅ | Completed successfully |
-| ❌ | Error occurred |
-| ⚠️ | Warning |
+| アイコン | 意味 |
+|---------|------|
+| 🔄 | 処理中 / 進行中 |
+| ✅ | 正常完了 |
+| ❌ | エラー発生 |
+| ⚠️ | 警告 |
 
 > **Values**: 基礎と型 / 成長の複利
 
-### Step 5 — Wire Events and Tab Integration
+### Step 5 — イベント接続とタブ統合
 
-Use when connecting the OCR tab to the parent ViewModel and integrating into a `TabControl`.
+OCRタブを親ViewModelに接続し、`TabControl`に統合するときに使用します。
 
-The parent ViewModel creates the tab ViewModel, subscribes to `OcrCompleted`, and manages tab switching. PDF upload events flow from the parent to the OCR tab via `OnPdfUploaded`.
+親ViewModelがタブViewModelを作成し、`OcrCompleted`をサブスクライブしてタブ切り替えを管理します。PDFアップロードイベントは`OnPdfUploaded`経由で親からOCRタブに流れます。
 
-**Parent ViewModel wiring** — subscribe to `OcrCompleted` and call `OnPdfUploaded`:
+**親ViewModelの接続** — `OcrCompleted`をサブスクライブし、`OnPdfUploaded`を呼び出す：
 
 ```csharp
 OcrTab = new OcrProcessTabViewModel(useCase);
 OcrTab.OcrCompleted += OnOcrCompleted;
 ```
 
-**Event flow**:
+**イベントフロー**：
 
 ```
 PDF Upload → Parent.NotifyPdfUploaded() → OcrTab.OnPdfUploaded()
@@ -219,25 +333,25 @@ User clicks Start → OcrTab.StartOcrAsync() → IProgress updates UI
 OcrTab.OcrCompleted event → Parent.OnOcrCompleted() → Switch to results tab
 ```
 
-Full wiring examples (Parent ViewModel, TabControl, State Reset): [`references/detailed-patterns.md`](references/detailed-patterns.md)
+完全な接続例（親ViewModel、TabControl、状態リセット）: [`references/detailed-patterns.md`](../references/detailed-patterns.md)
 
 > **Values**: ニュートラル / 継続は力
 
-### Step 6 — Customize Input Fields
+### Step 6 — 入力フィールドのカスタマイズ
 
-Use when adapting the generated skeleton to the specific use case requirements gathered in Step 1.
+Step 1で収集した具体的なユースケース要件に合わせて、生成されたスケルトンを適用するときに使用します。
 
-⚠️ **Replace placeholder fields** with the actual fields identified in Step 1. This table guides the customization:
+⚠️ **プレースホルダーフィールドを置換してください** — Step 1で特定した実際のフィールドに置き換えます。以下の表がカスタマイズのガイドです：
 
-| Customization | File | What to Change |
-|--------------|------|----------------|
-| Input field properties | `OcrProcessTabViewModel.cs` | Add/remove `[ObservableProperty]` fields |
-| ComboBox options | `OcrProcessTabViewModel.cs` | Populate `ObservableCollection` items |
-| XAML input section | `OcrProcessTabView.xaml` | Add/remove ComboBox, TextBox, CheckBox controls |
-| Use case parameters | `StartOcrAsync()` | Pass correct input values to `_useCase.ExecuteAsync()` |
-| Validation rules | `OcrProcessTabViewModel.cs` | Add field validation before OCR execution |
+| カスタマイズ項目 | ファイル | 変更内容 |
+|----------------|---------|---------|
+| 入力フィールドプロパティ | `OcrProcessTabViewModel.cs` | `[ObservableProperty]`フィールドの追加/削除 |
+| ComboBoxオプション | `OcrProcessTabViewModel.cs` | `ObservableCollection`アイテムの設定 |
+| XAML入力セクション | `OcrProcessTabView.xaml` | ComboBox、TextBox、CheckBoxコントロールの追加/削除 |
+| ユースケースパラメータ | `StartOcrAsync()` | `_useCase.ExecuteAsync()`に正しい入力値を渡す |
+| バリデーションルール | `OcrProcessTabViewModel.cs` | OCR実行前のフィールドバリデーション追加 |
 
-**Adding a CheckBox toggle field**:
+**CheckBoxトグルフィールドの追加**：
 
 ```csharp
 // ViewModel
@@ -249,7 +363,7 @@ Use when adapting the generated skeleton to the specific use case requirements g
 <CheckBox Content="Export" IsChecked="{Binding IsExport}" Margin="0,10,0,0"/>
 ```
 
-**Adding a required field validation**:
+**必須フィールドバリデーションの追加**：
 
 ```csharp
 [RelayCommand(CanExecute = nameof(CanStartOcr))]
@@ -271,19 +385,19 @@ private async Task StartOcrAsync()
 
 ## Good Practices
 
-### 1. Use IProgress\<T\> for Async Progress Reporting
+### 1. 非同期進捗レポートにIProgress\<T\>を使用
 
-**What**: Pass `IProgress<(int percent, string message)>` to the use case for thread-safe progress callbacks.
+**What**: スレッドセーフな進捗コールバックのために`IProgress<(int percent, string message)>`をユースケースに渡します。
 
-**Why**: `IProgress<T>` captures the `SynchronizationContext` at creation time and dispatches callbacks to the UI thread automatically. No manual `Dispatcher.Invoke` needed.
+**Why**: `IProgress<T>`は作成時に`SynchronizationContext`をキャプチャし、UIスレッドへのコールバックディスパッチを自動的に行います。手動の`Dispatcher.Invoke`は不要です。
 
 **Values**: 継続は力（非同期の型を正しく使う）
 
-### 2. Dispatch Progress Updates to UI Thread
+### 2. 進捗更新をUIスレッドにディスパッチ
 
-**What**: Create the `Progress<T>` instance on the UI thread so callbacks marshal back automatically.
+**What**: コールバックが自動的にマーシャリングされるよう、UIスレッド上で`Progress<T>`インスタンスを作成します。
 
-**Why**: If `Progress<T>` is created on a background thread, callbacks execute on that thread and throw when updating `ObservableCollection`.
+**Why**: `Progress<T>`がバックグラウンドスレッドで作成されると、コールバックはそのスレッドで実行され、`ObservableCollection`の更新時に例外をスローします。
 
 ```csharp
 // ✅ CORRECT — Created on UI thread, callbacks auto-dispatch
@@ -302,19 +416,19 @@ await Task.Run(() =>
 
 **Values**: 基礎と型（スレッド安全の型）
 
-### 3. Disable Start Button During Processing
+### 3. 処理中はStartボタンを無効化
 
-**What**: Set `IsProcessing = true` at the start and use `CanExecute` to prevent duplicate execution.
+**What**: 開始時に`IsProcessing = true`を設定し、`CanExecute`で重複実行を防止します。
 
-**Why**: Double-clicking Start during OCR execution can launch parallel processes, corrupt results, and confuse progress display.
+**Why**: OCR実行中にStartをダブルクリックすると、並列プロセスが起動し、結果が破損し、進捗表示が混乱する可能性があります。
 
 **Values**: ニュートラル（安全なUI操作）
 
-### 4. Reset State for Re-execution
+### 4. 再実行のための状態リセット
 
-**What**: Clear `ProgressItems`, reset `ProgressValue`, and update `CanStartOcr` when a new PDF is uploaded.
+**What**: 新しいPDFがアップロードされたときに`ProgressItems`をクリアし、`ProgressValue`をリセットし、`CanStartOcr`を更新します。
 
-**Why**: Stale progress from a previous run misleads users. Clean state ensures each execution starts fresh.
+**Why**: 前回実行の古い進捗がユーザーを誤解させます。クリーンな状態により、各実行が新鮮な状態で開始されます。
 
 **Values**: 継続は力（再実行の信頼性）
 
@@ -322,11 +436,11 @@ await Task.Run(() =>
 
 ## Common Pitfalls
 
-### 1. Not Dispatching to UI Thread from Async Callback
+### 1. 非同期コールバックからUIスレッドにディスパッチしない
 
-**Problem**: Updating `ObservableCollection` or `ObservableProperty` from a background thread throws `InvalidOperationException`.
+**Problem**: バックグラウンドスレッドから`ObservableCollection`や`ObservableProperty`を更新すると`InvalidOperationException`がスローされます。
 
-**Solution**: Create `Progress<T>` on the UI thread (before `await`). The `IProgress<T>.Report()` call from the background thread will automatically dispatch to the captured `SynchronizationContext`.
+**Solution**: `Progress<T>`をUIスレッド上（`await`の前）で作成します。バックグラウンドスレッドからの`IProgress<T>.Report()`呼び出しは、キャプチャされた`SynchronizationContext`に自動的にディスパッチされます。
 
 ```csharp
 // ❌ WRONG — Direct collection update from background thread
@@ -343,11 +457,11 @@ var progress = new Progress<(int percent, string message)>(p =>
 await _useCase.ExecuteAsync(progress); // Reports from background thread safely
 ```
 
-### 2. Forgetting to Re-enable Start Button After Completion
+### 2. 完了後にStartボタンを再有効化し忘れ
 
-**Problem**: `IsProcessing` set to `true` but never reset on exception, permanently disabling the Start button.
+**Problem**: `IsProcessing`が`true`に設定されたまま例外時にリセットされず、Startボタンが永久に無効化されます。
 
-**Solution**: Always reset `IsProcessing` in a `finally` block.
+**Solution**: 常に`finally`ブロックで`IsProcessing`をリセットします。
 
 ```csharp
 // ❌ WRONG — IsProcessing stuck on exception
@@ -360,11 +474,11 @@ try { var results = await _useCase.ExecuteAsync(progress); }
 finally { IsProcessing = false; }
 ```
 
-### 3. Not Clearing Progress Log on Re-execution
+### 3. 再実行時に進捗ログをクリアしない
 
-**Problem**: Previous run's log entries mix with the new run, confusing the user.
+**Problem**: 前回実行のログエントリが新しい実行と混在し、ユーザーが混乱します。
 
-**Solution**: Call `ProgressItems.Clear()` and `ProgressValue = 0` at the start of every execution.
+**Solution**: 実行開始時に毎回`ProgressItems.Clear()`と`ProgressValue = 0`を呼び出します。
 
 ```csharp
 [RelayCommand(CanExecute = nameof(CanStartOcr))]
@@ -381,13 +495,13 @@ private async Task StartOcrAsync()
 
 ## Anti-Patterns
 
-### Blocking UI Thread with Synchronous Processing
+### 同期処理によるUIスレッドのブロック
 
-**What**: Calling `.Wait()` or `.Result` on async OCR operations from the UI thread.
+**What**: UIスレッドから非同期OCR操作に対して`.Wait()`や`.Result`を呼び出すこと。
 
-**Why It's Wrong**: Blocks the UI thread, freezes the window, prevents progress bar updates, and can cause deadlocks with `SynchronizationContext`.
+**Why It's Wrong**: UIスレッドをブロックし、ウィンドウがフリーズし、進捗バーの更新が妨げられ、`SynchronizationContext`でデッドロックを引き起こす可能性があります。
 
-**Better Approach**: Use `async Task` with `await` throughout. The `[RelayCommand]` attribute generates an `IAsyncRelayCommand` that handles async execution correctly.
+**Better Approach**: 全体を通して`async Task`と`await`を使用します。`[RelayCommand]`属性は非同期実行を正しく処理する`IAsyncRelayCommand`を生成します。
 
 ```csharp
 // ❌ WRONG — Blocks UI, no progress updates
@@ -405,75 +519,74 @@ private async Task StartOcrAsync()
 }
 ```
 
-### Hardcoding Input Fields Instead of Making Them Configurable
+### 入力フィールドを設定可能にせずハードコード
 
-**What**: Embedding specific field names and options directly in the ViewModel without asking the user.
+**What**: ユーザーに確認せずに、特定のフィールド名とオプションをViewModelに直接埋め込むこと。
 
-**Why It's Wrong**: Every use case has different input requirements. Hardcoded fields force users to refactor the entire tab when requirements change.
+**Why It's Wrong**: ユースケースごとに入力要件が異なります。ハードコードされたフィールドは、要件変更時にタブ全体のリファクタリングを強制します。
 
-**Better Approach**: Follow Step 1 — ask the user what fields they need. Generate the ViewModel and XAML from their requirements. Provide the skeleton pattern, not a rigid implementation.
+**Better Approach**: Step 1に従い、ユーザーに必要なフィールドを確認します。ユーザーの要件からViewModelとXAMLを生成します。硬直的な実装ではなく、スケルトンパターンを提供してください。
 
 ---
 
 ## Quick Reference
 
-### Implementation Checklist
+### 実装チェックリスト
 
-- [ ] Ask user what input fields they need (Step 1)
-- [ ] Create `ProgressLogItem` model class (Step 4)
-- [ ] Create `OcrProcessTabViewModel` with input fields + progress (Step 2)
-- [ ] Create `OcrProcessTabView.xaml` with 4-row Grid layout (Step 3)
-- [ ] Wire `OcrCompleted` event in parent ViewModel (Step 5)
-- [ ] Integrate tab into `TabControl` (Step 5)
-- [ ] Wire `OnPdfUploaded` from parent PDF upload flow (Step 5)
-- [ ] Customize input fields per use case (Step 6)
-- [ ] Test: Start button disabled until PDF uploaded
-- [ ] Test: progress bar updates during OCR execution
-- [ ] Test: progress log shows timestamped entries
-- [ ] Test: Start button disabled during processing
-- [ ] Test: re-upload clears previous progress
+- [ ] ユーザーに必要な入力フィールドを確認（Step 1）
+- [ ] `ProgressLogItem`モデルクラスを作成（Step 4）
+- [ ] 入力フィールド＋進捗付き`OcrProcessTabViewModel`を作成（Step 2）
+- [ ] 4行Gridレイアウトの`OcrProcessTabView.xaml`を作成（Step 3）
+- [ ] 親ViewModelで`OcrCompleted`イベントを接続（Step 5）
+- [ ] タブを`TabControl`に統合（Step 5）
+- [ ] 親のPDFアップロードフローから`OnPdfUploaded`を接続（Step 5）
+- [ ] ユースケースに合わせて入力フィールドをカスタマイズ（Step 6）
+- [ ] テスト: PDFアップロードまでStartボタンが無効
+- [ ] テスト: OCR実行中に進捗バーが更新される
+- [ ] テスト: 進捗ログにタイムスタンプ付きエントリが表示される
+- [ ] テスト: 処理中はStartボタンが無効
+- [ ] テスト: 再アップロードで前回の進捗がクリアされる
 
-### File Structure
+### ファイル構造
 
-| File | Purpose | Layer |
-|------|---------|-------|
-| `OcrProcessTabView.xaml` | Tab UI with input fields + progress display | View |
-| `OcrProcessTabView.xaml.cs` | Minimal code-behind | View (code-behind) |
-| `OcrProcessTabViewModel.cs` | Input state + OCR execution + progress | ViewModel |
-| `ProgressLogItem.cs` | Progress log entry model | Model |
+| ファイル | 目的 | レイヤー |
+|---------|------|---------|
+| `OcrProcessTabView.xaml` | 入力フィールド＋進捗表示付きタブUI | View |
+| `OcrProcessTabView.xaml.cs` | 最小限のcode-behind | View (code-behind) |
+| `OcrProcessTabViewModel.cs` | 入力状態＋OCR実行＋進捗 | ViewModel |
+| `ProgressLogItem.cs` | 進捗ログエントリモデル | Model |
 
-### Progress Icon Reference
+### 進捗アイコンリファレンス
 
-| Icon | Usage | When |
-|------|-------|------|
-| 🔄 | In progress | Each progress callback |
-| ✅ | Success | OCR completed |
-| ❌ | Error | Exception caught |
-| ⚠️ | Warning | Validation failure |
+| アイコン | 用途 | タイミング |
+|---------|------|-----------|
+| 🔄 | 進行中 | 各進捗コールバック |
+| ✅ | 成功 | OCR完了 |
+| ❌ | エラー | 例外キャッチ |
+| ⚠️ | 警告 | バリデーション失敗 |
 
 ---
 
 ## Resources
 
-- **`dotnet-wpf-pdf-preview`** — PDF upload that feeds into this tab
-- **`dotnet-wpf-dify-api-integration`** — Dify API backend for OCR execution
-- [CommunityToolkit.Mvvm Documentation](https://learn.microsoft.com/dotnet/communitytoolkit/mvvm/)
-- [IProgress\<T\> Pattern](https://learn.microsoft.com/dotnet/api/system.progress-1)
-- [WPF TabControl](https://learn.microsoft.com/dotnet/desktop/wpf/controls/tabcontrol)
+- **`dotnet-wpf-pdf-preview`** — このタブに入力を提供するPDFアップロード
+- **`dotnet-wpf-dify-api-integration`** — OCR実行用Dify APIバックエンド
+- [CommunityToolkit.Mvvm ドキュメント](https://learn.microsoft.com/ja-jp/dotnet/communitytoolkit/mvvm/)
+- [IProgress\<T\> パターン](https://learn.microsoft.com/ja-jp/dotnet/api/system.progress-1)
+- [WPF TabControl](https://learn.microsoft.com/ja-jp/dotnet/desktop/wpf/controls/tabcontrol)
 
 ---
 
 ## Changelog
 
-### Version 1.0.0 (2026-02-18)
-- Initial release: OCR execution parameter input tab with progress display
-- 6-step workflow: Requirements → ViewModel → XAML → Model → Events → Customize
-- Configurable input fields pattern (ask user first)
-- IProgress\<T\> async progress reporting with UI thread safety
-- Progress bar + timestamped log ListView
-- Event-based OCR result handoff to parent ViewModel
-- CommunityToolkit.Mvvm integration with `[RelayCommand]` and `[ObservableProperty]`
+### バージョン 1.0.0 (2026-02-18)
+- 初回リリース: 進捗表示付きOCR実行パラメータ入力タブ
+- 6ステップワークフロー: 要件定義 → ViewModel → XAML → モデル → イベント → カスタマイズ
+- 設定可能な入力フィールドパターン（まずユーザーに確認）
+- IProgress\<T\>による非同期進捗レポート（UIスレッド安全）
+- 進捗バー＋タイムスタンプ付きログListView
+- イベントベースのOCR結果ハンドオフ（親ViewModelへの受け渡し）
+- CommunityToolkit.Mvvm統合（`[RelayCommand]`と`[ObservableProperty]`）
 
-<!--
-Japanese version available at references/SKILL.ja.md
--->
+<!-- 英語版は ../SKILL.md を参照してください -->
+

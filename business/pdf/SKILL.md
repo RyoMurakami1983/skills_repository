@@ -1,75 +1,74 @@
 ---
 name: pdf
-description: Use when: extracting PDF text, running Optical Character Recognition (OCR), splitting/merging files, and processing forms with reproducible uv-based commands.
+description: こんなときに使う: PDFテキスト抽出、Optical Character Recognition (OCR)、結合/分割、フォーム処理をuvベースの再現可能コマンドで実行したいときに使う。
 ---
+## こんなときに使う
 
-## When to Use This Skill
+業務ワークフローで、再実行可能な Portable Document Format (PDF) 処理が必要なときに使います。
 
-Use this skill when your task requires repeatable Portable Document Format (PDF) operations in business workflows.
-
-- Extracting text from born-digital PDF invoices for downstream reconciliation logs.
-- Running OCR on scanned maintenance reports before classification or compliance review.
-- Splitting large audit binders into deterministic page ranges for department delivery.
-- Merging signed appendices into a single release artifact with controlled file naming.
-- Filling or flattening form fields while preserving an auditable processing trail.
-- Building rerunnable command records that teammates can execute without hidden context.
+- 請求書PDFからテキストを抽出し、後段の照合ログへ受け渡したいとき。
+- スキャン報告書へOCRを実行し、分類や監査レビュー前に文字化したいとき。
+- 大きな監査資料を規則的なページ範囲で分割し、部門配布したいとき。
+- 署名済み付録を結合し、命名規則を守った単一成果物にしたいとき。
+- フォーム入力やフラット化を行い、監査可能な処理履歴を残したいとき。
+- 実行コマンドを記録し、他メンバーが同じ結果を再現できるようにしたいとき。
 
 ## Core Principles
 
-1. **Foundation before optimization**: Start with deterministic commands, then tune speed and cost.
-2. **Pattern over improvisation**: Reuse named flows so outputs stay consistent across operators.
-3. **Traceability over guessing**: Mark source method and uncertainty instead of silent correction.
-4. **Lifecycle-aware artifacts**: Separate intermediate files from final deliverables by design.
+1. **基礎を先に固める**: まず決定的なコマンドを作り、その後に速度とコストを最適化する。
+2. **型で運用する**: 名前付きフローを再利用し、担当者が変わっても出力を揃える。
+3. **推測より追跡性**: 根拠がない補正を避け、出典と不確実性を明示する。
+4. **成果物ライフサイクル設計**: 中間ファイルと最終成果物を意図的に分離する。
 
 ## Workflow:
 
-### Step 1 - Confirm paths and policy
+### Step 1 - 入出力パスと保管方針を確定する
 
-Use explicit paths for input, output, and retention metadata.
+入力、出力、保管メタ情報のパスを明示します。
 
 ```powershell
 Test-Path input.pdf
 ```
 
-> **Values**: Foundation and Form
+> **Values**: 基礎と型
 
-### Step 2 - Detect text layer
+### Step 2 - テキストレイヤ有無を判定する
 
-Use extraction first, because it is faster and preserves native text when available.
+テキスト抽出を先に使います。理由は、抽出のほうが高速で元文字を保持しやすいためです。
 
 ```powershell
 uv run --with pypdf==6.1.1 python scripts\extract_text.py input.pdf --output input.txt
 ```
 
-> **Values**: Foundation and Compound Growth
+> **Values**: 基礎と型 / 成長の複利
 
-### Step 3 - Choose extraction or OCR path
+### Step 3 - 抽出経路かOCR経路を選択する
 
-Use OCR only when extraction is empty or unusable, because OCR costs more compute time.
+抽出結果が空、または利用困難なときだけOCRを使います。理由は、OCRの計算コストが高いためです。
 
 ```powershell
 uv run --with pypdfium2==5.6.0 --with rapidocr-onnxruntime==1.4.4 --with numpy==2.4.3 python scripts\ocr_script.py input.pdf --output input.ocr.txt
 ```
 
-> **Values**: Neutral Perspective and White Space Design
+> **Values**: ニュートラルな視点 / 余白の設計
 
-### Step 4 - Publish and record provenance
+### Step 4 - 公開と出典記録を実施する
 
-Use deterministic naming and keep a rerunnable log, because operational audits require reproducibility.
+決定的命名と再実行ログを残します。理由は、運用監査で再現性が必要になるためです。
 
 ```powershell
 uv cache prune
 ```
 
-> **Values**: Teachability and Compound Growth
+> **Values**: 教える・広める / 成長の複利
 
 ### Decision Table
 
-| Situation | Primary Path | Fallback | Output Suffix |
+| 状況 | 主経路 | フォールバック | 出力サフィックス |
 | --- | --- | --- | --- |
-| Text layer exists and quality is acceptable | `extract_text.py` | OCR only for failed pages | `.txt` |
-| Text layer missing or empty | `ocr_script.py` | Increase `--scale` and rerun | `.ocr.txt` |
-| Mixed quality across pages | Hybrid by page | Manual review for unreadable spans | `.hybrid.txt` |
+| テキストレイヤがあり品質も十分 | `extract_text.py` | 失敗ページのみOCR | `.txt` |
+| テキストレイヤがない/空 | `ocr_script.py` | `--scale` を上げて再実行 | `.ocr.txt` |
+| ページごとに品質が混在 | ページ単位ハイブリッド | 読取不能箇所を手動確認 | `.hybrid.txt` |
 
 ## Patterns
 
@@ -77,17 +76,17 @@ uv cache prune
 
 #### Overview
 
-Use this pattern to extract text from born-digital PDFs with minimal setup.
+born-digital PDF から最小構成でテキスト抽出する基本型です。
 
 #### When to Use
 
-Use when extraction quality is already high and OCR would add unnecessary cost.
+抽出品質が十分で、OCRコストを増やしたくないときに使います。
 
 #### Steps
 
-1. Confirm that the source file exists.
-2. Run extraction with pinned dependency versions.
-3. Save output beside business artifacts, not in temp-only locations.
+1. ソースファイルの存在を確認する。
+2. 依存バージョン固定で抽出を実行する。
+3. 結果を業務フォルダへ保存し、Temp依存を避ける。
 
 ```powershell
 uv run --with pypdf==6.1.1 python scripts\extract_text.py input.pdf --output input.txt
@@ -97,17 +96,17 @@ uv run --with pypdf==6.1.1 python scripts\extract_text.py input.pdf --output inp
 
 #### Overview
 
-Use this pattern to switch between extraction and OCR based on measured evidence.
+抽出とOCRを判定ロジックで切り替える運用型です。
 
 #### When to Use
 
-Use when source quality varies by document or by page.
+文書ごと、またはページごとに品質がばらつくときに使います。
 
 #### Steps
 
-1. Run text extraction first.
-2. If extracted text is empty or unusable, run OCR.
-3. Record source type (`text-layer` or `ocr`) in the output header.
+1. 先にテキスト抽出を実行する。
+2. 結果が空、または利用困難ならOCRへ切り替える。
+3. 出力ヘッダへ `text-layer` か `ocr` かを記録する。
 
 ```powershell
 uv run --with pypdf==6.1.1 python scripts\extract_text.py scan.pdf --output scan.txt
@@ -118,17 +117,17 @@ uv run --with pypdfium2==5.6.0 --with rapidocr-onnxruntime==1.4.4 --with numpy==
 
 #### Overview
 
-Use this pattern to operate batch pipelines with explicit error handling and recovery.
+バッチ処理で失敗追跡と再実行性を担保する上級型です。
 
 #### When to Use
 
-Use when processing many files, enforcing naming rules, and preserving auditability.
+多ファイル処理、命名統制、監査証跡の維持が必要なときに使います。
 
 #### Steps
 
-1. Iterate files with deterministic naming conventions.
-2. Track success and failure per file.
-3. Preserve intermediate outputs for troubleshooting.
+1. 規則的な命名でファイルを走査する。
+2. ファイル単位で成功/失敗を記録する。
+3. トラブルシュート用に中間成果物を保持する。
 
 ```python
 from pathlib import Path
@@ -146,87 +145,88 @@ for pdf in sorted(Path("incoming").glob("*.pdf")):
 
 ## Best Practices
 
-- Pin every `--with` dependency to reduce drift.
-- Keep OCR raw output and normalized output as separate files.
-- Mark unreadable segments explicitly, such as `[UNREADABLE: page 3 line 12]`.
-- Record the exact command line used for each deliverable.
-- Use explicit source labels in every output header.
-- Avoid silent normalization when confidence is low.
-- Apply deterministic naming for every run.
-- Define retention rules before batch execution.
-- Consider audit-readiness as a default output requirement.
+- `--with` 依存は必ずバージョン固定する。
+- OCR生データと清書版を分離保存する。
+- 読取不能箇所は `[UNREADABLE: page 3 line 12]` のように明示する。
+- 成果物ごとに実行コマンドを記録する。
+- Use 明示ラベルで出典を常にヘッダへ書く。
+- Avoid 低信頼の自動補正を黙って反映しない。
+- Apply 実行ごとの決定的命名規則を運用する。
+- Define バッチ前に保管ルールを先に確定する。
+- Consider 監査対応可能性を標準要件として扱う。
 
 ### Why these practices work
 
-- **Why** deterministic commands: they reduce cross-operator variance.
-- **Why** source labels: they prevent mixing OCR and text-layer outputs.
-- **Why** separate raw/normalized files: they enable defensible reviews.
-- **Why** explicit retention policy: it avoids accidental loss of evidence.
-- **Why** rerunnable logs: they make troubleshooting and audits faster.
+- **Why** 決定的コマンド: 担当者差による出力揺れを減らせます。
+- **Why** 出典ラベル: OCRと抽出結果の混在事故を防げます。
+- **Why** 生データ分離: 根拠付きレビューを維持できます。
+- **Why** 保管方針明示: 証跡の消失を防げます。
+- **Why** 再実行ログ: 障害調査と監査対応を短縮できます。
 
 ### Good vs Bad Examples
 
-❌ Bad: Rewrite uncertain OCR text without documenting confidence or source method.
+❌ 悪い例: OCRの不確実な文字を、根拠なしで上書きする。
 
-✅ Good: Keep original OCR output, create a reviewed version, and log each correction reason.
+✅ 良い例: OCR原文を保持し、修正版との差分と理由を記録する。
 
-❌ Bad: Save final files only to temporary locations that are cleaned automatically.
+❌ 悪い例: 最終成果物を一時フォルダだけに保存する。
 
-✅ Good: Save final files to a durable business path and archive processing metadata.
+✅ 良い例: 最終成果物を業務保管先へ保存し、処理メタ情報を保管する。
 
-❌ Bad: Detect extraction failure but continue without a fallback decision record.
+❌ 悪い例: 抽出失敗を検知しても、フォールバック判断を記録しない。
 
-✅ Good: Record the fallback decision and run OCR **instead** with a clear reason.
+✅ 良い例: フォールバック判断を記録し、明確な理由付きでOCRへ切り替える。
 
 ## Common Pitfalls
 
-- Forgetting to pass explicit input and output paths in automation jobs.
-- Mixing OCR and text-layer results without source labels.
-- Reusing stale outputs after source PDFs changed.
+- 自動処理で入力/出力パス指定を省略してしまう。
+- OCR結果とテキスト抽出結果を、出典ラベルなしで混在させる。
+- 元PDF更新後に古い出力を再利用してしまう。
 
 ### Fixes
 
-- Use deterministic file naming with run identifiers as the first **solution**.
-- Add a header line that states extraction method and timestamp as a second **solution**.
-- Recompute output whenever source hash changes to **correct** stale deliverables.
-- If a page remains unreadable, **fix** downstream mapping by keeping explicit placeholders.
+- 最初の **solution** として、ファイル命名を実行ID付きに固定する。
+- 次の **solution** として、抽出方式と時刻をヘッダへ残す。
+- 旧版成果物を残した場合は、差し替え時に **correct** マーカーを付ける。
+- 読取不能ページはプレースホルダで **fix** し、下流マッピングを維持する。
 
 ## Anti-Patterns
 
-- Mixing `pip install` and `uv run --with` without an environment policy.
-- Deleting uv cache on every run, which wastes time and energy.
-- Publishing business outputs with no reproducibility log.
+- 運用方針なしで `pip install` と `uv run --with` を混在させる。
+- 毎回キャッシュ削除して処理時間と電力コストを増やす。
+- 再現ログなしで業務成果物を配布する。
 
 ## FAQ
 
-Q. Why does AppData cache appear during `uv run --with`?
-A. uv reuses cached dependency artifacts by design for faster reruns.
+Q. `uv run --with` でAppDataキャッシュが作られるのは正常ですか？
+A. 正常です。uvは再実行高速化のため依存キャッシュを再利用します。
 
-Q. Should we always create `.venv`?
-A. Use `.venv` for long-lived projects; use `--with` for task-scoped operations.
+Q. 常に `.venv` を作るべきですか？
+A. 長期開発では `.venv`、都度処理では `--with` を使い分けます。
 
-Q. When should cache be deleted?
-A. Delete cache only for disk pressure or suspected corruption.
+Q. キャッシュはいつ削除すべきですか？
+A. 容量圧迫、または破損疑いがあるときだけ削除します。
 
 ## Quick Reference
 
-| Decision | Command | Why |
+| 判定 | コマンド | 理由 |
 | --- | --- | --- |
-| Text layer available | `python scripts\extract_text.py` | Faster and preserves native text. |
-| Text layer unavailable | `python scripts\ocr_script.py` | Restores searchable text for downstream use. |
+| テキストレイヤあり | `python scripts\extract_text.py` | 高速で元文字を保持しやすい。 |
+| テキストレイヤなし | `python scripts\ocr_script.py` | 下流処理向けの検索可能テキストを作る。 |
 
 ```powershell
-# Text-layer extraction
+# テキストレイヤ抽出
 uv run --with pypdf==6.1.1 python scripts\extract_text.py input.pdf --output input.txt
 
-# OCR for scanned PDFs
+# スキャンPDF OCR
 uv run --with pypdfium2==5.6.0 --with rapidocr-onnxruntime==1.4.4 --with numpy==2.4.3 python scripts\ocr_script.py input.pdf --output input.ocr.txt
 
-# Cache operations
+# キャッシュ操作
 uv cache dir
 uv cache prune
 ```
 
-## License Note
+## ライセンス方針メモ
 
-This skill was authored from scratch for repository operations. Follow repository governance for reuse and redistribution.
+このスキルは本リポジトリ運用のために新規作成した内容です。利用・再配布の扱いはリポジトリ方針に従ってください。
+

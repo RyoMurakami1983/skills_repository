@@ -112,6 +112,7 @@ ADR は「なぜその設計判断を採ったのか」を後から追えるよ�
 **2026-03**
 
 - `skills/skill/` を追加してメタスキル群を単一入口 + sub_skills / _foundation / _eval / scripts 構成へ整備し、そこで固めた日本語正本化ルールを `skills/` の残り skill へ横展開して `references/SKILL.ja.md` の常設をやめた
+- `business/` と `dotnet/` の skill を日本語 `SKILL.md` 正本へ揃え、`references/SKILL.ja.md` を段階的に廃止した
 - `skill/_eval/scripts/validate_skill.py`、`skill/scripts/create_skill.py` などを新構造へ移し、スキル用ツールチェインを同梱した
 - README は Windows の `.copilot` 同期を最優先に保ちつつ、詳細を `docs/INSTALL.md` へ分離した
 

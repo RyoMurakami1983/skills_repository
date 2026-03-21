@@ -25,7 +25,7 @@ def test_create_skill_creates_expected_structure(tmp_path: Path):
         template,
         {
             "name": "sample-skill",
-            "description": "サンプルを作成する。Use when: template 生成を試したいとき。",
+            "description": "サンプルを作成する。こんなときに使う: template 生成を試したいとき。",
             "title": "サンプルスキル",
             "compatibility": "pytest",
         },
@@ -39,7 +39,7 @@ def test_create_skill_creates_expected_structure(tmp_path: Path):
     skill_md = (created / "SKILL.md").read_text(encoding="utf-8")
     assert "<What this skill does>" not in skill_md
     assert "<scenario 1>" not in skill_md
-    assert "サンプルを作成する。Use when: template 生成を試したいとき。" in skill_md
+    assert "サンプルを作成する。こんなときに使う: template 生成を試したいとき。" in skill_md
     assert "## こんなときに使う" in skill_md
     assert "## ワークフロー:" in skill_md
     assert 'compatibility: "pytest"' in skill_md
@@ -59,7 +59,7 @@ def test_create_router_creates_expected_structure(tmp_path: Path):
         {
             "name": "sample-router",
             "type": "router",
-            "description": "サンプルの流れを振り分ける。Use when: mode を選び分けたいとき。",
+            "description": "サンプルの流れを振り分ける。こんなときに使う: mode を選び分けたいとき。",
             "title": "サンプルルーター",
         },
         router_template=router_template,
@@ -76,7 +76,7 @@ def test_create_router_creates_expected_structure(tmp_path: Path):
     skill_md = (created / "SKILL.md").read_text(encoding="utf-8")
     assert "<What this router does>" not in skill_md
     assert "<scenario 1>" not in skill_md
-    assert "サンプルの流れを振り分ける。Use when: mode を選び分けたいとき。" in skill_md
+    assert "サンプルの流れを振り分ける。こんなときに使う: mode を選び分けたいとき。" in skill_md
     assert "## 判断表" in skill_md
 
 
@@ -94,18 +94,18 @@ def test_create_router_with_sub_skills(tmp_path: Path):
         {
             "name": "sample-router",
             "type": "router",
-            "description": "サンプルの流れを振り分ける。Use when: mode を選び分けたいとき。",
+            "description": "サンプルの流れを振り分ける。こんなときに使う: mode を選び分けたいとき。",
             "title": "サンプルルーター",
             "sub_skills": [
                 {
                     "name": "draft",
-                    "description": "サンプル下書きを作る。Use when: draft ルートを始めたいとき。",
+                    "description": "サンプル下書きを作る。こんなときに使う: draft ルートを始めたいとき。",
                     "intent": "下書きルートへ進める",
                     "summary": "ユーザーを draft sub-skill へ案内する。",
                 },
                 {
                     "name": "review",
-                    "description": "サンプル内容を見直す。Use when: review ルートを確認したいとき。",
+                    "description": "サンプル内容を見直す。こんなときに使う: review ルートを確認したいとき。",
                 },
             ],
         },
@@ -124,7 +124,7 @@ def test_create_router_with_sub_skills(tmp_path: Path):
     draft_skill = (created / "sub_skills" / "draft" / "SKILL.md").read_text(encoding="utf-8")
     assert "<What this sub-skill does>" not in draft_skill
     assert "<scenario 1>" not in draft_skill
-    assert "サンプル下書きを作る。Use when: draft ルートを始めたいとき。" in draft_skill
+    assert "サンプル下書きを作る。こんなときに使う: draft ルートを始めたいとき。" in draft_skill
     assert 'compatibility: "_foundation/"' in draft_skill
     assert "## こんなときに使う" in draft_skill
 
@@ -143,7 +143,7 @@ def test_add_sub_skill_to_existing_router(tmp_path: Path):
         {
             "name": "sample-router",
             "type": "router",
-            "description": "サンプルの流れを振り分ける。Use when: mode を選び分けたいとき。",
+            "description": "サンプルの流れを振り分ける。こんなときに使う: mode を選び分けたいとき。",
             "title": "サンプルルーター",
         },
         router_template=router_template,
@@ -155,7 +155,7 @@ def test_add_sub_skill_to_existing_router(tmp_path: Path):
         sub_skill_template,
         {
             "name": "review",
-            "description": "サンプル内容を見直す。Use when: review ルートを確認したいとき。",
+            "description": "サンプル内容を見直す。こんなときに使う: review ルートを確認したいとき。",
             "intent": "見直しルートへ進める",
             "summary": "ユーザーを review sub-skill へ案内する。",
         },
@@ -179,11 +179,11 @@ def test_suite_with_router_type(tmp_path: Path):
             {
               "name": "sample-router",
               "type": "router",
-              "description": "サンプルの流れを振り分ける。Use when: mode を選び分けたいとき。",
+              "description": "サンプルの流れを振り分ける。こんなときに使う: mode を選び分けたいとき。",
               "sub_skills": [
                 {
                   "name": "draft",
-                  "description": "サンプル下書きを作る。Use when: draft ルートを始めたいとき。"
+                  "description": "サンプル下書きを作る。こんなときに使う: draft ルートを始めたいとき。"
                 }
               ]
             }
@@ -204,10 +204,10 @@ def test_build_frontmatter_uses_folded_description_for_yaml_sensitive_text():
 
     frontmatter = mod.build_frontmatter(
         "sample-skill",
-        '作成: sample #1。Use when: "quoted" text を含む説明が必要なとき。',
+        '作成: sample #1。こんなときに使う: "quoted" text を含む説明が必要なとき。',
         'tool:>=1.0',
     )
 
     assert "description: >" in frontmatter
-    assert '作成: sample #1。Use when: "quoted" text を含む説明が必要なとき。' in frontmatter
+    assert '作成: sample #1。こんなときに使う: "quoted" text を含む説明が必要なとき。' in frontmatter
     assert 'compatibility: "tool:>=1.0"' in frontmatter
