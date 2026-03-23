@@ -4,11 +4,6 @@ description: >
   モダン C#（12+）で record、パターンマッチング、合成、Result 型エラーハンドリングを使った
   慣用的で高性能なコードを書く。こんなときに使う: 新規 C# コードの作成、API 設計、
   または C# 12+ イディオムへのリファクタリング。
-license: MIT
-metadata:
-  author: RyoMurakami1983
-  tags: [csharp, coding-standards, modern-csharp, best-practices]
-  invocable: false
 ---
 
 # モダン C# コーディング標準
