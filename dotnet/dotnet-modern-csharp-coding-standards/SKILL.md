@@ -82,7 +82,7 @@ public readonly record struct Money(decimal Amount, string Currency)
 | `class` | 可変サービス、フレームワーク要求の基底クラス |
 | `struct` | パフォーマンスクリティカル、小データ（≤16 バイト）、ID なし |
 
-> ⚠️ **値オブジェクトに暗黙的変換は禁止** — コンパイル時の型安全性を無効化します。詳細は [language-patterns.md](language-patterns.md) を参照。
+> ⚠️ **値オブジェクトに暗黙的変換は禁止** — コンパイル時の型安全性を無効化します。詳細は [language-patterns.md](references/language-patterns.md) を参照。
 
 > **Values**: 基礎と型の追求（型で不変条件を守り、コンパイラを味方にする）
 
@@ -119,7 +119,7 @@ public decimal GetDiscount(Customer? customer) => customer switch
 };
 ```
 
-リストパターン、タプルパターン、nullable 処理の詳細は [language-patterns.md](language-patterns.md) を参照。
+リストパターン、タプルパターン、nullable 処理の詳細は [language-patterns.md](references/language-patterns.md) を参照。
 
 > **Values**: 成長の複利（パターンマッチングの習得が、あらゆる分岐ロジックの品質を底上げする）
 
@@ -197,7 +197,7 @@ return result.Match(
 | バリデーション失敗、ビジネスルール違反、見つからない | `Result<T, TError>` |
 | ネットワーク障害、null 参照、OOM、プログラミングバグ | Exception |
 
-完全な `Result<T, TError>` 実装と Railway 合成は [error-handling-patterns.md](error-handling-patterns.md) を参照。
+完全な `Result<T, TError>` 実装と Railway 合成は [error-handling-patterns.md](references/error-handling-patterns.md) を参照。
 
 > **Values**: ニュートラルな視点（例外と Result を状況に応じて使い分け、偏りのない設計を保つ）
 
@@ -313,7 +313,7 @@ var dto = _mapper.Map<UserDto>(entity);
 public static UserDto ToDto(this UserEntity e) => new(e.Id.ToString(), e.FullName, e.EmailAddress);
 ```
 
-詳細はソースジェネレータと UnsafeAccessor について [anti-reflection-patterns.md](anti-reflection-patterns.md) を参照。
+詳細はソースジェネレータと UnsafeAccessor について [anti-reflection-patterns.md](references/anti-reflection-patterns.md) を参照。
 
 ### ❌ Returning Mutable Collections
 
@@ -371,6 +371,6 @@ public async Task<Order> GetOrderAsync(OrderId id, CancellationToken ct = defaul
 - [C# Language Reference](https://learn.microsoft.com/en-us/dotnet/csharp/)
 - [Pattern Matching](https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/functional/pattern-matching)
 - [Nullable Reference Types](https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references)
-- [language-patterns.md](language-patterns.md) — record、パターンマッチング、nullable の完全な例
-- [error-handling-patterns.md](error-handling-patterns.md) — Result\<T, TError\> 実装と Railway パターン
-- [anti-reflection-patterns.md](anti-reflection-patterns.md) — ソースジェネレータ、UnsafeAccessor、明示的マッピング
+- [language-patterns.md](references/language-patterns.md) — record、パターンマッチング、nullable の完全な例
+- [error-handling-patterns.md](references/error-handling-patterns.md) — Result\<T, TError\> 実装と Railway パターン
+- [anti-reflection-patterns.md](references/anti-reflection-patterns.md) — ソースジェネレータ、UnsafeAccessor、明示的マッピング
