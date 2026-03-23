@@ -1,41 +1,41 @@
-# Anti-Reflection Patterns — Detailed Reference
+# Anti-Reflection Patterns（詳細リファレンス）
 
 <!-- Parent skill: ../SKILL.md (dotnet-modern-csharp-coding-standards) -->
 
-This file covers why reflection-based mapping should be avoided, how to use explicit mappings, source generators, and the `UnsafeAccessorAttribute` for legitimate low-level access.
+このファイルでは、reflection-based mapping を避けるべき理由、explicit mapping の書き方、source generator の使いどころ、そして正当な低レベルアクセスにおける `UnsafeAccessorAttribute` の使い方を扱います。
 
 ---
 
-## Banned Libraries
+## 使用禁止ライブラリ
 
-| Library | Problem |
+| Library | 問題点 |
 |---------|---------|
-| **AutoMapper** | Reflection magic, hidden mappings, runtime failures, hard to debug |
-| **Mapster** | Same issues as AutoMapper |
-| **ExpressMapper** | Same issues |
+| **AutoMapper** | reflection magic、隠れた mapping、runtime failure、debug の難しさ |
+| **Mapster** | AutoMapper と同種の問題 |
+| **ExpressMapper** | 同上 |
 
 ---
 
-## Why Reflection Mapping Fails
+## Reflection Mapping が破綻しやすい理由
 
 ```csharp
-// With AutoMapper — compiles fine, fails at runtime
+// AutoMapper を使うと、コンパイルは通るが実行時に壊れうる
 public record UserDto(string Id, string Name, string Email);
 public record UserEntity(Guid Id, string FullName, string EmailAddress);
 
-// This mapping silently produces garbage:
-// - Id: string vs Guid mismatch
-// - Name vs FullName: no match, null/default
-// - Email vs EmailAddress: no match, null/default
-var dto = _mapper.Map<UserDto>(entity);  // Compiles! Breaks at runtime.
+// この mapping は静かに不正な値を作りうる:
+// - Id: string と Guid が不一致
+// - Name と FullName: 対応せず null/default になる
+// - Email と EmailAddress: 対応せず null/default になる
+var dto = _mapper.Map<UserDto>(entity);  // コンパイルは通るが実行時に破綻する。
 ```
 
 ---
 
-## Use Explicit Mapping Methods Instead
+## 代わりに Explicit Mapping Method を使う
 
 ```csharp
-// Extension method — compile-time checked, easy to find, easy to debug
+// Extension method — コンパイル時に検査でき、見つけやすく、debug しやすい
 public static class UserMappings
 {
     public static UserDto ToDto(this UserEntity entity) => new(
@@ -49,25 +49,25 @@ public static class UserMappings
         EmailAddress: request.Email);
 }
 
-// Usage — explicit and traceable
+// 使用例 — 明示的で追跡しやすい
 var dto = entity.ToDto();
 var entity = request.ToEntity();
 ```
 
-### Benefits of Explicit Mappings
+### Explicit Mapping の利点
 
-| Aspect | AutoMapper | Explicit Methods |
+| 観点 | AutoMapper | Explicit Methods |
 |--------|------------|------------------|
-| **Compile-time safety** | No — runtime errors | Yes — compiler catches mismatches |
-| **Discoverability** | Hidden in profiles | "Go to Definition" works |
-| **Debugging** | Black box | Step through code |
-| **Refactoring** | Rename breaks silently | IDE renames correctly |
-| **Performance** | Reflection overhead | Direct property access |
-| **Testing** | Need integration tests | Simple unit tests |
+| **Compile-time safety** | なし — runtime error になる | あり — compiler が不整合を検出 |
+| **Discoverability** | profile に隠れる | `Go to Definition` が効く |
+| **Debugging** | black box | step 実行できる |
+| **Refactoring** | rename が静かに壊れる | IDE が正しく rename する |
+| **Performance** | reflection overhead あり | 直接 property にアクセス |
+| **Testing** | integration test が要りやすい | 単純な unit test で済む |
 
-### Complex Mappings
+### 複雑な Mapping
 
-For complex transformations, explicit code is even more valuable:
+変換が複雑になるほど、explicit code の価値は高まります。
 
 ```csharp
 public static OrderSummaryDto ToSummary(this Order order) => new(
@@ -86,101 +86,101 @@ public static OrderSummaryDto ToSummary(this Order order) => new(
     FormattedDate: order.CreatedAt.ToString("MMMM d, yyyy"));
 ```
 
-This is:
-- **Readable**: Anyone can understand the transformation
-- **Debuggable**: Set a breakpoint, inspect values
-- **Testable**: Pass an Order, assert on the result
-- **Refactorable**: Change a property name, compiler tells you everywhere it's used
+この形には次の利点があります。
+- **Readable**: 変換内容を誰でも読める
+- **Debuggable**: breakpoint を置いて値を追える
+- **Testable**: `Order` を渡して結果をそのまま検証できる
+- **Refactorable**: property 名を変えると compiler が影響箇所を教えてくれる
 
 ---
 
-## When Reflection is Acceptable
+## Reflection が許容される場面
 
-| Use Case | Acceptable? |
+| Use Case | 許容可否 |
 |----------|-------------|
-| Serialization (System.Text.Json, Newtonsoft) | Yes — well-tested, source generators available |
-| Dependency injection container | Yes — framework infrastructure |
-| ORM entity mapping (EF Core) | Yes — necessary for database abstraction |
-| Test fixtures and builders | Sometimes — for convenience in tests only |
-| **DTO / domain object mapping** | **No — use explicit methods** |
+| Serialization (System.Text.Json, Newtonsoft) | Yes — 実績があり、source generator も使える |
+| Dependency injection container | Yes — framework infrastructure の一部 |
+| ORM entity mapping (EF Core) | Yes — database abstraction に必要 |
+| Test fixtures and builders | Sometimes — test 内の利便性に限る |
+| **DTO / domain object mapping** | **No — explicit method を使う** |
 
 ---
 
-## Source Generators vs Reflection
+## Source Generator vs Reflection
 
-For scenarios where you need dynamic behavior, prefer source generators over runtime reflection:
+動的な振る舞いが必要でも、runtime reflection より source generator を優先します。
 
 ```csharp
-// System.Text.Json source generator — AOT-friendly, zero reflection
+// System.Text.Json source generator — AOT 対応で reflection 不要
 [JsonSerializable(typeof(OrderDto))]
 [JsonSerializable(typeof(CustomerDto))]
 public partial class AppJsonContext : JsonSerializerContext { }
 
-// Usage
+// 使用例
 var json = JsonSerializer.Serialize(order, AppJsonContext.Default.OrderDto);
 var dto = JsonSerializer.Deserialize(json, AppJsonContext.Default.OrderDto);
 ```
 
-Source generators provide:
-- **Compile-time code generation** — no runtime reflection
-- **AOT compatibility** — works with NativeAOT trimming
-- **Better performance** — no reflection overhead
-- **Compile-time errors** — mismatches caught at build time
+source generator には次の利点があります。
+- **Compile-time code generation** — runtime reflection が不要
+- **AOT compatibility** — NativeAOT trimming と相性がよい
+- **Better performance** — reflection overhead がない
+- **Compile-time errors** — build 時に不整合を検出できる
 
 ---
 
-## UnsafeAccessorAttribute (.NET 8+)
+## `UnsafeAccessorAttribute`（.NET 8+）
 
-When you genuinely need to access private or internal members (serializers, test helpers, framework code), use `UnsafeAccessorAttribute` instead of traditional reflection. It provides **zero-overhead, AOT-compatible** member access.
+private / internal member に本当にアクセスする必要がある場合（serializer、test helper、framework code など）は、従来の reflection ではなく `UnsafeAccessorAttribute` を使います。これにより **zero-overhead かつ AOT-compatible** な member access ができます。
 
 ```csharp
-// ❌ AVOID: Traditional reflection — slow, allocates, breaks AOT
+// ❌ 非推奨: 従来の reflection — 遅く、allocation が発生し、AOT も壊しやすい
 var field = typeof(Order).GetField("_status", BindingFlags.NonPublic | BindingFlags.Instance);
 var status = (OrderStatus)field!.GetValue(order)!;
 
-// ✅ PREFER: UnsafeAccessor — zero overhead, AOT-compatible
+// ✅ 推奨: UnsafeAccessor — zero overhead で AOT-compatible
 [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_status")]
 static extern ref OrderStatus GetStatusField(Order order);
 
-var status = GetStatusField(order);  // Direct access, no reflection
+var status = GetStatusField(order);  // 直接アクセスでき、reflection は不要
 ```
 
-### Supported Accessor Kinds
+### 利用できる Accessor Kind
 
 ```csharp
-// Private field access
+// private field へのアクセス
 [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_items")]
 static extern ref List<OrderItem> GetItemsField(Order order);
 
-// Private method access
+// private method へのアクセス
 [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "Recalculate")]
 static extern void CallRecalculate(Order order);
 
-// Private static field
+// private static field へのアクセス
 [UnsafeAccessor(UnsafeAccessorKind.StaticField, Name = "_instanceCount")]
 static extern ref int GetInstanceCount(Order order);
 
-// Private constructor
+// private constructor の呼び出し
 [UnsafeAccessor(UnsafeAccessorKind.Constructor)]
 static extern Order CreateOrder(OrderId id, CustomerId customerId);
 ```
 
-### Why UnsafeAccessor Over Reflection
+### Reflection より UnsafeAccessor を選ぶ理由
 
-| Aspect | Reflection | UnsafeAccessor |
+| 観点 | Reflection | UnsafeAccessor |
 |--------|------------|----------------|
-| Performance | Slow (100–1000×) | Zero overhead |
+| Performance | 遅い（100–1000×） | Zero overhead |
 | AOT compatible | No | Yes |
-| Allocations | Yes (boxing, arrays) | None |
-| Compile-time checked | No | Partially (signature) |
+| Allocations | あり（boxing、array など） | なし |
+| Compile-time checked | No | 一部あり（signature） |
 
-### Use Cases
+### 主な Use Case
 
-- Serializers accessing private backing fields
-- Test helpers verifying internal state
-- Framework code that needs to bypass visibility
+- private backing field にアクセスする serializer
+- internal state を検証する test helper
+- 可視性を越えてアクセスする必要がある framework code
 
-### Resources
+### 参考リンク
 
 - [A new way of doing reflection with .NET 8](https://steven-giesel.com/blogPost/05ecdd16-8dc4-490f-b1cf-780c994346a4)
 - [Accessing private members without reflection in .NET 8.0](https://www.strathweb.com/2023/10/accessing-private-members-without-reflection-in-net-8-0/)

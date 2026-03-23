@@ -1,20 +1,20 @@
-# Language Patterns — Detailed Reference
+# Language Patterns（詳細リファレンス）
 
 <!-- Parent skill: ../SKILL.md (dotnet-modern-csharp-coding-standards) -->
 
-This file contains full examples for records, pattern matching, nullable reference types, and string handling patterns referenced from the main skill.
+このファイルには、メイン skill から参照する `record`、パターンマッチング、nullable reference types、文字列処理パターンの完全版サンプルをまとめています。
 
 ---
 
-## Records for Immutable Data (C# 9+)
+## 不変データのための Records（C# 9+）
 
-Use `record` types for DTOs, messages, events, and domain entities.
+DTO、メッセージ、イベント、ドメインエンティティには `record` 型を使います。
 
 ```csharp
-// Simple immutable DTO
+// シンプルな不変 DTO
 public record CustomerDto(string Id, string Name, string Email);
 
-// Record with validation in constructor
+// コンストラクタで validation する record
 public record EmailAddress
 {
     public string Value { get; init; }
@@ -27,13 +27,13 @@ public record EmailAddress
     }
 }
 
-// Record with computed properties
+// 計算プロパティを持つ record
 public record Order(string Id, decimal Subtotal, decimal Tax)
 {
     public decimal Total => Subtotal + Tax;
 }
 
-// Records with collections — use IReadOnlyList
+// collection を持つ record — IReadOnlyList を使う
 public record ShoppingCart(
     string CartId,
     string CustomerId,
@@ -43,18 +43,18 @@ public record ShoppingCart(
 }
 ```
 
-**When to use `record class` vs `record struct`:**
-- `record class` (default): Reference types for entities, aggregates, DTOs with multiple properties
-- `record struct`: Value types for value objects (see next section)
+**`record class` と `record struct` の使い分け:**
+- `record class`（既定）: エンティティ、集約、複数プロパティを持つ DTO などの参照型
+- `record struct`: 値オブジェクト向けの値型（次のセクション参照）
 
 ---
 
-## Value Objects as readonly record struct
+## 値オブジェクトは `readonly record struct`
 
-Value objects should **always be `readonly record struct`** for performance and value semantics.
+値オブジェクトは、パフォーマンスと value semantics のため **常に `readonly record struct`** を使います。
 
 ```csharp
-// Single-value object
+// 単一値の value object
 public readonly record struct OrderId(string Value)
 {
     public OrderId(string value) : this(
@@ -66,7 +66,7 @@ public readonly record struct OrderId(string Value)
     public override string ToString() => Value;
 }
 
-// Multi-value object
+// 複数値の value object
 public readonly record struct Money(decimal Amount, string Currency)
 {
     public Money(decimal amount, string currency) : this(
@@ -91,7 +91,7 @@ public readonly record struct Money(decimal Amount, string Currency)
     public override string ToString() => $"{Amount:N2} {Currency}";
 }
 
-// Complex value object with factory pattern
+// factory pattern を使う複雑な value object
 public readonly record struct PhoneNumber
 {
     public string Value { get; }
@@ -114,7 +114,7 @@ public readonly record struct PhoneNumber
     public override string ToString() => Value;
 }
 
-// Percentage value object with range validation
+// 範囲 validation を持つ percentage value object
 public readonly record struct Percentage
 {
     private readonly decimal _value;
@@ -139,14 +139,14 @@ public readonly record struct Percentage
     public override string ToString() => $"{_value}%";
 }
 
-// Strongly-typed ID
+// 強い型付けをした ID
 public readonly record struct CustomerId(Guid Value)
 {
     public static CustomerId New() => new(Guid.NewGuid());
     public override string ToString() => Value.ToString();
 }
 
-// Quantity with units
+// 単位付き quantity
 public readonly record struct Quantity(int Value, string Unit)
 {
     public Quantity(int value, string unit) : this(
@@ -158,55 +158,55 @@ public readonly record struct Quantity(int Value, string Unit)
 }
 ```
 
-**Why `readonly record struct` for value objects:**
-- **Value semantics**: Equality based on content, not reference
-- **Stack allocation**: Better performance, no GC pressure
-- **Immutability**: `readonly` prevents accidental mutation
-- **Pattern matching**: Works seamlessly with switch expressions
+**値オブジェクトに `readonly record struct` を使う理由:**
+- **Value semantics**: 参照ではなく内容で等価比較できる
+- **Stack allocation**: GC 圧力を抑えつつ高性能
+- **Immutability**: `readonly` により意図しない変更を防げる
+- **Pattern matching**: `switch` 式と自然に組み合わせられる
 
-### CRITICAL: NO Implicit Conversions
+### 重要: 暗黙的変換は禁止
 
-Implicit operators defeat the purpose of value objects by allowing silent type coercion:
+暗黙的変換演算子は、型のすり替えを静かに許してしまうため、値オブジェクトの目的を壊します。
 
 ```csharp
-// ❌ WRONG — defeats compile-time safety
+// ❌ 誤り — コンパイル時の型安全性を壊す
 public readonly record struct UserId(Guid Value)
 {
-    public static implicit operator UserId(Guid value) => new(value);  // NO!
-    public static implicit operator Guid(UserId value) => value.Value; // NO!
+    public static implicit operator UserId(Guid value) => new(value);  // 禁止
+    public static implicit operator Guid(UserId value) => value.Value; // 禁止
 }
 
-// With implicit operators, this compiles silently:
+// implicit operator があると、これは静かにコンパイルされてしまう:
 void ProcessUser(UserId userId) { }
-ProcessUser(Guid.NewGuid());  // Oops — meant to pass PostId
+ProcessUser(Guid.NewGuid());  // 意図は PostId だったかもしれないのに通ってしまう
 
-// ✅ CORRECT — all conversions explicit
+// ✅ 正しい — すべての変換を明示する
 public readonly record struct UserId(Guid Value)
 {
     public static UserId New() => new(Guid.NewGuid());
-    // Create: new UserId(guid) or UserId.New()
-    // Extract: userId.Value
+    // 作成: new UserId(guid) または UserId.New()
+    // 取り出し: userId.Value
 }
 ```
 
-Explicit conversions force every boundary crossing to be visible:
+明示的変換にすると、境界をまたぐ変換が必ずコード上に現れます。
 
 ```csharp
-// API boundary — explicit conversion IN
+// API 境界 — 明示的に変換して受け取る
 var userId = new UserId(request.UserId);
 
-// Database boundary — explicit conversion OUT
+// Database 境界 — 明示的に値を取り出して渡す
 await _db.ExecuteAsync(sql, new { UserId = userId.Value });
 ```
 
 ---
 
-## Pattern Matching (C# 8–12)
+## Pattern Matching（C# 8–12）
 
-Leverage modern pattern matching for cleaner, more expressive code.
+モダンなパターンマッチングを活用して、より簡潔で表現力の高いコードにします。
 
 ```csharp
-// Switch expressions with property patterns
+// property pattern を使う switch expression
 public string GetPaymentMethodDescription(PaymentMethod payment) => payment switch
 {
     { Type: PaymentType.CreditCard, Last4: var last4 } => $"Credit card ending in {last4}",
@@ -215,7 +215,7 @@ public string GetPaymentMethodDescription(PaymentMethod payment) => payment swit
     _ => "Unknown payment method"
 };
 
-// Property patterns with relational operators
+// relational operator を組み合わせた property pattern
 public decimal CalculateDiscount(Order order) => order switch
 {
     { Total: > 1000m } => order.Total * 0.15m,
@@ -224,7 +224,7 @@ public decimal CalculateDiscount(Order order) => order switch
     _ => 0m
 };
 
-// Relational and logical patterns
+// relational pattern と logical pattern
 public string ClassifyTemperature(int temp) => temp switch
 {
     < 0             => "Freezing",
@@ -235,7 +235,7 @@ public string ClassifyTemperature(int temp) => temp switch
     _ => throw new ArgumentOutOfRangeException(nameof(temp))
 };
 
-// List patterns (C# 11+)
+// list pattern（C# 11+）
 public bool IsValidSequence(int[] numbers) => numbers switch
 {
     []                                             => false,
@@ -244,7 +244,7 @@ public bool IsValidSequence(int[] numbers) => numbers switch
     _                                              => false
 };
 
-// Type patterns with null checks
+// null check を含む type pattern
 public string FormatValue(object? value) => value switch
 {
     null                         => "null",
@@ -257,7 +257,7 @@ public string FormatValue(object? value) => value switch
     _                            => value.ToString() ?? "unknown"
 };
 
-// Combining patterns for complex logic
+// 複雑なロジックで pattern を組み合わせる
 public record OrderState(bool IsPaid, bool IsShipped, bool IsCancelled);
 
 public string GetOrderStatus(OrderState state) => state switch
@@ -269,21 +269,21 @@ public string GetOrderStatus(OrderState state) => state switch
     _                                    => "Unknown"
 };
 
-// Tuple pattern matching with value objects
+// value object を含む tuple pattern matching
 public decimal CalculateShipping(Money total, Country destination) => (total, destination) switch
 {
-    ({ Amount: > 100m }, _)                  => 0m,       // Free shipping
-    (_, { Code: "US" or "CA" })              => 5m,       // North America
-    (_, { Code: "GB" or "FR" or "DE" })      => 10m,      // Europe
-    _                                        => 25m       // International
+    ({ Amount: > 100m }, _)                  => 0m,       // 送料無料
+    (_, { Code: "US" or "CA" })              => 5m,       // 北米
+    (_, { Code: "GB" or "FR" or "DE" })      => 10m,      // 欧州
+    _                                        => 25m       // その他海外
 };
 ```
 
 ---
 
-## Nullable Reference Types (C# 8+)
+## Nullable Reference Types（C# 8+）
 
-Enable nullable reference types project-wide and handle nulls explicitly.
+プロジェクト全体で nullable reference types を有効にし、null を明示的に扱います。
 
 ```xml
 <!-- In .csproj -->
@@ -295,25 +295,25 @@ Enable nullable reference types project-wide and handle nulls explicitly.
 ```csharp
 public class UserService
 {
-    // Non-nullable by default
+    // 既定では non-nullable
     public string GetUserName(User user) => user.Name;
 
-    // Explicitly nullable return
+    // 明示的に nullable を返す
     public string? FindUserName(string userId)
     {
         var user = _repository.Find(userId);
         return user?.Name;
     }
 
-    // Null-forgiving operator (use sparingly!)
+    // null-forgiving operator（多用しない）
     public string GetRequiredConfigValue(string key)
     {
         var value = Configuration[key];
-        return value!;  // Only if you're CERTAIN it's not null
+        return value!;  // null ではないと確信できる場合だけ使う
     }
 }
 
-// Pattern matching with null checks
+// null check を含む pattern matching
 public decimal GetDiscount(Customer? customer) => customer switch
 {
     null                   => 0m,
@@ -322,27 +322,27 @@ public decimal GetDiscount(Customer? customer) => customer switch
     _                      => 0.05m
 };
 
-// Null-coalescing patterns
+// null-coalescing のパターン
 public string GetDisplayName(User? user) =>
     user?.PreferredName ?? user?.Email ?? "Guest";
 
-// Guard clauses with ArgumentNullException.ThrowIfNull (C# 11+)
+// ArgumentNullException.ThrowIfNull を使う guard clause（C# 11+）
 public void ProcessOrder(Order? order)
 {
     ArgumentNullException.ThrowIfNull(order);
-    // order is now non-nullable in this scope
+    // このスコープでは order は non-nullable とみなせる
     Console.WriteLine(order.Id);
 }
 ```
 
 ---
 
-## String Handling Patterns
+## 文字列処理パターン
 
-Prefer `ReadOnlySpan<char>` for string parsing to avoid allocations:
+文字列パースでは、不要な allocation を避けるため `ReadOnlySpan<char>` を優先します。
 
 ```csharp
-// Span-based key-value parsing
+// Span ベースの key-value parsing
 public bool TryParseKeyValue(ReadOnlySpan<char> line, out string key, out string value)
 {
     key = string.Empty;
@@ -357,4 +357,4 @@ public bool TryParseKeyValue(ReadOnlySpan<char> line, out string key, out string
 }
 ```
 
-Use `string.Create` or `StringBuilder` for complex string construction — never `+` in loops.
+複雑な文字列組み立てには `string.Create` または `StringBuilder` を使い、ループ内で `+` 連結しないでください。

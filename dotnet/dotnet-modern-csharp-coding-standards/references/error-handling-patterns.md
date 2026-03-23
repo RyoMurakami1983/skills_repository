@@ -1,14 +1,14 @@
-# Error Handling Patterns — Detailed Reference
+# Error Handling Patterns（詳細リファレンス）
 
 <!-- Parent skill: ../SKILL.md (dotnet-modern-csharp-coding-standards) -->
 
-This file contains the full `Result<T, TError>` implementation, railway-oriented programming examples, and guidance on when to use exceptions vs Result types.
+このファイルには、完全な `Result<T, TError>` 実装、Railway-Oriented Programming の例、そして Exception と Result type の使い分け指針をまとめています。
 
 ---
 
-## Result<T, TError> Full Implementation
+## `Result<T, TError>` の完全実装
 
-A minimal, zero-dependency Result type as `readonly record struct`:
+依存ゼロの最小 `Result` type を `readonly record struct` として実装する例です。
 
 ```csharp
 public readonly record struct Result<TValue, TError>
@@ -45,21 +45,21 @@ public readonly record struct Result<TValue, TError>
     public static Result<TValue, TError> Success(TValue value) => new(value);
     public static Result<TValue, TError> Failure(TError error) => new(error);
 
-    // Functor: transform the success value
+    // Functor: success value を変換する
     public Result<TOut, TError> Map<TOut>(Func<TValue, TOut> mapper)
         => _isSuccess
             ? Result<TOut, TError>.Success(mapper(_value!))
             : Result<TOut, TError>.Failure(_error!);
 
-    // Monad bind: chain operations that may fail
+    // Monad bind: 失敗しうる処理を連結する
     public Result<TOut, TError> Bind<TOut>(Func<TValue, Result<TOut, TError>> binder)
         => _isSuccess ? binder(_value!) : Result<TOut, TError>.Failure(_error!);
 
-    // Provide a default on failure
+    // failure 時に既定値を返す
     public TValue GetValueOr(TValue defaultValue)
         => _isSuccess ? _value! : defaultValue;
 
-    // Exhaustive matching
+    // 網羅的な matching
     public TResult Match<TResult>(
         Func<TValue, TResult> onSuccess,
         Func<TError, TResult> onFailure)
@@ -69,14 +69,14 @@ public readonly record struct Result<TValue, TError>
 
 ---
 
-## Error Types
+## Error Type
 
-Define error types as `readonly record struct` for value semantics:
+error type も value semantics を持たせるため、`readonly record struct` として定義します。
 
 ```csharp
 public readonly record struct OrderError(string Code, string Message);
 
-// Common error codes as constants
+// 共通 error code を定数として定義
 public static class OrderErrorCodes
 {
     public const string ValidationError = "VALIDATION_ERROR";
@@ -90,7 +90,7 @@ public static class OrderErrorCodes
 
 ## Railway-Oriented Programming
 
-Chain multiple operations that may each fail, short-circuiting on the first error:
+失敗しうる複数の処理をつなぎ、最初のエラーで short-circuit させます。
 
 ```csharp
 public sealed class OrderService(IOrderRepository repository)
@@ -99,7 +99,7 @@ public sealed class OrderService(IOrderRepository repository)
         CreateOrderRequest request,
         CancellationToken cancellationToken)
     {
-        // Each step short-circuits on failure
+        // 各ステップは failure 時に short-circuit する
         var validationResult = ValidateRequest(request);
         if (validationResult.IsFailure)
             return Result<Order, OrderError>.Failure(validationResult.Error);
@@ -132,7 +132,7 @@ public sealed class OrderService(IOrderRepository repository)
 }
 ```
 
-### Mapping Results to HTTP Responses
+### Result を HTTP Response へマッピングする
 
 ```csharp
 public IActionResult MapToActionResult(Result<Order, OrderError> result)
@@ -149,9 +149,9 @@ public IActionResult MapToActionResult(Result<Order, OrderError> result)
 }
 ```
 
-### Chaining with Bind
+### `Bind` による合成
 
-Use `Bind` to compose multiple Result-returning operations:
+`Bind` を使うと、`Result` を返す処理を段階的に合成できます。
 
 ```csharp
 public Result<OrderConfirmation, OrderError> ProcessOrder(CreateOrderRequest request)
@@ -165,22 +165,22 @@ public Result<OrderConfirmation, OrderError> ProcessOrder(CreateOrderRequest req
 
 ---
 
-## When to Use Exceptions vs Result Types
+## Exception と Result Type の使い分け
 
-| Situation | Mechanism | Rationale |
+| 状況 | 使うもの | 理由 |
 |-----------|-----------|-----------|
-| Validation failure | `Result<T, TError>` | Expected — caller must decide how to handle |
-| Business rule violation | `Result<T, TError>` | Part of normal application flow |
-| Entity not found | `Result<T, TError>` | Expected query outcome |
-| Invalid argument (programming bug) | `ArgumentException` | Indicates a bug in the calling code |
-| Network / I/O failure | Exception | Unexpected infrastructure error |
-| Null dereference | `NullReferenceException` | Programming bug — fix the code |
-| Out of memory | `OutOfMemoryException` | System-level failure |
+| Validation failure | `Result<T, TError>` | 想定内の失敗であり、呼び出し側が処理方針を決める |
+| Business rule violation | `Result<T, TError>` | 通常のアプリケーションフローの一部 |
+| Entity not found | `Result<T, TError>` | 期待される query 結果 |
+| Invalid argument (programming bug) | `ArgumentException` | 呼び出し側コードのバグを示す |
+| Network / I/O failure | Exception | 想定外のインフラ障害 |
+| Null dereference | `NullReferenceException` | プログラミングバグなのでコードを直すべき |
+| Out of memory | `OutOfMemoryException` | システムレベルの障害 |
 
-### Guidelines
+### ガイドライン
 
-1. **Expected errors** → `Result<T, TError>`. The caller is responsible for handling them. They are part of the method's contract.
-2. **Unexpected errors** → Exceptions. They bubble up to a global handler (middleware, try/catch at the boundary).
-3. **Never catch `Exception`** in business logic. Catch specific types or use Result.
-4. **Never throw in a loop**. If an operation may fail repeatedly, return a collection of Results.
-5. **Error types should be value types** (`readonly record struct`) — no heap allocation for the common error path.
+1. **想定内のエラー** → `Result<T, TError>` を使います。これはメソッド契約の一部であり、呼び出し側が処理責任を持ちます。
+2. **想定外のエラー** → Exception を使います。middleware や境界の `try/catch` など、グローバルなハンドラまで伝播させます。
+3. ビジネスロジックで **`Exception` を丸ごと catch しない** でください。特定の型を捕まえるか、Result を返します。
+4. **ループ内で throw しない** でください。繰り返し失敗しうる処理なら、Result の collection を返します。
+5. **error type は value type にする**（`readonly record struct`）。よくある失敗経路で heap allocation を増やさないためです。
