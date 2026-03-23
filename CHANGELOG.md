@@ -28,6 +28,7 @@
 - `skills/skill/` で確立した型を `skills/` の残り skill へ横展開し、`references/SKILL.ja.md` を root `SKILL.md` へ統合したうえで frontmatter を最小構成へ正規化した
 - `business/` と `dotnet/` の既存 skill を日本語正本へ移行し、`references/SKILL.ja.md` を廃止した
 - `dotnet-modern-csharp-coding-standards` を日本語正本へ移行し、技術識別子を英語のまま保った
+- `dotnet-modern-csharp-coding-standards/references/` の overflow docs も日本語正本化し、`SKILL.md` と同じ言語方針へそろえた
 - `skills/skill/_eval` を `baseline / legacy / current` 標準へ整理し、trend viewer・append-only history・reproducibility metadata を持つ評価運用へ拡張
 - `README.md` を入口中心に簡素化し、詳細手順を `docs/INSTALL.md` へ分離
 - repo 固有の documentation maintenance ルールを `.github/copilot-instructions.md` に追加
