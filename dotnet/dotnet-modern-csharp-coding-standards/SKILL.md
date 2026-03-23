@@ -258,7 +258,7 @@ public readonly record struct OrderError(string Code, string Message);
 - ✅ リフレクションベースのマッパーではなく明示的なマッピングメソッドを使用
 - ✅ シンプルなサービスクラスにはプライマリコンストラクタ（C# 12+）を使用
 
-## よくある落とし穴
+## 注意点
 
 1. **async のブロッキング** — `.Result` や `.Wait()` の呼び出しはデッドロックを引き起こす。最後まで `async` を貫く。
 2. **可変 DTO** — `record` の代わりに `{ get; set; }` を持つ `class` を使用。意図しない変更につながる。
